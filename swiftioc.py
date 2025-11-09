@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 from __future__ import annotations
 import argparse
 import csv
@@ -8,6 +7,7 @@ import io
 import ipaddress
 import json
 import logging
+import os
 import random
 import re
 import time
@@ -24,30 +24,27 @@ import iocextract
 
 ISO_FMT = "%Y-%m-%dT%H:%M:%SZ"
 
-# ---------- UA handling ----------
+# ---------------- UA pool ----------------
 DEFAULT_UAS = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 13_5_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 13_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.2 Safari/605.1.15",
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.6613.84 Safari/537.36",
     "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1",
 ]
-
 UA_POOL: List[str] = list(DEFAULT_UAS)
 
-# ---------- confidence ranking ----------
-CONF_RANK = {"low": 10, "medium": 50, "high": 90}
-
-# ---------- runtime globals ----------
+# --------------- runtime globals ---------------
 logger = logging.getLogger("swiftioc")
 _SESSION: Optional[requests.Session] = None
 _FEEDPARSER = None
 _SAVE_RAW_DIR: Optional[Path] = None
 HTTP_DEBUG = False
 
+CONF_RANK = {"low": 10, "medium": 50, "high": 90}
 
-# --------------------- Models / utils ---------------------
 
+# ---------------- models / utils ----------------
 @dataclass
 class Indicator:
     indicator: str
@@ -109,26 +106,16 @@ def classify(v: str) -> Optional[str]:
     return None
 
 
-def is_cidr(v: str) -> bool:
-    return bool(re.fullmatch(r"(?:\d{1,3}\.){3}\d{1,3}/\d{1,2}", v.strip()))
-
-
 def merge_conf(a: str, b: str) -> str:
     return a if CONF_RANK.get(a, 0) >= CONF_RANK.get(b, 0) else b
 
 
-# --------------------- HTTP layer ---------------------
-
+# ---------------- HTTP layer ----------------
 def build_session() -> requests.Session:
     from urllib3.util import Retry
     from requests.adapters import HTTPAdapter
-
     s = requests.Session()
-    adapter = HTTPAdapter(
-        max_retries=Retry(
-            total=3, backoff_factor=0.6, status_forcelist=(429, 500, 502, 503, 504)
-        )
-    )
+    adapter = HTTPAdapter(max_retries=Retry(total=3, backoff_factor=0.6, status_forcelist=(429, 500, 502, 503, 504)))
     s.mount("http://", adapter)
     s.mount("https://", adapter)
     return s
@@ -171,8 +158,7 @@ def http_get(url: str, *, name: str, kind: str = "text", timeout: int = 30) -> s
     return body
 
 
-# --------------------- Lazy RSS ---------------------
-
+# --------------- Lazy RSS ----------------
 def load_feedparser() -> Any:
     global _FEEDPARSER
     if _FEEDPARSER is not None:
@@ -184,8 +170,7 @@ def load_feedparser() -> Any:
         raise SystemExit("Missing 'feedparser'. Install it or run with --skip-rss") from e
 
 
-# --------------------- Source adapters (no hard-coded refs) ---------------------
-
+# --------------- adapters (no hard-coded refs) ---------------
 def fetch_cisa_kev(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
     data = json.loads(http_get(url, name=source))
     out: List[Indicator] = []
@@ -197,13 +182,9 @@ def fetch_cisa_kev(url: str, ref_url: str, source: str, ws: datetime) -> List[In
             continue
         out.append(
             Indicator(
-                indicator=cve,
-                type="cve",
-                source=source,
-                first_seen=iso(pub or now),
-                last_seen=iso(now),
-                confidence="high",
-                tlp="CLEAR",
+                indicator=cve, type="cve", source=source,
+                first_seen=iso(pub or now), last_seen=iso(now),
+                confidence="high", tlp="CLEAR",
                 tags="cve,exploited-in-the-wild",
                 reference=ref_url or "",
                 context=it.get("notes") or it.get("shortDescription") or "CISA KEV",
@@ -233,28 +214,26 @@ def fetch_urlhaus_csv(url: str, ref_url: str, source: str, ws: datetime, *, stat
         t = classify(url_val) or "url"
         out.append(
             Indicator(
-                indicator=defang_min(url_val),
-                type=t,
-                source=source,
-                first_seen=iso(dateadded or now),
-                last_seen=iso(now),
-                confidence="medium",
-                tlp="CLEAR",
+                indicator=defang_min(url_val), type=t, source=source,
+                first_seen=iso(dateadded or now), last_seen=iso(now),
+                confidence="medium", tlp="CLEAR",
                 tags=",".join(filter(None, ["malware", threat])),
-                reference=ref_url or "",
-                context=f"URLhaus: {threat}",
+                reference=ref_url or "", context=f"URLhaus: {threat}",
             )
         )
     return out
 
 
-def fetch_malwarebazaar_csv(url: str, ref_url: str, source: str, ws: datetime, *, fallback_url: Optional[str] = None) -> List[Indicator]:
+def fetch_malwarebazaar_csv(url: str, ref_url: str, source: str, ws: datetime, *, fallback_url: Optional[str] = None, graceful_404: bool = False) -> List[Indicator]:
     try:
         text = http_get(url, name=source)
     except requests.HTTPError as e:
         if getattr(e, "response", None) and e.response.status_code == 404 and fallback_url:
             logger.warning("%s 404, falling back to %s", url, fallback_url)
             text = http_get(fallback_url, name=f"{source}_fallback")
+        elif getattr(e, "response", None) and e.response.status_code == 404 and graceful_404:
+            logger.warning("%s 404, treating as empty due to --grace-on-404", url)
+            return []
         else:
             raise
     out: List[Indicator] = []
@@ -263,49 +242,31 @@ def fetch_malwarebazaar_csv(url: str, ref_url: str, source: str, ws: datetime, *
         if not row or row[0].startswith("#"):
             continue
         try:
-            first_seen = parse_dt(row[0])
-            sha256 = row[4]
-            sig = row[7] if len(row) > 7 else ""
+            first_seen = parse_dt(row[0]); sha256 = row[4]; sig = row[7] if len(row) > 7 else ""
         except Exception:
             continue
         if first_seen and first_seen < ws:
             continue
         out.append(
             Indicator(
-                indicator=sha256.lower(),
-                type="sha256",
-                source=source,
-                first_seen=iso(first_seen or now),
-                last_seen=iso(now),
-                confidence="medium",
-                tlp="CLEAR",
+                indicator=sha256.lower(), type="sha256", source=source,
+                first_seen=iso(first_seen or now), last_seen=iso(now),
+                confidence="medium", tlp="CLEAR",
                 tags=",".join(filter(None, ["malware", sig])),
-                reference=ref_url or "",
-                context=f"MalwareBazaar: {sig}",
+                reference=ref_url or "", context=f"MalwareBazaar: {sig}",
             )
         )
     return out
 
 
-def fetch_threatfox_recent(ref_url: str, source: str, ws: datetime) -> List[Indicator]:
-    url = "https://threatfox.abuse.ch/api/v1/"  # API endpoint (not a vendor reference page)
-    s = ensure_session()
-    r = s.post(url, json={"query": "recent"}, headers=choose_ua(), timeout=30)
-    r.raise_for_status()
-    data = r.json()
+def fetch_threatfox_export_json(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
+    text = http_get(url, name=source)
+    data = json.loads(text)
     now = now_utc()
     out: List[Indicator] = []
-    tmap = {
-        "ipv4": "ipv4",
-        "ipv6": "ipv6",
-        "domain": "domain",
-        "url": "url",
-        "md5": "md5",
-        "sha1": "sha1",
-        "sha256": "sha256",
-    }
+    tmap = {"ipv4": "ipv4", "ipv6": "ipv6", "domain": "domain", "url": "url", "md5": "md5", "sha1": "sha1", "sha256": "sha256"}
 
-    for row in data.get("data", []) or []:
+    for row in data or []:
         ioc = row.get("ioc")
         itype = (row.get("ioc_type") or "").lower()
         seen = parse_dt(row.get("first_seen"))
@@ -318,13 +279,9 @@ def fetch_threatfox_recent(ref_url: str, source: str, ws: datetime) -> List[Indi
         tags = row.get("tags") or []
         out.append(
             Indicator(
-                indicator=val,
-                type=t,
-                source=source,
-                first_seen=iso(seen or now),
-                last_seen=iso(now),
-                confidence="medium",
-                tlp="CLEAR",
+                indicator=val, type=t, source=source,
+                first_seen=iso(seen or now), last_seen=iso(now),
+                confidence="medium", tlp="CLEAR",
                 tags=",".join(sorted(set(["threatfox"] + tags))),
                 reference=ref_url or "",
                 context=row.get("malware") or row.get("threat_type") or "ThreatFox recent",
@@ -341,25 +298,18 @@ def fetch_feodo_ipblocklist(url: str, ref_url: str, source: str, ws: datetime) -
         if not row or row[0].startswith("#"):
             continue
         try:
-            seen = parse_dt(row[0])
-            ip = row[1]
-            family = row[5] if len(row) > 5 else ""
+            seen = parse_dt(row[0]); ip = row[1]; family = row[5] if len(row) > 5 else ""
         except Exception:
             continue
         if seen and seen < ws:
             continue
         out.append(
             Indicator(
-                indicator=defang_min(ip),
-                type="ipv4",
-                source=source,
-                first_seen=iso(seen or now),
-                last_seen=iso(now),
-                confidence="high",
-                tlp="CLEAR",
+                indicator=defang_min(ip), type="ipv4", source=source,
+                first_seen=iso(seen or now), last_seen=iso(now),
+                confidence="high", tlp="CLEAR",
                 tags=",".join(filter(None, ["feodo", "c2", family])),
-                reference=ref_url or "",
-                context="Feodo Tracker C2 IP",
+                reference=ref_url or "", context="Feodo Tracker C2 IP",
             )
         )
     return out
@@ -381,16 +331,11 @@ def fetch_sslbl_ja3(url: str, ref_url: str, source: str, ws: datetime, *, kind: 
         desc = row[2] if len(row) > 2 else ""
         out.append(
             Indicator(
-                indicator=ja.lower(),
-                type=("ja3" if kind == "ja3" else "ja3s"),
-                source=source,
-                first_seen=iso(first_seen or now),
-                last_seen=iso(now),
-                confidence="medium",
-                tlp="CLEAR",
+                indicator=ja.lower(), type=("ja3" if kind == "ja3" else "ja3s"), source=source,
+                first_seen=iso(first_seen or now), last_seen=iso(now),
+                confidence="medium", tlp="CLEAR",
                 tags=",".join(filter(None, ["sslbl", "tls", "fingerprint", desc])),
-                reference=ref_url or "",
-                context=f"SSLBL {('JA3' if kind=='ja3' else 'JA3S')} fingerprint",
+                reference=ref_url or "", context=f"SSLBL {('JA3' if kind=='ja3' else 'JA3S')} fingerprint",
             )
         )
     return out
@@ -406,19 +351,14 @@ def fetch_spamhaus_drop(url: str, ref_url: str, source: str, ws: datetime) -> Li
             if not line or line.startswith(";") or line.startswith("#"):
                 continue
             cidr = line.split(";")[0].strip()
-            if not is_cidr(cidr):
+            if not re.fullmatch(r"(?:\d{1,3}\.){3}\d{1,3}/\d{1,2}", cidr):
                 continue
             out.append(
                 Indicator(
-                    indicator=cidr,
-                    type="ipv4_cidr",
-                    source=source,
-                    first_seen=iso(now),
-                    last_seen=iso(now),
-                    confidence="high",
-                    tlp="CLEAR",
-                    tags="spamhaus,drop",
-                    reference=ref_url or "",
+                    indicator=cidr, type="ipv4_cidr", source=source,
+                    first_seen=iso(now), last_seen=iso(now),
+                    confidence="high", tlp="CLEAR",
+                    tags="spamhaus,drop", reference=ref_url or "",
                     context="Spamhaus DROP/EDROP network",
                 )
             )
@@ -436,15 +376,10 @@ def fetch_openphish(url: str, ref_url: str, source: str, ws: datetime) -> List[I
                 continue
             out.append(
                 Indicator(
-                    indicator=defang_min(u),
-                    type="url",
-                    source=source,
-                    first_seen=iso(now),
-                    last_seen=iso(now),
-                    confidence="medium",
-                    tlp="CLEAR",
-                    tags="phishing,openphish",
-                    reference=ref_url or "",
+                    indicator=defang_min(u), type="url", source=source,
+                    first_seen=iso(now), last_seen=iso(now),
+                    confidence="medium", tlp="CLEAR",
+                    tags="phishing,openphish", reference=ref_url or "",
                     context="OpenPhish feed",
                 )
             )
@@ -463,15 +398,10 @@ def fetch_cins_army(url: str, ref_url: str, source: str, ws: datetime) -> List[I
             if re.match(r"^(?:\d{1,3}\.){3}\d{1,3}$", line):
                 out.append(
                     Indicator(
-                        indicator=defang_min(line),
-                        type="ipv4",
-                        source=source,
-                        first_seen=iso(now),
-                        last_seen=iso(now),
-                        confidence="low",
-                        tlp="CLEAR",
-                        tags="cins,scanning,suspicious",
-                        reference=ref_url or "",
+                        indicator=defang_min(line), type="ipv4", source=source,
+                        first_seen=iso(now), last_seen=iso(now),
+                        confidence="low", tlp="CLEAR",
+                        tags="cins,scanning,suspicious", reference=ref_url or "",
                         context="CINS Army IP",
                     )
                 )
@@ -490,23 +420,24 @@ def fetch_tor_exit(url: str, ref_url: str, source: str, ws: datetime) -> List[In
             if re.match(r"^(?:\d{1,3}\.){3}\d{1,3}$", line):
                 out.append(
                     Indicator(
-                        indicator=defang_min(line),
-                        type="ipv4",
-                        source=source,
-                        first_seen=iso(now),
-                        last_seen=iso(now),
-                        confidence="low",
-                        tlp="CLEAR",
-                        tags="tor,exit-node",
-                        reference=ref_url or "",
+                        indicator=defang_min(line), type="ipv4", source=source,
+                        first_seen=iso(now), last_seen=iso(now),
+                        confidence="low", tlp="CLEAR",
+                        tags="tor,exit-node", reference=ref_url or "",
                         context="Tor exit node list",
                     )
                 )
     return out
 
 
-def fetch_rss(url: str, ref_url: str, source: str, ws: datetime, *, per_entry_cap: int = 200) -> List[Indicator]:
-    fp = load_feedparser()
+def fetch_rss(url: str, ref_url: str, source: str, ws: datetime, *, per_entry_cap: int = 200, tolerate_missing: bool = False) -> List[Indicator]:
+    try:
+        fp = load_feedparser()
+    except SystemExit:
+        if tolerate_missing:
+            logger.warning("feedparser not available; skipping RSS for %s", source)
+            return []
+        raise
     try:
         feed = fp.parse(url, request_headers=choose_ua())
     except Exception:
@@ -518,8 +449,7 @@ def fetch_rss(url: str, ref_url: str, source: str, ws: datetime, *, per_entry_ca
         published = None
         for k in ("published", "updated"):
             if getattr(e, k, None):
-                published = parse_dt(getattr(e, k))
-                break
+                published = parse_dt(getattr(e, k)); break
         if not published:
             published = feed_updated
         if published and published < ws:
@@ -529,50 +459,35 @@ def fetch_rss(url: str, ref_url: str, source: str, ws: datetime, *, per_entry_ca
             text_parts.append(c.get("value", ""))
         blob = "\n".join(filter(None, text_parts))
         found: List[Tuple[str, str]] = []
-        for u in iocextract.extract_urls(blob, refang=False):
-            found.append(("url", u))
-        for ip in iocextract.extract_ips(blob):
-            found.append(("ipv4", ip))
-        for d in iocextract.extract_domains(blob):
-            found.append(("domain", d))
-        for h in iocextract.extract_hashes(blob):
-            found.append((classify(h) or "sha256", h))
-        for cve in set(re.findall(r"CVE-\d{4}-\d{4,7}", blob, flags=re.I)):
-            found.append(("cve", cve.upper()))
+        for u in iocextract.extract_urls(blob, refang=False): found.append(("url", u))
+        for ip in iocextract.extract_ips(blob): found.append(("ipv4", ip))
+        for d in iocextract.extract_domains(blob): found.append(("domain", d))
+        for h in iocextract.extract_hashes(blob): found.append((classify(h) or "sha256", h))
+        for cve in set(re.findall(r"CVE-\d{4}-\d{4,7}", blob, flags=re.I)): found.append(("cve", cve.upper()))
         if not found:
             continue
         seen: Set[Tuple[str, str]] = set()
         count = 0
         ref = getattr(e, "link", None) or ref_url or url
         for t, val in found:
-            if count >= per_entry_cap:
-                break
+            if count >= per_entry_cap: break
             k = (t, val)
-            if k in seen:
-                continue
-            seen.add(k)
-            count += 1
+            if k in seen: continue
+            seen.add(k); count += 1
             val_out = defang_min(val) if t in {"url", "domain", "ipv4", "ipv6"} else val
             out.append(
                 Indicator(
-                    indicator=val_out,
-                    type=t,
-                    source=source,
-                    first_seen=iso(published or now),
-                    last_seen=iso(now),
-                    confidence="medium",
-                    tlp="CLEAR",
-                    tags="blog,osint",
-                    reference=ref or "",
-                    context=f"RSS: {source}",
+                    indicator=val_out, type=t, source=source,
+                    first_seen=iso(published or now), last_seen=iso(now),
+                    confidence="medium", tlp="CLEAR",
+                    tags="blog,osint", reference=ref or "", context=f"RSS: {source}",
                 )
             )
     return out
 
 
-# --------------------- Collect / Orchestrate ---------------------
-
-def parse_source_window(pairs: List[str]) -> Dict[str, int]:
+# ---------------- collect / orchestrate ----------------
+def parse_name_int_pairs(pairs: List[str], flag: str) -> Dict[str, int]:
     out: Dict[str, int] = {}
     for item in pairs or []:
         if "=" in item:
@@ -580,19 +495,7 @@ def parse_source_window(pairs: List[str]) -> Dict[str, int]:
             try:
                 out[k.strip()] = int(v.strip())
             except ValueError:
-                logger.warning("Invalid --source-window: %s", item)
-    return out
-
-
-def parse_stale_pairs(pairs: List[str]) -> Dict[str, int]:
-    out: Dict[str, int] = {}
-    for item in pairs or []:
-        if "=" in item:
-            k, v = item.split("=", 1)
-            try:
-                out[k.strip()] = int(v.strip())
-            except ValueError:
-                logger.warning("Invalid --fail-if-stale pair: %s", item)
+                logger.warning("Invalid %s pair: %s", flag, item)
     return out
 
 
@@ -619,6 +522,8 @@ def collect_from_yaml(
     max_per_source: Optional[int],
     urlhaus_status: str,
     source_window: Dict[str, int],
+    grace_on_404: Set[str],
+    ci_safe_rss: bool,
 ) -> Tuple[List[Indicator], Dict[str, int]]:
     base_start = now_utc() - timedelta(hours=window_hours)
 
@@ -636,12 +541,12 @@ def collect_from_yaml(
     # APIs
     for api in cfg.get("apis", []) or []:
         name = api.get("name", "api")
-        url = api.get("url", "")
-        ref = api.get("reference", url) or ""
-        fb = api.get("fallback_url")  # optional
         parse = api.get("parse")
         if not parse:
             continue
+        url = api.get("url", "")
+        ref = api.get("reference", url) or ""
+        fb = api.get("fallback_url")
         ws = start_for(name)
         got: List[Indicator] = []
         try:
@@ -651,9 +556,9 @@ def collect_from_yaml(
             elif parse == "urlhaus":
                 got = fetch_urlhaus_csv(url, ref, name, ws, status_filter=urlhaus_status)
             elif parse == "malwarebazaar":
-                got = fetch_malwarebazaar_csv(url, ref, name, ws, fallback_url=fb)
-            elif parse == "threatfox_recent":
-                got = fetch_threatfox_recent(ref, name, ws)
+                got = fetch_malwarebazaar_csv(url, ref, name, ws, fallback_url=fb, graceful_404=(name in grace_on_404))
+            elif parse == "threatfox_export_json":
+                got = fetch_threatfox_export_json(url, ref, name, ws)
             elif parse == "feodo_ipblocklist":
                 got = fetch_feodo_ipblocklist(url, ref, name, ws)
             elif parse == "sslbl_ja3":
@@ -688,12 +593,10 @@ def collect_from_yaml(
             ref = rss.get("reference", url) or ""
             try:
                 t0 = time.perf_counter()
-                got = fetch_rss(url, ref, name, start_for(name))
+                got = fetch_rss(url, ref, name, start_for(name), tolerate_missing=ci_safe_rss)
                 dt = time.perf_counter() - t0
                 logger.debug("collect RSS %s %d in %.2fs", name, len(got), dt)
                 logger.debug("summary %s types=%s tags_top=%s", name, type_counts(got), top_tags(got))
-            except SystemExit:
-                got = []
             except Exception as e:
                 logger.warning("%s failed: %s", name, e)
                 got = []
@@ -701,7 +604,7 @@ def collect_from_yaml(
             indicators.extend(got)
             counts[name] = len(got)
 
-    # Deduplicate + merge
+    # Dedup + merge
     uniq: Dict[Tuple[str, str], Indicator] = {}
     for i in indicators:
         k = i.key()
@@ -716,7 +619,7 @@ def collect_from_yaml(
             prev.last_seen = iso(n if n > p else p)
         except Exception:
             prev.last_seen = max(prev.last_seen, i.last_seen)
-        # confidence + tags + source
+        # confidence/tags/source merge
         prev.confidence = merge_conf(prev.confidence, i.confidence)
         merged_tags = set(filter(None, prev.tags.split(","))) | set(filter(None, i.tags.split(",")))
         prev.tags = ",".join(sorted(t.strip().strip('"') for t in merged_tags if t))
@@ -726,15 +629,12 @@ def collect_from_yaml(
     return final, counts
 
 
-# --------------------- Writers ---------------------
-
+# ---------------- writers ----------------
 def write_csv(path: Path, rows: List[Indicator]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow(
-            ["indicator", "type", "source", "first_seen", "last_seen", "confidence", "tlp", "tags", "reference", "context"]
-        )
+        w.writerow(["indicator", "type", "source", "first_seen", "last_seen", "confidence", "tlp", "tags", "reference", "context"])
         for r in rows:
             w.writerow([r.indicator, r.type, r.source, r.first_seen, r.last_seen, r.confidence, r.tlp, r.tags, r.reference, r.context])
 
@@ -743,9 +643,7 @@ def write_tsv(path: Path, rows: List[Indicator]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="", encoding="utf-8") as f:
         w = csv.writer(f, delimiter="\t")
-        w.writerow(
-            ["indicator", "type", "source", "first_seen", "last_seen", "confidence", "tlp", "tags", "reference", "context"]
-        )
+        w.writerow(["indicator", "type", "source", "first_seen", "last_seen", "confidence", "tlp", "tags", "reference", "context"])
         for r in rows:
             w.writerow([r.indicator, r.type, r.source, r.first_seen, r.last_seen, r.confidence, r.tlp, r.tags, r.reference, r.context])
 
@@ -785,20 +683,12 @@ def write_stix(path: Path, rows: List[Indicator]) -> None:
         sid = hashlib.sha256((r.type + r.indicator).encode()).hexdigest()[:32]
         objects.append(
             {
-                "type": "indicator",
-                "spec_version": "2.1",
-                "id": f"indicator--{sid}",
-                "created": now,
-                "modified": now,
-                "name": f"{r.type}:{r.indicator}",
-                "pattern": pattern,
-                "pattern_type": "stix",
-                "valid_from": r.first_seen,
-                "confidence": 70 if r.confidence == "high" else 50 if r.confidence == "medium" else 30,
+                "type": "indicator", "spec_version": "2.1",
+                "id": f"indicator--{sid}", "created": now, "modified": now,
+                "name": f"{r.type}:{r.indicator}", "pattern": pattern, "pattern_type": "stix",
+                "valid_from": r.first_seen, "confidence": 70 if r.confidence == "high" else 50 if r.confidence == "medium" else 30,
                 "labels": [t for t in r.tags.split(",") if t],
-                "x_swiftioc_source": r.source,
-                "x_swiftioc_tlp": r.tlp,
-                "x_swiftioc_reference": r.reference,
+                "x_swiftioc_source": r.source, "x_swiftioc_tlp": r.tlp, "x_swiftioc_reference": r.reference,
             }
         )
     bundle = {"type": "bundle", "id": "bundle--" + hashlib.sha1(now.encode()).hexdigest(), "objects": objects}
@@ -816,16 +706,10 @@ def write_changelog(path: Path, counts: Dict[str, int], total: int) -> None:
         f.write("\n".join(lines))
 
 
-# --------------------- Logging ---------------------
-
+# ---------------- logging ----------------
 class JsonLineFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
-        payload = {
-            "ts": iso(now_utc()),
-            "level": record.levelname,
-            "name": record.name,
-            "msg": record.getMessage(),
-        }
+        payload = {"ts": iso(now_utc()), "level": record.levelname, "name": record.name, "msg": record.getMessage()}
         if record.exc_info:
             payload["exc"] = self.formatException(record.exc_info)
         return json.dumps(payload, ensure_ascii=False)
@@ -835,12 +719,10 @@ def configure_logging(console_level: int, *, log_file: Optional[Path], file_leve
     logger.setLevel(min(console_level, file_level))
     for h in list(logger.handlers):
         logger.removeHandler(h)
-
     ch = logging.StreamHandler()
     ch.setLevel(console_level)
     ch.setFormatter(logging.Formatter("%(levelname)s | %(message)s"))
     logger.addHandler(ch)
-
     if log_file:
         log_file.parent.mkdir(parents=True, exist_ok=True)
         fh = logging.FileHandler(log_file, encoding="utf-8")
@@ -849,27 +731,38 @@ def configure_logging(console_level: int, *, log_file: Optional[Path], file_leve
         logger.addHandler(fh)
 
 
-# --------------------- CLI ---------------------
-
 def _load_ua_file(path: Optional[Path]) -> None:
     if not path:
         return
     if not path.exists():
-        logger.warning("UA file not found: %s", path)
-        return
+        logger.warning("UA file not found: %s", path); return
     try:
-        lines = [ln.strip() for ln in path.read_text(encoding="utf-8").splitlines()]
-        pool = [ln for ln in lines if ln and not ln.startswith("#")]
+        pool = [ln.strip() for ln in path.read_text(encoding="utf-8").splitlines() if ln.strip() and not ln.startswith("#")]
         if pool:
-            UA_POOL.clear()
-            UA_POOL.extend(pool)
+            UA_POOL.clear(); UA_POOL.extend(pool)
             logger.info("Loaded %d User-Agents from %s", len(pool), path)
     except Exception as e:
         logger.warning("Failed loading UA file: %s", e)
 
 
+# ---------------- small helpers ----------------
+def gh_summary_path() -> Optional[Path]:
+    p = os.environ.get("GITHUB_STEP_SUMMARY")
+    return Path(p) if p else None
+
+
+def append_gh_summary(lines: List[str]) -> None:
+    p = gh_summary_path()
+    if not p: return
+    try:
+        p.parent.mkdir(parents=True, exist_ok=True)
+        with p.open("a", encoding="utf-8") as f:
+            f.write("\n".join(lines) + "\n")
+    except Exception:
+        pass
+
+
 def _self_tests() -> int:
-    # classify tests
     assert classify("1.2.3.4") == "ipv4"
     assert classify("2001:db8::1") == "ipv6"
     assert classify("https://x.com") == "url"
@@ -878,24 +771,25 @@ def _self_tests() -> int:
     assert classify("d41d8cd98f00b204e9800998ecf8427e") == "md5"
     assert classify("da39a3ee5e6b4b0d3255bfef95601890afd80709") == "sha1"
     assert classify("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855") == "sha256"
-    # defang
     df = defang_min("https://a.b")
     assert df.startswith("hxxps://") and "[.]" in df
     print("Self-tests passed.")
     return 0
 
 
+# ---------------- CLI ----------------
 def main() -> int:
-    ap = argparse.ArgumentParser(description="SwiftIOC — collect IOCs from YAML-defined sources (no hard-coded refs)")
+    ap = argparse.ArgumentParser(description="SwiftIOC — collect IOCs from YAML-defined sources (CI-friendly)")
     ap.add_argument("--out-dir", type=Path, default=Path("public"))
-    ap.add_argument("--sources", type=Path, default=Path("sources.yml"), help="Path to YAML (use sources.example.yml if you prefer)")
+    ap.add_argument("--sources", type=Path, default=Path("sources.yml"))
     ap.add_argument("--window-hours", type=int, default=48)
-    ap.add_argument("--skip-rss", action="store_true", help="Skip RSS parsing (no feedparser needed)")
+    ap.add_argument("--skip-rss", action="store_true")
     ap.add_argument("--max-per-source", type=int, default=None)
     ap.add_argument("--urlhaus-status", choices=["any", "online", "offline"], default="any")
     ap.add_argument("--source-window", action="append", default=[], help="Override lookback per source: name=HOURS")
     ap.add_argument("--fail-on-empty", nargs="*", default=None, help="Fail if any listed sources return zero")
     ap.add_argument("--fail-if-stale", action="append", default=[], help="Fail if source newest first_seen older than HOURS: name=HOURS")
+    ap.add_argument("--grace-on-404", action="append", default=[], help="Treat 404 on these sources as empty but non-fatal: name")
 
     # logging / diag
     ap.add_argument("-v", "--verbose", action="count", default=0)
@@ -903,23 +797,35 @@ def main() -> int:
     ap.add_argument("--log-format", choices=["text", "json"], default="text")
     ap.add_argument("--log-file-level", choices=["ERROR", "WARNING", "INFO", "DEBUG"], default="DEBUG")
     ap.add_argument("--save-raw-dir", type=Path, default=None)
-    ap.add_argument("--diag-json", type=Path, default=None)
-    ap.add_argument("--report", type=Path, default=None)
+    ap.add_argument("--diag-json", type=Path, default=Path("public/diagnostics/run.json"))
+    ap.add_argument("--report", type=Path, default=Path("public/diagnostics/REPORT.md"))
     ap.add_argument("--ua-file", type=Path, default=None, help="Optional file with one UA per line")
 
-    ap.add_argument("--self-test", action="store_true", help="Run built-in tests and exit")
+    # CI helpers
+    ap.add_argument("--ci-safe", action="store_true", help="CI convenience: JSON logs, ensure diagnostics dirs, tolerate missing RSS dep")
+
+    ap.add_argument("--self-test", action="store_true")
 
     args = ap.parse_args()
 
     if args.self_test:
         return _self_tests()
 
+    # CI-aware tweaks
+    on_ci = os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
+    if args.ci_safe:
+        args.log_format = "json"
+        if not args.save_raw_dir:
+            args.save_raw_dir = Path("public/diagnostics/raw")
+        args.skip_rss = args.skip_rss  # unchanged, but RSS will tolerate missing dep
+    if on_ci and args.verbose == 0:
+        # default to INFO on CI to get more signal in logs
+        args.verbose = 1
+
     # logging
     console_level = logging.WARNING
-    if args.verbose == 1:
-        console_level = logging.INFO
-    elif args.verbose >= 2:
-        console_level = logging.DEBUG
+    if args.verbose == 1: console_level = logging.INFO
+    elif args.verbose >= 2: console_level = logging.DEBUG
     file_level = getattr(logging, args.log_file_level, logging.DEBUG) if isinstance(args.log_file_level, str) else logging.DEBUG
     configure_logging(console_level, log_file=args.log_file, file_level=file_level, fmt=args.log_format)
 
@@ -930,10 +836,23 @@ def main() -> int:
     # UA file
     _load_ua_file(args.ua_file)
 
-    # YAML
+    # Ensure diagnostics dirs (nice for GH Artifacts)
+    if args.diag_json:
+        args.diag_json.parent.mkdir(parents=True, exist_ok=True)
+    if args.report:
+        args.report.parent.mkdir(parents=True, exist_ok=True)
+    if _SAVE_RAW_DIR:
+        _SAVE_RAW_DIR.mkdir(parents=True, exist_ok=True)
+
+    # YAML (auto fallback to example)
     if not args.sources.exists():
-        logger.error("Sources file not found: %s", args.sources)
-        return 1
+        ex = Path("sources.example.yml")
+        if ex.exists():
+            logger.warning("Sources file %s not found; using %s", args.sources, ex)
+            args.sources = ex
+        else:
+            logger.error("Sources file not found: %s", args.sources)
+            return 1
     with args.sources.open("r", encoding="utf-8") as f:
         cfg = yaml.safe_load(f) or {}
 
@@ -944,7 +863,9 @@ def main() -> int:
         skip_rss=args.skip_rss,
         max_per_source=args.max_per_source,
         urlhaus_status=args.urlhaus_status,
-        source_window=parse_source_window(args.source_window),
+        source_window=parse_name_int_pairs(args.source_window, "--source-window"),
+        grace_on_404=set(args.grace_on_404 or []),
+        ci_safe_rss=args.ci_safe,
     )
 
     # outputs
@@ -956,9 +877,18 @@ def main() -> int:
     write_stix(out_dir / "iocs" / "stix2.json", rows)
     write_changelog(out_dir / "changelog" / "CHANGELOG.md", counts, total=len(rows))
 
-    # diagnostics
+    # diagnostics / summary
+    diag = {
+        "window_hours": args.window_hours,
+        "total": len(rows),
+        "counts": counts,
+        "version": 1,
+        "ts": iso(now_utc()),
+    }
+    if args.diag_json:
+        args.diag_json.write_text(json.dumps(diag, ensure_ascii=False, indent=2), encoding="utf-8")
+
     if args.report:
-        args.report.parent.mkdir(parents=True, exist_ok=True)
         args.report.write_text(
             "\n".join(
                 [
@@ -975,22 +905,17 @@ def main() -> int:
             ),
             encoding="utf-8",
         )
-    if args.diag_json:
-        args.diag_json.parent.mkdir(parents=True, exist_ok=True)
-        args.diag_json.write_text(
-            json.dumps(
-                {
-                    "window_hours": args.window_hours,
-                    "total": len(rows),
-                    "counts": counts,
-                    "version": 1,
-                    "ts": iso(now_utc()),
-                },
-                ensure_ascii=False,
-                indent=2,
-            ),
-            encoding="utf-8",
-        )
+
+    # Append a brief GH step summary (if available)
+    append_gh_summary(
+        [
+            "### SwiftIOC",
+            f"- Total indicators: **{len(rows)}**",
+            "- Per-source counts:",
+            *[f"  - {k}: {v}" for k, v in sorted(counts.items())],
+            "",
+        ]
+    )
 
     # guardrails
     if args.fail_on_empty:
@@ -999,10 +924,8 @@ def main() -> int:
             logger.error("Failing due to empty sources: %s", empty)
             return 1
 
-    # staleness guard
-    stale_cfg = parse_stale_pairs(args.fail_if_stale)
+    stale_cfg = parse_name_int_pairs(args.fail_if_stale, "--fail-if-stale")
     if stale_cfg:
-        # map: source -> newest first_seen
         newest: Dict[str, Optional[datetime]] = {}
         for r in rows:
             dt = parse_dt(r.first_seen)
