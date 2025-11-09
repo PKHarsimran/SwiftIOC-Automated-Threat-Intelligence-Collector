@@ -1,0 +1,49 @@
+# How far back to collect
+window_hours: 48
+
+apis:
+  - name: cisa_kev
+    kind: json
+    parse: kev
+    url: https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json
+    reference: https://www.cisa.gov/known-exploited-vulnerabilities-catalog
+
+  - name: urlhaus_recent_urls
+    kind: csv
+    parse: urlhaus
+    url: https://urlhaus.abuse.ch/downloads/csv_recent/
+    reference: https://urlhaus.abuse.ch/
+    # optional filter by status in CLI (--urlhaus-status online/offline/any)
+
+  - name: malwarebazaar_recent
+    kind: csv
+    parse: malwarebazaar
+    url: https://mb-api.abuse.ch/downloads/csv_recent/
+    fallback_url: https://bazaar.abuse.ch/export/csv/recent/
+    reference: https://bazaar.abuse.ch/
+
+  - name: threatfox_recent
+    kind: json
+    parse: threatfox_recent
+    url: ""   # API ignores this
+    reference: https://threatfox.abuse.ch/browse/
+
+  - name: feodo_ipblocklist
+    kind: csv
+    parse: feodo_ipblocklist
+    url: https://feodotracker.abuse.ch/downloads/ipblocklist.csv
+    reference: https://feodotracker.abuse.ch/
+
+  - name: sslbl_ja3
+    kind: csv
+    parse: sslbl_ja3
+    url: https://sslbl.abuse.ch/blacklist/ja3_fingerprints.csv
+    reference: https://sslbl.abuse.ch/blacklist/
+
+rss:
+  - name: google_tag
+    url: https://blog.google/threat-analysis-group/rss/
+    reference: https://blog.google/threat-analysis-group/
+  - name: microsoft_msrc
+    url: https://msrc.microsoft.com/blog/feed
+    reference: https://msrc.microsoft.com/blog/
