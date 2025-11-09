@@ -224,14 +224,26 @@ def fetch_urlhaus_csv(url: str, ref_url: str, source: str, ws: datetime, *, stat
     return out
 
 
-def fetch_malwarebazaar_csv(url: str, ref_url: str, source: str, ws: datetime, *, fallback_url: Optional[str] = None, graceful_404: bool = False) -> List[Indicator]:
+def fetch_malwarebazaar_csv(
+    url: str,
+    ref_url: str,
+    source: str,
+    ws: datetime,
+    *,
+    fallback_url: Optional[str] = None,
+    graceful_404: bool = False,
+) -> List[Indicator]:
     try:
         text = http_get(url, name=source)
-    except requests.HTTPError as e:
-        if getattr(e, "response", None) and e.response.status_code == 404 and fallback_url:
+    except Exception as e:
+        if not isinstance(e, requests.exceptions.HTTPError):
+            raise
+        resp = getattr(e, "response", None)
+        status = getattr(resp, "status_code", None)
+        if resp is not None and status == 404 and fallback_url:
             logger.warning("%s 404, falling back to %s", url, fallback_url)
             text = http_get(fallback_url, name=f"{source}_fallback")
-        elif getattr(e, "response", None) and e.response.status_code == 404 and graceful_404:
+        elif resp is not None and status == 404 and graceful_404:
             logger.warning("%s 404, treating as empty due to --grace-on-404", url)
             return []
         else:
@@ -242,8 +254,19 @@ def fetch_malwarebazaar_csv(url: str, ref_url: str, source: str, ws: datetime, *
         if not row or row[0].startswith("#"):
             continue
         try:
-            first_seen = parse_dt(row[0]); sha256 = row[4]; sig = row[7] if len(row) > 7 else ""
+            first_seen = parse_dt(row[0].strip())
+            sha256 = (row[3] if len(row) > 3 else "").strip().strip('"')
+            sig_raw = ""
+            if len(row) > 8:
+                sig_raw = row[8]
+            elif len(row) > 7:
+                sig_raw = row[7]
+            sig = sig_raw.strip().strip('"')
+            if sig.lower() in {"", "n/a", "na", "none"}:
+                sig = ""
         except Exception:
+            continue
+        if not sha256:
             continue
         if first_seen and first_seen < ws:
             continue
@@ -557,7 +580,7 @@ def collect_from_yaml(
                 got = fetch_urlhaus_csv(url, ref, name, ws, status_filter=urlhaus_status)
             elif parse == "malwarebazaar":
                 got = fetch_malwarebazaar_csv(url, ref, name, ws, fallback_url=fb, graceful_404=(name in grace_on_404))
-            elif parse == "threatfox_export_json":
+            elif parse in {"threatfox_export_json", "threatfox_recent"}:
                 got = fetch_threatfox_export_json(url, ref, name, ws)
             elif parse == "feodo_ipblocklist":
                 got = fetch_feodo_ipblocklist(url, ref, name, ws)
