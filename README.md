@@ -66,7 +66,10 @@ ATT&CK® framework, and ensure downstream tools receive consistent IOC data.
 ```
 ├── public/                 # Default output directory for generated feeds
 │   ├── iocs/               # CSV, JSON, JSONL, TSV, and STIX artifacts
+│   ├── diagnostics/        # Run report, JSON diagnostics, and auto summary
 │   └── changelog/          # Markdown changelog between runs
+├── scripts/                # Utility helpers for post-processing
+│   └── summarize_iocs.py   # Generates Markdown summaries for Pages & artifacts
 ├── requirements.txt        # Python dependencies
 ├── sources.example.yml     # Sample feed configuration
 ├── swiftioc.py             # Main collector implementation & CLI
@@ -227,6 +230,7 @@ Running the collector produces the following structure (paths relative to
 
 ```
 public/
+├── index.md
 ├── iocs/
 │   ├── latest.csv
 │   ├── latest.tsv
@@ -238,13 +242,33 @@ public/
 └── diagnostics/
     ├── REPORT.md
     ├── run.json
+    ├── summary.md
     └── raw/                 # optional when --save-raw-dir is supplied
 ```
 
 All indicators share a common schema (`indicator`, `type`, `source`,
 `first_seen`, `last_seen`, `confidence`, `tlp`, `tags`, `reference`, `context`).
 `REPORT.md` and `run.json` summarise totals, per-source counts, type breakdowns,
-and any issues encountered.
+and any issues encountered, while `summary.md` condenses the run into a portal-
+ready Markdown snapshot that also drives `public/index.md`.
+
+### Auto-generated IOC summary
+
+The helper script [`scripts/summarize_iocs.py`](scripts/summarize_iocs.py)
+produces the Markdown summary and GitHub Pages landing page. It runs
+automatically in the **Collect – SwiftIOC** workflow and also appends the same
+information to the GitHub Actions job summary. You can execute it locally after
+any collection run:
+
+```bash
+python scripts/summarize_iocs.py \
+  --diag public/diagnostics/run.json \
+  --ioc-jsonl public/iocs/latest.jsonl
+```
+
+Override `--out` or `--index` if you want to write the summary elsewhere.
+The workflow ships with GitHub Pages deployment enabled, so everything under
+`public/`—including the summary—goes live after each successful run.
 
 ## 🔌 Integrations & compatibility
 SwiftIOC plays well with popular security platforms and file formats:
