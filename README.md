@@ -270,49 +270,41 @@ Override `--out` or `--index` if you want to write the summary elsewhere.
 The workflow ships with GitHub Pages deployment enabled, so everything under
 `public/`—including the summary—goes live after each successful run.
 
-**🧭 High-level Data Flow**
+### Code Flow (overview)
+```mermaid
 flowchart LR
-  A[sources.yml<br/>+ CLI flags] --> B[Collector Orchestrator<br/><code>collect_from_yaml()</code>]
-  subgraph S[Adapters]
-    K[CISA KEV]:::adp
-    U[URLhaus CSV]:::adp
-    M[MalwareBazaar CSV]:::adp
-    T[ThreatFox JSON]:::adp
-    F[Feodo IP Blocklist]:::adp
-    J[SSLBL JA3/JA3S]:::adp
-    H[Spamhaus DROP]:::adp
-    O[OpenPhish]:::adp
-    C[CINS Army]:::adp
-    R[Tor Exit Nodes]:::adp
-    RSS[RSS (iocextract)]:::adp
+  A[CLI (argparse)<br/>flags & paths] --> B[Setup]
+  B --> B1[configure_logging()]
+  B --> B2[_load_ua_file()]
+  B --> B3[load sources.yml]
+  A -->|--window-hours/…| C[collect_from_yaml()]
+
+  subgraph ADP[Source Adapters]
+    K[fetch_cisa_kev]
+    U[fetch_urlhaus_csv]
+    M[fetch_malwarebazaar_csv]
+    T[fetch_threatfox_export_json]
+    F[fetch_feodo_ipblocklist]
+    J[fetch_sslbl_ja3 / ja3s]
+    H[fetch_spamhaus_drop]
+    O[fetch_openphish]
+    C2[fetch_cins_army]
+    X[fetch_tor_exit]
+    R[fetch_rss]
   end
-  B --> S
-  S --> C1[(Indicator List)]
-  C1 --> D[Deduplicate & Merge<br/>(by type+indicator)]
-  D --> E[[Writers]]
-  E --> E1[CSV/TSV/JSON/JSONL]
-  E --> E2[STIX 2.1 Bundle]
-  E --> E3[Changelog.md]
-  D --> G[Diagnostics<br/>run.json + REPORT.md]
-  classDef adp fill:#eef,stroke:#99f;
 
-**🔧 Runtime Architecture**
-
-graph TD
-  main --> parse_args[argparse CLI]
-  parse_args --> logging[configure_logging()]
-  parse_args --> ua[_load_ua_file()]
-  parse_args --> cfg[load sources.yml]
-  parse_args --> collect[collect_from_yaml()]
-  collect --> adapters
-  adapters --> indicators[(List[Indicator])]
-  indicators --> dedup[dedupe + merge_conf + tag union]
-  dedup --> outputs
-  outputs --> csv[write_csv/tsv/json/jsonl]
-  outputs --> stix[write_stix]
-  outputs --> change[write_changelog]
-  outputs --> diag[diagnostics json + report]
-  main --> summary[append_gh_summary()]
+  C -->|orchestrates| ADP
+  ADP --> D[(List&lt;Indicator&gt;)]
+  D --> E[Deduplicate & Merge<br/>(type+indicator, confidence, tags, last_seen)]
+  E --> W[Writers]
+  W --> W1[CSV / TSV / JSON / JSONL]
+  W --> W2[STIX 2.1 bundle]
+  W --> W3[Changelog.md]
+  E --> G[Diagnostics]
+  G --> G1[public/diagnostics/run.json]
+  G --> G2[public/diagnostics/REPORT.md]
+  E --> S[append_gh_summary()]
+```
 
 
 ## 🔌 Integrations & compatibility
