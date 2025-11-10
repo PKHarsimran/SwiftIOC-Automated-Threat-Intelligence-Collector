@@ -273,39 +273,39 @@ The workflow ships with GitHub Pages deployment enabled, so everything under
 ### Code Flow (Overview)
 ```mermaid
 flowchart TD
-  A[CLI (argparse)] --> B[Setup]
-  B --> B1[configure_logging()]
-  B --> B2[_load_ua_file()]
-  B --> B3[load sources.yml]
-  A --> C[collect_from_yaml()]
+    A[CLI argparse] --> B[Setup]
+    B --> B1[configure_logging]
+    B --> B2[load_user_agents]
+    B --> B3[load_sources_yml]
+    A --> C[collect_from_yaml]
 
-  subgraph ADP[Source Adapters]
-    K[fetch_cisa_kev]
-    U[fetch_urlhaus_csv]
-    M[fetch_malwarebazaar_csv]
-    T[fetch_threatfox_export_json]
-    F[fetch_feodo_ipblocklist]
-    J[fetch_sslbl_ja3 / ja3s]
-    H[fetch_spamhaus_drop]
-    O[fetch_openphish]
-    C2[fetch_cins_army]
-    X[fetch_tor_exit]
-    R[fetch_rss]
-  end
+    subgraph Adapters
+        K[fetch_cisa_kev]
+        U[fetch_urlhaus_csv]
+        M[fetch_malwarebazaar_csv]
+        T[fetch_threatfox_export_json]
+        F[fetch_feodo_ipblocklist]
+        J[fetch_sslbl_ja3]
+        H[fetch_spamhaus_drop]
+        O[fetch_openphish]
+        C2[fetch_cins_army]
+        X[fetch_tor_exit]
+        R[fetch_rss]
+    end
 
-  C --> ADP
-  ADP --> D[List of Indicators]
-  D --> E[Deduplicate & Merge]
-  E --> W[Writers]
-  W --> W1[CSV / TSV / JSON / JSONL]
-  W --> W2[STIX 2.1 Bundle]
-  W --> W3[Changelog.md]
-  E --> G[Diagnostics]
-  G --> G1[run.json]
-  G --> G2[REPORT.md]
-  E --> S[GitHub Step Summary]
+    C --> Adapters
+    Adapters --> D[List of Indicators]
+    D --> E[Deduplicate and Merge]
+    E --> W[Writers]
+    W --> W1[CSV TSV JSON JSONL]
+    W --> W2[STIX 2.1 Bundle]
+    W --> W3[Changelog]
+    E --> G[Diagnostics]
+    G --> G1[run.json]
+    G --> G2[REPORT.md]
+    E --> S[GitHub Step Summary]
+
 ```
-
 
 ## 🔌 Integrations & compatibility
 SwiftIOC plays well with popular security platforms and file formats:
