@@ -270,14 +270,14 @@ Override `--out` or `--index` if you want to write the summary elsewhere.
 The workflow ships with GitHub Pages deployment enabled, so everything under
 `public/`—including the summary—goes live after each successful run.
 
-### Code Flow (overview)
+### Code Flow (Overview)
 ```mermaid
-flowchart LR
-  A[CLI (argparse)<br/>flags & paths] --> B[Setup]
+flowchart TD
+  A[CLI (argparse)] --> B[Setup]
   B --> B1[configure_logging()]
   B --> B2[_load_ua_file()]
   B --> B3[load sources.yml]
-  A -->|--window-hours/…| C[collect_from_yaml()]
+  A --> C[collect_from_yaml()]
 
   subgraph ADP[Source Adapters]
     K[fetch_cisa_kev]
@@ -293,17 +293,17 @@ flowchart LR
     R[fetch_rss]
   end
 
-  C -->|orchestrates| ADP
-  ADP --> D[(List&lt;Indicator&gt;)]
-  D --> E[Deduplicate & Merge<br/>(type+indicator, confidence, tags, last_seen)]
+  C --> ADP
+  ADP --> D[List of Indicators]
+  D --> E[Deduplicate & Merge]
   E --> W[Writers]
   W --> W1[CSV / TSV / JSON / JSONL]
-  W --> W2[STIX 2.1 bundle]
+  W --> W2[STIX 2.1 Bundle]
   W --> W3[Changelog.md]
   E --> G[Diagnostics]
-  G --> G1[public/diagnostics/run.json]
-  G --> G2[public/diagnostics/REPORT.md]
-  E --> S[append_gh_summary()]
+  G --> G1[run.json]
+  G --> G2[REPORT.md]
+  E --> S[GitHub Step Summary]
 ```
 
 
