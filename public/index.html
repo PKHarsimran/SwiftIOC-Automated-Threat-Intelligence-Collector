@@ -11,7 +11,7 @@
     <link rel="preload" href="assets/styles.css" as="style" />
     <link rel="stylesheet" href="assets/styles.css" />
   </head>
-  <body>
+  <body data-ioc-root=".">
     <a href="#main" class="skip-link">Skip to main content</a>
     <div class="page-wrapper">
       <header class="page-header">
@@ -28,7 +28,7 @@
             <a href="#indicator-types">Types</a>
             <a href="#preview">Preview</a>
             <a href="#actions">Downloads</a>
-            <a href="diagnostics/summary.md">Diagnostics</a>
+            <a href="diagnostics/summary.html">Diagnostics</a>
           </div>
         </nav>
       </header>
@@ -45,15 +45,15 @@
             <ul class="hero-meta">
               <li>
                 <span class="meta-label">Generated</span>
-                <span class="meta-value">2025-11-10T00:38:51Z</span>
+                <span class="meta-value" data-stat="generated-at">—</span>
               </li>
               <li>
                 <span class="meta-label">Collection window</span>
-                <span class="meta-value">2025-11-08 → 2025-11-10</span>
+                <span class="meta-value" data-stat="collection-window">—</span>
               </li>
               <li>
                 <span class="meta-label">Feeds online</span>
-                <span class="meta-value">4 active sources</span>
+                <span class="meta-value" data-stat="feeds-online">—</span>
               </li>
             </ul>
             <div class="hero-actions">
@@ -82,22 +82,22 @@
           <div class="metrics-grid">
             <article class="metric-card">
               <h3>Total indicators</h3>
-              <p class="metric-value">2,497</p>
+              <p class="metric-value" data-stat="total-indicators">—</p>
               <p class="metric-detail">Unique IOCs collected during the latest cycle.</p>
             </article>
             <article class="metric-card">
               <h3>Sources reporting</h3>
-              <p class="metric-value">4</p>
+              <p class="metric-value" data-stat="active-sources">—</p>
               <p class="metric-detail">Active intelligence feeds that produced data this run.</p>
             </article>
             <article class="metric-card">
               <h3>Indicator types</h3>
-              <p class="metric-value">4</p>
+              <p class="metric-value" data-stat="indicator-types">—</p>
               <p class="metric-detail">Distinct IOC formats discovered across the feeds.</p>
             </article>
             <article class="metric-card">
               <h3>Duplicates removed</h3>
-              <p class="metric-value">0</p>
+              <p class="metric-value" data-stat="duplicates-removed">—</p>
               <p class="metric-detail">Indicators deduplicated to maintain a clean dataset.</p>
             </article>
           </div>
@@ -112,22 +112,22 @@
             <article class="metric-card">
               <h3>Earliest first seen</h3>
               <p class="metric-value">
-                2025-11-08
-                <span class="metric-subvalue">00:38:37Z</span>
+                <span data-stat="earliest-first-seen-date">—</span>
+                <span class="metric-subvalue" data-stat="earliest-first-seen-time">—</span>
               </p>
               <p class="metric-detail">Oldest IOC sighting retained in the active window.</p>
             </article>
             <article class="metric-card">
               <h3>Newest first seen</h3>
               <p class="metric-value">
-                2025-11-10
-                <span class="metric-subvalue">00:34:46Z</span>
+                <span data-stat="newest-first-seen-date">—</span>
+                <span class="metric-subvalue" data-stat="newest-first-seen-time">—</span>
               </p>
               <p class="metric-detail">Most recent IOC discovery across all sources.</p>
             </article>
             <article class="metric-card">
               <h3>Multi-source overlaps</h3>
-              <p class="metric-value">0</p>
+              <p class="metric-value" data-stat="multi-source-overlaps">—</p>
               <p class="metric-detail">Indicators independently confirmed by more than one feed.</p>
             </article>
           </div>
@@ -146,22 +146,9 @@
                   <th scope="col" class="numeric">Indicators</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody data-table="sources">
                 <tr>
-                  <td data-title="Source">urlhaus_recent_urls</td>
-                  <td class="numeric" data-title="Indicators">1,635</td>
-                </tr>
-                <tr>
-                  <td data-title="Source">malwarebazaar_recent</td>
-                  <td class="numeric" data-title="Indicators">769</td>
-                </tr>
-                <tr>
-                  <td data-title="Source">sslbl_ja3</td>
-                  <td class="numeric" data-title="Indicators">92</td>
-                </tr>
-                <tr>
-                  <td data-title="Source">feodo_ipblocklist</td>
-                  <td class="numeric" data-title="Indicators">1</td>
+                  <td data-title="Source" colspan="2">Loading sources…</td>
                 </tr>
               </tbody>
             </table>
@@ -181,22 +168,9 @@
                   <th scope="col" class="numeric">Indicators</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody data-table="types">
                 <tr>
-                  <td data-title="Type">url</td>
-                  <td class="numeric" data-title="Indicators">1,635</td>
-                </tr>
-                <tr>
-                  <td data-title="Type">sha256</td>
-                  <td class="numeric" data-title="Indicators">769</td>
-                </tr>
-                <tr>
-                  <td data-title="Type">ja3</td>
-                  <td class="numeric" data-title="Indicators">92</td>
-                </tr>
-                <tr>
-                  <td data-title="Type">ipv4</td>
-                  <td class="numeric" data-title="Indicators">1</td>
+                  <td data-title="Type" colspan="2">Loading indicator types…</td>
                 </tr>
               </tbody>
             </table>
@@ -216,46 +190,9 @@
                   <th scope="col" class="numeric">Indicators</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody data-table="tags">
                 <tr>
-                  <td data-title="Tag">malware</td>
-                  <td class="numeric" data-title="Indicators">2,405</td>
-                </tr>
-                <tr>
-                  <td data-title="Tag">Mirai</td>
-                  <td class="numeric" data-title="Indicators">496</td>
-                </tr>
-                <tr>
-                  <td data-title="Tag">sslbl</td>
-                  <td class="numeric" data-title="Indicators">92</td>
-                </tr>
-                <tr>
-                  <td data-title="Tag">tls</td>
-                  <td class="numeric" data-title="Indicators">92</td>
-                </tr>
-                <tr>
-                  <td data-title="Tag">fingerprint</td>
-                  <td class="numeric" data-title="Indicators">92</td>
-                </tr>
-                <tr>
-                  <td data-title="Tag">Rhadamanthys</td>
-                  <td class="numeric" data-title="Indicators">20</td>
-                </tr>
-                <tr>
-                  <td data-title="Tag">Ngioweb</td>
-                  <td class="numeric" data-title="Indicators">14</td>
-                </tr>
-                <tr>
-                  <td data-title="Tag">AgentTesla</td>
-                  <td class="numeric" data-title="Indicators">11</td>
-                </tr>
-                <tr>
-                  <td data-title="Tag">RemcosRAT</td>
-                  <td class="numeric" data-title="Indicators">10</td>
-                </tr>
-                <tr>
-                  <td data-title="Tag">XWorm</td>
-                  <td class="numeric" data-title="Indicators">9</td>
+                  <td data-title="Tag" colspan="2">Loading tags…</td>
                 </tr>
               </tbody>
             </table>
@@ -372,7 +309,7 @@
                 </p>
               </div>
               <div class="action-links">
-                <a class="button-link" href="diagnostics/summary.md">View diagnostics</a>
+                <a class="button-link" href="diagnostics/summary.html">View diagnostics</a>
               </div>
             </article>
             <article class="action-card">
@@ -397,8 +334,7 @@
           basis. For implementation details, explore the repository README.
         </p>
         <p class="footer-links">
-          <a href="diagnostics/summary.md" class="button-link secondary">Diagnostics summary</a>
-          <a href="diagnostics/REPORT.md" class="button-link secondary">Full report</a>
+          <a href="diagnostics/summary.html" class="button-link secondary">Diagnostics summary</a>
         </p>
       </footer>
     </div>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SwiftIOC Diagnostics Summary</title>
+    <link rel="stylesheet" href="../assets/styles.css" />
+  </head>
+  <body data-ioc-root="..">
+    <div class="page-wrapper">
+      <nav class="top-nav" aria-label="Diagnostics navigation">
+        <a class="brand" href="../index.html">
+          <span class="brand-mark">SwiftIOC</span>
+          <span class="brand-tagline">Diagnostics</span>
+        </a>
+        <div class="nav-links">
+          <a href="#run-health">Run health</a>
+          <a href="#timeline">Timeline</a>
+          <a href="#sources">Sources</a>
+          <a href="#indicator-types">Types</a>
+          <a href="#tags">Tags</a>
+        </div>
+      </nav>
+
+      <header class="page-header">
+        <div>
+          <h1 class="section-title">SwiftIOC IOC Summary</h1>
+          <p class="section-subtitle">
+            Detailed breakdown of the most recent SwiftIOC aggregation, including per-source performance and tag distribution.
+          </p>
+          <p class="updated-at">Generated <span data-stat="generated-at">—</span></p>
+        </div>
+      </header>
+
+      <section id="run-health">
+        <h2 class="section-title">Run Health Snapshot</h2>
+        <div class="card-grid">
+          <article class="stat-card">
+            <h3>Total Indicators</h3>
+            <div class="stat-value" data-stat="total-indicators">—</div>
+            <p class="action-description">
+              Total number of indicators published after normalisation and de-duplication.
+            </p>
+          </article>
+          <article class="stat-card">
+            <h3>Duplicates Removed</h3>
+            <div class="stat-value" data-stat="duplicates-removed">—</div>
+            <p class="action-description">
+              Indicators that were identified as duplicates across sources and filtered out.
+            </p>
+          </article>
+          <article class="stat-card">
+            <h3>Active Sources</h3>
+            <div class="stat-value" data-stat="active-sources">—</div>
+            <p class="action-description">Feeds successfully queried during the latest scheduled run.</p>
+          </article>
+          <article class="stat-card">
+            <h3>Indicator Types</h3>
+            <div class="stat-value" data-stat="indicator-types">—</div>
+            <p class="action-description">Distinct IOC formats identified within the aggregated dataset.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="timeline">
+        <h2 class="section-title">Timeline Details</h2>
+        <div class="card-grid">
+          <article class="stat-card">
+            <h3>Earliest First Seen</h3>
+            <div class="stat-value">
+              <span data-stat="earliest-first-seen-date">—</span><br />
+              <span class="badge" data-stat="earliest-first-seen-time">—</span>
+            </div>
+            <p class="action-description">Oldest IOC retained in the analysis window for this run.</p>
+          </article>
+          <article class="stat-card">
+            <h3>Newest First Seen</h3>
+            <div class="stat-value">
+              <span data-stat="newest-first-seen-date">—</span><br />
+              <span class="badge" data-stat="newest-first-seen-time">—</span>
+            </div>
+            <p class="action-description">Most recent IOC observed across all activated sources.</p>
+          </article>
+          <article class="stat-card">
+            <h3>Multi-source Overlaps</h3>
+            <div class="stat-value" data-stat="multi-source-overlaps">—</div>
+            <p class="action-description">IOCs confirmed independently by multiple feeds in this cycle.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="sources">
+        <h2 class="section-title">Per-source Totals</h2>
+        <p class="section-subtitle">Use these counts to identify which feeds are most active or may require follow-up.</p>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Source</th>
+                <th scope="col" class="numeric">Indicators</th>
+              </tr>
+            </thead>
+            <tbody data-table="sources">
+              <tr>
+                <td data-title="Source" colspan="2">Loading sources…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="indicator-types">
+        <h2 class="section-title">Indicator Types</h2>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Type</th>
+                <th scope="col" class="numeric">Indicators</th>
+              </tr>
+            </thead>
+            <tbody data-table="types">
+              <tr>
+                <td data-title="Type" colspan="2">Loading indicator types…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="tags">
+        <h2 class="section-title">Top Tags</h2>
+        <p class="section-subtitle">Tags highlight dominant malware families or tooling associated with the collected IOCs.</p>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Tag</th>
+                <th scope="col" class="numeric">Indicators</th>
+              </tr>
+            </thead>
+            <tbody data-table="tags">
+              <tr>
+                <td data-title="Tag" colspan="2">Loading tags…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="follow-up">
+        <h2 class="section-title">Next Steps</h2>
+        <div class="actions-grid">
+          <article class="action-card">
+            <h3>Download Raw Data</h3>
+            <p class="action-description">
+              Access the published IOC directory directly for bulk analysis or integration with external tooling.
+            </p>
+            <div class="action-links">
+              <a class="button-link" href="../iocs/">Open IOC directory</a>
+            </div>
+          </article>
+          <article class="action-card">
+            <h3>Return to Overview</h3>
+            <p class="action-description">
+              Navigate back to the main snapshot for high-level statistics and download actions.
+            </p>
+            <div class="action-links">
+              <a class="button-link" href="../index.html">Back to Snapshot</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <p>
+          Need historical context? Consult the archived reports or regenerate data using the SwiftIOC collection pipeline.
+        </p>
+      </footer>
+    </div>
+    <script defer src="../assets/dashboard.js"></script>
+  </body>
+</html>
