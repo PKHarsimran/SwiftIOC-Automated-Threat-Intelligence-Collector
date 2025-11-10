@@ -138,8 +138,14 @@ def save_raw(name: str, content: str | bytes, kind: str) -> None:
     try:
         _SAVE_RAW_DIR.mkdir(parents=True, exist_ok=True)
         p = _SAVE_RAW_DIR / f"{name}.{'txt' if kind == 'text' else 'bin'}"
-        with (p.open("w", encoding="utf-8") if kind == "text" else p.open("wb")) as f:
-            f.write(content)
+        if kind == "text":
+            data = content if isinstance(content, str) else content.decode("utf-8", errors="ignore")
+            with p.open("w", encoding="utf-8") as f_text:
+                f_text.write(data)
+        else:
+            payload = content.encode("utf-8") if isinstance(content, str) else content
+            with p.open("wb") as f_bin:
+                f_bin.write(payload)
     except Exception as e:
         logger.debug("raw-save-failed %s: %s", name, e)
 
@@ -156,6 +162,12 @@ def http_get(url: str, *, name: str, kind: str = "text", timeout: int = 30) -> s
     body = r.text if kind == "text" else r.content
     save_raw(name, body, kind)
     return body
+
+
+def ensure_text(content: str | bytes) -> str:
+    if isinstance(content, bytes):
+        return content.decode("utf-8", errors="ignore")
+    return content
 
 
 # --------------- Lazy RSS ----------------
@@ -194,7 +206,7 @@ def fetch_cisa_kev(url: str, ref_url: str, source: str, ws: datetime) -> List[In
 
 
 def fetch_urlhaus_csv(url: str, ref_url: str, source: str, ws: datetime, *, status_filter: str = "any") -> List[Indicator]:
-    text = http_get(url, name=source)
+    text = ensure_text(http_get(url, name=source))
     out: List[Indicator] = []
     now = now_utc()
     for row in csv.reader(io.StringIO(text)):
@@ -234,7 +246,7 @@ def fetch_malwarebazaar_csv(
     graceful_404: bool = False,
 ) -> List[Indicator]:
     try:
-        text = http_get(url, name=source)
+        text = ensure_text(http_get(url, name=source))
     except Exception as e:
         if not isinstance(e, requests.exceptions.HTTPError):
             raise
@@ -242,7 +254,7 @@ def fetch_malwarebazaar_csv(
         status = getattr(resp, "status_code", None)
         if resp is not None and status == 404 and fallback_url:
             logger.warning("%s 404, falling back to %s", url, fallback_url)
-            text = http_get(fallback_url, name=f"{source}_fallback")
+            text = ensure_text(http_get(fallback_url, name=f"{source}_fallback"))
         elif resp is not None and status == 404 and graceful_404:
             logger.warning("%s 404, treating as empty due to --grace-on-404", url)
             return []
@@ -283,7 +295,7 @@ def fetch_malwarebazaar_csv(
 
 
 def fetch_threatfox_export_json(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
-    text = http_get(url, name=source)
+    text = ensure_text(http_get(url, name=source))
     data = json.loads(text)
     now = now_utc()
     out: List[Indicator] = []
@@ -314,14 +326,16 @@ def fetch_threatfox_export_json(url: str, ref_url: str, source: str, ws: datetim
 
 
 def fetch_feodo_ipblocklist(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
-    text = http_get(url, name=source)
+    text = ensure_text(http_get(url, name=source))
     out: List[Indicator] = []
     now = now_utc()
     for row in csv.reader(io.StringIO(text)):
         if not row or row[0].startswith("#"):
             continue
         try:
-            seen = parse_dt(row[0]); ip = row[1]; family = row[5] if len(row) > 5 else ""
+            seen = parse_dt(row[0])
+            ip = row[1]
+            family = row[5] if len(row) > 5 else ""
         except Exception:
             continue
         if seen and seen < ws:
@@ -339,7 +353,7 @@ def fetch_feodo_ipblocklist(url: str, ref_url: str, source: str, ws: datetime) -
 
 
 def fetch_sslbl_ja3(url: str, ref_url: str, source: str, ws: datetime, *, kind: str = "ja3") -> List[Indicator]:
-    text = http_get(url, name=source)
+    text = ensure_text(http_get(url, name=source))
     out: List[Indicator] = []
     now = now_utc()
     for row in csv.reader(io.StringIO(text)):
@@ -365,91 +379,87 @@ def fetch_sslbl_ja3(url: str, ref_url: str, source: str, ws: datetime, *, kind: 
 
 
 def fetch_spamhaus_drop(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
-    text = http_get(url, name=source)
+    text = ensure_text(http_get(url, name=source))
     out: List[Indicator] = []
     now = now_utc()
-    if isinstance(text, str):
-        for line in text.splitlines():
-            line = line.strip()
-            if not line or line.startswith(";") or line.startswith("#"):
-                continue
-            cidr = line.split(";")[0].strip()
-            if not re.fullmatch(r"(?:\d{1,3}\.){3}\d{1,3}/\d{1,2}", cidr):
-                continue
-            out.append(
-                Indicator(
-                    indicator=cidr, type="ipv4_cidr", source=source,
-                    first_seen=iso(now), last_seen=iso(now),
-                    confidence="high", tlp="CLEAR",
-                    tags="spamhaus,drop", reference=ref_url or "",
-                    context="Spamhaus DROP/EDROP network",
-                )
+    for line in text.splitlines():
+        line = line.strip()
+        if not line or line.startswith(";") or line.startswith("#"):
+            continue
+        cidr = line.split(";")[0].strip()
+        if not re.fullmatch(r"(?:\d{1,3}\.){3}\d{1,3}/\d{1,2}", cidr):
+            continue
+        out.append(
+            Indicator(
+                indicator=cidr, type="ipv4_cidr", source=source,
+                first_seen=iso(now), last_seen=iso(now),
+                confidence="high", tlp="CLEAR",
+                tags="spamhaus,drop", reference=ref_url or "",
+                context="Spamhaus DROP/EDROP network",
             )
+        )
     return out
 
 
 def fetch_openphish(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
-    text = http_get(url, name=source)
+    text = ensure_text(http_get(url, name=source))
     out: List[Indicator] = []
     now = now_utc()
-    if isinstance(text, str):
-        for u in text.splitlines():
-            u = u.strip()
-            if not u or not re.match(r"^(?:https?://)", u, flags=re.I):
-                continue
+    for u in text.splitlines():
+        u = u.strip()
+        if not u or not re.match(r"^(?:https?://)", u, flags=re.I):
+            continue
+        out.append(
+            Indicator(
+                indicator=defang_min(u), type="url", source=source,
+                first_seen=iso(now), last_seen=iso(now),
+                confidence="medium", tlp="CLEAR",
+                tags="phishing,openphish", reference=ref_url or "",
+                context="OpenPhish feed",
+            )
+        )
+    return out
+
+
+def fetch_cins_army(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
+    text = ensure_text(http_get(url, name=source))
+    out: List[Indicator] = []
+    now = now_utc()
+    for line in text.splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if re.match(r"^(?:\d{1,3}\.){3}\d{1,3}$", line):
             out.append(
                 Indicator(
-                    indicator=defang_min(u), type="url", source=source,
+                    indicator=defang_min(line), type="ipv4", source=source,
                     first_seen=iso(now), last_seen=iso(now),
-                    confidence="medium", tlp="CLEAR",
-                    tags="phishing,openphish", reference=ref_url or "",
-                    context="OpenPhish feed",
+                    confidence="low", tlp="CLEAR",
+                    tags="cins,scanning,suspicious", reference=ref_url or "",
+                    context="CINS Army IP",
                 )
             )
     return out
 
 
-def fetch_cins_army(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
-    text = http_get(url, name=source)
-    out: List[Indicator] = []
-    now = now_utc()
-    if isinstance(text, str):
-        for line in text.splitlines():
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
-            if re.match(r"^(?:\d{1,3}\.){3}\d{1,3}$", line):
-                out.append(
-                    Indicator(
-                        indicator=defang_min(line), type="ipv4", source=source,
-                        first_seen=iso(now), last_seen=iso(now),
-                        confidence="low", tlp="CLEAR",
-                        tags="cins,scanning,suspicious", reference=ref_url or "",
-                        context="CINS Army IP",
-                    )
-                )
-    return out
-
-
 def fetch_tor_exit(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
-    text = http_get(url, name=source)
+    text = ensure_text(http_get(url, name=source))
     out: List[Indicator] = []
     now = now_utc()
-    if isinstance(text, str):
-        for line in text.splitlines():
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
-            if re.match(r"^(?:\d{1,3}\.){3}\d{1,3}$", line):
-                out.append(
-                    Indicator(
-                        indicator=defang_min(line), type="ipv4", source=source,
-                        first_seen=iso(now), last_seen=iso(now),
-                        confidence="low", tlp="CLEAR",
-                        tags="tor,exit-node", reference=ref_url or "",
-                        context="Tor exit node list",
-                    )
+    for line in text.splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if re.match(r"^(?:\d{1,3}\.){3}\d{1,3}$", line):
+            out.append(
+                Indicator(
+                    indicator=defang_min(line), type="ipv4", source=source,
+                    first_seen=iso(now), last_seen=iso(now),
+                    confidence="low", tlp="CLEAR",
+                    tags="tor,exit-node", reference=ref_url or "",
+                    context="Tor exit node list",
                 )
+            )
     return out
 
 
@@ -471,8 +481,10 @@ def fetch_rss(url: str, ref_url: str, source: str, ws: datetime, *, per_entry_ca
     for e in getattr(feed, "entries", []) or []:
         published = None
         for k in ("published", "updated"):
-            if getattr(e, k, None):
-                published = parse_dt(getattr(e, k)); break
+            value = getattr(e, k, None)
+            if value:
+                published = parse_dt(value)
+                break
         if not published:
             published = feed_updated
         if published and published < ws:
@@ -482,21 +494,29 @@ def fetch_rss(url: str, ref_url: str, source: str, ws: datetime, *, per_entry_ca
             text_parts.append(c.get("value", ""))
         blob = "\n".join(filter(None, text_parts))
         found: List[Tuple[str, str]] = []
-        for u in iocextract.extract_urls(blob, refang=False): found.append(("url", u))
-        for ip in iocextract.extract_ips(blob): found.append(("ipv4", ip))
-        for d in iocextract.extract_domains(blob): found.append(("domain", d))
-        for h in iocextract.extract_hashes(blob): found.append((classify(h) or "sha256", h))
-        for cve in set(re.findall(r"CVE-\d{4}-\d{4,7}", blob, flags=re.I)): found.append(("cve", cve.upper()))
+        for u in iocextract.extract_urls(blob, refang=False):
+            found.append(("url", u))
+        for ip in iocextract.extract_ips(blob):
+            found.append(("ipv4", ip))
+        for d in iocextract.extract_domains(blob):  # type: ignore[attr-defined]
+            found.append(("domain", d))
+        for h in iocextract.extract_hashes(blob):
+            found.append((classify(h) or "sha256", h))
+        for cve in set(re.findall(r"CVE-\d{4}-\d{4,7}", blob, flags=re.I)):
+            found.append(("cve", cve.upper()))
         if not found:
             continue
         seen: Set[Tuple[str, str]] = set()
         count = 0
         ref = getattr(e, "link", None) or ref_url or url
         for t, val in found:
-            if count >= per_entry_cap: break
+            if count >= per_entry_cap:
+                break
             k = (t, val)
-            if k in seen: continue
-            seen.add(k); count += 1
+            if k in seen:
+                continue
+            seen.add(k)
+            count += 1
             val_out = defang_min(val) if t in {"url", "domain", "ipv4", "ipv6"} else val
             out.append(
                 Indicator(
@@ -527,6 +547,13 @@ def type_counts(items: List[Indicator]) -> Dict[str, int]:
     return {t: sum(1 for r in items if r.type == t) for t in wanted}
 
 
+def type_breakdown(items: List[Indicator]) -> List[Tuple[str, int]]:
+    bag: Dict[str, int] = {}
+    for r in items:
+        bag[r.type] = bag.get(r.type, 0) + 1
+    return sorted(bag.items(), key=lambda kv: (-kv[1], kv[0]))
+
+
 def top_tags(items: List[Indicator], n: int = 5) -> List[Tuple[str, int]]:
     bag: Dict[str, int] = {}
     for r in items:
@@ -547,7 +574,7 @@ def collect_from_yaml(
     source_window: Dict[str, int],
     grace_on_404: Set[str],
     ci_safe_rss: bool,
-) -> Tuple[List[Indicator], Dict[str, int]]:
+) -> Tuple[List[Indicator], Dict[str, int], Dict[str, Any]]:
     base_start = now_utc() - timedelta(hours=window_hours)
 
     def start_for(name: str) -> datetime:
@@ -560,6 +587,8 @@ def collect_from_yaml(
 
     indicators: List[Indicator] = []
     counts: Dict[str, int] = {}
+    failures: List[Dict[str, str]] = []
+    raw_total = 0
 
     # APIs
     for api in cfg.get("apis", []) or []:
@@ -601,8 +630,10 @@ def collect_from_yaml(
             logger.debug("summary %s types=%s tags_top=%s", name, type_counts(got), top_tags(got))
         except Exception as e:
             logger.warning("%s failed: %s", name, e)
+            failures.append({"source": name, "error": str(e)})
             got = []
         got = cap(got)
+        raw_total += len(got)
         indicators.extend(got)
         counts[name] = len(got)
 
@@ -622,8 +653,10 @@ def collect_from_yaml(
                 logger.debug("summary %s types=%s tags_top=%s", name, type_counts(got), top_tags(got))
             except Exception as e:
                 logger.warning("%s failed: %s", name, e)
+                failures.append({"source": name, "error": str(e)})
                 got = []
             got = cap(got)
+            raw_total += len(got)
             indicators.extend(got)
             counts[name] = len(got)
 
@@ -649,7 +682,11 @@ def collect_from_yaml(
         if i.source not in prev.source.split(","):
             prev.source = ",".join(sorted(set(prev.source.split(",")) | set(i.source.split(","))))
     final = sorted(uniq.values(), key=lambda r: (r.type, r.indicator, r.source))
-    return final, counts
+    stats: Dict[str, Any] = {
+        "raw_total": raw_total,
+        "failures": failures,
+    }
+    return final, counts, stats
 
 
 # ---------------- writers ----------------
@@ -758,11 +795,13 @@ def _load_ua_file(path: Optional[Path]) -> None:
     if not path:
         return
     if not path.exists():
-        logger.warning("UA file not found: %s", path); return
+        logger.warning("UA file not found: %s", path)
+        return
     try:
         pool = [ln.strip() for ln in path.read_text(encoding="utf-8").splitlines() if ln.strip() and not ln.startswith("#")]
         if pool:
-            UA_POOL.clear(); UA_POOL.extend(pool)
+            UA_POOL.clear()
+            UA_POOL.extend(pool)
             logger.info("Loaded %d User-Agents from %s", len(pool), path)
     except Exception as e:
         logger.warning("Failed loading UA file: %s", e)
@@ -776,7 +815,8 @@ def gh_summary_path() -> Optional[Path]:
 
 def append_gh_summary(lines: List[str]) -> None:
     p = gh_summary_path()
-    if not p: return
+    if not p:
+        return
     try:
         p.parent.mkdir(parents=True, exist_ok=True)
         with p.open("a", encoding="utf-8") as f:
@@ -847,8 +887,10 @@ def main() -> int:
 
     # logging
     console_level = logging.WARNING
-    if args.verbose == 1: console_level = logging.INFO
-    elif args.verbose >= 2: console_level = logging.DEBUG
+    if args.verbose == 1:
+        console_level = logging.INFO
+    elif args.verbose >= 2:
+        console_level = logging.DEBUG
     file_level = getattr(logging, args.log_file_level, logging.DEBUG) if isinstance(args.log_file_level, str) else logging.DEBUG
     configure_logging(console_level, log_file=args.log_file, file_level=file_level, fmt=args.log_format)
 
@@ -880,7 +922,7 @@ def main() -> int:
         cfg = yaml.safe_load(f) or {}
 
     # collect
-    rows, counts = collect_from_yaml(
+    rows, counts, stats = collect_from_yaml(
         cfg,
         window_hours=args.window_hours,
         skip_rss=args.skip_rss,
@@ -901,44 +943,124 @@ def main() -> int:
     write_changelog(out_dir / "changelog" / "CHANGELOG.md", counts, total=len(rows))
 
     # diagnostics / summary
+    run_ts = iso(now_utc())
+    type_totals = type_breakdown(rows)
+    first_seen_dates: List[datetime] = []
+    for r in rows:
+        dt = parse_dt(r.first_seen)
+        if dt:
+            first_seen_dates.append(dt)
+    earliest = iso(min(first_seen_dates)) if first_seen_dates else None
+    latest = iso(max(first_seen_dates)) if first_seen_dates else None
+    raw_total = stats.get("raw_total", len(rows))
+    duplicates_removed = max(raw_total - len(rows), 0)
+    empty_sources = sorted([name for name, count in counts.items() if count == 0])
     diag = {
         "window_hours": args.window_hours,
         "total": len(rows),
+        "total_before_dedup": raw_total,
+        "duplicates_removed": duplicates_removed,
         "counts": counts,
-        "version": 1,
-        "ts": iso(now_utc()),
+        "type_counts": {k: v for k, v in type_totals},
+        "earliest_first_seen": earliest,
+        "newest_first_seen": latest,
+        "empty_sources": empty_sources,
+        "failures": stats.get("failures", []),
+        "version": 2,
+        "ts": run_ts,
     }
     if args.diag_json:
         args.diag_json.write_text(json.dumps(diag, ensure_ascii=False, indent=2), encoding="utf-8")
 
     if args.report:
-        args.report.write_text(
-            "\n".join(
-                [
-                    "# SwiftIOC Run Report",
-                    "",
-                    f"**Started:** {iso(now_utc())}",
-                    f"**Window (hours):** {args.window_hours}",
-                    f"**Total indicators:** {len(rows)}",
-                    "",
-                    "## Per-source counts",
-                    *[f"- {k}: {v}" for k, v in sorted(counts.items())],
-                    "",
-                ]
-            ),
-            encoding="utf-8",
-        )
+        report_lines: List[str] = [
+            "# SwiftIOC Run Report",
+            "",
+            "## Overview",
+            "",
+            "| Metric | Value |",
+            "| --- | ---: |",
+            f"| Generated | {run_ts} |",
+            f"| Window (hours) | {args.window_hours} |",
+            f"| Total indicators | {len(rows)} |",
+            f"| Duplicates removed | {duplicates_removed} |",
+        ]
+        if earliest:
+            report_lines.append(f"| Earliest first_seen | {earliest} |")
+        if latest:
+            report_lines.append(f"| Newest first_seen | {latest} |")
+        report_lines.append("")
+        report_lines.extend(["## Per-source counts", ""])
+        report_lines.append("| Source | Indicators |")
+        report_lines.append("| --- | ---: |")
+        if counts:
+            for name, count in sorted(counts.items()):
+                report_lines.append(f"| {name} | {count} |")
+        else:
+            report_lines.append("| _None_ | 0 |")
+        report_lines.append("")
+        if type_totals:
+            report_lines.extend(["## Indicator types", "", "| Type | Indicators |", "| --- | ---: |"])
+            for t, count in type_totals:
+                report_lines.append(f"| {t} | {count} |")
+            report_lines.append("")
+        issues: List[str] = []
+        for failure in stats.get("failures", []):
+            src = failure.get("source", "unknown")
+            err = failure.get("error", "")
+            issues.append(f"- ⚠️ **{src}**: {err}")
+        for src in empty_sources:
+            issues.append(f"- ⚠️ **{src}** returned zero indicators")
+        if issues:
+            report_lines.extend(["## Issues", "", *issues, ""])
+        args.report.write_text("\n".join(report_lines), encoding="utf-8")
 
     # Append a brief GH step summary (if available)
-    append_gh_summary(
-        [
-            "### SwiftIOC",
-            f"- Total indicators: **{len(rows)}**",
-            "- Per-source counts:",
-            *[f"  - {k}: {v}" for k, v in sorted(counts.items())],
+    summary_lines: List[str] = [
+        "### SwiftIOC",
+        "",
+        "| Metric | Value |",
+        "| --- | ---: |",
+        f"| Total indicators | {len(rows)} |",
+        f"| Duplicates removed | {duplicates_removed} |",
+    ]
+    if earliest:
+        summary_lines.append(f"| Earliest first_seen | {earliest} |")
+    if latest:
+        summary_lines.append(f"| Newest first_seen | {latest} |")
+    summary_lines.extend([
+        "",
+        "#### Per-source counts",
+        "",
+        "| Source | Indicators |",
+        "| --- | ---: |",
+    ])
+    if counts:
+        for name, count in sorted(counts.items()):
+            summary_lines.append(f"| {name} | {count} |")
+    else:
+        summary_lines.append("| _None_ | 0 |")
+    if type_totals:
+        summary_lines.extend([
             "",
-        ]
-    )
+            "#### Indicator types",
+            "",
+            "| Type | Indicators |",
+            "| --- | ---: |",
+        ])
+        for t, count in type_totals:
+            summary_lines.append(f"| {t} | {count} |")
+    issues_summary: List[str] = []
+    for failure in stats.get("failures", []):
+        src = failure.get("source", "unknown")
+        err = failure.get("error", "")
+        issues_summary.append(f"- ⚠️ **{src}**: {err}")
+    for src in empty_sources:
+        issues_summary.append(f"- ⚠️ **{src}** returned zero indicators")
+    if issues_summary:
+        summary_lines.extend(["", "#### Issues", "", *issues_summary])
+    summary_lines.append("")
+    append_gh_summary(summary_lines)
 
     # guardrails
     if args.fail_on_empty:

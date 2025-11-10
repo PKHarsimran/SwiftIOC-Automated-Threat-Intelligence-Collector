@@ -1,0 +1,98 @@
+name: Maintenance - SwiftIOC
+
+on:
+  schedule:
+    - cron: "30 5 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  zero-indicator-watch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check recent changelog totals
+        id: zero_check
+        run: |
+          python <<'PY'
+          import os
+          import re
+          from pathlib import Path
+
+          path = Path("public/changelog/CHANGELOG.md")
+          totals: list[int] = []
+          if path.exists():
+              text = path.read_text(encoding="utf-8", errors="ignore")
+              totals = [int(m.group(1)) for m in re.finditer(r"Total indicators:\s+\*\*(\d+)\*\*", text)]
+              totals = totals[-3:]
+          needs_issue = len(totals) == 3 and all(t == 0 for t in totals)
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as fh:
+              fh.write(f"needs_issue={'true' if needs_issue else 'false'}\n")
+              fh.write("totals=" + ("/".join(str(t) for t in totals) if totals else "none") + "\n")
+          if totals:
+              print(f"Latest totals: {totals}")
+          else:
+              print("No totals found; skipping alert check.")
+          PY
+
+      - name: Open issue for empty runs
+        if: steps.zero_check.outputs.needs_issue == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const title = "Alert: SwiftIOC collected zero indicators in the last 3 runs";
+            const totals = "${{ steps.zero_check.outputs.totals }}";
+            const { owner, repo } = context.repo;
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner,
+              repo,
+              state: "open",
+              per_page: 100,
+            });
+            if (issues.some(issue => issue.title === title)) {
+              core.info("Alert issue already open");
+              return;
+            }
+            await github.rest.issues.create({
+              owner,
+              repo,
+              title,
+              body: `The last three changelog entries recorded zero indicators.\n\nTotals: ${totals}`,
+            });
+
+  artifact-uptime-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify recent artifact commits
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ ! -d public/iocs ]; then
+            echo "No public/iocs directory; skipping check."
+            exit 0
+          fi
+          last_commit=$(git log -1 --format=%ct -- public/iocs || true)
+          if [ -z "$last_commit" ]; then
+            echo "No commits found for public/iocs; skipping."
+            exit 0
+          fi
+          now=$(date +%s)
+          age_hours=$(( (now - last_commit) / 3600 ))
+          echo "Hours since last artifact commit: ${age_hours}"
+          if [ "$age_hours" -gt 12 ]; then
+            echo "::error::No updates to public/iocs in the last 12 hours"
+            exit 1
+          fi
