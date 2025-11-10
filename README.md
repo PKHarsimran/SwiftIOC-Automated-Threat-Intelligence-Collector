@@ -1,84 +1,124 @@
-# ⚡ SwiftIOC – Automated Threat Intelligence Collector (Python + GitHub Actions)
+# ⚡ SwiftIOC – Open-Source Automated Threat Intelligence Collector
 
-SwiftIOC is a **lightweight, zero-infrastructure threat intelligence collector** that automatically fetches the latest **Indicators of Compromise (IOCs)** from trusted open-source feeds like **CISA KEV**, **URLhaus**, and **MalwareBazaar**.
+SwiftIOC is an **open-source, zero-infrastructure threat intelligence collector**
+that automatically aggregates the latest Indicators of Compromise (IOCs) from
+trusted cybersecurity feeds. It transforms the raw data into machine-readable,
+defanged formats that are ideal for **security operations centers (SOC), threat
+hunting teams, incident responders, and detection engineers** who need timely
+intel without the overhead of maintaining custom pipelines.
 
-Built entirely with **Python** and **GitHub Actions**, it runs on a simple schedule—no servers, databases, or manual updates required.  
-SwiftIOC normalizes, deduplicates, and enriches threat data, then publishes clean, ready-to-use feeds in **CSV**, **JSON**, and **STIX 2.1** formats—perfect for integration with **Splunk**, **Cortex XDR**, **MISP**, or **OpenCTI**.
+The project ships as a single Python module (`swiftioc.py`) and runs anywhere
+Python 3.11+ is available—including **GitHub Actions**, CI/CD pipelines, or a
+lightweight workstation. By default SwiftIOC focuses on **fresh activity from
+the last 24–48 hours**, normalizes and deduplicates IOCs, and publishes feeds
+ready for SIEM, SOAR, EDR, and threat intelligence platforms.
 
-> 🧠 Ideal for SOC analysts, threat hunters, detection engineers, and cybersecurity researchers who want **fresh threat intel** without maintaining heavy infrastructure.
+> 🧠 Use SwiftIOC to keep pace with malware campaigns, phishing URLs, botnet
+> infrastructure, ransomware hashes, and CVEs circulating across the security
+> community—without building your own aggregator.
 
-## 🔍 Key Features
+## 📚 Table of Contents
+- [Key capabilities](#-key-capabilities-for-cybersecurity-automation)
+- [Use cases & benefits](#-use-cases--benefits)
+- [Repository layout](#-repository-layout)
+- [How the collector works](#-how-the-collector-works)
+- [Getting started locally](#-getting-started-locally)
+- [Running in GitHub Actions](#-running-in-github-actions)
+- [Configuring sources](#-configuring-sources)
+- [CLI reference](#-cli-reference)
+- [Outputs & diagnostics](#-outputs--diagnostics)
+- [Integrations & compatibility](#-integrations--compatibility)
+- [Roadmap & contributing](#-roadmap--contributing)
 
-- 🕒 **Recent-Only Collection** — gathers IOCs from the last 24–48 hours for timely visibility  
-- 🔌 **Feed-Driven Architecture** — customize or extend sources via a simple `sources.yml` file  
-- 🧹 **Normalized Output** — standard fields for IPs, domains, URLs, hashes, and CVEs  
-- 🧠 **Enrichment Ready** — supports optional lookups using AbuseIPDB, URLhaus, ASN, and GeoIP  
-- 📦 **Zero-Infrastructure Setup** — runs fully on GitHub Actions, no server or database required  
-- 📄 **Open Formats** — exports CSV, JSON, and STIX 2.1 for SIEM and threat-intel platforms  
-- 📊 **Seamless Integration** — feed files can be imported into Splunk, Cortex XDR, MISP, or OpenCTI  
-- 🧩 **Defanged Indicators** — safely share URLs and IPs without risk of accidental execution  
-- 🧠 **Ideal for** SOC teams, CTI analysts, blue teams, and security researchers
+## 🚀 Key capabilities for cybersecurity automation
+- 🕒 **Recent-only lookback** – configurable collection window (48h default)
+  ensures feeds stay focused on active adversary infrastructure.
+- 🔌 **Feed-driven architecture** – add or disable feeds via YAML without touching
+  code, making it simple to align with your threat intelligence requirements.
+- 🧹 **Normalization & defanging** – IP addresses, URLs, domains, file hashes,
+  CVEs, and malware families are typed, deduplicated, and safely defanged for
+  sharing across security tooling.
+- 📄 **Multiple export formats** – export to CSV, TSV, JSON, JSON Lines, and
+  STIX 2.1 for immediate ingestion by SIEM, SOAR, EDR, TIP, and DFIR workflows.
+- 📊 **Actionable reporting** – detailed run diagnostics, per-source statistics,
+  and change summaries power dashboards and automated quality checks.
+- 🧠 **Enrichment hooks** – AbuseIPDB, URLhaus, ASN lookups, GeoIP context, and
+  parser enrichments are built in and toggled through the source definitions.
+- 🧩 **CI friendly** – deterministic CLI flags, optional raw feed capture, and
+  guardrails that prevent CI runs from silently succeeding on empty feeds.
+- 🌐 **GitHub Pages ready** – outputs publish directly to `public/` so you can
+  host a live threat intelligence portal in minutes.
 
-## 🗂️ Output Structure
+## 🎯 Use cases & benefits
+- **SOC automation** – push vetted IOCs into detection content or blocklists on
+  a predictable schedule.
+- **Threat hunting** – triage fresh indicators, enrich with context, and pivot
+  quickly using defanged URLs and MITRE ATT&CK-aligned tagging.
+- **Incident response** – compare live incident data against curated feeds to
+  confirm or disprove compromise quickly.
+- **Security research** – monitor vendor advisories and malware trackers to
+  inform blog posts, newsletters, and situational awareness briefings.
 
-When SwiftIOC runs (locally or through GitHub Actions), it automatically generates a clean set of IOC artifacts inside the `public/` directory.
+SwiftIOC helps teams reduce manual feed collection, stay aligned with the MITRE
+ATT&CK® framework, and ensure downstream tools receive consistent IOC data.
 
-public/
-├── iocs/
-│ ├── latest.csv
-│ ├── latest.json
-│ └── stix2.json
-└── changelog/
-└── CHANGELOG.md
+## 🗂️ Repository layout
+```
+├── public/                 # Default output directory for generated feeds
+│   ├── iocs/               # CSV, JSON, JSONL, TSV, and STIX artifacts
+│   └── changelog/          # Markdown changelog between runs
+├── requirements.txt        # Python dependencies
+├── sources.example.yml     # Sample feed configuration
+├── swiftioc.py             # Main collector implementation & CLI
+├── README.md               # This document
+└── SECURITY.md             # Security reporting policy
+```
 
-Each run updates:
-- **`iocs/`** — machine-readable IOC files ready for import into SIEM or threat-intel tools  
-- **`changelog/`** — markdown summary of what changed since the last update (useful for analysts)
+## 🧠 How the collector works
+1. **Load sources** – `swiftioc.py` reads `sources.yml` (or
+   `sources.example.yml`) to discover JSON, CSV, and RSS feeds.
+2. **Fetch & parse** – each source is fetched with retrying HTTP clients and a
+   rotating User-Agent pool. Feed-specific parsers normalize the data into a
+   unified schema.
+3. **Normalize** – every indicator is typed, defanged, timestamped, and
+   attributed to its originating source.
+4. **Deduplicate & filter** – duplicates are removed and the collection window is
+   enforced globally or per-source.
+5. **Publish** – indicators and run diagnostics are written to the `public/`
+   directory, ready to be served via GitHub Pages or consumed by downstream
+   systems.
 
-Every IOC entry follows a normalized schema:
-
-| Field | Description |
-|--------|-------------|
-| `indicator` | IOC value (IP, domain, URL, hash, CVE) |
-| `type` | Indicator type (ipv4, domain, url, sha256, etc.) |
-| `source` | Feed or source name |
-| `first_seen` / `last_seen` | ISO 8601 timestamps for time of observation |
-| `confidence` | low / medium / high |
-| `tlp` | Traffic Light Protocol label (default: CLEAR) |
-| `tags` | Related threat or malware family tags |
-| `reference` | Link to original report or feed |
-| `context` | Short free-text context or description |
-
-> 📄 Outputs are **defanged by default** to ensure safety when shared or published.
-
-## 🚀 Quick Start
-
-You can run SwiftIOC locally for testing or let **GitHub Actions** run it automatically on a schedule.
-
-### 🧩 Local Setup
+## 🧪 Getting started locally
+Prerequisites:
+- Python **3.11+**
+- A virtual environment is recommended
 
 ```bash
-# 1. Clone the repository
-git clone https://github.com/<your-username>/swift-ioc.git
-cd swift-ioc
+# 1. Clone and enter the repository
+git clone https://github.com/<your-username>/SwiftIOC-Automated-Threat-Intelligence-Collector.git
+cd SwiftIOC-Automated-Threat-Intelligence-Collector
 
 # 2. (Optional) Create and activate a virtual environment
-python -m venv .venv && source .venv/bin/activate
+python -m venv .venv
+source .venv/bin/activate  # Linux/macOS
+.venv\Scripts\activate     # Windows PowerShell
 
 # 3. Install dependencies
 pip install -r requirements.txt
 
-# 4. Run the collector manually
-python -m swiftioc --out-dir public
+# 4. Run the collector with the sample sources
+python -m swiftioc --sources sources.example.yml --out-dir public
 ```
 
-## ⚙️ GitHub Actions Automation
+Artifacts will appear under `public/`. Add `--verbose` to watch progress, or
+`--self-test` to run quick assertions verifying the classifier and defanging
+helpers.
 
-SwiftIOC is designed to run entirely through **GitHub Actions** — no servers, cron jobs, or databases required.
-
-By default, it can execute hourly to pull new IOCs, normalize them, and publish updated feeds directly to your repository’s `public/` folder.
-
-### 🕐 Example Workflow (`.github/workflows/pages.yml`)
+## ⚙️ Running in GitHub Actions
+SwiftIOC ships with a workflow-friendly CLI and writes outputs to `public/`,
+which can be published directly via **GitHub Pages** or stored as artifacts.
+Below is an example workflow (`.github/workflows/pages.yml`) that executes hourly
+and deploys the latest feeds to Pages:
 
 ```yaml
 name: SwiftIOC – Threat Intel Collector
@@ -110,7 +150,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Collect recent IOCs
-        run: python -m swiftioc --window-hours 48 --out-dir public
+        run: python -m swiftioc --ci-safe --window-hours 48 --out-dir public
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -126,3 +166,103 @@ jobs:
       - id: deployment
         uses: actions/deploy-pages@v4
 ```
+
+`--ci-safe` enables JSON logging, ensures diagnostic directories exist, and
+suppresses failures when optional dependencies (like `feedparser` for RSS) are
+missing.
+
+## 🛠️ Configuring sources
+Create a `sources.yml` file to describe the feeds you care about. The
+`window_hours` setting defines the default lookback period. Each source entry can
+override behaviour (such as per-source window or fallback URLs). A trimmed
+example:
+
+```yaml
+window_hours: 48
+
+apis:
+  - name: cisa_kev
+    kind: json
+    parse: kev
+    url: https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json
+    reference: https://www.cisa.gov/known-exploited-vulnerabilities-catalog
+
+  - name: urlhaus_recent_urls
+    kind: csv
+    parse: urlhaus
+    url: https://urlhaus.abuse.ch/downloads/csv_recent/
+    reference: https://urlhaus.abuse.ch/
+
+rss:
+  - name: google_tag
+    url: https://blog.google/threat-analysis-group/rss/
+    reference: https://blog.google/threat-analysis-group/
+```
+
+To disable RSS handling (and the `feedparser` dependency), pass `--skip-rss` at
+runtime. When a requested `sources.yml` file is missing, the CLI automatically
+falls back to `sources.example.yml`.
+
+## 🧾 CLI reference
+Run `python -m swiftioc --help` for the full list of switches. Highlights:
+
+| Flag | Purpose |
+| --- | --- |
+| `--out-dir PATH` | Where to write generated artifacts (`public/` by default). |
+| `--sources PATH` | YAML configuration of API and RSS feeds (`sources.yml`). |
+| `--window-hours N` | Global lookback window (hours). Override per source via `--source-window name=N`. |
+| `--urlhaus-status {any,online,offline}` | Filter URLhaus indicators by status. |
+| `--max-per-source N` | Cap the number of indicators recorded from each source. |
+| `--fail-on-empty name…` | Fail the run if any listed sources return zero indicators. |
+| `--fail-if-stale name=N` | Fail the run if newest indicator from `name` is older than `N` hours. |
+| `--save-raw-dir PATH` | Persist the raw feed responses for auditing/debugging. |
+| `--diag-json PATH` | Write a structured diagnostics summary (defaults to `public/diagnostics/run.json`). |
+| `--report PATH` | Generate a Markdown run report (defaults to `public/diagnostics/REPORT.md`). |
+| `--ci-safe` | Convenience flag for CI environments (JSON logs, tolerant RSS handling). |
+| `--self-test` | Execute built-in sanity checks instead of collecting feeds. |
+
+## 📦 Outputs & diagnostics
+Running the collector produces the following structure (paths relative to
+`--out-dir`):
+
+```
+public/
+├── iocs/
+│   ├── latest.csv
+│   ├── latest.tsv
+│   ├── latest.json
+│   ├── latest.jsonl
+│   └── stix2.json
+├── changelog/
+│   └── CHANGELOG.md
+└── diagnostics/
+    ├── REPORT.md
+    ├── run.json
+    └── raw/                 # optional when --save-raw-dir is supplied
+```
+
+All indicators share a common schema (`indicator`, `type`, `source`,
+`first_seen`, `last_seen`, `confidence`, `tlp`, `tags`, `reference`, `context`).
+`REPORT.md` and `run.json` summarise totals, per-source counts, type breakdowns,
+and any issues encountered.
+
+## 🔌 Integrations & compatibility
+SwiftIOC plays well with popular security platforms and file formats:
+
+- **SIEM & log platforms:** Splunk, Elastic, Microsoft Sentinel, QRadar, Sumo
+  Logic
+- **SOAR & automation:** Cortex XSOAR, Tines, Shuffle, Torq
+- **Threat intelligence platforms:** MISP, OpenCTI, Anomali, ThreatConnect
+- **Blocklists & firewalls:** pfSense, Palo Alto Networks, Fortinet, Cisco
+
+Use the standard export formats or extend the CLI to push to custom REST APIs,
+message queues, or data lakes.
+
+## 📈 Roadmap & contributing
+Have ideas for new feeds, enrichments, or output formats? We welcome issues and
+pull requests. Join the conversation by opening a GitHub issue outlining the
+problem, enhancement, or research collaboration you have in mind. For
+security-sensitive reports, follow the [security policy](SECURITY.md).
+
+If you build something cool with SwiftIOC, share it! Blog posts, YouTube demos,
+and conference talks help other defenders discover the project.

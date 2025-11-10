@@ -1,21 +1,36 @@
-# Security Policy
+# 🔐 Security Policy
 
-## Supported Versions
+We take the security of SwiftIOC seriously and appreciate responsible
+vulnerability reports. SwiftIOC powers automated threat intelligence workflows,
+so timely disclosure helps the cybersecurity community keep pace with adversary
+infrastructure. This document explains which versions receive security updates
+and how to disclose potential issues.
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+## ✅ Supported Versions
+Security fixes are applied to the latest commit on the `main` branch. Releases
+or tags may be created from time to time, but older snapshots are not actively
+maintained.
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+| Version / Branch | Supported |
+| ---------------- | --------- |
+| `main`           | ✅ |
+| anything else    | ❌ |
 
-## Reporting a Vulnerability
+If you are using a fork or pinned commit, please pull the latest changes from
+`main` before reporting an issue to ensure the vulnerability still exists.
 
-Use this section to tell people how to report a vulnerability.
+## 📣 Reporting a Vulnerability
+1. **Do not create a public issue.** Instead, open a [GitHub Security Advisory
+   report](https://github.com/SwiftOnSecurity/SwiftIOC-Automated-Threat-Intelligence-Collector/security/advisories/new)
+   or email `security@swiftsecurity.blog`.
+2. Include as much detail as possible:
+   - Steps to reproduce or proof-of-concept
+   - Affected configuration (CLI flags, `sources.yml`, environment)
+   - Potential impact or exploitation scenario
+3. You will receive an acknowledgement within **3 business days**. We aim to
+   provide status updates at least every **7 days** until the report is
+   resolved.
+4. Once a fix is ready, we will coordinate a disclosure timeline with you. By
+   default we release patches publicly as soon as mitigations are available.
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+Thank you for helping us keep SwiftIOC secure! 🛡️
