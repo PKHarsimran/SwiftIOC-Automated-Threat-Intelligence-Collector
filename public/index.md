@@ -1,249 +1,407 @@
-<link rel="stylesheet" href="assets/styles.css">
-<div class="page-wrapper">
-  <header class="page-header">
-    <nav class="top-nav" aria-label="Primary">
-      <div class="brand">
-        <strong>SwiftIOC</strong>
-        <span>Automated Threat Intelligence Collector</span>
-      </div>
-      <div class="action-links">
-        <a href="#highlights" class="button-link">Highlights</a>
-        <a href="#sources" class="button-link">Sources</a>
-        <a href="#indicator-types" class="button-link">Indicator Types</a>
-        <a href="#actions" class="button-link">Data Actions</a>
-        <a href="diagnostics/summary.md" class="button-link">Diagnostics</a>
-      </div>
-    </nav>
-    <div>
-      <h1 class="section-title">SwiftIOC Threat Intelligence Snapshot</h1>
-      <p class="section-subtitle">Automatically generated snapshot from the most recent SwiftIOC collection run, designed for quick situational awareness and rapid access to downloadable intelligence feeds.</p>
-      <p class="updated-at">Generated 2025-11-10T00:38:51Z</p>
-    </div>
-  </header>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SwiftIOC Threat Intelligence Dashboard</title>
+    <meta
+      name="description"
+      content="Live snapshot of the most recent SwiftIOC automated threat intelligence collection run with download links, source breakdowns, and a live data preview."
+    />
+    <link rel="preload" href="assets/styles.css" as="style" />
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body>
+    <a href="#main" class="skip-link">Skip to main content</a>
+    <div class="page-wrapper">
+      <header class="page-header">
+        <nav class="top-nav" aria-label="Primary navigation">
+          <a class="brand" href="./">
+            <span class="brand-mark">SwiftIOC</span>
+            <span class="brand-tagline">Automated Threat Intelligence</span>
+          </a>
+          <div class="nav-links">
+            <a href="#overview">Overview</a>
+            <a href="#highlights">Highlights</a>
+            <a href="#timeline">Timeline</a>
+            <a href="#sources">Sources</a>
+            <a href="#indicator-types">Types</a>
+            <a href="#preview">Preview</a>
+            <a href="#actions">Downloads</a>
+            <a href="diagnostics/summary.md">Diagnostics</a>
+          </div>
+        </nav>
+      </header>
 
-  <section id="highlights">
-    <h2 class="section-title">Operational Highlights</h2>
-    <p class="section-subtitle">A summary of the current indicator of compromise (IOC) landscape derived from all enabled sources.</p>
-    <div class="card-grid">
-      <article class="stat-card">
-        <h3>Total Indicators</h3>
-        <div class="stat-value">2,497</div>
-        <p class="action-description">Unique IOCs collected during the latest cycle.</p>
-      </article>
-      <article class="stat-card">
-        <h3>Sources Reporting</h3>
-        <div class="stat-value">4</div>
-        <p class="action-description">Active intelligence feeds that produced data in this run.</p>
-      </article>
-      <article class="stat-card">
-        <h3>Indicator Types</h3>
-        <div class="stat-value">4</div>
-        <p class="action-description">Distinct IOC formats identified across the feeds.</p>
-      </article>
-      <article class="stat-card">
-        <h3>Duplicates Removed</h3>
-        <div class="stat-value">0</div>
-        <p class="action-description">Indicators deduplicated to maintain a clean dataset.</p>
-      </article>
-    </div>
-  </section>
+      <main id="main" class="page-main" tabindex="-1">
+        <section id="overview" class="hero">
+          <div class="hero-body">
+            <p class="eyebrow">Automated Threat Intelligence Collector</p>
+            <h1>SwiftIOC Threat Intelligence Snapshot</h1>
+            <p class="hero-lede">
+              Automatically generated from the latest SwiftIOC collection run. Use this dashboard for
+              instant situational awareness, source health, and quick access to download-ready feeds.
+            </p>
+            <ul class="hero-meta">
+              <li>
+                <span class="meta-label">Generated</span>
+                <span class="meta-value">2025-11-10T00:38:51Z</span>
+              </li>
+              <li>
+                <span class="meta-label">Collection window</span>
+                <span class="meta-value">2025-11-08 → 2025-11-10</span>
+              </li>
+              <li>
+                <span class="meta-label">Feeds online</span>
+                <span class="meta-value">4 active sources</span>
+              </li>
+            </ul>
+            <div class="hero-actions">
+              <a class="button-link" href="#preview">Live preview</a>
+              <a class="button-link secondary" href="#actions">Download data</a>
+            </div>
+          </div>
+          <div class="hero-aside">
+            <div class="hero-card">
+              <h2 class="hero-card-title">Quality signals</h2>
+              <p>SwiftIOC deduplicates indicators, preserves provenance, and publishes in open formats.</p>
+              <ul class="chip-list">
+                <li class="chip">TLP: CLEAR</li>
+                <li class="chip">High confidence majority</li>
+                <li class="chip">JSONL · STIX · CSV</li>
+              </ul>
+            </div>
+          </div>
+        </section>
 
-  <section id="timeline">
-    <h2 class="section-title">Collection Timeline</h2>
-    <div class="card-grid">
-      <article class="stat-card">
-        <h3>Earliest First Seen</h3>
-        <div class="stat-value">2025-11-08<br><span class="badge">00:38:37Z</span></div>
-        <p class="action-description">Oldest IOC sighting retained in the active window.</p>
-      </article>
-      <article class="stat-card">
-        <h3>Newest First Seen</h3>
-        <div class="stat-value">2025-11-10<br><span class="badge">00:34:46Z</span></div>
-        <p class="action-description">Most recent IOC discovery across all sources.</p>
-      </article>
-      <article class="stat-card">
-        <h3>Multi-source Overlaps</h3>
-        <div class="stat-value">0</div>
-        <p class="action-description">IOCs independently confirmed by more than one feed.</p>
-      </article>
-    </div>
-  </section>
+        <section id="highlights" class="section">
+          <div class="section-heading">
+            <h2>Operational highlights</h2>
+            <p>Key metrics that summarise the current indicator landscape across all enabled feeds.</p>
+          </div>
+          <div class="metrics-grid">
+            <article class="metric-card">
+              <h3>Total indicators</h3>
+              <p class="metric-value">2,497</p>
+              <p class="metric-detail">Unique IOCs collected during the latest cycle.</p>
+            </article>
+            <article class="metric-card">
+              <h3>Sources reporting</h3>
+              <p class="metric-value">4</p>
+              <p class="metric-detail">Active intelligence feeds that produced data this run.</p>
+            </article>
+            <article class="metric-card">
+              <h3>Indicator types</h3>
+              <p class="metric-value">4</p>
+              <p class="metric-detail">Distinct IOC formats discovered across the feeds.</p>
+            </article>
+            <article class="metric-card">
+              <h3>Duplicates removed</h3>
+              <p class="metric-value">0</p>
+              <p class="metric-detail">Indicators deduplicated to maintain a clean dataset.</p>
+            </article>
+          </div>
+        </section>
 
-  <section id="sources">
-    <h2 class="section-title">Per-source Totals</h2>
-    <p class="section-subtitle">Understand which feeds are contributing the most intelligence at a glance.</p>
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th scope="col">Source</th>
-            <th scope="col" style="text-align:right">Indicators</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>urlhaus_recent_urls</td>
-            <td style="text-align:right">1,635</td>
-          </tr>
-          <tr>
-            <td>malwarebazaar_recent</td>
-            <td style="text-align:right">769</td>
-          </tr>
-          <tr>
-            <td>sslbl_ja3</td>
-            <td style="text-align:right">92</td>
-          </tr>
-          <tr>
-            <td>feodo_ipblocklist</td>
-            <td style="text-align:right">1</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
+        <section id="timeline" class="section">
+          <div class="section-heading">
+            <h2>Collection timeline</h2>
+            <p>Understand recency and overlap across sources to plan enrichment and response.</p>
+          </div>
+          <div class="metrics-grid timeline-grid">
+            <article class="metric-card">
+              <h3>Earliest first seen</h3>
+              <p class="metric-value">
+                2025-11-08
+                <span class="metric-subvalue">00:38:37Z</span>
+              </p>
+              <p class="metric-detail">Oldest IOC sighting retained in the active window.</p>
+            </article>
+            <article class="metric-card">
+              <h3>Newest first seen</h3>
+              <p class="metric-value">
+                2025-11-10
+                <span class="metric-subvalue">00:34:46Z</span>
+              </p>
+              <p class="metric-detail">Most recent IOC discovery across all sources.</p>
+            </article>
+            <article class="metric-card">
+              <h3>Multi-source overlaps</h3>
+              <p class="metric-value">0</p>
+              <p class="metric-detail">Indicators independently confirmed by more than one feed.</p>
+            </article>
+          </div>
+        </section>
 
-  <section id="indicator-types">
-    <h2 class="section-title">Indicator Types</h2>
-    <p class="section-subtitle">Breakdown of IOC formats to support filtering and response planning.</p>
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th scope="col">Type</th>
-            <th scope="col" style="text-align:right">Indicators</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>url</td>
-            <td style="text-align:right">1,635</td>
-          </tr>
-          <tr>
-            <td>sha256</td>
-            <td style="text-align:right">769</td>
-          </tr>
-          <tr>
-            <td>ja3</td>
-            <td style="text-align:right">92</td>
-          </tr>
-          <tr>
-            <td>ipv4</td>
-            <td style="text-align:right">1</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
+        <section id="sources" class="section">
+          <div class="section-heading">
+            <h2>Per-source totals</h2>
+            <p>See which feeds are contributing the most intelligence at a glance.</p>
+          </div>
+          <div class="table-card">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Source</th>
+                  <th scope="col" class="numeric">Indicators</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-title="Source">urlhaus_recent_urls</td>
+                  <td class="numeric" data-title="Indicators">1,635</td>
+                </tr>
+                <tr>
+                  <td data-title="Source">malwarebazaar_recent</td>
+                  <td class="numeric" data-title="Indicators">769</td>
+                </tr>
+                <tr>
+                  <td data-title="Source">sslbl_ja3</td>
+                  <td class="numeric" data-title="Indicators">92</td>
+                </tr>
+                <tr>
+                  <td data-title="Source">feodo_ipblocklist</td>
+                  <td class="numeric" data-title="Indicators">1</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
 
-  <section id="top-tags">
-    <h2 class="section-title">Top Tags</h2>
-    <p class="section-subtitle">Most prevalent threat tags assigned to indicators in the latest sweep.</p>
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th scope="col">Tag</th>
-            <th scope="col" style="text-align:right">Indicators</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>malware</td>
-            <td style="text-align:right">2,405</td>
-          </tr>
-          <tr>
-            <td>Mirai</td>
-            <td style="text-align:right">496</td>
-          </tr>
-          <tr>
-            <td>sslbl</td>
-            <td style="text-align:right">92</td>
-          </tr>
-          <tr>
-            <td>tls</td>
-            <td style="text-align:right">92</td>
-          </tr>
-          <tr>
-            <td>fingerprint</td>
-            <td style="text-align:right">92</td>
-          </tr>
-          <tr>
-            <td>Rhadamanthys</td>
-            <td style="text-align:right">20</td>
-          </tr>
-          <tr>
-            <td>Ngioweb</td>
-            <td style="text-align:right">14</td>
-          </tr>
-          <tr>
-            <td>AgentTesla</td>
-            <td style="text-align:right">11</td>
-          </tr>
-          <tr>
-            <td>RemcosRAT</td>
-            <td style="text-align:right">10</td>
-          </tr>
-          <tr>
-            <td>XWorm</td>
-            <td style="text-align:right">9</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
+        <section id="indicator-types" class="section">
+          <div class="section-heading">
+            <h2>Indicator types</h2>
+            <p>Breakdown of IOC formats to support filtering and response planning.</p>
+          </div>
+          <div class="table-card">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Type</th>
+                  <th scope="col" class="numeric">Indicators</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-title="Type">url</td>
+                  <td class="numeric" data-title="Indicators">1,635</td>
+                </tr>
+                <tr>
+                  <td data-title="Type">sha256</td>
+                  <td class="numeric" data-title="Indicators">769</td>
+                </tr>
+                <tr>
+                  <td data-title="Type">ja3</td>
+                  <td class="numeric" data-title="Indicators">92</td>
+                </tr>
+                <tr>
+                  <td data-title="Type">ipv4</td>
+                  <td class="numeric" data-title="Indicators">1</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
 
-  <section id="actions">
-    <h2 class="section-title">Data Actions</h2>
-    <p class="section-subtitle">Choose the format that best fits your workflow. Each action card explains what you get before you download.</p>
-    <div class="actions-grid">
-      <article class="action-card">
-        <h3>Download CSV</h3>
-        <p class="action-description">Exports all current indicators in comma-separated format. Ideal for spreadsheets, SIEM ingestion, and manual review.</p>
-        <div class="action-links">
-          <a class="button-link" href="iocs/latest.csv">Get CSV</a>
-        </div>
-      </article>
-      <article class="action-card">
-        <h3>Download TSV</h3>
-        <p class="action-description">Tab-delimited indicators for tooling that expects whitespace-separated values with consistent quoting.</p>
-        <div class="action-links">
-          <a class="button-link" href="iocs/latest.tsv">Get TSV</a>
-        </div>
-      </article>
-      <article class="action-card">
-        <h3>JSON Feed</h3>
-        <p class="action-description">Machine-readable JSON document containing the full indicator payload, suitable for scripting and automation.</p>
-        <div class="action-links">
-          <a class="button-link" href="iocs/latest.json">Download JSON</a>
-          <a class="button-link" href="iocs/latest.jsonl">Stream (JSONL)</a>
-        </div>
-      </article>
-      <article class="action-card">
-        <h3>STIX 2.1 Bundle</h3>
-        <p class="action-description">Standards-compliant STIX bundle for sharing threat intelligence with TIPs and platforms that ingest STIX objects.</p>
-        <div class="action-links">
-          <a class="button-link" href="iocs/stix2.json">Download STIX</a>
-        </div>
-      </article>
-      <article class="action-card">
-        <h3>Diagnostics Report</h3>
-        <p class="action-description">Dive deeper into collection health, failures, and per-source diagnostics to troubleshoot feed availability.</p>
-        <div class="action-links">
-          <a class="button-link" href="diagnostics/summary.md">View Diagnostics</a>
-        </div>
-      </article>
-      <article class="action-card">
-        <h3>Raw Data Directory</h3>
-        <p class="action-description">Browse the published IOC folder directly to integrate with external tooling or scripted downloads.</p>
-        <div class="action-links">
-          <a class="button-link" href="iocs/">Open Directory</a>
-        </div>
-      </article>
-    </div>
-  </section>
+        <section id="top-tags" class="section">
+          <div class="section-heading">
+            <h2>Top tags</h2>
+            <p>Most prevalent threat tags assigned to indicators in the latest sweep.</p>
+          </div>
+          <div class="table-card">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Tag</th>
+                  <th scope="col" class="numeric">Indicators</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-title="Tag">malware</td>
+                  <td class="numeric" data-title="Indicators">2,405</td>
+                </tr>
+                <tr>
+                  <td data-title="Tag">Mirai</td>
+                  <td class="numeric" data-title="Indicators">496</td>
+                </tr>
+                <tr>
+                  <td data-title="Tag">sslbl</td>
+                  <td class="numeric" data-title="Indicators">92</td>
+                </tr>
+                <tr>
+                  <td data-title="Tag">tls</td>
+                  <td class="numeric" data-title="Indicators">92</td>
+                </tr>
+                <tr>
+                  <td data-title="Tag">fingerprint</td>
+                  <td class="numeric" data-title="Indicators">92</td>
+                </tr>
+                <tr>
+                  <td data-title="Tag">Rhadamanthys</td>
+                  <td class="numeric" data-title="Indicators">20</td>
+                </tr>
+                <tr>
+                  <td data-title="Tag">Ngioweb</td>
+                  <td class="numeric" data-title="Indicators">14</td>
+                </tr>
+                <tr>
+                  <td data-title="Tag">AgentTesla</td>
+                  <td class="numeric" data-title="Indicators">11</td>
+                </tr>
+                <tr>
+                  <td data-title="Tag">RemcosRAT</td>
+                  <td class="numeric" data-title="Indicators">10</td>
+                </tr>
+                <tr>
+                  <td data-title="Tag">XWorm</td>
+                  <td class="numeric" data-title="Indicators">9</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
 
-  <footer class="footer">
-    <p>SwiftIOC automatically harvests, normalises, and publishes threat intelligence on a rolling basis. For implementation details, explore the repository README.</p>
-    <p><a href="diagnostics/summary.md" class="button-link">Diagnostics Summary</a> · <a href="diagnostics/REPORT.md" class="button-link">Full Report</a></p>
-  </footer>
-</div>
+        <section id="preview" class="section data-preview">
+          <div class="section-heading">
+            <h2>Live indicator preview</h2>
+            <p>Peek at the most recent indicators directly from the JSONL feed before downloading.</p>
+          </div>
+          <div
+            class="preview-panel"
+            data-preview-container
+            role="region"
+            aria-live="polite"
+            aria-busy="false"
+          >
+            <div class="preview-toolbar">
+              <label class="toolbar-group" for="preview-filter">
+                <span>Filter by type</span>
+                <select id="preview-filter" data-preview-filter disabled>
+                  <option value="all">All types</option>
+                </select>
+              </label>
+              <button type="button" class="button-link secondary" data-preview-refresh>
+                Refresh preview
+              </button>
+            </div>
+            <div class="preview-table-wrapper">
+              <table class="preview-table" data-preview-table hidden>
+                <thead>
+                  <tr>
+                    <th scope="col">Indicator</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Source</th>
+                    <th scope="col">First seen</th>
+                    <th scope="col">Confidence</th>
+                    <th scope="col">Tags</th>
+                  </tr>
+                </thead>
+                <tbody data-preview-body></tbody>
+              </table>
+              <div class="preview-status" data-preview-status role="status">Preparing live preview…</div>
+            </div>
+            <p class="preview-footnote">
+              The preview streams the first 12 indicators over HTTPS using lightweight streaming logic to
+              keep load times fast. Fetch the full dataset below when you need complete coverage.
+            </p>
+          </div>
+        </section>
+
+        <section id="actions" class="section">
+          <div class="section-heading">
+            <h2>Data actions</h2>
+            <p>Choose the format that best fits your workflow before exporting the latest dataset.</p>
+          </div>
+          <div class="actions-grid">
+            <article class="action-card">
+              <div>
+                <h3>Download CSV</h3>
+                <p class="action-description">
+                  Exports all current indicators in comma-separated format. Ideal for spreadsheets, SIEM
+                  ingestion, and manual review.
+                </p>
+              </div>
+              <div class="action-links">
+                <a class="button-link" href="iocs/latest.csv">Get CSV</a>
+              </div>
+            </article>
+            <article class="action-card">
+              <div>
+                <h3>Download TSV</h3>
+                <p class="action-description">
+                  Tab-delimited indicators for tooling that expects whitespace-separated values with
+                  consistent quoting.
+                </p>
+              </div>
+              <div class="action-links">
+                <a class="button-link" href="iocs/latest.tsv">Get TSV</a>
+              </div>
+            </article>
+            <article class="action-card">
+              <div>
+                <h3>JSON feed</h3>
+                <p class="action-description">
+                  Machine-readable JSON document containing the full indicator payload, suitable for
+                  scripting and automation.
+                </p>
+              </div>
+              <div class="action-links">
+                <a class="button-link" href="iocs/latest.json">Download JSON</a>
+                <a class="button-link secondary" href="iocs/latest.jsonl">Stream (JSONL)</a>
+              </div>
+            </article>
+            <article class="action-card">
+              <div>
+                <h3>STIX 2.1 bundle</h3>
+                <p class="action-description">
+                  Standards-compliant STIX bundle for sharing threat intelligence with TIPs and platforms
+                  that ingest STIX objects.
+                </p>
+              </div>
+              <div class="action-links">
+                <a class="button-link" href="iocs/stix2.json">Download STIX</a>
+              </div>
+            </article>
+            <article class="action-card">
+              <div>
+                <h3>Diagnostics report</h3>
+                <p class="action-description">
+                  Dive deeper into collection health, failures, and per-source diagnostics to troubleshoot
+                  feed availability.
+                </p>
+              </div>
+              <div class="action-links">
+                <a class="button-link" href="diagnostics/summary.md">View diagnostics</a>
+              </div>
+            </article>
+            <article class="action-card">
+              <div>
+                <h3>Raw data directory</h3>
+                <p class="action-description">
+                  Browse the published IOC folder directly to integrate with external tooling or scripted
+                  downloads.
+                </p>
+              </div>
+              <div class="action-links">
+                <a class="button-link secondary" href="iocs/">Open directory</a>
+              </div>
+            </article>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <p>
+          SwiftIOC automatically harvests, normalises, and publishes threat intelligence on a rolling
+          basis. For implementation details, explore the repository README.
+        </p>
+        <p class="footer-links">
+          <a href="diagnostics/summary.md" class="button-link secondary">Diagnostics summary</a>
+          <a href="diagnostics/REPORT.md" class="button-link secondary">Full report</a>
+        </p>
+      </footer>
+    </div>
+    <script defer src="assets/dashboard.js"></script>
+  </body>
+</html>
