@@ -29,7 +29,7 @@ ready for SIEM, SOAR, EDR, and threat intelligence platforms.
 - [Outputs & diagnostics](#-outputs--diagnostics)
 - [Integrations & compatibility](#-integrations--compatibility)
 - [Roadmap & contributing](#-roadmap--contributing)
-- [Code Flow (Overview)](#-Code-Flow-(Overview))
+- [Code Flow (Overview)](#code-flow-overview)
 
 ## 🚀 Key capabilities for cybersecurity automation
 - 🕒 **Recent-only lookback** – configurable collection window (48h default)
