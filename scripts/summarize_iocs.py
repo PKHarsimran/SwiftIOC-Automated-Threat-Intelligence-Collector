@@ -131,7 +131,13 @@ def build_highlights(diag: Dict[str, Any] | None, rows: List[Dict[str, Any]]) ->
     duplicates = diag.get("duplicates_removed") if diag else None
     if duplicates is None:
         duplicates = 0
-    generated = diag.get("ts") if diag else iso(datetime.now(timezone.utc))
+    generated_value = diag.get("ts") if diag else None
+    if isinstance(generated_value, str) and generated_value:
+        generated = generated_value
+    elif generated_value:
+        generated = str(generated_value)
+    else:
+        generated = iso(datetime.now(timezone.utc))
     window = diag.get("window_hours") if diag else None
     counts = (diag.get("counts") if diag else None) or derive_counts(rows)
     active_sources = sum(1 for _, value in counts.items() if value > 0)
