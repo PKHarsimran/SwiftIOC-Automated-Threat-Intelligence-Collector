@@ -25,7 +25,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  ENABLE_PAGES: "false"  # set to "true" to deploy GitHub Pages
+  ENABLE_PAGES: "true"
 
 jobs:
   collect:
@@ -84,6 +84,14 @@ jobs:
             --diag-json public/diagnostics/run.json \
             --report public/diagnostics/REPORT.md \
             --fail-on-empty urlhaus_recent_urls malwarebazaar_recent
+
+      - name: Summarize IOC outputs
+        run: |
+          python scripts/summarize_iocs.py \
+            --diag public/diagnostics/run.json \
+            --ioc-jsonl public/iocs/latest.jsonl \
+            --out public/diagnostics/summary.md \
+            --index public/index.md
 
       - name: Upload artifacts (diagnostics & outputs)
         uses: actions/upload-artifact@v4
