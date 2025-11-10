@@ -270,6 +270,51 @@ Override `--out` or `--index` if you want to write the summary elsewhere.
 The workflow ships with GitHub Pages deployment enabled, so everything under
 `public/`—including the summary—goes live after each successful run.
 
+**🧭 High-level Data Flow**
+flowchart LR
+  A[sources.yml<br/>+ CLI flags] --> B[Collector Orchestrator<br/><code>collect_from_yaml()</code>]
+  subgraph S[Adapters]
+    K[CISA KEV]:::adp
+    U[URLhaus CSV]:::adp
+    M[MalwareBazaar CSV]:::adp
+    T[ThreatFox JSON]:::adp
+    F[Feodo IP Blocklist]:::adp
+    J[SSLBL JA3/JA3S]:::adp
+    H[Spamhaus DROP]:::adp
+    O[OpenPhish]:::adp
+    C[CINS Army]:::adp
+    R[Tor Exit Nodes]:::adp
+    RSS[RSS (iocextract)]:::adp
+  end
+  B --> S
+  S --> C1[(Indicator List)]
+  C1 --> D[Deduplicate & Merge<br/>(by type+indicator)]
+  D --> E[[Writers]]
+  E --> E1[CSV/TSV/JSON/JSONL]
+  E --> E2[STIX 2.1 Bundle]
+  E --> E3[Changelog.md]
+  D --> G[Diagnostics<br/>run.json + REPORT.md]
+  classDef adp fill:#eef,stroke:#99f;
+
+**🔧 Runtime Architecture**
+
+graph TD
+  main --> parse_args[argparse CLI]
+  parse_args --> logging[configure_logging()]
+  parse_args --> ua[_load_ua_file()]
+  parse_args --> cfg[load sources.yml]
+  parse_args --> collect[collect_from_yaml()]
+  collect --> adapters
+  adapters --> indicators[(List[Indicator])]
+  indicators --> dedup[dedupe + merge_conf + tag union]
+  dedup --> outputs
+  outputs --> csv[write_csv/tsv/json/jsonl]
+  outputs --> stix[write_stix]
+  outputs --> change[write_changelog]
+  outputs --> diag[diagnostics json + report]
+  main --> summary[append_gh_summary()]
+
+
 ## 🔌 Integrations & compatibility
 SwiftIOC plays well with popular security platforms and file formats:
 
