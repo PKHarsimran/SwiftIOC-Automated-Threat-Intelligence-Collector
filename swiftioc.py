@@ -48,7 +48,7 @@ CONF_RANK = {"low": 10, "medium": 50, "high": 90}
 
 
 # ---------------- parser registry ----------------
-ParserFunc = Callable[[str, str, str, datetime], List["Indicator"]]
+ParserFunc = Callable[..., List["Indicator"]]
 
 
 class ParserRegistry(dict):
