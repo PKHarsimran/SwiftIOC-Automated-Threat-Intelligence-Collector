@@ -6,8 +6,16 @@
     <title>SwiftIOC Threat Intelligence Dashboard</title>
     <meta
       name="description"
-      content="Live snapshot of the most recent SwiftIOC automated threat intelligence collection run with download links, source breakdowns, and a live data preview."
+      content="Live snapshot of the most recent SwiftIOC automated threat intelligence collection run with download links, source breakdowns, operational recommendations, and a live data preview."
     />
+    <meta name="theme-color" content="#0f172a" />
+    <meta property="og:title" content="SwiftIOC Threat Intelligence Dashboard" />
+    <meta
+      property="og:description"
+      content="Inspect the freshest SwiftIOC indicators, understand source health, and act on curated operational recommendations."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="twitter:card" content="summary_large_image" />
     <link rel="preload" href="assets/styles.css" as="style" />
     <link rel="stylesheet" href="assets/styles.css" />
   </head>
@@ -24,10 +32,13 @@
             <a href="#overview">Overview</a>
             <a href="#highlights">Highlights</a>
             <a href="#timeline">Timeline</a>
+            <a href="#playbook">Playbook</a>
             <a href="#sources">Sources</a>
             <a href="#indicator-types">Types</a>
             <a href="#preview">Preview</a>
             <a href="#actions">Downloads</a>
+            <a href="#recommendations">Recommendations</a>
+            <a href="#faq">FAQ</a>
             <a href="diagnostics/summary.html">Diagnostics</a>
           </div>
         </nav>
@@ -133,6 +144,63 @@
           </div>
         </section>
 
+        <section id="playbook" class="section section-alt">
+          <div class="section-heading">
+            <h2>Operational playbook</h2>
+            <p>
+              A lightweight, repeatable workflow that helps responders keep SwiftIOC data fresh, actionable,
+              and measurable inside their existing tooling.
+            </p>
+          </div>
+          <ol class="step-list">
+            <li class="step-card">
+              <div class="step-badge" aria-hidden="true">1</div>
+              <div class="step-content">
+                <h3>Validate freshness and scope</h3>
+                <p>
+                  Start each review by confirming the collection window and overlaps so downstream teams
+                  know exactly how recent and comprehensive the data is.
+                </p>
+                <ul class="step-actions">
+                  <li>Compare <a href="#timeline">timeline</a> metrics with your detection coverage SLAs.</li>
+                  <li>Alert stakeholders if the multi-source overlap count drops unexpectedly.</li>
+                  <li>Bookmark the diagnostics summary for quick health checks during incidents.</li>
+                </ul>
+              </div>
+            </li>
+            <li class="step-card">
+              <div class="step-badge" aria-hidden="true">2</div>
+              <div class="step-content">
+                <h3>Promote the right exports</h3>
+                <p>
+                  Select the format that best aligns with your automation stack and make it part of a
+                  scheduled sync so analysts always see the latest indicators.
+                </p>
+                <ul class="step-actions">
+                  <li>Use the JSON feed for orchestration platforms and enrichment microservices.</li>
+                  <li>Stream the JSONL file into data lakes to preserve historical context.</li>
+                  <li>Create a GitHub Action that publishes CSV/TSV artifacts for SIEM uploads.</li>
+                </ul>
+              </div>
+            </li>
+            <li class="step-card">
+              <div class="step-badge" aria-hidden="true">3</div>
+              <div class="step-content">
+                <h3>Close the loop with feedback</h3>
+                <p>
+                  Track which sources and indicator types deliver the most value so you can iterate on the
+                  playbook and retire noisy feeds.
+                </p>
+                <ul class="step-actions">
+                  <li>Map <a href="#sources">source totals</a> to your internal asset or client groups.</li>
+                  <li>Collect analyst feedback directly inside pull requests for new source onboarding.</li>
+                  <li>Document high-confidence tags and share them with your threat hunting community.</li>
+                </ul>
+              </div>
+            </li>
+          </ol>
+        </section>
+
         <section id="sources" class="section">
           <div class="section-heading">
             <h2>Per-source totals</h2>
@@ -212,15 +280,44 @@
             aria-busy="false"
           >
             <div class="preview-toolbar">
-              <label class="toolbar-group" for="preview-filter">
-                <span>Filter by type</span>
-                <select id="preview-filter" data-preview-filter disabled>
-                  <option value="all">All types</option>
-                </select>
-              </label>
-              <button type="button" class="button-link secondary" data-preview-refresh>
-                Refresh preview
-              </button>
+              <div class="toolbar-controls">
+                <label class="toolbar-group" for="preview-filter">
+                  <span>Filter by type</span>
+                  <select id="preview-filter" data-preview-filter disabled>
+                    <option value="all">All types</option>
+                  </select>
+                </label>
+                <label class="toolbar-group" for="preview-tag-filter">
+                  <span>Focus on tag</span>
+                  <select id="preview-tag-filter" data-preview-tag-filter disabled>
+                    <option value="all">All tags</option>
+                  </select>
+                </label>
+                <label class="toolbar-group" for="preview-limit">
+                  <span>Rows</span>
+                  <select id="preview-limit" data-preview-limit>
+                    <option value="12">12</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                  </select>
+                </label>
+              </div>
+              <div class="toolbar-actions">
+                <label class="toolbar-group" for="preview-search">
+                  <span>Search indicators</span>
+                  <input
+                    id="preview-search"
+                    type="search"
+                    name="preview-search"
+                    placeholder="Indicator, tag, source, or type"
+                    autocomplete="off"
+                    data-preview-search
+                  />
+                </label>
+                <button type="button" class="button-link secondary" data-preview-refresh>
+                  Refresh preview
+                </button>
+              </div>
             </div>
             <div class="preview-table-wrapper">
               <table class="preview-table" data-preview-table hidden>
@@ -324,6 +421,94 @@
                 <a class="button-link secondary" href="iocs/">Open directory</a>
               </div>
             </article>
+          </div>
+        </section>
+
+        <section id="recommendations" class="section section-alt">
+          <div class="section-heading">
+            <h2>Recommendations for GitHub Pages deployments</h2>
+            <p>
+              Keep the published dashboard trustworthy and easy to evangelise with these lightweight
+              improvements tailored for GitHub Pages hosting.
+            </p>
+          </div>
+          <div class="recommendations-grid">
+            <article class="recommendation-card">
+              <h3>Automate publishing</h3>
+              <p>
+                Use a scheduled GitHub Action that runs the SwiftIOC collector, commits the refreshed
+                <code>public/</code> artefacts, and triggers a Pages deploy so the site never goes stale.
+              </p>
+              <ul>
+                <li>Store API secrets as GitHub Action secrets with least-privilege scopes.</li>
+                <li>Attach a job summary that links directly back to the latest dashboard build.</li>
+              </ul>
+            </article>
+            <article class="recommendation-card">
+              <h3>Deliver rich previews</h3>
+              <p>
+                Add Open Graph images to <code>public/assets/</code> and reference them via metadata so
+                sharing the dashboard in Slack or Teams displays an informative preview.
+              </p>
+              <ul>
+                <li>Generate the image as part of the pipeline to highlight total indicators and freshness.</li>
+                <li>Optimise the asset below 512&nbsp;KB to keep GitHub Pages fast.</li>
+              </ul>
+            </article>
+            <article class="recommendation-card">
+              <h3>Instrument engagement</h3>
+              <p>
+                Track which download options are most popular by wiring privacy-friendly analytics such as
+                Plausible or Azure Application Insights through a consent-aware toggle.
+              </p>
+              <ul>
+                <li>Sample page views per environment instead of collecting user-level data.</li>
+                <li>Expose opt-in messaging so defenders understand the measurement scope.</li>
+              </ul>
+            </article>
+            <article class="recommendation-card">
+              <h3>Boost discoverability</h3>
+              <p>
+                Publish a <code>security.txt</code> and sitemap.xml alongside the dashboard to help external
+                teams and search engines locate support contacts and machine-readable content.
+              </p>
+              <ul>
+                <li>Reference the security contact in your organisation profile and repository README.</li>
+                <li>Mirror the sitemap generation inside the SwiftIOC pipeline for zero-maintenance updates.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section id="faq" class="section">
+          <div class="section-heading">
+            <h2>Frequently asked questions</h2>
+            <p>Share these quick answers with stakeholders rolling out the GitHub Pages dashboard.</p>
+          </div>
+          <div class="faq-group">
+            <details>
+              <summary>How often should the dashboard refresh?</summary>
+              <p>
+                Align the schedule with your highest-priority detection workflows. Many teams rebuild the
+                site hourly during active incidents and at least daily during steady state operations.
+              </p>
+            </details>
+            <details>
+              <summary>Can we restrict access to the published data?</summary>
+              <p>
+                GitHub Pages is public by design. If you require access controls, mirror the generated
+                <code>public/</code> directory to a private S3 bucket or internal static site hosting
+                service and reuse these assets there.
+              </p>
+            </details>
+            <details>
+              <summary>Where should contributors report issues?</summary>
+              <p>
+                Encourage teams to open GitHub issues in the repository so feedback stays close to the
+                infrastructure-as-code. The <a href="diagnostics/summary.html">diagnostics report</a>
+                helps triage whether the problem stems from data quality or hosting.
+              </p>
+            </details>
           </div>
         </section>
       </main>
