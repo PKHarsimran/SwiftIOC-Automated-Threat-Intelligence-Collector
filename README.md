@@ -1,67 +1,102 @@
-# ⚡ SwiftIOC – Open-Source Automated Threat Intelligence Collector
+# ⚡ SwiftIOC – Open Source Automated Threat Intelligence Collector
 
-SwiftIOC is an **open-source, zero-infrastructure threat intelligence collector**
-that automatically aggregates the latest Indicators of Compromise (IOCs) from
-trusted cybersecurity feeds. It transforms the raw data into machine-readable,
-defanged formats that are ideal for **security operations centers (SOC), threat
-hunting teams, incident responders, and detection engineers** who need timely
-intel without the overhead of maintaining custom pipelines.
+SwiftIOC is an open-source Python threat intelligence automation toolkit that
+keeps recent Indicators of Compromise (IOCs) in machine-readable formats. The
+lightweight collector (`swiftioc.py`) ingests threat feeds via YAML
+configuration, normalises and deduplicates the indicators, and exports them to
+CSV, TSV, JSON, JSON Lines, and STIX 2.1 alongside searchable run diagnostics.
 
-The project ships as a single Python module (`swiftioc.py`) and runs anywhere
-Python 3.11+ is available—including **GitHub Actions**, CI/CD pipelines, or a
-lightweight workstation. By default SwiftIOC focuses on **fresh activity from
-the last 24–48 hours**, normalizes and deduplicates IOCs, and publishes feeds
-ready for SIEM, SOAR, EDR, and threat intelligence platforms.
+Designed for security operations teams, SOC analysts, and cyber threat hunters,
+SwiftIOC runs anywhere Python is available—local workstations, CI/CD pipelines,
+GitHub Actions, or automated cron jobs. Outputs land under `public/` by default
+so they can be published directly with GitHub Pages, integrated into SIEM and
+SOAR tooling, or archived for compliance reporting. The repository includes
+ready-to-use examples for rapid deployment in modern DevSecOps workflows.
 
-> 🧠 Use SwiftIOC to keep pace with malware campaigns, phishing URLs, botnet
-> infrastructure, ransomware hashes, and CVEs circulating across the security
-> community—without building your own aggregator.
-
-## 📚 Table of Contents
-- [Key capabilities](#-key-capabilities-for-cybersecurity-automation)
-- [Use cases & benefits](#-use-cases--benefits)
+## 📚 Table of contents
+- [SwiftIOC at a glance](#-swiftioc-at-a-glance)
+- [Features](#-features)
+- [Supported threat intelligence sources](#-supported-threat-intelligence-sources)
+- [Use cases & SEO-friendly keywords](#-use-cases--seo-friendly-keywords)
 - [Repository layout](#-repository-layout)
-- [How the collector works](#-how-the-collector-works)
-- [Getting started locally](#-getting-started-locally)
-- [Running in GitHub Actions](#-running-in-github-actions)
+- [How it works](#-how-it-works)
+- [Quick start](#-quick-start)
 - [Configuring sources](#-configuring-sources)
 - [CLI reference](#-cli-reference)
 - [Outputs & diagnostics](#-outputs--diagnostics)
-- [Integrations & compatibility](#-integrations--compatibility)
-- [Roadmap & contributing](#-roadmap--contributing)
-- [Code Flow (Overview)](#code-flow-overview)
+- [Running in GitHub Actions](#-running-in-github-actions)
+- [Auto-generated IOC summary](#auto-generated-ioc-summary)
 
-## 🚀 Key capabilities for cybersecurity automation
-- 🕒 **Recent-only lookback** – configurable collection window (48h default)
-  ensures feeds stay focused on active adversary infrastructure.
-- 🔌 **Feed-driven architecture** – add or disable feeds via YAML without touching
-  code, making it simple to align with your threat intelligence requirements.
-- 🧹 **Normalization & defanging** – IP addresses, URLs, domains, file hashes,
-  CVEs, and malware families are typed, deduplicated, and safely defanged for
-  sharing across security tooling.
-- 📄 **Multiple export formats** – export to CSV, TSV, JSON, JSON Lines, and
-  STIX 2.1 for immediate ingestion by SIEM, SOAR, EDR, TIP, and DFIR workflows.
-- 📊 **Actionable reporting** – detailed run diagnostics, per-source statistics,
-  and change summaries power dashboards and automated quality checks.
-- 🧠 **Enrichment hooks** – AbuseIPDB, URLhaus, ASN lookups, GeoIP context, and
-  parser enrichments are built in and toggled through the source definitions.
-- 🧩 **CI friendly** – deterministic CLI flags, optional raw feed capture, and
-  guardrails that prevent CI runs from silently succeeding on empty feeds.
-- 🌐 **GitHub Pages ready** – outputs publish directly to `public/` so you can
-  host a live threat intelligence portal in minutes.
+## 🔍 SwiftIOC at a glance
+SwiftIOC helps cybersecurity teams automate the collection and publication of
+high-fidelity IOCs from authoritative sources. The project emphasises:
 
-## 🎯 Use cases & benefits
-- **SOC automation** – push vetted IOCs into detection content or blocklists on
-  a predictable schedule.
-- **Threat hunting** – triage fresh indicators, enrich with context, and pivot
-  quickly using defanged URLs and MITRE ATT&CK-aligned tagging.
-- **Incident response** – compare live incident data against curated feeds to
-  confirm or disprove compromise quickly.
-- **Security research** – monitor vendor advisories and malware trackers to
-  inform blog posts, newsletters, and situational awareness briefings.
+- **Automated threat feed aggregation** with YAML-based configuration.
+- **Consistent IOC enrichment** ready for SIEM, SOAR, IDS, and DFIR tooling.
+- **Git-friendly artefacts** tailored for GitHub Pages, GitHub Actions, and
+  other CI/CD environments.
 
-SwiftIOC helps teams reduce manual feed collection, stay aligned with the MITRE
-ATT&CK® framework, and ensure downstream tools receive consistent IOC data.
+## 🚀 Features
+- **YAML-driven feeds** – feed metadata lives in `sources.yml` so collections can
+  be changed without touching Python code. The example file includes adapters for
+  CISA KEV, URLhaus, MalwareBazaar, ThreatFox, Feodo Tracker, SSLBL JA3, Spamhaus
+  DROP, OpenPhish, CINS Army, and Tor exit lists. 【F:swiftioc.py†L255-L549】【F:sources.example.yml†L1-L40】
+- **Indicator normalisation** – every indicator is represented by the
+  `Indicator` dataclass and classified (IPv4/IPv6, URL, domain, hash, CVE, etc.)
+  before being written to disk. 【F:swiftioc.py†L94-L181】
+- **Defanging & deduplication** – helper functions defang URLs/domains and
+  remove duplicate indicators so that downstream tools receive safe, unique
+  values. 【F:swiftioc.py†L158-L215】【F:swiftioc.py†L688-L774】
+- **Multiple export formats** – each run emits CSV, TSV, JSON, JSON Lines, a
+  STIX 2.1 bundle, and a Markdown changelog. 【F:swiftioc.py†L1115-L1156】
+- **Rich diagnostics** – a JSON run summary, Markdown report, and per-source
+  counts are generated automatically for audits and dashboards. 【F:swiftioc.py†L1158-L1248】
+- **Optional RSS collection** – RSS feeds are processed when `feedparser` is
+  installed; use `--skip-rss` (or `--ci-safe`) to run without the dependency.
+  【F:swiftioc.py†L243-L251】【F:swiftioc.py†L571-L579】【F:swiftioc.py†L1214-L1231】
+- **CI-friendly defaults** – JSON logging, deterministic output paths, and
+  guard-rail flags (`--fail-on-empty`, `--fail-if-stale`, `--grace-on-404`) make
+  the collector predictable in automation. 【F:swiftioc.py†L1001-L1109】
+
+## 🌐 Supported threat intelligence sources
+SwiftIOC ships with parsers and adapters for widely referenced cyber threat
+intelligence feeds used by SOC teams and managed security providers:
+
+- **CISA Known Exploited Vulnerabilities (KEV)** – prioritise patching by
+  monitoring the official CISA KEV catalogue.
+- **URLhaus** – ingest malicious URL indicators to protect web gateways and
+  proxies.
+- **MalwareBazaar** – track malicious file hashes for EDR, AV, and sandbox
+  tooling.
+- **ThreatFox** – add IPs, domains, URLs, and hashes curated by abuse.ch.
+- **Feodo Tracker & SSLBL JA3 fingerprints** – detect C2 traffic associated
+  with banking trojans and malicious TLS fingerprints.
+- **Spamhaus DROP/EDROP** – block known botnet controllers at the network edge.
+- **OpenPhish, CINS Army, Tor exit lists, and more** – extend coverage with
+  phishing, scanning, and anonymiser indicators.
+
+Each feed is configurable through `sources.yml`, allowing teams to fine-tune the
+collection cadence, lookback windows, and authentication as required.
+
+## 🎯 Use cases & SEO-friendly keywords
+SwiftIOC supports a wide range of cybersecurity automation workflows. Common
+use cases include:
+
+- **Security Operations Centre (SOC) automation** – schedule IOC collection
+  jobs to keep SIEM and IDS rules current with open-source threat intelligence.
+- **Digital forensics & incident response (DFIR)** – export defanged indicators
+  for investigations without risking accidental activation.
+- **DevSecOps pipelines** – integrate threat feed enrichment into CI/CD, GitOps,
+  or infrastructure-as-code projects.
+- **Threat hunting playbooks** – generate STIX 2.1 bundles consumable by MISP,
+  OpenCTI, and other CTI platforms.
+- **Compliance reporting and executive dashboards** – leverage Markdown and
+  JSON diagnostics for stakeholder-friendly reporting.
+
+Keywords to improve discoverability: "automated threat intelligence collector",
+"open source IOC feed aggregator", "Python threat hunting toolkit", "cyber
+threat intelligence automation", "STIX export for SOC", and "GitHub Actions
+threat feed workflow".
 
 ## 🗂️ Repository layout
 ```
@@ -74,28 +109,27 @@ ATT&CK® framework, and ensure downstream tools receive consistent IOC data.
 ├── requirements.txt        # Python dependencies
 ├── sources.example.yml     # Sample feed configuration
 ├── swiftioc.py             # Main collector implementation & CLI
+├── index.html              # Optional GitHub Pages entry point
 ├── README.md               # This document
 └── SECURITY.md             # Security reporting policy
 ```
 
-## 🧠 How the collector works
-1. **Load sources** – `swiftioc.py` reads `sources.yml` (or
-   `sources.example.yml`) to discover JSON, CSV, and RSS feeds.
-2. **Fetch & parse** – each source is fetched with retrying HTTP clients and a
-   rotating User-Agent pool. Feed-specific parsers normalize the data into a
-   unified schema.
-3. **Normalize** – every indicator is typed, defanged, timestamped, and
-   attributed to its originating source.
-4. **Deduplicate & filter** – duplicates are removed and the collection window is
-   enforced globally or per-source.
-5. **Publish** – indicators and run diagnostics are written to the `public/`
-   directory, ready to be served via GitHub Pages or consumed by downstream
-   systems.
+## 🧠 How it works
+1. **Load configuration** – `swiftioc.py` reads `sources.yml` (falling back to
+   `sources.example.yml` when needed) and sets up logging, user agents, and
+   output directories. 【F:swiftioc.py†L1001-L1091】
+2. **Collect per source** – each API or RSS source is routed to a parser
+   registered via `@register_parser`, which fetches and converts raw feed data
+   into `Indicator` objects. 【F:swiftioc.py†L71-L160】【F:swiftioc.py†L255-L593】
+3. **Deduplicate & filter** – indicators are merged, deduplicated, and filtered
+   by the configured lookback window. 【F:swiftioc.py†L632-L774】
+4. **Publish outputs** – all formats, diagnostics, and changelog entries are
+   written beneath the chosen output directory. 【F:swiftioc.py†L1115-L1248】
 
-## 🧪 Getting started locally
+## 🏁 Quick start
 Prerequisites:
-- Python **3.11+**
-- A virtual environment is recommended
+- Python 3.10 or newer (tested with CPython on Linux and GitHub Actions)
+- `pip` for dependency management
 
 ```bash
 # 1. Clone and enter the repository
@@ -114,15 +148,98 @@ pip install -r requirements.txt
 python -m swiftioc --sources sources.example.yml --out-dir public
 ```
 
-Artifacts will appear under `public/`. Add `--verbose` to watch progress, or
-`--self-test` to run quick assertions verifying the classifier and defanging
-helpers.
+Artifacts appear under `public/`. Add `--verbose` for progress logging or
+`--self-test` to run the built-in sanity checks without touching the network.
+【F:swiftioc.py†L1093-L1156】
+
+## 🧾 Configuring sources
+Create a `sources.yml` to describe the feeds you care about. The file mirrors the
+structure in `sources.example.yml` and supports per-source options. `window_hours`
+defines the global lookback window; override it for individual feeds using
+`--source-window name=HOURS` on the CLI. 【F:swiftioc.py†L1001-L1109】
+
+```yaml
+window_hours: 48
+
+apis:
+  - name: cisa_kev
+    kind: json
+    parse: kev
+    url: https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json
+    reference: https://www.cisa.gov/known-exploited-vulnerabilities-catalog
+
+  - name: urlhaus_recent_urls
+    kind: csv
+    parse: urlhaus
+    url: https://urlhaus.abuse.ch/downloads/csv_recent/
+    reference: https://urlhaus.abuse.ch/
+    # Optional filter supplied via --urlhaus-status
+
+rss:
+  - name: google_tag
+    url: https://blog.google/threat-analysis-group/rss/
+    reference: https://blog.google/threat-analysis-group/
+```
+
+Each parser can accept additional keyword arguments defined under `options:`.
+Custom parsers are supported via Python dotted paths (for example,
+`parse: my_package.parsers:parse_feed`). 【F:swiftioc.py†L60-L145】【F:swiftioc.py†L562-L593】
+
+## 📋 CLI reference
+Run `python -m swiftioc --help` for the full list of switches. Highlights:
+
+| Flag | Purpose |
+| --- | --- |
+| `--out-dir PATH` | Directory where artifacts are written (`public/` by default). |
+| `--sources PATH` | YAML configuration (`sources.yml`, falls back to `sources.example.yml`). |
+| `--window-hours N` | Global lookback window in hours. |
+| `--skip-rss` | Disable RSS processing entirely. |
+| `--max-per-source N` | Cap the number of indicators taken from each source. |
+| `--urlhaus-status {any,online,offline}` | Filter URLhaus indicators by status. |
+| `--source-window name=N` | Override the lookback window for specific sources. |
+| `--grace-on-404 name…` | Treat HTTP 404 for listed sources as a non-fatal empty result. |
+| `--fail-on-empty name…` | Fail the run if any listed sources return zero indicators. |
+| `--fail-if-stale name=N` | Fail when the newest indicator from `name` is older than `N` hours. |
+| `--save-raw-dir PATH` | Persist raw feed responses for later inspection. |
+| `--diag-json PATH` | Write diagnostics JSON (defaults to `public/diagnostics/run.json`). |
+| `--report PATH` | Write Markdown run report (defaults to `public/diagnostics/REPORT.md`). |
+| `--ua-file PATH` | Provide a custom user-agent pool (one UA per line). |
+| `--ci-safe` | Convenience flag for CI runs (JSON logs, ensures diagnostics dirs, tolerates missing RSS dependency). |
+| `--self-test` | Execute built-in assertions without fetching feeds. |
+| `-v/--verbose` | Increase console logging (`-vv` for debug). |
+| `--log-file PATH` | Send logs to a file. |
+| `--log-format {text,json}` | Choose console/file log format. |
+| `--log-file-level LEVEL` | Control the file log level (default `DEBUG`). |
+
+## 📦 Outputs & diagnostics
+The collector populates the following structure (paths relative to `--out-dir`):
+
+```
+public/
+├── index.md
+├── iocs/
+│   ├── latest.csv
+│   ├── latest.tsv
+│   ├── latest.json
+│   ├── latest.jsonl
+│   └── stix2.json
+├── changelog/
+│   └── CHANGELOG.md
+└── diagnostics/
+    ├── REPORT.md
+    ├── run.json
+    ├── summary.md
+    └── raw/                 # present when --save-raw-dir is used
+```
+
+The diagnostics include per-source counts, duplicate statistics, earliest and
+latest timestamps, and any recorded failures. These summaries are useful for CI
+status checks and dashboards. 【F:swiftioc.py†L1158-L1248】
 
 ## ⚙️ Running in GitHub Actions
-SwiftIOC ships with a workflow-friendly CLI and writes outputs to `public/`,
-which can be published directly via **GitHub Pages** or stored as artifacts.
-Below is an example workflow (`.github/workflows/pages.yml`) that executes hourly
-and deploys the latest feeds to Pages:
+SwiftIOC runs cleanly inside GitHub Actions and emits artifacts that can be
+published via GitHub Pages. The workflow below collects IOCs hourly and deploys
+`public/`:
 
 ```yaml
 name: SwiftIOC – Threat Intel Collector
@@ -172,109 +289,14 @@ jobs:
 ```
 
 `--ci-safe` enables JSON logging, ensures diagnostic directories exist, and
-suppresses failures when optional dependencies (like `feedparser` for RSS) are
-missing.
+suppresses hard failures when the optional RSS dependency is missing.
+【F:swiftioc.py†L1001-L1109】
 
-## 🛠️ Configuring sources
-Create a `sources.yml` file to describe the feeds you care about. The
-`window_hours` setting defines the default lookback period. Each source entry can
-override behaviour (such as per-source window or fallback URLs). A trimmed
-example:
-
-```yaml
-window_hours: 48
-
-apis:
-  - name: cisa_kev
-    kind: json
-    parse: kev
-    url: https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json
-    reference: https://www.cisa.gov/known-exploited-vulnerabilities-catalog
-
-  - name: urlhaus_recent_urls
-    kind: csv
-    parse: urlhaus
-    url: https://urlhaus.abuse.ch/downloads/csv_recent/
-    reference: https://urlhaus.abuse.ch/
-    options:
-      status_filter: online
-
-# Custom parsers can be referenced via dotted paths
-  - name: community_feed
-    parse: my_plugins.parsers:parse_feed
-    url: https://example.org/export.json
-    reference: https://example.org/
-
-rss:
-  - name: google_tag
-    url: https://blog.google/threat-analysis-group/rss/
-    reference: https://blog.google/threat-analysis-group/
-```
-
-The `parse` field maps to functions registered in SwiftIOC's parser registry.
-Built-in collectors (e.g., `kev`, `urlhaus`, `malwarebazaar`) are available out
-of the box, and custom callables can be referenced via a dotted Python path
-(`module:function`). Any `options` block is passed as keyword arguments to the
-parser after filtering by its signature, so feed-specific settings (like the
-`status_filter` override above) live alongside the source definition.
-
-To disable RSS handling (and the `feedparser` dependency), pass `--skip-rss` at
-runtime. When a requested `sources.yml` file is missing, the CLI automatically
-falls back to `sources.example.yml`.
-
-## 🧾 CLI reference
-Run `python -m swiftioc --help` for the full list of switches. Highlights:
-
-| Flag | Purpose |
-| --- | --- |
-| `--out-dir PATH` | Where to write generated artifacts (`public/` by default). |
-| `--sources PATH` | YAML configuration of API and RSS feeds (`sources.yml`). |
-| `--window-hours N` | Global lookback window (hours). Override per source via `--source-window name=N`. |
-| `--urlhaus-status {any,online,offline}` | Filter URLhaus indicators by status. |
-| `--max-per-source N` | Cap the number of indicators recorded from each source. |
-| `--fail-on-empty name…` | Fail the run if any listed sources return zero indicators. |
-| `--fail-if-stale name=N` | Fail the run if newest indicator from `name` is older than `N` hours. |
-| `--save-raw-dir PATH` | Persist the raw feed responses for auditing/debugging. |
-| `--diag-json PATH` | Write a structured diagnostics summary (defaults to `public/diagnostics/run.json`). |
-| `--report PATH` | Generate a Markdown run report (defaults to `public/diagnostics/REPORT.md`). |
-| `--ci-safe` | Convenience flag for CI environments (JSON logs, tolerant RSS handling). |
-| `--self-test` | Execute built-in sanity checks instead of collecting feeds. |
-
-## 📦 Outputs & diagnostics
-Running the collector produces the following structure (paths relative to
-`--out-dir`):
-
-```
-public/
-├── index.md
-├── iocs/
-│   ├── latest.csv
-│   ├── latest.tsv
-│   ├── latest.json
-│   ├── latest.jsonl
-│   └── stix2.json
-├── changelog/
-│   └── CHANGELOG.md
-└── diagnostics/
-    ├── REPORT.md
-    ├── run.json
-    ├── summary.md
-    └── raw/                 # optional when --save-raw-dir is supplied
-```
-
-All indicators share a common schema (`indicator`, `type`, `source`,
-`first_seen`, `last_seen`, `confidence`, `tlp`, `tags`, `reference`, `context`).
-`REPORT.md` and `run.json` summarise totals, per-source counts, type breakdowns,
-and any issues encountered, while `summary.md` condenses the run into a portal-
-ready Markdown snapshot that also drives `public/index.md`.
-
-### Auto-generated IOC summary
-
+## 🧪 Auto-generated IOC summary
 The helper script [`scripts/summarize_iocs.py`](scripts/summarize_iocs.py)
-produces the Markdown summary and GitHub Pages landing page. It runs
-automatically in the **Collect – SwiftIOC** workflow and also appends the same
-information to the GitHub Actions job summary. You can execute it locally after
-any collection run:
+turns the diagnostics and JSONL output into Markdown summaries. It runs
+automatically in the "Collect – SwiftIOC" workflow and can also be executed
+manually:
 
 ```bash
 python scripts/summarize_iocs.py \
@@ -282,64 +304,10 @@ python scripts/summarize_iocs.py \
   --ioc-jsonl public/iocs/latest.jsonl
 ```
 
-Override `--out` or `--index` if you want to write the summary elsewhere.
-The workflow ships with GitHub Pages deployment enabled, so everything under
-`public/`—including the summary—goes live after each successful run.
+Override `--out` or `--index` to control where the summary is written. When the
+repository is published with GitHub Pages, everything under `public/` becomes the
+site content.
 
-### Code Flow (Overview)
-```mermaid
-flowchart TD
-    A[CLI argparse] --> B[Setup]
-    B --> B1[configure_logging]
-    B --> B2[load_user_agents]
-    B --> B3[load_sources_yml]
-    A --> C[collect_from_yaml]
+---
 
-    subgraph Adapters
-        K[fetch_cisa_kev]
-        U[fetch_urlhaus_csv]
-        M[fetch_malwarebazaar_csv]
-        T[fetch_threatfox_export_json]
-        F[fetch_feodo_ipblocklist]
-        J[fetch_sslbl_ja3]
-        H[fetch_spamhaus_drop]
-        O[fetch_openphish]
-        C2[fetch_cins_army]
-        X[fetch_tor_exit]
-        R[fetch_rss]
-    end
-
-    C --> Adapters
-    Adapters --> D[List of Indicators]
-    D --> E[Deduplicate and Merge]
-    E --> W[Writers]
-    W --> W1[CSV TSV JSON JSONL]
-    W --> W2[STIX 2.1 Bundle]
-    W --> W3[Changelog]
-    E --> G[Diagnostics]
-    G --> G1[run.json]
-    G --> G2[REPORT.md]
-    E --> S[GitHub Step Summary]
-
-```
-
-## 🔌 Integrations & compatibility
-SwiftIOC plays well with popular security platforms and file formats:
-
-- **SIEM & log platforms:** Splunk, Elastic, Microsoft Sentinel, QRadar, Sumo
-  Logic
-- **SOAR & automation:** Cortex XSOAR, Tines, Shuffle, Torq
-- **Threat intelligence platforms:** MISP, OpenCTI, Anomali, ThreatConnect
-- **Blocklists & firewalls:** pfSense, Palo Alto Networks, Fortinet, Cisco
-
-Use the standard export formats or extend the CLI to push to custom REST APIs,
-message queues, or data lakes.
-
-## 📈 Roadmap & contributing
-Have ideas for new feeds, enrichments, or output formats? We welcome issues and
-pull requests. Join the conversation by opening a GitHub issue outlining the
-problem, enhancement, or research collaboration you have in mind. For
-security-sensitive reports, follow the [security policy](SECURITY.md).
-
-If you build something cool with SwiftIOC, share it! Blog posts, YouTube demos,
-and conference talks help other defenders discover the project.
+For security disclosures, please see [SECURITY.md](SECURITY.md).
