@@ -429,8 +429,14 @@ def fetch_feodo_ipblocklist(url: str, ref_url: str, source: str, ws: datetime) -
     return out
 
 
-@register_parser("sslbl_ja3")
-def fetch_sslbl_ja3(url: str, ref_url: str, source: str, ws: datetime, *, kind: str = "ja3") -> List[Indicator]:
+def _fetch_sslbl_ja3(
+    url: str,
+    ref_url: str,
+    source: str,
+    ws: datetime,
+    *,
+    kind: str,
+) -> List[Indicator]:
     text = ensure_text(http_get(url, name=source))
     out: List[Indicator] = []
     now = now_utc()
@@ -462,6 +468,11 @@ def fetch_sslbl_ja3(url: str, ref_url: str, source: str, ws: datetime, *, kind: 
     return out
 
 
+@register_parser("sslbl_ja3")
+def fetch_sslbl_ja3(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
+    return _fetch_sslbl_ja3(url, ref_url, source, ws, kind="ja3")
+
+
 @register_parser("spamhaus_drop")
 def fetch_spamhaus_drop(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
     text = ensure_text(http_get(url, name=source))
@@ -488,7 +499,7 @@ def fetch_spamhaus_drop(url: str, ref_url: str, source: str, ws: datetime) -> Li
 
 @register_parser("sslbl_ja3s")
 def fetch_sslbl_ja3s(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
-    return fetch_sslbl_ja3(url, ref_url, source, ws, kind="ja3s")
+    return _fetch_sslbl_ja3(url, ref_url, source, ws, kind="ja3s")
 
 
 @register_parser("openphish")
