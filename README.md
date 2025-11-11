@@ -40,23 +40,22 @@ high-fidelity IOCs from authoritative sources. The project emphasises:
 - **YAML-driven feeds** – feed metadata lives in `sources.yml` so collections can
   be changed without touching Python code. The example file includes adapters for
   CISA KEV, URLhaus, MalwareBazaar, ThreatFox, Feodo Tracker, SSLBL JA3, Spamhaus
-  DROP, OpenPhish, CINS Army, and Tor exit lists. 【F:swiftioc.py†L255-L549】【F:sources.example.yml†L1-L40】
+  DROP, OpenPhish, CINS Army, and Tor exit lists. 
 - **Indicator normalisation** – every indicator is represented by the
   `Indicator` dataclass and classified (IPv4/IPv6, URL, domain, hash, CVE, etc.)
-  before being written to disk. 【F:swiftioc.py†L94-L181】
+  before being written to disk. 
 - **Defanging & deduplication** – helper functions defang URLs/domains and
   remove duplicate indicators so that downstream tools receive safe, unique
-  values. 【F:swiftioc.py†L158-L215】【F:swiftioc.py†L688-L774】
+  values. 
 - **Multiple export formats** – each run emits CSV, TSV, JSON, JSON Lines, a
-  STIX 2.1 bundle, and a Markdown changelog. 【F:swiftioc.py†L1115-L1156】
+  STIX 2.1 bundle, and a Markdown changelog. 
 - **Rich diagnostics** – a JSON run summary, Markdown report, and per-source
-  counts are generated automatically for audits and dashboards. 【F:swiftioc.py†L1158-L1248】
+  counts are generated automatically for audits and dashboards. 
 - **Optional RSS collection** – RSS feeds are processed when `feedparser` is
   installed; use `--skip-rss` (or `--ci-safe`) to run without the dependency.
-  【F:swiftioc.py†L243-L251】【F:swiftioc.py†L571-L579】【F:swiftioc.py†L1214-L1231】
 - **CI-friendly defaults** – JSON logging, deterministic output paths, and
   guard-rail flags (`--fail-on-empty`, `--fail-if-stale`, `--grace-on-404`) make
-  the collector predictable in automation. 【F:swiftioc.py†L1001-L1109】
+  the collector predictable in automation. 
 
 ## 🌐 Supported threat intelligence sources
 SwiftIOC ships with parsers and adapters for widely referenced cyber threat
@@ -117,14 +116,14 @@ threat feed workflow".
 ## 🧠 How it works
 1. **Load configuration** – `swiftioc.py` reads `sources.yml` (falling back to
    `sources.example.yml` when needed) and sets up logging, user agents, and
-   output directories. 【F:swiftioc.py†L1001-L1091】
+   output directories. 
 2. **Collect per source** – each API or RSS source is routed to a parser
    registered via `@register_parser`, which fetches and converts raw feed data
-   into `Indicator` objects. 【F:swiftioc.py†L71-L160】【F:swiftioc.py†L255-L593】
+   into `Indicator` objects. 
 3. **Deduplicate & filter** – indicators are merged, deduplicated, and filtered
-   by the configured lookback window. 【F:swiftioc.py†L632-L774】
+   by the configured lookback window. 
 4. **Publish outputs** – all formats, diagnostics, and changelog entries are
-   written beneath the chosen output directory. 【F:swiftioc.py†L1115-L1248】
+   written beneath the chosen output directory. 
 
 ## 🏁 Quick start
 Prerequisites:
@@ -150,13 +149,13 @@ python -m swiftioc --sources sources.example.yml --out-dir public
 
 Artifacts appear under `public/`. Add `--verbose` for progress logging or
 `--self-test` to run the built-in sanity checks without touching the network.
-【F:swiftioc.py†L1093-L1156】
+
 
 ## 🧾 Configuring sources
 Create a `sources.yml` to describe the feeds you care about. The file mirrors the
 structure in `sources.example.yml` and supports per-source options. `window_hours`
 defines the global lookback window; override it for individual feeds using
-`--source-window name=HOURS` on the CLI. 【F:swiftioc.py†L1001-L1109】
+`--source-window name=HOURS` on the CLI. 
 
 ```yaml
 window_hours: 48
@@ -183,7 +182,7 @@ rss:
 
 Each parser can accept additional keyword arguments defined under `options:`.
 Custom parsers are supported via Python dotted paths (for example,
-`parse: my_package.parsers:parse_feed`). 【F:swiftioc.py†L60-L145】【F:swiftioc.py†L562-L593】
+`parse: my_package.parsers:parse_feed`). 
 
 ## 📋 CLI reference
 Run `python -m swiftioc --help` for the full list of switches. Highlights:
@@ -234,7 +233,7 @@ public/
 
 The diagnostics include per-source counts, duplicate statistics, earliest and
 latest timestamps, and any recorded failures. These summaries are useful for CI
-status checks and dashboards. 【F:swiftioc.py†L1158-L1248】
+status checks and dashboards. 
 
 ## ⚙️ Running in GitHub Actions
 SwiftIOC runs cleanly inside GitHub Actions and emits artifacts that can be
@@ -290,7 +289,7 @@ jobs:
 
 `--ci-safe` enables JSON logging, ensures diagnostic directories exist, and
 suppresses hard failures when the optional RSS dependency is missing.
-【F:swiftioc.py†L1001-L1109】
+
 
 ## 🧪 Auto-generated IOC summary
 The helper script [`scripts/summarize_iocs.py`](scripts/summarize_iocs.py)
