@@ -327,6 +327,85 @@ def fetch_cisa_kev(url: str, ref_url: str, source: str, ws: datetime) -> List[In
     return out
 
 
+@register_parser("nvd", "nist_nvd", "nist_nvd_recent")
+def fetch_nvd_recent(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
+    text = ensure_text(http_get(url, name=source))
+    try:
+        data = json.loads(text)
+    except json.JSONDecodeError:
+        logger.warning("%s returned invalid JSON", source)
+        return []
+    records = data.get("vulnerabilities") if isinstance(data, dict) else None
+    if not isinstance(records, list):
+        return []
+    now = now_utc()
+    out: List[Indicator] = []
+
+    def extract_severity(entry: Dict[str, Any]) -> Optional[str]:
+        metrics = entry.get("metrics", {})
+        if not isinstance(metrics, dict):
+            return None
+        for key in ("cvssMetricV31", "cvssMetricV30", "cvssMetricV2"):
+            items = metrics.get(key)
+            if not isinstance(items, list):
+                continue
+            for metric in items:
+                if not isinstance(metric, dict):
+                    continue
+                if key == "cvssMetricV2":
+                    sev = metric.get("baseSeverity")
+                    if isinstance(sev, str):
+                        return sev.lower()
+                cvss = metric.get("cvssData")
+                if isinstance(cvss, dict):
+                    sev = cvss.get("baseSeverity")
+                    if isinstance(sev, str):
+                        return sev.lower()
+        return None
+
+    for item in records:
+        if not isinstance(item, dict):
+            continue
+        cve = item.get("cve")
+        if not isinstance(cve, dict):
+            continue
+        cve_id = cve.get("id")
+        if not isinstance(cve_id, str):
+            continue
+        published = parse_dt(cve.get("published"))
+        last_modified = parse_dt(cve.get("lastModified"))
+        first_seen = published or last_modified or now
+        if first_seen and first_seen < ws:
+            continue
+        description = ""
+        for desc in cve.get("descriptions", []) or []:
+            if isinstance(desc, dict) and desc.get("lang", "").lower() == "en":
+                value = desc.get("value")
+                if isinstance(value, str):
+                    description = value.strip()
+                    break
+        severity = extract_severity(cve)
+        tags = {"cve", "nvd"}
+        if severity:
+            tags.add(severity.lower())
+        context = description or "NVD recent CVE"
+        out.append(
+            Indicator(
+                indicator=cve_id.upper(),
+                type="cve",
+                source=source,
+                first_seen=iso(first_seen or now),
+                last_seen=iso(last_modified or first_seen or now),
+                confidence="high",
+                tlp="CLEAR",
+                tags=",".join(sorted(tags)),
+                reference=ref_url or "",
+                context=context,
+            )
+        )
+    return out
+
+
 @register_parser("urlhaus")
 def fetch_urlhaus_csv(url: str, ref_url: str, source: str, ws: datetime, *, status_filter: str = "any") -> List[Indicator]:
     text = ensure_text(http_get(url, name=source))
@@ -421,7 +500,11 @@ def fetch_malwarebazaar_csv(
 @register_parser("threatfox_recent", "threatfox_export_json")
 def fetch_threatfox_export_json(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
     text = ensure_text(http_get(url, name=source))
-    data = json.loads(text)
+    raw = json.loads(text)
+    if isinstance(raw, dict):
+        data = raw.get("data") or []
+    else:
+        data = raw
     now = now_utc()
     out: List[Indicator] = []
     tmap = {"ipv4": "ipv4", "ipv6": "ipv6", "domain": "domain", "url": "url", "md5": "md5", "sha1": "sha1", "sha256": "sha256"}
@@ -575,6 +658,82 @@ def fetch_openphish(url: str, ref_url: str, source: str, ws: datetime) -> List[I
     return out
 
 
+@register_parser("phishstats")
+def fetch_phishstats(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
+    text = ensure_text(http_get(url, name=source))
+    try:
+        payload = json.loads(text)
+    except json.JSONDecodeError:
+        logger.warning("%s returned invalid JSON", source)
+        return []
+    if isinstance(payload, list):
+        records: Iterable[Any] = payload
+    elif isinstance(payload, dict):
+        records = payload.get("data") or []
+    else:
+        return []
+    now = now_utc()
+    out: List[Indicator] = []
+
+    def choose(row: Dict[str, Any], keys: Iterable[str]) -> Optional[str]:
+        for key in keys:
+            val = row.get(key)
+            if isinstance(val, str) and val.strip():
+                return val
+        return None
+
+    for row in records:
+        if not isinstance(row, dict):
+            continue
+        url_val = choose(row, ("url", "phish_url", "phishURL", "phish_url_https"))
+        if not url_val:
+            continue
+        seen = parse_dt(choose(row, ("date", "first_seen", "submission_time", "created_at")))
+        if seen and seen < ws:
+            continue
+        tags = {"phishing", "phishstats"}
+        target = choose(row, ("target", "brand", "campaign"))
+        if target:
+            tags.add(target.lower())
+        context_parts = ["PhishStats entry"]
+        if target:
+            context_parts.append(target)
+        context = ": ".join(context_parts)
+        ref = choose(row, ("phish_detail_url", "detail_url", "source")) or ref_url or ""
+        out.append(
+            Indicator(
+                indicator=defang_min(url_val),
+                type="url",
+                source=source,
+                first_seen=iso(seen or now),
+                last_seen=iso(now),
+                confidence="medium",
+                tlp="CLEAR",
+                tags=",".join(sorted(tags)),
+                reference=ref,
+                context=context,
+            )
+        )
+        ip_val = choose(row, ("ip", "ip_address", "resolved_ip"))
+        if ip_val and classify(ip_val) in {"ipv4", "ipv6"}:
+            indicator_type = "ipv6" if ":" in ip_val else "ipv4"
+            out.append(
+                Indicator(
+                    indicator=defang_min(ip_val),
+                    type=indicator_type,
+                    source=source,
+                    first_seen=iso(seen or now),
+                    last_seen=iso(now),
+                    confidence="medium",
+                    tlp="CLEAR",
+                    tags=",".join(sorted(tags | {"infrastructure"})),
+                    reference=ref,
+                    context=f"PhishStats infrastructure for {url_val}",
+                )
+            )
+    return out
+
+
 @register_parser("cins_army")
 def fetch_cins_army(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
     text = ensure_text(http_get(url, name=source))
@@ -615,10 +774,73 @@ def fetch_tor_exit(url: str, ref_url: str, source: str, ws: datetime) -> List[In
                     tags="tor,exit-node", reference=ref_url or "",
                     context="Tor exit node list",
                 )
+        )
+    return out
+
+
+@register_parser("blocklist_txt")
+def fetch_blocklist_txt(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
+    text = ensure_text(http_get(url, name=source))
+    now = now_utc()
+    out: List[Indicator] = []
+    seen: Set[Tuple[str, str]] = set()
+    allowed_types = {"ipv4", "ipv6", "ipv4_cidr", "ipv6_cidr", "domain"}
+    src_lower = source.lower()
+
+    def derive_tags() -> Set[str]:
+        tags = {"blocklist"}
+        if "tor" in src_lower:
+            tags.update({"tor", "exit-node"})
+        if "ssh" in src_lower:
+            tags.update({"ssh", "bruteforce"})
+        if "greensnow" in src_lower:
+            tags.add("greensnow")
+        if "ci" in src_lower and "army" in src_lower:
+            tags.update({"scanner", "cins"})
+        return tags
+
+    tags = derive_tags()
+    confidence = "low" if "tor" in src_lower else "medium"
+
+    for line in text.splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or line.startswith(";"):
+            continue
+        if line.lower().startswith("exitaddress"):
+            parts = line.split()
+            tokens = parts[1:2]
+        else:
+            tokens = re.split(r"[\s,;]+", line)
+        for token in tokens:
+            token = token.strip()
+            if not token:
+                continue
+            itype = classify(token)
+            if itype not in allowed_types:
+                continue
+            value = defang_min(token) if itype in {"ipv4", "ipv6", "domain"} else token
+            key = (itype, value)
+            if key in seen:
+                continue
+            seen.add(key)
+            out.append(
+                Indicator(
+                    indicator=value,
+                    type=itype,
+                    source=source,
+                    first_seen=iso(now),
+                    last_seen=iso(now),
+                    confidence=confidence,
+                    tlp="CLEAR",
+                    tags=",".join(sorted(tags)),
+                    reference=ref_url or "",
+                    context=f"Blocklist entry from {source}",
+                )
             )
     return out
 
 
+@register_parser("rss")
 def fetch_rss(url: str, ref_url: str, source: str, ws: datetime, *, per_entry_cap: int = 200, tolerate_missing: bool = False) -> List[Indicator]:
     try:
         fp = load_feedparser()
