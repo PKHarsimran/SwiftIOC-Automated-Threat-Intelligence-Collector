@@ -2,10 +2,16 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>SwiftIOC Dashboard Redirect</title>
-    <meta http-equiv="refresh" content="0; url=public/">
+    <meta name="description" content="Jump to the SwiftIOC GitHub Pages dashboard that visualises the latest automated threat intelligence collection run.">
+    <meta http-equiv="refresh" content="3; url=public/">
     <link rel="canonical" href="public/">
+    <meta name="theme-color" content="#0f172a">
     <style>
+      :root {
+        color-scheme: dark light;
+      }
       body {
         font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
         margin: 0;
@@ -14,34 +20,95 @@
         min-height: 100vh;
         align-items: center;
         justify-content: center;
-        background-color: #0f172a;
+        background: radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.12), transparent 55%), #0f172a;
         color: #e2e8f0;
       }
       a {
         color: #38bdf8;
       }
       .card {
-        max-width: 32rem;
-        background: rgba(15, 23, 42, 0.85);
-        padding: 2rem;
-        border-radius: 1rem;
-        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.45);
-        text-align: center;
+        max-width: 38rem;
+        background: rgba(15, 23, 42, 0.88);
+        padding: 2.5rem;
+        border-radius: 1.25rem;
+        box-shadow: 0 24px 55px rgba(15, 23, 42, 0.5);
+        text-align: left;
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
       }
       h1 {
-        font-size: 1.5rem;
-        margin-bottom: 0.75rem;
+        font-size: 1.6rem;
+        margin: 0;
       }
       p {
-        margin: 0.5rem 0 0;
-        line-height: 1.5;
+        margin: 0;
+        line-height: 1.6;
+      }
+      ul {
+        margin: 0;
+        padding-left: 1.1rem;
+        display: grid;
+        gap: 0.35rem;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.65rem;
+      }
+      .button-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.6rem 1rem;
+        border-radius: 999px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.2s ease;
+      }
+      .button-link.primary {
+        background: #38bdf8;
+        color: #0b1324;
+      }
+      .button-link.secondary {
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        background: rgba(15, 23, 42, 0.65);
+        color: inherit;
+      }
+      .button-link:hover,
+      .button-link:focus-visible {
+        background: rgba(56, 189, 248, 0.15);
+      }
+      .button-link.primary:hover,
+      .button-link.primary:focus-visible {
+        background: #0ea5e9;
+        color: #f8fafc;
       }
     </style>
   </head>
   <body>
     <div class="card">
       <h1>Redirecting to the SwiftIOC Dashboard</h1>
-      <p>If you are not redirected automatically, <a href="public/">click here to open the dashboard</a>.</p>
+      <p>
+        You are being routed to the GitHub Pages experience that showcases the most recent SwiftIOC
+        automated threat intelligence collection run. The full dashboard includes live metrics,
+        download-ready feeds, and operational recommendations.
+      </p>
+      <ul>
+        <li>Need the data immediately? Jump straight to the <a href="public/#actions">download area</a>.</li>
+        <li>Curious how the pipeline works? Review the <a href="README.md">implementation guide</a>.</li>
+        <li>Prefer diagnostics? Open the <a href="public/diagnostics/summary.html">collection summary</a>.</li>
+      </ul>
+      <div class="actions">
+        <a class="button-link primary" href="public/">Open dashboard now</a>
+        <a class="button-link secondary" href="https://github.com/SecurityRiskAdvisors/SwiftIOC-Automated-Threat-Intelligence-Collector">
+          View repository
+        </a>
+      </div>
+      <p>
+        No automatic redirect? Use the buttons above. This landing page waits a few seconds before
+        sending you along so you can choose the best starting point.
+      </p>
     </div>
   </body>
 </html>
