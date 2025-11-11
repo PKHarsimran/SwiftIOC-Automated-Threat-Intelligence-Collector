@@ -30,6 +30,8 @@ env:
 jobs:
   collect:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
     timeout-minutes: 20
 
     steps:
