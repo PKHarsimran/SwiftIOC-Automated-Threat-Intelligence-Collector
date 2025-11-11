@@ -2,30 +2,36 @@
 window_hours: 48
 
 apis:
+  # --- Official & Government Feeds ---
   - name: cisa_kev
     kind: json
     parse: kev
     url: https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json
     reference: https://www.cisa.gov/known-exploited-vulnerabilities-catalog
 
+  - name: nist_nvd_recent
+    kind: json
+    parse: nvd
+    url: https://services.nvd.nist.gov/rest/json/cves/2.0/?resultsPerPage=200
+    reference: https://nvd.nist.gov/
+
+  # --- Abuse.ch Family ---
   - name: urlhaus_recent_urls
     kind: csv
     parse: urlhaus
     url: https://urlhaus.abuse.ch/downloads/csv_recent/
     reference: https://urlhaus.abuse.ch/
-    # optional filter by status in CLI (--urlhaus-status online/offline/any)
 
   - name: malwarebazaar_recent
     kind: csv
     parse: malwarebazaar
-    url: https://mb-api.abuse.ch/downloads/csv_recent/
-    fallback_url: https://bazaar.abuse.ch/export/csv/recent/
+    url: https://bazaar.abuse.ch/export/csv/recent/
     reference: https://bazaar.abuse.ch/
 
-  - name: threatfox_recent
+  - name: threatfox_export_json
     kind: json
-    parse: threatfox_recent
-    url: ""   # API ignores this
+    parse: threatfox_export_json
+    url: https://threatfox.abuse.ch/export/json/recent/
     reference: https://threatfox.abuse.ch/browse/
 
   - name: feodo_ipblocklist
@@ -40,10 +46,68 @@ apis:
     url: https://sslbl.abuse.ch/blacklist/ja3_fingerprints.csv
     reference: https://sslbl.abuse.ch/blacklist/
 
+  # --- Phishing Feeds ---
+  - name: openphish_feed
+    kind: csv
+    parse: openphish
+    url: https://openphish.com/feed.txt
+    reference: https://openphish.com/
+
+  - name: phishstats_api
+    kind: json
+    parse: phishstats
+    url: https://phishstats.info:2096/api/phishing?_limit=100
+    reference: https://phishstats.info/
+
+  # --- Network / Malware IP Feeds ---
+  - name: blocklist_de_ssh
+    kind: txt
+    parse: blocklist_txt
+    url: https://lists.blocklist.de/lists/ssh.txt
+    reference: https://www.blocklist.de/en/
+
+  - name: greensnow_blocklist
+    kind: txt
+    parse: blocklist_txt
+    url: https://blocklist.greensnow.co/greensnow.txt
+    reference: https://greensnow.co/
+
+  - name: ci_army_list
+    kind: txt
+    parse: blocklist_txt
+    url: https://cinsscore.com/list/ci-badguys.txt
+    reference: https://cinsscore.com/
+
+  - name: tor_exit_nodes
+    kind: txt
+    parse: blocklist_txt
+    url: https://check.torproject.org/exit-addresses
+    reference: https://check.torproject.org/
+
+  # --- Vulnerability & Exploit Feeds ---
+  - name: exploitdb_recent
+    kind: rss
+    parse: rss
+    url: https://www.exploit-db.com/rss.xml
+    reference: https://www.exploit-db.com/
+
 rss:
   - name: google_tag
     url: https://blog.google/threat-analysis-group/rss/
     reference: https://blog.google/threat-analysis-group/
+
   - name: microsoft_msrc
     url: https://msrc.microsoft.com/blog/feed
     reference: https://msrc.microsoft.com/blog/
+
+  - name: cisco_talos
+    url: https://blog.talosintelligence.com/feeds/posts/default
+    reference: https://blog.talosintelligence.com/
+
+  - name: proofpoint_threatinsight
+    url: https://www.proofpoint.com/us/rss.xml
+    reference: https://www.proofpoint.com/us/blog/threat-insight
+
+  - name: bleepingcomputer_security
+    url: https://www.bleepingcomputer.com/feed/
+    reference: https://www.bleepingcomputer.com/
