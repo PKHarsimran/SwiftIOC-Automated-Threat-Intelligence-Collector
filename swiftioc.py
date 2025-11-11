@@ -16,7 +16,9 @@ from dataclasses import dataclass, asdict
 from datetime import datetime, timedelta, timezone
 from importlib import import_module
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, List, Optional, Set, Tuple
+from typing import Any, Callable, Dict, Iterable, List, Optional, Set, Tuple, cast
+
+from collections.abc import Iterable as IterableABC
 
 import requests
 import yaml
@@ -187,10 +189,13 @@ def _safe_iocextract(name: str, *args: Any, **kwargs: Any) -> Iterable[str]:
     if not callable(func):
         return []
     try:
-        return func(*args, **kwargs)
+        result = func(*args, **kwargs)
     except Exception as exc:  # pragma: no cover - defensive
         logger.debug("iocextract %s failed: %s", name, exc)
         return []
+    if isinstance(result, str) or not isinstance(result, IterableABC):
+        return []
+    return cast(Iterable[str], result)
 
 
 def extract_indicators_from_text(blob: str) -> List[Tuple[str, str]]:
