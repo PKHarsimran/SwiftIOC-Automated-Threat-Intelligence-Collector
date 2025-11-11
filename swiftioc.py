@@ -135,6 +135,8 @@ SHA512_RE = re.compile(r"^[a-fA-F0-9]{128}$")
 EMAIL_RE = re.compile(r"^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$", re.I)
 BTC_RE = re.compile(r"^(?:bc1|[13])[A-Za-z0-9]{25,39}$")
 BTC_INLINE_RE = re.compile(r"\b(?:bc1|[13])[A-Za-z0-9]{25,39}\b")
+DATE_FIELD_RE = re.compile(r"(first|last)?_?(seen|time|date)|timestamp", re.I)
+TAGS_FIELD_RE = re.compile(r"tags?|labels?|famil(?:y|ies)|threats?|malware|campaign", re.I)
 
 
 def classify(v: str) -> Optional[str]:
@@ -177,6 +179,51 @@ def classify(v: str) -> Optional[str]:
 
 def merge_conf(a: str, b: str) -> str:
     return a if CONF_RANK.get(a, 0) >= CONF_RANK.get(b, 0) else b
+
+
+# ---------------- indicator extraction helpers ----------------
+def _safe_iocextract(name: str, *args: Any, **kwargs: Any) -> Iterable[str]:
+    func = getattr(iocextract, name, None)
+    if not callable(func):
+        return []
+    try:
+        return func(*args, **kwargs)
+    except Exception as exc:  # pragma: no cover - defensive
+        logger.debug("iocextract %s failed: %s", name, exc)
+        return []
+
+
+def extract_indicators_from_text(blob: str) -> List[Tuple[str, str]]:
+    found: List[Tuple[str, str]] = []
+
+    def push(token: str, *, fallback: Optional[str] = None, transform: Optional[Callable[[str], str]] = None) -> None:
+        indicator_type = classify(token) or fallback
+        if not indicator_type:
+            return
+        value = transform(token) if transform else token
+        found.append((indicator_type, value))
+
+    for url in _safe_iocextract("extract_urls", blob, refang=False):
+        push(url, fallback="url")
+    for ip in _safe_iocextract("extract_ips", blob):
+        push(ip, fallback="ipv4")
+    for ip in _safe_iocextract("extract_ipv6s", blob):  # type: ignore[attr-defined]
+        push(ip, fallback="ipv6")
+    for domain in _safe_iocextract("extract_domains", blob):  # type: ignore[attr-defined]
+        push(domain, fallback="domain")
+    for h in _safe_iocextract("extract_hashes", blob):
+        push(h, fallback="sha256")
+    for h in _safe_iocextract("extract_sha512_hashes", blob):  # type: ignore[attr-defined]
+        push(h, fallback="sha512")
+    for mail in _safe_iocextract("extract_emails", blob):  # type: ignore[attr-defined]
+        push(mail, fallback="email")
+    for cve in set(re.findall(r"CVE-\d{4}-\d{4,7}", blob, flags=re.I)):
+        push(cve.upper(), fallback="cve")
+    for ja3 in set(JA3_RE.findall(blob)):
+        push(ja3.lower(), fallback="ja3")
+    for btc in {m.group(0) for m in BTC_INLINE_RE.finditer(blob)}:
+        push(btc, fallback="btc_address")
+    return found
 
 
 # ---------------- HTTP layer ----------------
@@ -597,37 +644,7 @@ def fetch_rss(url: str, ref_url: str, source: str, ws: datetime, *, per_entry_ca
         for c in getattr(e, "content", []) or []:
             text_parts.append(c.get("value", ""))
         blob = "\n".join(filter(None, text_parts))
-        found: List[Tuple[str, str]] = []
-
-        def push(token: str, *, fallback: Optional[str] = None, transform: Optional[Callable[[str], str]] = None) -> None:
-            indicator_type = classify(token) or fallback
-            if not indicator_type:
-                return
-            found.append((indicator_type, transform(token) if transform else token))
-
-        for u in iocextract.extract_urls(blob, refang=False):
-            push(u)
-        for ip in iocextract.extract_ips(blob):
-            push(ip, fallback="ipv4")
-        if hasattr(iocextract, "extract_ipv6s"):
-            for ip in iocextract.extract_ipv6s(blob):  # type: ignore[attr-defined]
-                push(ip, fallback="ipv6")
-        for d in iocextract.extract_domains(blob):  # type: ignore[attr-defined]
-            push(d, fallback="domain")
-        for h in iocextract.extract_hashes(blob):
-            push(h, fallback="sha256")
-        if hasattr(iocextract, "extract_sha512_hashes"):
-            for h in iocextract.extract_sha512_hashes(blob):  # type: ignore[attr-defined]
-                push(h, fallback="sha512")
-        if hasattr(iocextract, "extract_emails"):
-            for eaddr in iocextract.extract_emails(blob):  # type: ignore[attr-defined]
-                push(eaddr, fallback="email")
-        for cve in set(re.findall(r"CVE-\d{4}-\d{4,7}", blob, flags=re.I)):
-            push(cve.upper(), fallback="cve")
-        for ja3 in set(JA3_RE.findall(blob)):
-            push(ja3.lower(), fallback="ja3")
-        for btc in {m.group(0) for m in BTC_INLINE_RE.finditer(blob)}:
-            push(btc, fallback="btc_address")
+        found = extract_indicators_from_text(blob)
         if not found:
             continue
         seen: Set[Tuple[str, str]] = set()
@@ -651,6 +668,177 @@ def fetch_rss(url: str, ref_url: str, source: str, ws: datetime, *, per_entry_ca
                 )
             )
     return out
+
+
+# ---------------- universal parser ----------------
+@register_parser("universal", "auto", "generic")
+def fetch_universal(
+    url: str,
+    ref_url: str,
+    source: str,
+    ws: datetime,
+    *,
+    assume_recent: bool = True,
+    limit: Optional[int] = None,
+) -> List[Indicator]:
+    raw = http_get(url, name=source)
+    text = ensure_text(raw)
+    now = now_utc()
+    candidates: List[Tuple[str, str, Optional[datetime], Set[str], str]] = []
+
+    def push_candidate(value: str, itype: str, seen: Optional[datetime], tags: Set[str], context: str) -> None:
+        if limit is not None and len(candidates) >= limit:
+            return
+        if seen and seen < ws:
+            return
+        candidates.append((value, itype, seen, set(tags), context))
+
+    def tagify(value: Any) -> Set[str]:
+        tags: Set[str] = set()
+        if isinstance(value, str):
+            parts = re.split(r"[,;/\s]+", value)
+            tags.update(t.strip().lower() for t in parts if t.strip())
+        elif isinstance(value, (list, tuple, set)):
+            for item in value:
+                if isinstance(item, str):
+                    tags.update(tagify(item))
+        return tags
+
+    def derive_seen_from_dict(data: Dict[str, Any]) -> Optional[datetime]:
+        for key, value in data.items():
+            if not isinstance(value, str):
+                continue
+            if DATE_FIELD_RE.search(key):
+                seen = parse_dt(value)
+                if seen:
+                    return seen
+        return None
+
+    def derive_tags_from_dict(data: Dict[str, Any]) -> Set[str]:
+        tags: Set[str] = set()
+        for key, value in data.items():
+            if TAGS_FIELD_RE.search(key):
+                tags.update(tagify(value))
+        return tags
+
+    def handle_text(blob: str, *, context: str, seen: Optional[datetime], tags: Set[str]) -> None:
+        for itype, token in extract_indicators_from_text(blob):
+            val = defang_min(token) if itype in {"url", "domain", "ipv4", "ipv6"} else token
+            push_candidate(val, itype, seen, tags, context)
+
+    def walk_json(
+        node: Any,
+        *,
+        path: Tuple[str, ...] = (),
+        inherited_seen: Optional[datetime] = None,
+        inherited_tags: Optional[Set[str]] = None,
+    ) -> None:
+        tags = set(inherited_tags or set())
+        seen = inherited_seen
+        if isinstance(node, dict):
+            seen = seen or derive_seen_from_dict(node)
+            tags |= derive_tags_from_dict(node)
+            for key, value in node.items():
+                new_path = path + (str(key),)
+                context = "/".join(new_path)
+                if isinstance(value, str):
+                    handle_text(value, context=context, seen=seen, tags=tags)
+                elif isinstance(value, (list, tuple)):
+                    walk_json(value, path=new_path, inherited_seen=seen, inherited_tags=tags)
+                elif isinstance(value, dict):
+                    walk_json(value, path=new_path, inherited_seen=seen, inherited_tags=tags)
+                elif isinstance(value, (int, float)):
+                    handle_text(str(value), context=context, seen=seen, tags=tags)
+        elif isinstance(node, (list, tuple)):
+            for idx, item in enumerate(node):
+                walk_json(
+                    item,
+                    path=path + (f"[{idx}]",),
+                    inherited_seen=inherited_seen,
+                    inherited_tags=inherited_tags,
+                )
+        elif isinstance(node, str):
+            handle_text(node, context="/".join(path) or source, seen=inherited_seen, tags=inherited_tags or set())
+        elif isinstance(node, (int, float)):
+            handle_text(str(node), context="/".join(path) or source, seen=inherited_seen, tags=inherited_tags or set())
+
+    def parse_as_json() -> bool:
+        try:
+            data = json.loads(text)
+        except Exception:
+            return False
+        walk_json(data, path=(source,))
+        return True
+
+    def parse_as_csv() -> bool:
+        try:
+            sample = "\n".join(text.splitlines()[:5])
+            dialect = csv.Sniffer().sniff(sample) if sample else csv.excel
+            reader = csv.reader(io.StringIO(text), dialect)
+        except Exception:
+            return False
+        header: Optional[List[str]] = None
+        for idx, row in enumerate(reader):
+            if not row or all(not cell.strip() for cell in row):
+                continue
+            if header is None:
+                header = [cell.strip() for cell in row]
+                if any(classify(cell) for cell in header) or not any(re.search(r"[A-Za-z]", cell or "") for cell in header):
+                    header = None
+                else:
+                    continue
+            context_base = f"{source}[{idx}]"
+            row_dict = {
+                header[i] if header and i < len(header) else f"col{i}": row[i] for i in range(len(row))
+            }
+            seen = derive_seen_from_dict(row_dict) if isinstance(row_dict, dict) else None
+            tags = derive_tags_from_dict(row_dict)
+            for key, value in row_dict.items():
+                if not isinstance(value, str):
+                    continue
+                handle_text(value, context=f"{context_base}/{key}", seen=seen, tags=tags)
+        return True
+
+    parsed = parse_as_json()
+    if not parsed:
+        parsed = parse_as_csv()
+    if not parsed:
+        handle_text(text, context=source, seen=None, tags=set())
+
+    uniq: Dict[Tuple[str, str], Indicator] = {}
+    for val, itype, seen, tags, context in candidates:
+        if limit is not None and len(uniq) >= limit:
+            break
+        first_seen_dt = seen or (now if assume_recent else None)
+        key = (itype, val)
+        if key in uniq:
+            indicator = uniq[key]
+            existing_tags = set(filter(None, indicator.tags.split(",")))
+            combined_tags = existing_tags | tags
+            indicator.tags = ",".join(sorted(combined_tags))
+            indicator.last_seen = iso(now)
+            if seen:
+                existing_first = parse_dt(indicator.first_seen)
+                if existing_first is None or seen < existing_first:
+                    indicator.first_seen = iso(seen)
+            continue
+        first_seen = first_seen_dt or now
+        if first_seen < ws:
+            continue
+        uniq[key] = Indicator(
+            indicator=val,
+            type=itype,
+            source=source,
+            first_seen=iso(first_seen),
+            last_seen=iso(now),
+            confidence="medium",
+            tlp="CLEAR",
+            tags=",".join(sorted(t for t in tags if t)),
+            reference=ref_url or "",
+            context=context or source,
+        )
+
+    return list(uniq.values())
 
 
 # ---------------- collect / orchestrate ----------------
