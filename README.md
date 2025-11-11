@@ -182,7 +182,12 @@ rss:
 
 Each parser can accept additional keyword arguments defined under `options:`.
 Custom parsers are supported via Python dotted paths (for example,
-`parse: my_package.parsers:parse_feed`). 
+`parse: my_package.parsers:parse_feed`).
+
+For feeds without a dedicated adapter you can fall back to the universal
+collector by setting `parse: universal`. It will autodetect JSON, CSV, or plain
+text payloads, discover common timestamp/tag fields, and extract indicators via
+the same heuristics used for RSS content.
 
 ## 📋 CLI reference
 Run `python -m swiftioc --help` for the full list of switches. Highlights:
