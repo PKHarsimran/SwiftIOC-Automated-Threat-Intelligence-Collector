@@ -1,18 +1,23 @@
-# ⚡ SwiftIOC – Automated Threat Intelligence Collector
+# ⚡ SwiftIOC – Open Source Automated Threat Intelligence Collector
 
-SwiftIOC is a single-file Python tool (`swiftioc.py`) that keeps recent
-Indicators of Compromise (IOCs) in a machine-readable format. It loads feed
-definitions from YAML, pulls data from a set of built-in adapters, normalises
-and deduplicates the indicators, and writes the results to CSV/TSV/JSON/JSONL/STIX
-alongside run diagnostics.
+SwiftIOC is an open-source Python threat intelligence automation toolkit that
+keeps recent Indicators of Compromise (IOCs) in machine-readable formats. The
+lightweight collector (`swiftioc.py`) ingests threat feeds via YAML
+configuration, normalises and deduplicates the indicators, and exports them to
+CSV, TSV, JSON, JSON Lines, and STIX 2.1 alongside searchable run diagnostics.
 
-SwiftIOC is designed to run anywhere Python is available—local workstations,
-CI/CD pipelines, or GitHub Actions. Outputs are written under `public/` by
-default so they can be published directly with GitHub Pages or collected as CI
-artifacts.
+Designed for security operations teams, SOC analysts, and cyber threat hunters,
+SwiftIOC runs anywhere Python is available—local workstations, CI/CD pipelines,
+GitHub Actions, or automated cron jobs. Outputs land under `public/` by default
+so they can be published directly with GitHub Pages, integrated into SIEM and
+SOAR tooling, or archived for compliance reporting. The repository includes
+ready-to-use examples for rapid deployment in modern DevSecOps workflows.
 
 ## 📚 Table of contents
+- [SwiftIOC at a glance](#-swiftioc-at-a-glance)
 - [Features](#-features)
+- [Supported threat intelligence sources](#-supported-threat-intelligence-sources)
+- [Use cases & SEO-friendly keywords](#-use-cases--seo-friendly-keywords)
 - [Repository layout](#-repository-layout)
 - [How it works](#-how-it-works)
 - [Quick start](#-quick-start)
@@ -21,6 +26,15 @@ artifacts.
 - [Outputs & diagnostics](#-outputs--diagnostics)
 - [Running in GitHub Actions](#-running-in-github-actions)
 - [Auto-generated IOC summary](#auto-generated-ioc-summary)
+
+## 🔍 SwiftIOC at a glance
+SwiftIOC helps cybersecurity teams automate the collection and publication of
+high-fidelity IOCs from authoritative sources. The project emphasises:
+
+- **Automated threat feed aggregation** with YAML-based configuration.
+- **Consistent IOC enrichment** ready for SIEM, SOAR, IDS, and DFIR tooling.
+- **Git-friendly artefacts** tailored for GitHub Pages, GitHub Actions, and
+  other CI/CD environments.
 
 ## 🚀 Features
 - **YAML-driven feeds** – feed metadata lives in `sources.yml` so collections can
@@ -43,6 +57,46 @@ artifacts.
 - **CI-friendly defaults** – JSON logging, deterministic output paths, and
   guard-rail flags (`--fail-on-empty`, `--fail-if-stale`, `--grace-on-404`) make
   the collector predictable in automation. 【F:swiftioc.py†L1001-L1109】
+
+## 🌐 Supported threat intelligence sources
+SwiftIOC ships with parsers and adapters for widely referenced cyber threat
+intelligence feeds used by SOC teams and managed security providers:
+
+- **CISA Known Exploited Vulnerabilities (KEV)** – prioritise patching by
+  monitoring the official CISA KEV catalogue.
+- **URLhaus** – ingest malicious URL indicators to protect web gateways and
+  proxies.
+- **MalwareBazaar** – track malicious file hashes for EDR, AV, and sandbox
+  tooling.
+- **ThreatFox** – add IPs, domains, URLs, and hashes curated by abuse.ch.
+- **Feodo Tracker & SSLBL JA3 fingerprints** – detect C2 traffic associated
+  with banking trojans and malicious TLS fingerprints.
+- **Spamhaus DROP/EDROP** – block known botnet controllers at the network edge.
+- **OpenPhish, CINS Army, Tor exit lists, and more** – extend coverage with
+  phishing, scanning, and anonymiser indicators.
+
+Each feed is configurable through `sources.yml`, allowing teams to fine-tune the
+collection cadence, lookback windows, and authentication as required.
+
+## 🎯 Use cases & SEO-friendly keywords
+SwiftIOC supports a wide range of cybersecurity automation workflows. Common
+use cases include:
+
+- **Security Operations Centre (SOC) automation** – schedule IOC collection
+  jobs to keep SIEM and IDS rules current with open-source threat intelligence.
+- **Digital forensics & incident response (DFIR)** – export defanged indicators
+  for investigations without risking accidental activation.
+- **DevSecOps pipelines** – integrate threat feed enrichment into CI/CD, GitOps,
+  or infrastructure-as-code projects.
+- **Threat hunting playbooks** – generate STIX 2.1 bundles consumable by MISP,
+  OpenCTI, and other CTI platforms.
+- **Compliance reporting and executive dashboards** – leverage Markdown and
+  JSON diagnostics for stakeholder-friendly reporting.
+
+Keywords to improve discoverability: "automated threat intelligence collector",
+"open source IOC feed aggregator", "Python threat hunting toolkit", "cyber
+threat intelligence automation", "STIX export for SOC", and "GitHub Actions
+threat feed workflow".
 
 ## 🗂️ Repository layout
 ```
