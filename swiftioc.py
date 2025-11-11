@@ -5,6 +5,7 @@ import csv
 import hashlib
 import io
 import ipaddress
+import inspect
 import json
 import logging
 import os
@@ -15,7 +16,7 @@ from dataclasses import dataclass, asdict
 from datetime import datetime, timedelta, timezone
 from importlib import import_module
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Callable, Dict, Iterable, List, Optional, Set, Tuple
 
 import requests
 import yaml
@@ -42,6 +43,51 @@ _SAVE_RAW_DIR: Optional[Path] = None
 HTTP_DEBUG = False
 
 CONF_RANK = {"low": 10, "medium": 50, "high": 90}
+
+
+# ---------------- parser registry ----------------
+ParserFunc = Callable[[str, str, str, datetime], List["Indicator"]]
+
+
+class ParserRegistry(dict):
+    def register(self, names: Iterable[str]) -> Callable[[ParserFunc], ParserFunc]:
+        def decorator(func: ParserFunc) -> ParserFunc:
+            for name in names:
+                key = name.lower()
+                if key in self:
+                    raise ValueError(f"Parser already registered for '{name}'")
+                self[key] = func
+            return func
+
+        return decorator
+
+
+PARSERS: ParserRegistry = ParserRegistry()
+
+
+def register_parser(*names: str) -> Callable[[ParserFunc], ParserFunc]:
+    if not names:
+        raise ValueError("At least one parser name is required")
+    return PARSERS.register(names)
+
+
+def resolve_parser(identifier: str) -> ParserFunc:
+    key = identifier.lower()
+    if key in PARSERS:
+        return PARSERS[key]
+    module_name: Optional[str] = None
+    attr_name: Optional[str] = None
+    if ":" in identifier:
+        module_name, attr_name = identifier.split(":", 1)
+    elif "." in identifier:
+        module_name, attr_name = identifier.rsplit(".", 1)
+    if not module_name or not attr_name:
+        raise KeyError(f"Unknown parser '{identifier}'")
+    module = import_module(module_name)
+    func = getattr(module, attr_name)
+    if not callable(func):
+        raise TypeError(f"Parser '{identifier}' is not callable")
+    return func  # type: ignore[return-value]
 
 
 # ---------------- models / utils ----------------
@@ -84,11 +130,26 @@ def defang_min(text: str) -> str:
     return text.replace(".", "[.]")
 
 
+JA3_RE = re.compile(r"^[a-fA-F0-9]{32}$")
+SHA512_RE = re.compile(r"^[a-fA-F0-9]{128}$")
+EMAIL_RE = re.compile(r"^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$", re.I)
+BTC_RE = re.compile(r"^(?:bc1|[13])[A-Za-z0-9]{25,39}$")
+BTC_INLINE_RE = re.compile(r"\b(?:bc1|[13])[A-Za-z0-9]{25,39}\b")
+
+
 def classify(v: str) -> Optional[str]:
     s = v.strip()
     try:
         ipaddress.ip_address(s)
         return "ipv6" if ":" in s else "ipv4"
+    except Exception:
+        pass
+    try:
+        if "/" in s:
+            net = ipaddress.ip_network(s, strict=False)
+            if isinstance(net, ipaddress.IPv4Network):
+                return "ipv4_cidr"
+            return "ipv6_cidr"
     except Exception:
         pass
     if re.match(r"^(?:https?|ftp)://", s, flags=re.I):
@@ -101,8 +162,16 @@ def classify(v: str) -> Optional[str]:
         return "sha1"
     if re.fullmatch(r"^[A-Fa-f0-9]{64}$", s):
         return "sha256"
+    if SHA512_RE.fullmatch(s):
+        return "sha512"
+    if JA3_RE.fullmatch(s):
+        return "ja3"
     if re.fullmatch(r"CVE-\d{4}-\d{4,7}", s, re.IGNORECASE):
         return "cve"
+    if EMAIL_RE.fullmatch(s):
+        return "email"
+    if BTC_RE.fullmatch(s):
+        return "btc_address"
     return None
 
 
@@ -183,6 +252,7 @@ def load_feedparser() -> Any:
 
 
 # --------------- adapters (no hard-coded refs) ---------------
+@register_parser("kev", "cisa_kev")
 def fetch_cisa_kev(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
     data = json.loads(http_get(url, name=source))
     out: List[Indicator] = []
@@ -205,6 +275,7 @@ def fetch_cisa_kev(url: str, ref_url: str, source: str, ws: datetime) -> List[In
     return out
 
 
+@register_parser("urlhaus")
 def fetch_urlhaus_csv(url: str, ref_url: str, source: str, ws: datetime, *, status_filter: str = "any") -> List[Indicator]:
     text = ensure_text(http_get(url, name=source))
     out: List[Indicator] = []
@@ -236,6 +307,7 @@ def fetch_urlhaus_csv(url: str, ref_url: str, source: str, ws: datetime, *, stat
     return out
 
 
+@register_parser("malwarebazaar")
 def fetch_malwarebazaar_csv(
     url: str,
     ref_url: str,
@@ -294,6 +366,7 @@ def fetch_malwarebazaar_csv(
     return out
 
 
+@register_parser("threatfox_recent", "threatfox_export_json")
 def fetch_threatfox_export_json(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
     text = ensure_text(http_get(url, name=source))
     data = json.loads(text)
@@ -325,17 +398,21 @@ def fetch_threatfox_export_json(url: str, ref_url: str, source: str, ws: datetim
     return out
 
 
+@register_parser("feodo_ipblocklist")
 def fetch_feodo_ipblocklist(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
     text = ensure_text(http_get(url, name=source))
     out: List[Indicator] = []
     now = now_utc()
     for row in csv.reader(io.StringIO(text)):
-        if not row or row[0].startswith("#"):
+        if not row:
+            continue
+        header_token = row[0].strip().lower()
+        if header_token.startswith("#") or header_token in {"first_seen_utc", "timestamp"}:
             continue
         try:
             seen = parse_dt(row[0])
-            ip = row[1]
-            family = row[5] if len(row) > 5 else ""
+            ip = row[1].strip()
+            family = row[5].strip() if len(row) > 5 else ""
         except Exception:
             continue
         if seen and seen < ws:
@@ -352,15 +429,22 @@ def fetch_feodo_ipblocklist(url: str, ref_url: str, source: str, ws: datetime) -
     return out
 
 
+@register_parser("sslbl_ja3")
 def fetch_sslbl_ja3(url: str, ref_url: str, source: str, ws: datetime, *, kind: str = "ja3") -> List[Indicator]:
     text = ensure_text(http_get(url, name=source))
     out: List[Indicator] = []
     now = now_utc()
     for row in csv.reader(io.StringIO(text)):
-        if not row or row[0].startswith("#"):
+        if not row:
             continue
-        ja = row[1] if len(row) > 1 else None
+        header_token = row[0].strip().lower()
+        if header_token.startswith("#") or header_token in {"first_seen", "timestamp"}:
+            continue
+        ja = row[1].strip() if len(row) > 1 else None
         if not ja:
+            continue
+        if not JA3_RE.fullmatch(ja.strip()):
+            # Skip malformed entries and ensure we only publish valid JA3 hashes
             continue
         first_seen = parse_dt(row[0]) if row[0] else None
         if first_seen and first_seen < ws:
@@ -378,6 +462,7 @@ def fetch_sslbl_ja3(url: str, ref_url: str, source: str, ws: datetime, *, kind: 
     return out
 
 
+@register_parser("spamhaus_drop")
 def fetch_spamhaus_drop(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
     text = ensure_text(http_get(url, name=source))
     out: List[Indicator] = []
@@ -401,6 +486,12 @@ def fetch_spamhaus_drop(url: str, ref_url: str, source: str, ws: datetime) -> Li
     return out
 
 
+@register_parser("sslbl_ja3s")
+def fetch_sslbl_ja3s(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
+    return fetch_sslbl_ja3(url, ref_url, source, ws, kind="ja3s")
+
+
+@register_parser("openphish")
 def fetch_openphish(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
     text = ensure_text(http_get(url, name=source))
     out: List[Indicator] = []
@@ -421,6 +512,7 @@ def fetch_openphish(url: str, ref_url: str, source: str, ws: datetime) -> List[I
     return out
 
 
+@register_parser("cins_army")
 def fetch_cins_army(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
     text = ensure_text(http_get(url, name=source))
     out: List[Indicator] = []
@@ -442,6 +534,7 @@ def fetch_cins_army(url: str, ref_url: str, source: str, ws: datetime) -> List[I
     return out
 
 
+@register_parser("tor_exit")
 def fetch_tor_exit(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
     text = ensure_text(http_get(url, name=source))
     out: List[Indicator] = []
@@ -494,16 +587,36 @@ def fetch_rss(url: str, ref_url: str, source: str, ws: datetime, *, per_entry_ca
             text_parts.append(c.get("value", ""))
         blob = "\n".join(filter(None, text_parts))
         found: List[Tuple[str, str]] = []
+
+        def push(token: str, *, fallback: Optional[str] = None, transform: Optional[Callable[[str], str]] = None) -> None:
+            indicator_type = classify(token) or fallback
+            if not indicator_type:
+                return
+            found.append((indicator_type, transform(token) if transform else token))
+
         for u in iocextract.extract_urls(blob, refang=False):
-            found.append(("url", u))
+            push(u)
         for ip in iocextract.extract_ips(blob):
-            found.append(("ipv4", ip))
+            push(ip, fallback="ipv4")
+        if hasattr(iocextract, "extract_ipv6s"):
+            for ip in iocextract.extract_ipv6s(blob):  # type: ignore[attr-defined]
+                push(ip, fallback="ipv6")
         for d in iocextract.extract_domains(blob):  # type: ignore[attr-defined]
-            found.append(("domain", d))
+            push(d, fallback="domain")
         for h in iocextract.extract_hashes(blob):
-            found.append((classify(h) or "sha256", h))
+            push(h, fallback="sha256")
+        if hasattr(iocextract, "extract_sha512_hashes"):
+            for h in iocextract.extract_sha512_hashes(blob):  # type: ignore[attr-defined]
+                push(h, fallback="sha512")
+        if hasattr(iocextract, "extract_emails"):
+            for eaddr in iocextract.extract_emails(blob):  # type: ignore[attr-defined]
+                push(eaddr, fallback="email")
         for cve in set(re.findall(r"CVE-\d{4}-\d{4,7}", blob, flags=re.I)):
-            found.append(("cve", cve.upper()))
+            push(cve.upper(), fallback="cve")
+        for ja3 in set(JA3_RE.findall(blob)):
+            push(ja3.lower(), fallback="ja3")
+        for btc in {m.group(0) for m in BTC_INLINE_RE.finditer(blob)}:
+            push(btc, fallback="btc_address")
         if not found:
             continue
         seen: Set[Tuple[str, str]] = set()
@@ -543,7 +656,23 @@ def parse_name_int_pairs(pairs: List[str], flag: str) -> Dict[str, int]:
 
 
 def type_counts(items: List[Indicator]) -> Dict[str, int]:
-    wanted = ("url", "domain", "ipv4", "sha256", "cve", "ipv4_cidr", "ja3", "ja3s")
+    wanted = (
+        "url",
+        "domain",
+        "ipv4",
+        "ipv6",
+        "ipv4_cidr",
+        "ipv6_cidr",
+        "md5",
+        "sha1",
+        "sha256",
+        "sha512",
+        "cve",
+        "email",
+        "btc_address",
+        "ja3",
+        "ja3s",
+    )
     return {t: sum(1 for r in items if r.type == t) for t in wanted}
 
 
@@ -598,33 +727,27 @@ def collect_from_yaml(
             continue
         url = api.get("url", "")
         ref = api.get("reference", url) or ""
-        fb = api.get("fallback_url")
         ws = start_for(name)
         got: List[Indicator] = []
         try:
             t0 = time.perf_counter()
-            if parse == "kev":
-                got = fetch_cisa_kev(url, ref, name, ws)
-            elif parse == "urlhaus":
-                got = fetch_urlhaus_csv(url, ref, name, ws, status_filter=urlhaus_status)
-            elif parse == "malwarebazaar":
-                got = fetch_malwarebazaar_csv(url, ref, name, ws, fallback_url=fb, graceful_404=(name in grace_on_404))
-            elif parse in {"threatfox_export_json", "threatfox_recent"}:
-                got = fetch_threatfox_export_json(url, ref, name, ws)
-            elif parse == "feodo_ipblocklist":
-                got = fetch_feodo_ipblocklist(url, ref, name, ws)
-            elif parse == "sslbl_ja3":
-                got = fetch_sslbl_ja3(url, ref, name, ws, kind="ja3")
-            elif parse == "sslbl_ja3s":
-                got = fetch_sslbl_ja3(url, ref, name, ws, kind="ja3s")
-            elif parse == "spamhaus_drop":
-                got = fetch_spamhaus_drop(url, ref, name, ws)
-            elif parse == "openphish":
-                got = fetch_openphish(url, ref, name, ws)
-            elif parse == "cins_army":
-                got = fetch_cins_army(url, ref, name, ws)
-            elif parse == "tor_exit":
-                got = fetch_tor_exit(url, ref, name, ws)
+            parser_fn = resolve_parser(parse)
+            parser_sig = inspect.signature(parser_fn)
+            supported_kwargs = {
+                k
+                for k in parser_sig.parameters
+                if k not in {"url", "ref_url", "source", "ws"}
+            }
+            options: Dict[str, Any] = dict(api.get("options", {}))
+            for key in ("fallback_url", "graceful_404", "status_filter"):
+                if key in api and key not in options:
+                    options[key] = api[key]
+            if name in grace_on_404 and "graceful_404" in supported_kwargs:
+                options.setdefault("graceful_404", True)
+            if "status_filter" in supported_kwargs:
+                options.setdefault("status_filter", urlhaus_status)
+            filtered_options = {k: v for k, v in options.items() if k in supported_kwargs}
+            got = parser_fn(url, ref, name, ws, **filtered_options)
             dt = time.perf_counter() - t0
             logger.debug("collect %s %d in %.2fs", name, len(got), dt)
             logger.debug("summary %s types=%s tags_top=%s", name, type_counts(got), top_tags(got))

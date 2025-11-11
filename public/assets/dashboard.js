@@ -1,11 +1,20 @@
 (function () {
   const IOC_ROOT = document.body?.dataset.iocRoot || '.';
   const PREVIEW_LIMIT = 12;
-  const INDICATORS_JSON_URL = `${IOC_ROOT}/iocs/latest.json`;
-  const PREVIEW_STREAM_URL = `${IOC_ROOT}/iocs/latest.jsonl`;
+  const INDICATORS_JSONL_URL = `${IOC_ROOT}/iocs/latest.jsonl`;
+  const INDICATORS_JSON_FALLBACK_URL = `${IOC_ROOT}/iocs/latest.json`;
+  const PREVIEW_STREAM_URL = INDICATORS_JSONL_URL;
 
   const numberFormatter = new Intl.NumberFormat('en-US');
   const formatNumber = (value) => numberFormatter.format(value ?? 0);
+
+  const safeParseJson = (line) => {
+    try {
+      return JSON.parse(line);
+    } catch (error) {
+      return null;
+    }
+  };
 
   const parseTimestamp = (value) => {
     if (!value) return null;
@@ -65,98 +74,184 @@
     });
   };
 
-  const computeStats = (indicators) => {
+  const createStatsAccumulator = () => {
     const bySource = new Map();
     const byType = new Map();
     const tags = new Map();
+    const indicatorCounts = new Map();
     const indicatorSources = new Map();
     let earliestFirstSeen = null;
     let newestFirstSeen = null;
-    let generatedTimestamp = null;
+    let latestObservation = null;
+    let total = 0;
 
-    indicators.forEach((row) => {
-      const source = (row.source || '').toString().trim();
-      const type = (row.type || '').toString().trim();
-      const indicator = (row.indicator || '').toString().trim();
+    const normalise = (value) => (value ?? '').toString().trim();
 
-      if (source) {
-        bySource.set(source, (bySource.get(source) || 0) + 1);
-      }
-      if (type) {
-        byType.set(type, (byType.get(type) || 0) + 1);
-      }
-      if (indicator) {
-        if (!indicatorSources.has(indicator)) {
-          indicatorSources.set(indicator, new Set());
-        }
-        if (source) {
-          indicatorSources.get(indicator).add(source);
-        }
-      }
-
-      const firstSeen = parseTimestamp(row.first_seen || row.firstSeen);
-      const lastSeen = parseTimestamp(row.last_seen || row.lastSeen);
-
-      if (firstSeen) {
-        if (!earliestFirstSeen || firstSeen.time < earliestFirstSeen.time) {
-          earliestFirstSeen = firstSeen;
-        }
-        if (!newestFirstSeen || firstSeen.time > newestFirstSeen.time) {
-          newestFirstSeen = firstSeen;
-        }
-        if (!generatedTimestamp || firstSeen.time > generatedTimestamp.time) {
-          generatedTimestamp = firstSeen;
-        }
-      }
-      if (lastSeen && (!generatedTimestamp || lastSeen.time > generatedTimestamp.time)) {
-        generatedTimestamp = lastSeen;
-      }
-
-      const rowTags = (row.tags || '')
-        .toString()
-        .split(',')
-        .map((tag) => tag.trim())
-        .filter(Boolean);
-      rowTags.forEach((tag) => {
-        tags.set(tag, (tags.get(tag) || 0) + 1);
-      });
-    });
-
-    const total = indicators.length;
-    const uniqueIndicators = indicatorSources.size;
-    const duplicatesRemoved = Math.max(total - uniqueIndicators, 0);
-    const multiSourceOverlaps = Array.from(indicatorSources.values()).filter((sources) => sources.size > 1).length;
-
-    const sortedSources = Array.from(bySource.entries()).sort((a, b) => b[1] - a[1]);
-    const sortedTypes = Array.from(byType.entries()).sort((a, b) => b[1] - a[1]);
-    const sortedTags = Array.from(tags.entries()).sort((a, b) => b[1] - a[1]).slice(0, 10);
-
-    const earliestParts = earliestFirstSeen ? isoToParts(earliestFirstSeen.iso) : { date: null, time: null };
-    const newestParts = newestFirstSeen ? isoToParts(newestFirstSeen.iso) : { date: null, time: null };
-
-    let collectionWindow = null;
-    if (earliestParts.date && newestParts.date) {
-      collectionWindow = `${earliestParts.date} → ${newestParts.date}`;
-    } else if (earliestParts.date) {
-      collectionWindow = earliestParts.date;
-    } else if (newestParts.date) {
-      collectionWindow = newestParts.date;
-    }
+    const registerTags = (rawTags) => {
+      rawTags
+        .map((tag) => (tag ?? '').toString().trim())
+        .filter(Boolean)
+        .forEach((tag) => {
+          tags.set(tag, (tags.get(tag) || 0) + 1);
+        });
+    };
 
     return {
-      total,
-      duplicatesRemoved,
-      activeSources: bySource.size,
-      indicatorTypes: byType.size,
-      multiSourceOverlaps,
-      bySource: sortedSources,
-      byType: sortedTypes,
-      topTags: sortedTags,
-      earliestFirstSeen: earliestParts,
-      newestFirstSeen: newestParts,
-      generatedAt: generatedTimestamp?.iso || null,
-      collectionWindow,
+      ingest(row) {
+        if (!row || typeof row !== 'object') return;
+
+        total += 1;
+
+        const source = normalise(row.source);
+        const type = normalise(row.type);
+        const indicator = normalise(row.indicator);
+
+        if (source) {
+          bySource.set(source, (bySource.get(source) || 0) + 1);
+        }
+        if (type) {
+          byType.set(type, (byType.get(type) || 0) + 1);
+        }
+        if (indicator) {
+          indicatorCounts.set(indicator, (indicatorCounts.get(indicator) || 0) + 1);
+          if (source) {
+            if (!indicatorSources.has(indicator)) {
+              indicatorSources.set(indicator, new Set());
+            }
+            indicatorSources.get(indicator).add(source);
+          }
+        }
+
+        const firstSeen = parseTimestamp(row.first_seen ?? row.firstSeen);
+        const lastSeen = parseTimestamp(row.last_seen ?? row.lastSeen);
+
+        if (firstSeen) {
+          if (!earliestFirstSeen || firstSeen.time < earliestFirstSeen.time) {
+            earliestFirstSeen = firstSeen;
+          }
+          if (!newestFirstSeen || firstSeen.time > newestFirstSeen.time) {
+            newestFirstSeen = firstSeen;
+          }
+          if (!latestObservation || firstSeen.time > latestObservation.time) {
+            latestObservation = firstSeen;
+          }
+        }
+        if (lastSeen) {
+          if (!latestObservation || lastSeen.time > latestObservation.time) {
+            latestObservation = lastSeen;
+          }
+        }
+
+        const parsedTags = Array.isArray(row.tags) ? row.tags : normalise(row.tags).split(',');
+        registerTags(parsedTags);
+      },
+      finalize() {
+        const sortedSources = Array.from(bySource.entries()).sort((a, b) => b[1] - a[1]);
+        const sortedTypes = Array.from(byType.entries()).sort((a, b) => b[1] - a[1]);
+        const sortedTags = Array.from(tags.entries()).sort((a, b) => b[1] - a[1]).slice(0, 10);
+
+        const earliestParts = earliestFirstSeen ? isoToParts(earliestFirstSeen.iso) : { date: null, time: null };
+        const newestParts = newestFirstSeen ? isoToParts(newestFirstSeen.iso) : { date: null, time: null };
+
+        let collectionWindow = null;
+        if (earliestParts.date && newestParts.date) {
+          collectionWindow = `${earliestParts.date} → ${newestParts.date}`;
+        } else if (earliestParts.date) {
+          collectionWindow = earliestParts.date;
+        } else if (newestParts.date) {
+          collectionWindow = newestParts.date;
+        }
+
+        const uniqueIndicators = indicatorCounts.size;
+        const duplicatesRemoved = Math.max(total - uniqueIndicators, 0);
+        const multiSourceOverlaps = Array.from(indicatorSources.values()).filter((sources) => sources.size > 1).length;
+
+        return {
+          total,
+          duplicatesRemoved,
+          activeSources: bySource.size,
+          indicatorTypes: byType.size,
+          multiSourceOverlaps,
+          bySource: sortedSources,
+          byType: sortedTypes,
+          topTags: sortedTags,
+          earliestFirstSeen: earliestParts,
+          newestFirstSeen: newestParts,
+          generatedAt: latestObservation?.iso ?? null,
+          collectionWindow,
+        };
+      },
     };
+  };
+
+  const computeStatsFromIterable = (iterable) => {
+    const acc = createStatsAccumulator();
+    for (const row of iterable || []) {
+      acc.ingest(row);
+    }
+    return acc.finalize();
+  };
+
+  const streamJsonLines = async (url, { limit = Infinity, onRow } = {}) => {
+    const response = await fetch(url, { cache: 'no-store' });
+    if (!response.ok) {
+      throw new Error(`Unable to fetch ${url} (${response.status})`);
+    }
+
+    let processed = 0;
+    const handleRow = typeof onRow === 'function' ? onRow : () => {};
+
+    const processLine = (line) => {
+      const trimmed = line.trim();
+      if (!trimmed) return false;
+      const parsed = safeParseJson(trimmed);
+      if (!parsed) return false;
+      handleRow(parsed);
+      processed += 1;
+      return processed >= limit;
+    };
+
+    if (!response.body || !response.body.getReader) {
+      const text = await response.text();
+      const lines = text.split(/\r?\n/);
+      for (const line of lines) {
+        if (processLine(line)) {
+          break;
+        }
+      }
+      return processed;
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    try {
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const parts = buffer.split(/\r?\n/);
+        buffer = parts.pop() ?? '';
+        for (const part of parts) {
+          if (processLine(part)) {
+            await reader.cancel().catch(() => {});
+            return processed;
+          }
+        }
+      }
+
+      const remainder = buffer.trim();
+      if (remainder) {
+        processLine(remainder);
+      }
+    } finally {
+      if (reader.releaseLock) {
+        reader.releaseLock();
+      }
+    }
+
+    return processed;
   };
 
   const applyStats = (stats) => {
@@ -198,12 +293,23 @@
 
   const loadStats = async () => {
     try {
-      const response = await fetch(INDICATORS_JSON_URL, { cache: 'no-store' });
+      const accumulator = createStatsAccumulator();
+      await streamJsonLines(INDICATORS_JSONL_URL, {
+        onRow: (row) => accumulator.ingest(row),
+      });
+      applyStats(accumulator.finalize());
+      return;
+    } catch (streamError) {
+      console.warn('Streaming statistics failed, attempting JSON fallback', streamError);
+    }
+
+    try {
+      const response = await fetch(INDICATORS_JSON_FALLBACK_URL, { cache: 'no-store' });
       if (!response.ok) {
         throw new Error(`Unable to fetch indicator summary (${response.status})`);
       }
       const indicators = await response.json();
-      const stats = computeStats(Array.isArray(indicators) ? indicators : []);
+      const stats = computeStatsFromIterable(Array.isArray(indicators) ? indicators : []);
       applyStats(stats);
     } catch (error) {
       console.error('Failed to load indicator statistics', error);
@@ -241,75 +347,25 @@
       container.setAttribute('aria-busy', busy ? 'true' : 'false');
     };
 
-    const safeParse = (line) => {
-      try {
-        return JSON.parse(line);
-      } catch (error) {
-        console.warn('Skipping malformed preview row', error);
-        return null;
-      }
+    const fetchPreviewRows = async (limit) => {
+      const rows = [];
+      await streamJsonLines(PREVIEW_STREAM_URL, {
+        limit,
+        onRow: (row) => rows.push(row),
+      });
+      return rows;
     };
 
-    const readPreview = async (url, limit) => {
-      const response = await fetch(url, { cache: 'no-store' });
+    const fetchPreviewFallback = async () => {
+      const response = await fetch(INDICATORS_JSON_FALLBACK_URL, { cache: 'no-store' });
       if (!response.ok) {
-        throw new Error(`Failed to fetch preview (${response.status})`);
+        throw new Error(`Failed to fetch preview fallback (${response.status})`);
       }
-
-      const takeFromBuffer = (buffer, rows) => {
-        const lines = buffer.split(/\r?\n/);
-        const remainder = lines.pop() ?? '';
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (!trimmed) continue;
-          const parsed = safeParse(trimmed);
-          if (parsed) {
-            rows.push(parsed);
-            if (rows.length >= limit) {
-              break;
-            }
-          }
-        }
-        return remainder;
-      };
-
-      const rows = [];
-
-      if (!response.body || !response.body.getReader) {
-        const text = await response.text();
-        takeFromBuffer(text, rows);
-        return rows.slice(0, limit);
+      const indicators = await response.json();
+      if (!Array.isArray(indicators)) {
+        return [];
       }
-
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = '';
-
-      try {
-        while (rows.length < limit) {
-          const { value, done } = await reader.read();
-          if (done) break;
-          buffer += decoder.decode(value, { stream: true });
-          buffer = takeFromBuffer(buffer, rows);
-          if (rows.length >= limit) {
-            await reader.cancel().catch(() => {});
-            break;
-          }
-        }
-
-        if (rows.length < limit && buffer.trim()) {
-          const parsed = safeParse(buffer.trim());
-          if (parsed) {
-            rows.push(parsed);
-          }
-        }
-      } finally {
-        if (reader.releaseLock) {
-          reader.releaseLock();
-        }
-      }
-
-      return rows.slice(0, limit);
+      return indicators.slice(0, PREVIEW_LIMIT);
     };
 
     const renderRows = (rows) => {
@@ -428,7 +484,7 @@
       if (refreshButton) refreshButton.disabled = true;
 
       try {
-        const rows = await readPreview(PREVIEW_STREAM_URL, PREVIEW_LIMIT);
+        const rows = await fetchPreviewRows(PREVIEW_LIMIT);
         state.rows = rows;
         state.filter = 'all';
 
@@ -439,9 +495,25 @@
 
         populateFilterOptions(rows);
         applyFilter();
-      } catch (error) {
-        console.error('Unable to load live preview', error);
-        setStatus('Unable to load the preview. Try again shortly or download the full feed below.', 'error');
+      } catch (streamError) {
+        console.error('Unable to load live preview via streaming', streamError);
+        try {
+          const fallbackRows = await fetchPreviewFallback();
+          state.rows = fallbackRows;
+          state.filter = 'all';
+
+          if (!fallbackRows.length) {
+            setStatus('No indicators available right now. Check back shortly.', 'empty');
+            return;
+          }
+
+          populateFilterOptions(fallbackRows);
+          applyFilter();
+        } catch (fallbackError) {
+          console.error('Fallback preview load failed', fallbackError);
+          state.rows = [];
+          setStatus('Unable to load the preview. Try again shortly or download the full feed below.', 'error');
+        }
       } finally {
         if (filterSelect) filterSelect.disabled = state.rows.length === 0;
         if (refreshButton) refreshButton.disabled = false;
@@ -462,7 +534,24 @@
       });
     }
 
-    loadPreview();
+    const triggerInitialLoad = () => {
+      loadPreview();
+    };
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((entry) => entry.isIntersecting)) {
+            observer.disconnect();
+            triggerInitialLoad();
+          }
+        },
+        { rootMargin: '0px 0px 200px 0px' }
+      );
+      observer.observe(container);
+    } else {
+      triggerInitialLoad();
+    }
   };
 
   loadStats();

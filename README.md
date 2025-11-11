@@ -196,12 +196,27 @@ apis:
     parse: urlhaus
     url: https://urlhaus.abuse.ch/downloads/csv_recent/
     reference: https://urlhaus.abuse.ch/
+    options:
+      status_filter: online
+
+# Custom parsers can be referenced via dotted paths
+  - name: community_feed
+    parse: my_plugins.parsers:parse_feed
+    url: https://example.org/export.json
+    reference: https://example.org/
 
 rss:
   - name: google_tag
     url: https://blog.google/threat-analysis-group/rss/
     reference: https://blog.google/threat-analysis-group/
 ```
+
+The `parse` field maps to functions registered in SwiftIOC's parser registry.
+Built-in collectors (e.g., `kev`, `urlhaus`, `malwarebazaar`) are available out
+of the box, and custom callables can be referenced via a dotted Python path
+(`module:function`). Any `options` block is passed as keyword arguments to the
+parser after filtering by its signature, so feed-specific settings (like the
+`status_filter` override above) live alongside the source definition.
 
 To disable RSS handling (and the `feedparser` dependency), pass `--skip-rss` at
 runtime. When a requested `sources.yml` file is missing, the CLI automatically
