@@ -336,8 +336,9 @@
               <div class="preview-status" data-preview-status role="status">Preparing live preview…</div>
             </div>
             <p class="preview-footnote">
-              The preview streams the first 12 indicators over HTTPS using lightweight streaming logic to
-              keep load times fast. Fetch the full dataset below when you need complete coverage.
+              The preview reuses a cached snapshot for instant loads, refreshes it in the background, and
+              shares the same dataset as the metrics above so there are no duplicate downloads. Grab the
+              full dataset below when you need complete coverage.
             </p>
           </div>
         </section>

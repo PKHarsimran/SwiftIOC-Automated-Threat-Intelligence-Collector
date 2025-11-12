@@ -2,9 +2,12 @@
   const IOC_ROOT = document.body?.dataset.iocRoot || '.';
   const DEFAULT_PREVIEW_LIMIT = 12;
   const PREVIEW_LOOKAHEAD_MULTIPLIER = 12;
+  const PREVIEW_CACHE_LIMIT = Math.max(DEFAULT_PREVIEW_LIMIT * PREVIEW_LOOKAHEAD_MULTIPLIER, 240);
   const INDICATORS_JSONL_URL = `${IOC_ROOT}/iocs/latest.jsonl`;
   const INDICATORS_JSON_FALLBACK_URL = `${IOC_ROOT}/iocs/latest.json`;
   const PREVIEW_STREAM_URL = INDICATORS_JSONL_URL;
+  const DATASET_STORAGE_KEY = 'swiftioc-dashboard-cache-v1';
+  const DATASET_CACHE_TTL = 5 * 60 * 1000;
 
   const numberFormatter = new Intl.NumberFormat('en-US');
   const formatNumber = (value) => numberFormatter.format(value ?? 0);
@@ -34,6 +37,106 @@
     });
     return result;
   };
+
+  const datasetListeners = new Set();
+  const subscribeToDataset = (listener) => {
+    if (typeof listener !== 'function') {
+      return () => {};
+    }
+    datasetListeners.add(listener);
+    return () => {
+      datasetListeners.delete(listener);
+    };
+  };
+
+  const createDatasetStorage = () => {
+    let storageChecked = false;
+    let storage = null;
+
+    const resolveStorage = () => {
+      if (storageChecked) return storage;
+      storageChecked = true;
+      try {
+        if (typeof window === 'undefined' || !window.sessionStorage) {
+          storage = null;
+          return storage;
+        }
+        const testKey = `${DATASET_STORAGE_KEY}__test`;
+        window.sessionStorage.setItem(testKey, '1');
+        window.sessionStorage.removeItem(testKey);
+        storage = window.sessionStorage;
+      } catch (error) {
+        console.warn('Session storage unavailable for dataset caching', error);
+        storage = null;
+      }
+      return storage;
+    };
+
+    const read = () => {
+      const target = resolveStorage();
+      if (!target) return null;
+      try {
+        const raw = target.getItem(DATASET_STORAGE_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== 'object') {
+          target.removeItem(DATASET_STORAGE_KEY);
+          return null;
+        }
+        if (typeof parsed.timestamp !== 'number' || typeof parsed.dataset !== 'object' || !parsed.dataset) {
+          target.removeItem(DATASET_STORAGE_KEY);
+          return null;
+        }
+        const dataset = parsed.dataset;
+        const age = Date.now() - parsed.timestamp;
+        const stale = age > DATASET_CACHE_TTL;
+        dataset.fetchedAt = typeof dataset.fetchedAt === 'number' ? dataset.fetchedAt : parsed.timestamp;
+        dataset.origin = stale ? 'cache-stale' : 'cache';
+        return dataset;
+      } catch (error) {
+        console.warn('Failed to read cached dataset', error);
+        try {
+          target.removeItem(DATASET_STORAGE_KEY);
+        } catch (cleanupError) {
+          console.warn('Failed to clear corrupt dataset cache', cleanupError);
+        }
+        return null;
+      }
+    };
+
+    const write = (dataset) => {
+      const target = resolveStorage();
+      if (!target || !dataset) return;
+      try {
+        const datasetToStore = {
+          ...dataset,
+          origin: 'network',
+          fetchedAt: typeof dataset.fetchedAt === 'number' ? dataset.fetchedAt : Date.now(),
+        };
+        const payload = JSON.stringify({
+          timestamp: Date.now(),
+          dataset: datasetToStore,
+        });
+        target.setItem(DATASET_STORAGE_KEY, payload);
+      } catch (error) {
+        console.warn('Failed to persist dataset cache', error);
+      }
+    };
+
+    const clear = () => {
+      const target = resolveStorage();
+      if (!target) return;
+      try {
+        target.removeItem(DATASET_STORAGE_KEY);
+      } catch (error) {
+        console.warn('Failed to clear dataset cache', error);
+      }
+    };
+
+    return { read, write, clear };
+  };
+
+  const datasetStorage = createDatasetStorage();
 
   const extractTags = (value) => {
     if (!value) return [];
@@ -236,6 +339,164 @@
     return acc.finalize();
   };
 
+  const formatTimestampForDisplay = (value) => {
+    const parsed = parseTimestamp(value);
+    if (!parsed) {
+      const fallback = normaliseString(value);
+      return fallback || '—';
+    }
+    const parts = isoToParts(parsed.iso);
+    if (parts.date && parts.time) {
+      return `${parts.date} ${parts.time}`;
+    }
+    if (parts.date) {
+      return parts.date;
+    }
+    return parsed.iso;
+  };
+
+  const selectDiverseRows = (rows, limit) => {
+    if (!Array.isArray(rows) || !rows.length) return [];
+    const max = Math.max(Number(limit) || DEFAULT_PREVIEW_LIMIT, 1);
+    const remaining = rows.slice();
+    const selected = [];
+    const usedTags = new Set();
+
+    while (remaining.length && selected.length < max) {
+      let bestIndex = 0;
+      let bestNewTags = -1;
+      let bestTime = -Infinity;
+
+      remaining.forEach((row, index) => {
+        const newTags = row.tagsLower.filter((tag) => !usedTags.has(tag)).length;
+        const time = row.firstSeenTime ?? 0;
+        if (
+          newTags > bestNewTags ||
+          (newTags === bestNewTags && time > bestTime) ||
+          (newTags === bestNewTags && time === bestTime && index < bestIndex)
+        ) {
+          bestIndex = index;
+          bestNewTags = newTags;
+          bestTime = time;
+        }
+      });
+
+      const [chosen] = remaining.splice(bestIndex, 1);
+      selected.push(chosen);
+      chosen.tagsLower.forEach((tag) => usedTags.add(tag));
+    }
+
+    if (selected.length < max && remaining.length) {
+      remaining
+        .sort((a, b) => (b.firstSeenTime ?? 0) - (a.firstSeenTime ?? 0))
+        .slice(0, max - selected.length)
+        .forEach((row) => selected.push(row));
+    }
+
+    return selected.sort((a, b) => (b.firstSeenTime ?? 0) - (a.firstSeenTime ?? 0));
+  };
+
+  const preparePreviewRow = (row) => {
+    if (!row || typeof row !== 'object') return null;
+    const indicator = coalesceString(
+      row.indicator,
+      row.observable,
+      row.observable_value,
+      row.value,
+      row.domain,
+      row.url,
+      row.hash,
+      row.address
+    );
+    if (!indicator) return null;
+
+    const typeRaw = coalesceString(
+      row.type,
+      row.indicator_type,
+      row.observable_type,
+      row.pattern_type,
+      row.kind,
+      row.category
+    );
+    const sourceRaw = coalesceString(
+      row.source,
+      row.feed,
+      row.provider,
+      row.collection,
+      row.origin,
+      row.dataset,
+      row.author,
+      row.organization
+    );
+    const confidenceRaw = coalesceString(
+      row.confidence,
+      row.confidence_score,
+      row.confidenceScore,
+      row.confidence_level,
+      row.confidenceLevel,
+      row.score
+    );
+
+    const tagValues = [
+      ...extractTags(row.tags),
+      ...extractTags(row.labels),
+      ...extractTags(row.label),
+      ...extractTags(row.classifications),
+      ...extractTags(row.malware_family),
+      ...extractTags(row.threat_type),
+      ...extractTags(row.threat_types),
+      ...extractTags(row.sectors),
+      ...extractTags(row.industries),
+    ];
+    const tags = uniqueStrings(tagValues).slice(0, 8);
+
+    const firstSeenRaw = coalesceString(
+      row.first_seen,
+      row.firstSeen,
+      row.first_observed,
+      row.firstObservation,
+      row.first_observed_at,
+      row.created,
+      row.created_at,
+      row.observed,
+      row.observed_at,
+      row.timestamp,
+      row.date_seen,
+      row.last_seen,
+      row.lastSeen,
+      row.seen
+    );
+    const firstSeenParsed = parseTimestamp(firstSeenRaw);
+
+    return {
+      indicator,
+      indicatorLower: indicator.toLowerCase(),
+      type: typeRaw || '—',
+      typeKey: typeRaw ? typeRaw.toLowerCase() : 'unknown',
+      source: sourceRaw || '—',
+      sourceLower: sourceRaw ? sourceRaw.toLowerCase() : '',
+      firstSeen: formatTimestampForDisplay(firstSeenParsed?.iso ?? firstSeenRaw),
+      firstSeenTime: firstSeenParsed?.time ?? null,
+      confidence: confidenceRaw || '—',
+      confidenceLower: confidenceRaw ? confidenceRaw.toLowerCase() : '',
+      tags,
+      tagsLower: tags.map((tag) => tag.toLowerCase()),
+      searchBlob: [indicator, typeRaw, sourceRaw, confidenceRaw, firstSeenRaw, ...tags]
+        .filter(Boolean)
+        .map((value) => value.toLowerCase())
+        .join(' '),
+    };
+  };
+
+  const confidenceClassFor = (confidence) => {
+    const value = normaliseLower(confidence);
+    if (!value) return null;
+    if (value.includes('high')) return 'confidence-high';
+    if (value.includes('medium')) return 'confidence-medium';
+    if (value.includes('low')) return 'confidence-low';
+    return null;
+  };
+
   const streamJsonLines = async (url, { limit = Infinity, onRow } = {}) => {
     const response = await fetch(url, { cache: 'no-store' });
     if (!response.ok) {
@@ -301,6 +562,183 @@
     return processed;
   };
 
+  const isCacheOrigin = (origin) => origin === 'cache' || origin === 'cache-stale';
+
+  const computeDatasetKey = (dataset) => {
+    if (!dataset || typeof dataset !== 'object') return null;
+    if (typeof dataset.fetchedAt === 'number') {
+      return `fetched:${dataset.fetchedAt}`;
+    }
+    if (dataset.stats?.generatedAt) return `generated:${dataset.stats.generatedAt}`;
+    if (dataset.stats?.collectionWindow) return `window:${dataset.stats.collectionWindow}`;
+    if (dataset.previewEntries?.length) {
+      return `preview:${dataset.previewEntries[0].indicatorLower ?? dataset.previewEntries[0].indicator}`;
+    }
+    return null;
+  };
+
+  let lastNotificationKey = null;
+
+  const datasetCache = {
+    promise: null,
+    refreshing: null,
+  };
+
+  const notifyDatasetListeners = (dataset) => {
+    if (!dataset || isCacheOrigin(dataset.origin)) return;
+    const key = computeDatasetKey(dataset) ?? '__swiftioc-null-key__';
+    if (key === lastNotificationKey) return;
+    lastNotificationKey = key;
+    datasetListeners.forEach((listener) => {
+      try {
+        listener(dataset);
+      } catch (error) {
+        console.error('Dataset listener failed', error);
+      }
+    });
+  };
+
+  const wrapDatasetPromise = (promise) => {
+    let wrapped;
+    wrapped = promise
+      .then((dataset) => {
+        notifyDatasetListeners(dataset);
+        return dataset;
+      })
+      .catch((error) => {
+        if (datasetCache.promise === wrapped) {
+          datasetCache.promise = null;
+        }
+        throw error;
+      });
+    datasetCache.promise = wrapped;
+    return wrapped;
+  };
+
+  const fetchDatasetFromJson = async () => {
+    const response = await fetch(INDICATORS_JSON_FALLBACK_URL, { cache: 'no-store' });
+    if (!response.ok) {
+      throw new Error(`Failed to fetch preview fallback (${response.status})`);
+    }
+    const indicators = await response.json();
+    const iterable = Array.isArray(indicators) ? indicators : [];
+    const stats = computeStatsFromIterable(iterable);
+    const previewEntries = [];
+    const seen = new Set();
+    for (const row of iterable) {
+      if (previewEntries.length >= PREVIEW_CACHE_LIMIT) break;
+      const entry = preparePreviewRow(row);
+      if (!entry) continue;
+      if (seen.has(entry.indicatorLower)) continue;
+      seen.add(entry.indicatorLower);
+      previewEntries.push(entry);
+    }
+    return { stats, previewEntries, source: 'json' };
+  };
+
+  const fetchDatasetFromStream = async () => {
+    const accumulator = createStatsAccumulator();
+    const previewEntries = [];
+    const seen = new Set();
+
+    await streamJsonLines(PREVIEW_STREAM_URL, {
+      onRow: (row) => {
+        accumulator.ingest(row);
+        if (previewEntries.length < PREVIEW_CACHE_LIMIT) {
+          const entry = preparePreviewRow(row);
+          if (entry && !seen.has(entry.indicatorLower)) {
+            seen.add(entry.indicatorLower);
+            previewEntries.push(entry);
+          }
+        }
+        return false;
+      },
+    });
+
+    const stats = accumulator.finalize();
+
+    if (!previewEntries.length) {
+      try {
+        const fallback = await fetchDatasetFromJson();
+        return { stats, previewEntries: fallback.previewEntries, source: fallback.source };
+      } catch (fallbackError) {
+        console.warn('Failed to augment preview entries via JSON fallback', fallbackError);
+      }
+    }
+
+    return { stats, previewEntries, source: 'jsonl' };
+  };
+
+  const fetchFreshDataset = async () => {
+    const fetchedAt = Date.now();
+    try {
+      const dataset = await fetchDatasetFromStream();
+      const enriched = { ...dataset, origin: 'network', fetchedAt };
+      datasetStorage.write(enriched);
+      return enriched;
+    } catch (streamError) {
+      console.warn('Streaming dataset failed, falling back to JSON', streamError);
+      const dataset = await fetchDatasetFromJson();
+      const enriched = { ...dataset, origin: 'network', fetchedAt };
+      datasetStorage.write(enriched);
+      return enriched;
+    }
+  };
+
+  const resolveDataset = async ({ forceRefresh = false } = {}) => {
+    if (forceRefresh) {
+      datasetStorage.clear();
+      datasetCache.promise = null;
+      datasetCache.refreshing = null;
+    }
+
+    if (!datasetCache.promise) {
+      if (!forceRefresh) {
+        const cached = datasetStorage.read();
+        if (cached) {
+          const resolved = wrapDatasetPromise(Promise.resolve(cached));
+          if (!datasetCache.refreshing) {
+            const refresh = fetchFreshDataset()
+              .then((dataset) => {
+                if (dataset) {
+                  wrapDatasetPromise(Promise.resolve(dataset));
+                }
+                return dataset;
+              })
+              .catch((error) => {
+                console.warn('Background dataset refresh failed', error);
+                return null;
+              })
+              .finally(() => {
+                if (datasetCache.refreshing === refresh) {
+                  datasetCache.refreshing = null;
+                }
+              });
+            datasetCache.refreshing = refresh;
+          }
+          return resolved;
+        }
+      }
+      return wrapDatasetPromise(fetchFreshDataset());
+    }
+
+    if (forceRefresh) {
+      return wrapDatasetPromise(fetchFreshDataset());
+    }
+
+    return datasetCache.promise;
+  };
+
+  const loadDataset = async ({ previewLimit = DEFAULT_PREVIEW_LIMIT, forceRefresh = false } = {}) => {
+    const dataset = await resolveDataset({ forceRefresh });
+    const desired = Math.max(Number(previewLimit) || DEFAULT_PREVIEW_LIMIT, 1);
+    const previewRows = selectDiverseRows(dataset.previewEntries, desired);
+    return {
+      dataset,
+      previewRows,
+    };
+  };
+
   const applyStats = (stats) => {
     setStatText('total-indicators', formatNumber(stats.total));
     setStatText('duplicates-removed', formatNumber(stats.duplicatesRemoved));
@@ -338,34 +776,34 @@
     populateTable('tags', tagRows, 'No tags available yet.');
   };
 
-  const loadStats = async () => {
+  const loadStats = async (forceRefresh = false) => {
     try {
-      const accumulator = createStatsAccumulator();
-      await streamJsonLines(INDICATORS_JSONL_URL, {
-        onRow: (row) => accumulator.ingest(row),
-      });
-      applyStats(accumulator.finalize());
-      return;
-    } catch (streamError) {
-      console.warn('Streaming statistics failed, attempting JSON fallback', streamError);
-    }
-
-    try {
-      const response = await fetch(INDICATORS_JSON_FALLBACK_URL, { cache: 'no-store' });
-      if (!response.ok) {
-        throw new Error(`Unable to fetch indicator summary (${response.status})`);
-      }
-      const indicators = await response.json();
-      const stats = computeStatsFromIterable(Array.isArray(indicators) ? indicators : []);
-      applyStats(stats);
+      const { dataset } = await loadDataset({ forceRefresh });
+      applyStats(dataset.stats);
     } catch (error) {
       console.error('Failed to load indicator statistics', error);
+      setStatText('total-indicators', '—');
+      setStatText('duplicates-removed', '—');
+      setStatText('active-sources', '—');
+      setStatText('indicator-types', '—');
+      setStatText('feeds-online', 'Unavailable');
+      setStatText('collection-window', '—');
       setStatText('generated-at', 'Unavailable');
+      setStatText('earliest-first-seen-date', '—');
+      setStatText('earliest-first-seen-time', '—');
+      setStatText('newest-first-seen-date', '—');
+      setStatText('newest-first-seen-time', '—');
+      setStatText('multi-source-overlaps', '—');
       populateTable('sources', [], 'Source data unavailable.');
       populateTable('types', [], 'Indicator type data unavailable.');
       populateTable('tags', [], 'Tag data unavailable.');
     }
   };
+
+  subscribeToDataset((dataset) => {
+    if (!dataset || isCacheOrigin(dataset.origin)) return;
+    applyStats(dataset.stats);
+  });
 
   const initialisePreview = () => {
     const container = document.querySelector('[data-preview-container]');
@@ -386,6 +824,8 @@
       tagFilter: 'all',
       search: '',
       limit: DEFAULT_PREVIEW_LIMIT,
+      origin: 'network',
+      fetchedAt: null,
     };
 
     if (limitSelect) {
@@ -405,6 +845,24 @@
 
     const setBusy = (busy) => {
       container.setAttribute('aria-busy', busy ? 'true' : 'false');
+    };
+
+    const describeCacheAge = () => {
+      if (typeof state.fetchedAt !== 'number') return '';
+      const diff = Math.max(Date.now() - state.fetchedAt, 0);
+      if (diff < 45000) return ' (<1 min old)';
+      const minutes = Math.round(diff / 60000);
+      return ` (~${minutes} min old)`;
+    };
+
+    const augmentStatusMessage = (message) => {
+      if (state.origin === 'cache-stale') {
+        return `${message} Cached snapshot${describeCacheAge()} is older than our refresh window—fetching fresh data…`;
+      }
+      if (state.origin === 'cache') {
+        return `${message} Cached snapshot${describeCacheAge()}—refreshing data in the background…`;
+      }
+      return message;
     };
 
     const copyToClipboard = async (text) => {
@@ -439,213 +897,6 @@
       }
     };
 
-    const formatTimestampForDisplay = (value) => {
-      const parsed = parseTimestamp(value);
-      if (!parsed) {
-        const fallback = normaliseString(value);
-        return fallback || '—';
-      }
-      const parts = isoToParts(parsed.iso);
-      if (parts.date && parts.time) {
-        return `${parts.date} ${parts.time}`;
-      }
-      if (parts.date) {
-        return parts.date;
-      }
-      return parsed.iso;
-    };
-
-    const selectDiverseRows = (rows, limit) => {
-      if (!Array.isArray(rows) || !rows.length) return [];
-      const max = Math.max(Number(limit) || DEFAULT_PREVIEW_LIMIT, 1);
-      const remaining = rows.slice();
-      const selected = [];
-      const usedTags = new Set();
-
-      while (remaining.length && selected.length < max) {
-        let bestIndex = 0;
-        let bestNewTags = -1;
-        let bestTime = -Infinity;
-
-        remaining.forEach((row, index) => {
-          const newTags = row.tagsLower.filter((tag) => !usedTags.has(tag)).length;
-          const time = row.firstSeenTime ?? 0;
-          if (
-            newTags > bestNewTags ||
-            (newTags === bestNewTags && time > bestTime) ||
-            (newTags === bestNewTags && time === bestTime && index < bestIndex)
-          ) {
-            bestIndex = index;
-            bestNewTags = newTags;
-            bestTime = time;
-          }
-        });
-
-        const [chosen] = remaining.splice(bestIndex, 1);
-        selected.push(chosen);
-        chosen.tagsLower.forEach((tag) => usedTags.add(tag));
-      }
-
-      if (selected.length < max && remaining.length) {
-        remaining
-          .sort((a, b) => (b.firstSeenTime ?? 0) - (a.firstSeenTime ?? 0))
-          .slice(0, max - selected.length)
-          .forEach((row) => selected.push(row));
-      }
-
-      return selected.sort((a, b) => (b.firstSeenTime ?? 0) - (a.firstSeenTime ?? 0));
-    };
-
-    const preparePreviewRow = (row) => {
-      if (!row || typeof row !== 'object') return null;
-      const indicator = coalesceString(
-        row.indicator,
-        row.observable,
-        row.observable_value,
-        row.value,
-        row.domain,
-        row.url,
-        row.hash,
-        row.address
-      );
-      if (!indicator) return null;
-
-      const typeRaw = coalesceString(
-        row.type,
-        row.indicator_type,
-        row.observable_type,
-        row.pattern_type,
-        row.kind,
-        row.category
-      );
-      const sourceRaw = coalesceString(
-        row.source,
-        row.feed,
-        row.provider,
-        row.collection,
-        row.origin,
-        row.dataset
-      );
-      const firstSeenRaw = coalesceString(
-        row.first_seen,
-        row.firstSeen,
-        row.first_observed,
-        row.firstObservation,
-        row.first_observed_at,
-        row.created,
-        row.created_at,
-        row.observed,
-        row.observed_at,
-        row.timestamp,
-        row.date_seen,
-        row.last_seen,
-        row.lastSeen
-      );
-      const confidenceRaw = coalesceString(
-        row.confidence,
-        row.confidence_score,
-        row.confidenceScore,
-        row.confidence_level,
-        row.confidenceLevel
-      );
-
-      const tags = uniqueStrings([
-        ...extractTags(row.tags),
-        ...extractTags(row.labels),
-        ...extractTags(row.label),
-        ...extractTags(row.classifications),
-        ...extractTags(row.malware_family),
-        ...extractTags(row.threat_type),
-      ]).slice(0, 8);
-
-      const firstSeenParsed = parseTimestamp(firstSeenRaw);
-
-      return {
-        indicator,
-        indicatorLower: indicator.toLowerCase(),
-        type: typeRaw || '—',
-        typeKey: typeRaw ? typeRaw.toLowerCase() : 'unknown',
-        source: sourceRaw || '—',
-        sourceLower: sourceRaw ? sourceRaw.toLowerCase() : '',
-        firstSeen: formatTimestampForDisplay(firstSeenParsed?.iso ?? firstSeenRaw),
-        firstSeenTime: firstSeenParsed?.time ?? null,
-        confidence: confidenceRaw || '—',
-        confidenceLower: confidenceRaw ? confidenceRaw.toLowerCase() : '',
-        tags,
-        tagsLower: tags.map((tag) => tag.toLowerCase()),
-        searchBlob: [
-          indicator,
-          typeRaw,
-          sourceRaw,
-          confidenceRaw,
-          firstSeenRaw,
-          ...tags,
-        ]
-          .filter(Boolean)
-          .map((value) => value.toLowerCase())
-          .join(' '),
-      };
-    };
-
-    const curatePreviewRows = (rows, limit) => {
-      if (!Array.isArray(rows) || !rows.length) return [];
-      const seenIndicators = new Set();
-      const prepared = [];
-      rows.forEach((row) => {
-        const entry = preparePreviewRow(row);
-        if (!entry) return;
-        if (seenIndicators.has(entry.indicatorLower)) return;
-        seenIndicators.add(entry.indicatorLower);
-        prepared.push(entry);
-      });
-      return selectDiverseRows(prepared, limit);
-    };
-
-    const fetchPreviewRows = async (limit) => {
-      const desired = Math.max(Number(limit) || DEFAULT_PREVIEW_LIMIT, 1);
-      const candidates = [];
-      const seenIndicators = new Set();
-      const streamLimit = Math.max(desired * PREVIEW_LOOKAHEAD_MULTIPLIER, desired * 2);
-      const targetUnique = Math.max(desired * 2, desired + 4);
-
-      await streamJsonLines(PREVIEW_STREAM_URL, {
-        limit: streamLimit,
-        onRow: (row) => {
-          const entry = preparePreviewRow(row);
-          if (!entry) return false;
-          if (seenIndicators.has(entry.indicatorLower)) return false;
-          seenIndicators.add(entry.indicatorLower);
-          candidates.push(entry);
-          if (candidates.length >= targetUnique) {
-            return true;
-          }
-          return false;
-        },
-      });
-
-      return selectDiverseRows(candidates, desired);
-    };
-
-    const fetchPreviewFallback = async (limit) => {
-      const response = await fetch(INDICATORS_JSON_FALLBACK_URL, { cache: 'no-store' });
-      if (!response.ok) {
-        throw new Error(`Failed to fetch preview fallback (${response.status})`);
-      }
-      const indicators = await response.json();
-      if (!Array.isArray(indicators)) {
-        return [];
-      }
-      return curatePreviewRows(indicators, limit);
-    };
-
-    const confidenceClassFor = (confidence) => {
-      const value = normaliseLower(confidence);
-      if (!value) return null;
-      if (value.includes('high')) return 'confidence-high';
-      if (value.includes('medium')) return 'confidence-medium';
-      if (value.includes('low')) return 'confidence-low';
-      return null;
-    };
 
     const renderRows = (rows) => {
       if (!tbody) return;
@@ -761,7 +1012,7 @@
       if (!rows.length) {
         if (tbody) tbody.innerHTML = '';
         if (table) table.hidden = true;
-        setStatus('No indicators available right now. Check back shortly.', 'empty');
+        setStatus(augmentStatusMessage('No indicators available right now. Check back shortly.'), 'empty');
         return;
       }
 
@@ -787,7 +1038,12 @@
         if (state.tagFilter !== 'all') summaryParts.push(`tag: ${buildSummaryLabel(tagFilterSelect, state.tagFilter)}`);
         if (searchTerm) summaryParts.push(`search: “${state.search.trim()}”`);
         const qualifier = summaryParts.length ? ` for ${summaryParts.join(', ')}` : '';
-        setStatus(`No indicators match the current filters${qualifier}. Adjust filters or refresh the feed.`, 'empty');
+        setStatus(
+          augmentStatusMessage(
+            `No indicators match the current filters${qualifier}. Adjust filters or refresh the feed.`
+          ),
+          'empty'
+        );
         return;
       }
 
@@ -798,7 +1054,10 @@
       if (state.tagFilter !== 'all') summaryParts.push(`tag: ${buildSummaryLabel(tagFilterSelect, state.tagFilter)}`);
       if (searchTerm) summaryParts.push(`search: “${state.search.trim()}”`);
       const qualifier = summaryParts.length ? ` (${summaryParts.join(', ')})` : '';
-      setStatus(`Showing ${filtered.length} of ${rows.length} curated indicators${qualifier}.`, 'ready');
+      setStatus(
+        augmentStatusMessage(`Showing ${filtered.length} of ${rows.length} curated indicators${qualifier}.`),
+        'ready'
+      );
     };
 
     const addOption = (select, value, label, count) => {
@@ -878,7 +1137,7 @@
       }
     };
 
-    const loadPreview = async (silent = false) => {
+    const loadPreview = async ({ silent = false, forceRefresh = false } = {}) => {
       if (!table || !tbody) return;
 
       setBusy(true);
@@ -892,33 +1151,33 @@
       });
 
       try {
-        let rows = await fetchPreviewRows(state.limit);
-        if (!rows.length) {
-          rows = await fetchPreviewFallback(state.limit);
-        }
-        state.rows = rows;
-        populateFilterOptions(rows);
+        const { dataset, previewRows } = await loadDataset({
+          previewLimit: state.limit,
+          forceRefresh,
+        });
+        state.rows = previewRows;
+        state.origin = dataset.origin || 'network';
+        state.fetchedAt = typeof dataset.fetchedAt === 'number' ? dataset.fetchedAt : null;
+        populateFilterOptions(previewRows);
         applyFilter();
-      } catch (streamError) {
-        console.error('Unable to load live preview via streaming', streamError);
-        try {
-          const fallbackRows = await fetchPreviewFallback(state.limit);
-          state.rows = fallbackRows;
-          populateFilterOptions(fallbackRows);
-          applyFilter();
-        } catch (fallbackError) {
-          console.error('Fallback preview load failed', fallbackError);
-          state.rows = [];
-          if (tbody) tbody.innerHTML = '';
-          setStatus('Unable to load the preview. Try again shortly or download the full feed below.', 'error');
+        if (forceRefresh || !isCacheOrigin(dataset.origin)) {
+          applyStats(dataset.stats);
         }
+      } catch (error) {
+        console.error('Unable to load live preview data', error);
+        state.rows = [];
+        state.origin = 'network';
+        state.fetchedAt = null;
+        if (tbody) tbody.innerHTML = '';
+        setStatus('Unable to load the preview. Try again shortly or download the full feed below.', 'error');
       } finally {
         controls.forEach((control) => {
           if (!control) return;
           if (control === filterSelect) {
             control.disabled = state.rows.length === 0;
           } else if (control === tagFilterSelect) {
-            control.disabled = state.rows.length === 0 || !tagFilterSelect.options || tagFilterSelect.options.length <= 1;
+            control.disabled =
+              state.rows.length === 0 || !tagFilterSelect.options || tagFilterSelect.options.length <= 1;
           } else if (control === searchInput) {
             control.disabled = state.rows.length === 0;
             if (!control.disabled) {
@@ -951,7 +1210,7 @@
         const parsed = parseInt(event.target.value, 10);
         if (!Number.isNaN(parsed) && parsed > 0) {
           state.limit = parsed;
-          loadPreview(true);
+          loadPreview({ silent: true });
         }
       });
     }
@@ -984,9 +1243,20 @@
       });
     }
 
+    subscribeToDataset((dataset) => {
+      if (!dataset || !table || !tbody) return;
+      if (isCacheOrigin(dataset.origin)) return;
+      const previewRows = selectDiverseRows(dataset.previewEntries, state.limit);
+      state.rows = previewRows;
+      state.origin = dataset.origin || 'network';
+      state.fetchedAt = typeof dataset.fetchedAt === 'number' ? dataset.fetchedAt : null;
+      populateFilterOptions(previewRows);
+      applyFilter();
+    });
+
     if (refreshButton) {
       refreshButton.addEventListener('click', () => {
-        loadPreview(true);
+        loadPreview({ silent: true, forceRefresh: true });
       });
     }
 
@@ -994,7 +1264,8 @@
       loadPreview();
     };
 
-    if ('IntersectionObserver' in window) {
+    const hasIntersectionObserver = typeof window !== 'undefined' && 'IntersectionObserver' in window;
+    if (hasIntersectionObserver) {
       const observer = new IntersectionObserver(
         (entries) => {
           if (entries.some((entry) => entry.isIntersecting)) {
