@@ -48,11 +48,12 @@ def load_iocs(path: Path) -> List[Dict[str, Any]]:
     return rows
 
 
-def to_table(rows: Sequence[Tuple[str, str]], headers: Tuple[str, str]) -> List[str]:
+def to_table(rows: Sequence[Tuple[str, Any]], headers: Tuple[str, str]) -> List[str]:
     if not rows:
         return ["_No data available._", ""]
     lines = [f"| {headers[0]} | {headers[1]} |", "| --- | ---: |"]
-    lines.extend(f"| {k} | {v} |" for k, v in rows)
+    for key, value in rows:
+        lines.append(f"| {key} | {value} |")
     lines.append("")
     return lines
 
