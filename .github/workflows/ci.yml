@@ -51,7 +51,7 @@ jobs:
         run: pytest
 
       - name: Dependency audit
-        run: pip-audit --strict
+        run: pip-audit --strict -r requirements.txt
 
       - name: Self-test
         run: python -m swiftioc --self-test

@@ -254,6 +254,18 @@ Tests cover indicator classification, defanging, and deduplication/merging
 behaviour for custom parser plugins. They are safe to run offline and require no
 network connectivity.
 
+## 🔐 Auditing dependencies
+
+To verify the runtime dependencies for known vulnerabilities, use
+[`pip-audit`](https://pypi.org/project/pip-audit/) against the bundled
+`requirements.txt`. The explicit requirements file keeps the audit focused on
+published packages while `--strict` maintains a non-zero exit status if any
+vulnerabilities are discovered.
+
+```bash
+pip-audit --strict -r requirements.txt
+```
+
 
 ## 🧾 Configuring sources
 Create a `sources.yml` to describe the feeds you care about. The file mirrors the
