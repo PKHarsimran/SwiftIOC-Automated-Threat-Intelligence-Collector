@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Automated open source threat intelligence collector"
 readme = "README.md"
 requires-python = ">=3.10"
-license = {file = "LICENSE"}
+license = "MIT"
 authors = [
   {name = "SwiftIOC Maintainers"}
 ]
@@ -30,6 +30,9 @@ dev = [
 
 [project.scripts]
 swiftioc = "swiftioc.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["swiftioc"]
 
 [tool.pytest.ini_options]
 addopts = "-ra"
