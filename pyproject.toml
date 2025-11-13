@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "swiftioc"
+version = "0.1.0"
+description = "Automated open source threat intelligence collector"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+authors = [
+  {name = "SwiftIOC Maintainers"}
+]
+dependencies = [
+  "requests>=2.32.0",
+  "PyYAML>=6.0",
+  "python-dateutil>=2.9.0",
+  "iocextract>=1.15.0",
+  "feedparser>=6.0.11",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2",
+  "ruff>=0.6.8",
+  "pyright>=1.1.377",
+  "pip-audit>=2.7.3",
+]
+
+[project.scripts]
+swiftioc = "swiftioc.cli:main"
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+filterwarnings = [
+  "ignore::DeprecationWarning",
+]

@@ -2,7 +2,7 @@
 
 SwiftIOC is an open-source Python threat intelligence automation toolkit that
 keeps recent Indicators of Compromise (IOCs) in machine-readable formats. The
-lightweight collector (`swiftioc.py`) ingests threat feeds via YAML
+lightweight collector package (`swiftioc`) ingests threat feeds via YAML
 configuration, normalises and deduplicates the indicators, and exports them to
 CSV, TSV, JSON, JSON Lines, and STIX 2.1 alongside searchable run diagnostics.
 
@@ -15,6 +15,7 @@ ready-to-use examples for rapid deployment in modern DevSecOps workflows.
 
 ## 📚 Table of contents
 - [SwiftIOC at a glance](#-swiftioc-at-a-glance)
+- [Branch strategy for the packaged edition](#-branch-strategy-for-the-packaged-edition)
 - [Features](#-features)
 - [Supported threat intelligence sources](#-supported-threat-intelligence-sources)
 - [Use cases & SEO-friendly keywords](#-use-cases--seo-friendly-keywords)
@@ -35,6 +36,59 @@ high-fidelity IOCs from authoritative sources. The project emphasises:
 - **Consistent IOC enrichment** ready for SIEM, SOAR, IDS, and DFIR tooling.
 - **Git-friendly artefacts** tailored for GitHub Pages, GitHub Actions, and
   other CI/CD environments.
+
+## 🌳 Branch strategy for the packaged edition
+
+This branch (`work`) carries the installable, multi-team edition of SwiftIOC.
+It keeps the existing collector logic compatible with the historical repository
+while adding packaging metadata, a richer README, and CI expectations suited to
+large security programmes. Keeping these changes on a dedicated branch avoids
+disrupting the lighter-weight default experience on `main`.
+
+- **GitHub Actions coverage.** The CI workflow now targets both `main` and this
+  branch, so pull requests and pushes to `work` receive the same linting,
+  testing, and CLI self-checks as the default branch.
+- **Scheduled runs.** GitHub only executes scheduled workflows from the default
+  branch. When operating exclusively from `work`, trigger collections with the
+  provided `workflow_dispatch` inputs or mirror the workflow into your own
+  repository where the branch is default.
+- **Packaging parity.** Tags created from this branch can be published to a
+  private package index without affecting the lightweight clone-and-run users on
+  `main`.
+
+## 🪄 Using this branch as a separate product
+
+If you want to treat the packaged edition as its own project—without merging it
+back to `main`—work directly from the `work` branch and make it the default in
+your fork or downstream repository.
+
+1. **Create a fork or new repository.** Fork this repo on GitHub or create an
+   empty repo under your organisation and add it as a new remote.
+2. **Push the `work` branch.**
+
+   ```bash
+   git clone https://github.com/<your-account>/SwiftIOC-Automated-Threat-Intelligence-Collector.git
+   cd SwiftIOC-Automated-Threat-Intelligence-Collector
+   git checkout work
+   git remote add packaged git@github.com:<your-account>/<new-repo>.git
+   git push packaged work:main   # or work:work if you want to keep the name
+   ```
+
+   Setting the branch name to `main` in the target repo lets GitHub schedule
+   workflows automatically. If you prefer to keep the name `work`, make that the
+   default branch in repository settings so the cron-based workflow runs.
+3. **Enable GitHub Actions & Pages.** Actions are disabled by default in new
+   forks. Turn them on (Settings → Actions → General) and optionally enable
+   GitHub Pages to publish the generated dashboard from `public/`.
+4. **Update secrets and ownership.** Replace any automation-specific secrets,
+   tokens, or email addresses (for example, the auto-commit identity) so the new
+   repository reflects your organisation.
+5. **Iterate independently.** Continue committing against your packaged branch;
+   the CI workflow will exercise the installable package, and the collector
+   workflow can be launched manually or on a schedule from your fork.
+
+These steps keep the packaged edition isolated while still benefiting from the
+automated tests, dashboards, and documentation tailored to larger teams.
 
 ## 🚀 Features
 - **YAML-driven feeds** – feed metadata lives in `sources.yml` so collections can
@@ -105,16 +159,23 @@ threat feed workflow".
 │   └── changelog/          # Markdown changelog between runs
 ├── scripts/                # Utility helpers for post-processing
 │   └── summarize_iocs.py   # Generates Markdown summaries for Pages & artifacts
-├── requirements.txt        # Python dependencies
+├── swiftioc/               # Installable package with collector logic & CLI
+│   ├── __init__.py
+│   ├── __main__.py
+│   ├── cli.py
+│   └── core.py
+├── tests/                  # Pytest-based regression tests
+│   └── test_core.py
+├── pyproject.toml          # Packaging metadata (install via pip)
+├── requirements.txt        # Python dependencies for manual installs
 ├── sources.example.yml     # Sample feed configuration
-├── swiftioc.py             # Main collector implementation & CLI
 ├── index.html              # Optional GitHub Pages entry point
 ├── README.md               # This document
 └── SECURITY.md             # Security reporting policy
 ```
 
 ## 🧠 How it works
-1. **Load configuration** – `swiftioc.py` reads `sources.yml` (falling back to
+1. **Load configuration** – the `swiftioc` CLI reads `sources.yml` (falling back to
    `sources.example.yml` when needed) and sets up logging, user agents, and
    output directories. 
 2. **Collect per source** – each API or RSS source is routed to a parser
@@ -140,15 +201,58 @@ python -m venv .venv
 source .venv/bin/activate  # Linux/macOS
 .venv\Scripts\activate     # Windows PowerShell
 
-# 3. Install dependencies
-pip install -r requirements.txt
+# 3. Install dependencies (package or requirements file)
+pip install .            # installs the swiftioc package and console script
+# For local development with linting/type-checking tools, use:
+# pip install ".[dev]"
+# or, if you prefer the legacy requirements file
+# pip install -r requirements.txt
 
 # 4. Run the collector with the sample sources
 python -m swiftioc --sources sources.example.yml --out-dir public
+# or invoke the console script once installed:
+# swiftioc --sources sources.example.yml --out-dir public
 ```
 
 Artifacts appear under `public/`. Add `--verbose` for progress logging or
 `--self-test` to run the built-in sanity checks without touching the network.
+
+## 👥 Deploying SwiftIOC across teams
+
+The installable package lets security, DFIR, and platform engineering teams share
+the same collector without cloning this repository. Publish the project to an
+internal package index or distribute a signed wheel, then manage
+`sources.yml` per environment (production SOC, lab, red team, etc.). Because the
+CLI accepts dotted-path parser names, organisations can ship proprietary parser
+plugins as separate wheels and list them alongside the built-ins in YAML.
+
+To keep environments consistent:
+
+- Use `pip install .` (or `pip install swiftioc` once published) inside virtual
+  environments or automation containers.
+- Commit curated `sources.yml` files for each environment and refer to them via
+  `--sources path/to/team-sources.yml`.
+- Enable the optional `dev` extra (`pip install "swiftioc[dev]"`) on developer
+  workstations to gain the same linting, typing, and auditing checks that run in
+  CI.
+- Reuse the provided GitHub Actions as templates for Jenkins, GitLab CI, or
+  other orchestrators—the CLI is self-contained and only depends on the YAML
+  configuration.
+
+
+## 🧪 Running the test suite
+
+The project now ships with lightweight regression tests to keep the core logic
+stable. After installing the optional development dependencies, execute:
+
+```bash
+pip install ".[dev]"
+pytest
+```
+
+Tests cover indicator classification, defanging, and deduplication/merging
+behaviour for custom parser plugins. They are safe to run offline and require no
+network connectivity.
 
 
 ## 🧾 Configuring sources
@@ -221,6 +325,7 @@ The collector populates the following structure (paths relative to `--out-dir`):
 ```
 public/
 ├── index.md
+├── index.html             # Live dashboard powered by summary.json
 ├── iocs/
 │   ├── latest.csv
 │   ├── latest.tsv
@@ -232,18 +337,30 @@ public/
 └── diagnostics/
     ├── REPORT.md
     ├── run.json
+    ├── summary.json         # machine-readable highlights for dashboards
     ├── summary.md
     └── raw/                 # present when --save-raw-dir is used
 ```
 
 The diagnostics include per-source counts, duplicate statistics, earliest and
 latest timestamps, and any recorded failures. These summaries are useful for CI
-status checks and dashboards. 
+status checks and dashboards. The new `summary.json` powers the enhanced landing
+page (`index.html`), which fetches metrics client-side so viewers immediately
+see the health of the latest run without waiting for a redirect.
 
 ## ⚙️ Running in GitHub Actions
 SwiftIOC runs cleanly inside GitHub Actions and emits artifacts that can be
-published via GitHub Pages. The workflow below collects IOCs hourly and deploys
-`public/`:
+published via GitHub Pages. This repository includes:
+
+- **`CI – SwiftIOC`** for linting, typing, tests, dependency audits, and a
+  diagnostic dry run using the new package entry point.
+- **`Collect – SwiftIOC`** for scheduled feed aggregation with optional
+  GitHub Pages deployment.
+- **`Maintenance – SwiftIOC`** for alerting when collections stay empty or
+  artifacts go stale.
+
+The snippet below shows a minimal workflow teams can copy into other repos. It
+collects IOCs hourly and deploys `public/` as a GitHub Pages site:
 
 ```yaml
 name: SwiftIOC – Threat Intel Collector
@@ -271,8 +388,10 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+      - name: Install SwiftIOC package
+        run: |
+          python -m pip install --upgrade pip
+          pip install .
 
       - name: Collect recent IOCs
         run: python -m swiftioc --ci-safe --window-hours 48 --out-dir public

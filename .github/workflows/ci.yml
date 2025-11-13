@@ -2,14 +2,16 @@ name: CI – SwiftIOC
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, work ]
     paths:
-      - "swiftioc.py"
+      - "swiftioc/**"
       - "sources*.yml"
       - "requirements.txt"
+      - "pyproject.toml"
+      - "tests/**"
       - ".github/workflows/ci.yml"
   pull_request:
-    branches: [ main ]
+    branches: [ main, work ]
 
 permissions:
   contents: read
@@ -31,14 +33,13 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('pyproject.toml', 'requirements.txt') }}
           restore-keys: ${{ runner.os }}-pip-
 
-      - name: Install dependencies
+      - name: Install project
         run: |
-          python -m pip install -U pip
-          pip install -r requirements.txt
-          pip install ruff pyright pip-audit
+          python -m pip install --upgrade pip
+          pip install ".[dev]"
 
       - name: Ruff lint
         run: ruff check .
@@ -46,17 +47,20 @@ jobs:
       - name: Pyright type check
         run: pyright
 
+      - name: Pytest
+        run: pytest
+
       - name: Dependency audit
         run: pip-audit --strict
 
       - name: Self-test
-        run: python swiftioc.py --self-test
+        run: python -m swiftioc --self-test
 
       - name: Dry run (skip RSS, short window)
         run: |
           mkdir -p public/diagnostics/raw
-          python swiftioc.py -v --out-dir public --sources sources.example.yml \
-            --window-hours 6 --skip-rss \
+          python -m swiftioc -v --out-dir public --sources sources.example.yml \
+            --window-hours 6 --skip-rss --ci-safe \
             --log-file public/diagnostics/run.log --log-format json --log-file-level DEBUG \
             --save-raw-dir public/diagnostics/raw \
             --diag-json public/diagnostics/run.json \
