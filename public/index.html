@@ -269,8 +269,8 @@
 
         <section id="preview" class="section data-preview">
           <div class="section-heading">
-            <h2>Live indicator preview</h2>
-            <p>Peek at the most recent indicators directly from the JSONL feed before downloading.</p>
+            <h2>Live source preview</h2>
+            <p>Review the strongest, highest-confidence signal from each reporting source before downloading.</p>
           </div>
           <div
             class="preview-panel"
@@ -279,6 +279,39 @@
             aria-live="polite"
             aria-busy="false"
           >
+            <div class="preview-summary" data-preview-summary hidden>
+              <article class="summary-card">
+                <p class="summary-label">Sources highlighted</p>
+                <p class="summary-value" data-preview-visible>—</p>
+                <p class="summary-subvalue">
+                  out of <span data-preview-total>—</span> reporting sources
+                </p>
+              </article>
+              <article class="summary-card">
+                <p class="summary-label">High-confidence sources</p>
+                <p class="summary-value" data-preview-high>—</p>
+                <p class="summary-subvalue">
+                  <span data-preview-high-percent>—</span> of highlighted
+                </p>
+              </article>
+              <article class="summary-card">
+                <p class="summary-label">Most common tag</p>
+                <p class="summary-value" data-preview-top-tag>—</p>
+                <p class="summary-subvalue" data-preview-top-tag-count>—</p>
+              </article>
+              <article class="summary-card">
+                <p class="summary-label">Freshest sighting</p>
+                <p class="summary-value" data-preview-newest>—</p>
+                <p class="summary-subvalue" data-preview-newest-relative></p>
+              </article>
+            </div>
+            <div class="preview-meta" data-preview-meta hidden>
+              <span class="preview-meta-pill" data-preview-origin>Live data</span>
+              <span class="preview-meta-detail">
+                Updated <time data-preview-refreshed>—</time>
+                <span class="preview-meta-relative" data-preview-relative></span>
+              </span>
+            </div>
             <div class="preview-toolbar">
               <div class="toolbar-controls">
                 <label class="toolbar-group" for="preview-filter">
@@ -302,9 +335,9 @@
                   </select>
                 </label>
               </div>
-              <div class="toolbar-actions">
-                <label class="toolbar-group" for="preview-search">
-                  <span>Search indicators</span>
+                <div class="toolbar-actions">
+                  <label class="toolbar-group" for="preview-search">
+                    <span>Search highlights</span>
                   <input
                     id="preview-search"
                     type="search"
@@ -336,9 +369,9 @@
               <div class="preview-status" data-preview-status role="status">Preparing live preview…</div>
             </div>
             <p class="preview-footnote">
-              The preview reuses a cached snapshot for instant loads, refreshes it in the background, and
-              shares the same dataset as the metrics above so there are no duplicate downloads. Grab the
-              full dataset below when you need complete coverage.
+              The preview surfaces one leader per source using cached data for instant loads, refreshes in
+              the background, and shares the same dataset as the metrics above. Grab the full dataset below
+              when you need complete coverage.
             </p>
           </div>
         </section>

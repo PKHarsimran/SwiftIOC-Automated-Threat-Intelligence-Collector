@@ -12,6 +12,46 @@
   const numberFormatter = new Intl.NumberFormat('en-US');
   const formatNumber = (value) => numberFormatter.format(value ?? 0);
 
+  const relativeTimeFormatter =
+    typeof Intl !== 'undefined' && typeof Intl.RelativeTimeFormat === 'function'
+      ? new Intl.RelativeTimeFormat('en', { numeric: 'auto' })
+      : null;
+  const relativeDivisions = [
+    { amount: 60, unit: 'second' },
+    { amount: 60, unit: 'minute' },
+    { amount: 24, unit: 'hour' },
+    { amount: 7, unit: 'day' },
+    { amount: 4.34524, unit: 'week' },
+    { amount: 12, unit: 'month' },
+    { amount: Infinity, unit: 'year' },
+  ];
+
+  const dateTimeFormatter =
+    typeof Intl !== 'undefined' && typeof Intl.DateTimeFormat === 'function'
+      ? new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short' })
+      : null;
+
+  const formatRelativeTimeFromNow = (timestamp) => {
+    if (!relativeTimeFormatter || typeof timestamp !== 'number') return null;
+    const now = Date.now();
+    let delta = Math.round((timestamp - now) / 1000);
+    for (const division of relativeDivisions) {
+      if (Math.abs(delta) < division.amount || division.amount === Infinity) {
+        return relativeTimeFormatter.format(delta, division.unit);
+      }
+      delta = Math.round(delta / division.amount);
+    }
+    return null;
+  };
+
+  const formatAbsoluteTimestamp = (timestamp) => {
+    if (typeof timestamp !== 'number') return null;
+    const date = new Date(timestamp);
+    if (Number.isNaN(date.getTime())) return null;
+    if (dateTimeFormatter) return dateTimeFormatter.format(date);
+    return date.toISOString();
+  };
+
   const normaliseString = (value) => (value ?? '').toString().trim();
   const normaliseLower = (value) => normaliseString(value).toLowerCase();
   const coalesceString = (...values) => {
@@ -36,6 +76,70 @@
       result.push(normalised);
     });
     return result;
+  };
+
+  const UNKNOWN_SOURCE_KEY = '__swiftioc-unknown-source__';
+
+  const confidenceRankForValue = (confidence) => {
+    const value = normaliseLower(confidence);
+    if (!value) return 0;
+    if (value.includes('very high') || value.includes('critical')) return 4;
+    if (value.includes('high')) return 3;
+    if (value.includes('medium') || value.includes('moderate')) return 2;
+    if (value.includes('low')) return 1;
+    const numeric = Number.parseFloat(value);
+    if (Number.isFinite(numeric)) {
+      if (numeric >= 80) return 3;
+      if (numeric >= 50) return 2;
+      if (numeric > 0) return 1;
+    }
+    return 0;
+  };
+
+  const confidenceRankForRow = (row) => {
+    if (!row) return 0;
+    if (typeof row.confidenceRank === 'number') return row.confidenceRank;
+    const rank = confidenceRankForValue(row.confidenceLower || row.confidence);
+    row.confidenceRank = rank;
+    return rank;
+  };
+
+  const compareRowStrength = (a, b) => {
+    if (!a && !b) return 0;
+    if (!a) return 1;
+    if (!b) return -1;
+    const rankDiff = confidenceRankForRow(b) - confidenceRankForRow(a);
+    if (rankDiff !== 0) return rankDiff;
+    const timeDiff = (b.firstSeenTime ?? 0) - (a.firstSeenTime ?? 0);
+    if (timeDiff !== 0) return timeDiff;
+    const sourceDiff = normaliseString(a.source).localeCompare(normaliseString(b.source));
+    if (sourceDiff !== 0) return sourceDiff;
+    return normaliseString(a.indicator).localeCompare(normaliseString(b.indicator));
+  };
+
+  const selectBestPerSource = (rows) => {
+    if (!Array.isArray(rows) || !rows.length) return [];
+    const best = new Map();
+    rows.forEach((row) => {
+      if (!row) return;
+      const key = row.sourceLower || UNKNOWN_SOURCE_KEY;
+      const current = best.get(key);
+      if (!current || compareRowStrength(row, current) < 0) {
+        best.set(key, row);
+      }
+    });
+    return Array.from(best.values()).sort(compareRowStrength);
+  };
+
+  const countDistinctSources = (rows) => {
+    if (!Array.isArray(rows) || !rows.length) return 0;
+    const seen = new Set();
+    rows.forEach((row) => {
+      if (!row) return;
+      const key = row.sourceLower || UNKNOWN_SOURCE_KEY;
+      seen.add(key);
+    });
+    return seen.size;
   };
 
   const datasetListeners = new Set();
@@ -356,44 +460,61 @@
   };
 
   const selectDiverseRows = (rows, limit) => {
-    if (!Array.isArray(rows) || !rows.length) return [];
+    const candidates = selectBestPerSource(rows);
+    if (!candidates.length) return [];
+
     const max = Math.max(Number(limit) || DEFAULT_PREVIEW_LIMIT, 1);
-    const remaining = rows.slice();
+    const remaining = candidates.slice();
     const selected = [];
     const usedTags = new Set();
 
     while (remaining.length && selected.length < max) {
-      let bestIndex = 0;
+      let bestIndex = -1;
+      let bestRow = null;
       let bestNewTags = -1;
-      let bestTime = -Infinity;
 
       remaining.forEach((row, index) => {
+        if (!row) return;
         const newTags = row.tagsLower.filter((tag) => !usedTags.has(tag)).length;
-        const time = row.firstSeenTime ?? 0;
-        if (
-          newTags > bestNewTags ||
-          (newTags === bestNewTags && time > bestTime) ||
-          (newTags === bestNewTags && time === bestTime && index < bestIndex)
-        ) {
+        if (bestIndex === -1) {
           bestIndex = index;
+          bestRow = row;
           bestNewTags = newTags;
-          bestTime = time;
+          return;
+        }
+        if (newTags > bestNewTags) {
+          bestIndex = index;
+          bestRow = row;
+          bestNewTags = newTags;
+          return;
+        }
+        if (newTags === bestNewTags && compareRowStrength(row, bestRow) < 0) {
+          bestIndex = index;
+          bestRow = row;
         }
       });
 
+      if (bestIndex === -1) {
+        break;
+      }
+
       const [chosen] = remaining.splice(bestIndex, 1);
+      if (!chosen) break;
       selected.push(chosen);
       chosen.tagsLower.forEach((tag) => usedTags.add(tag));
     }
 
     if (selected.length < max && remaining.length) {
       remaining
-        .sort((a, b) => (b.firstSeenTime ?? 0) - (a.firstSeenTime ?? 0))
+        .sort(compareRowStrength)
         .slice(0, max - selected.length)
-        .forEach((row) => selected.push(row));
+        .forEach((row) => {
+          if (!row) return;
+          selected.push(row);
+        });
     }
 
-    return selected.sort((a, b) => (b.firstSeenTime ?? 0) - (a.firstSeenTime ?? 0));
+    return selected.sort(compareRowStrength);
   };
 
   const preparePreviewRow = (row) => {
@@ -479,6 +600,7 @@
       firstSeenTime: firstSeenParsed?.time ?? null,
       confidence: confidenceRaw || '—',
       confidenceLower: confidenceRaw ? confidenceRaw.toLowerCase() : '',
+      confidenceRank: confidenceRankForValue(confidenceRaw),
       tags,
       tagsLower: tags.map((tag) => tag.toLowerCase()),
       searchBlob: [indicator, typeRaw, sourceRaw, confidenceRaw, firstSeenRaw, ...tags]
@@ -817,6 +939,19 @@
     const limitSelect = container.querySelector('[data-preview-limit]');
     const searchInput = container.querySelector('[data-preview-search]');
     const refreshButton = container.querySelector('[data-preview-refresh]');
+    const summaryRoot = container.querySelector('[data-preview-summary]');
+    const summaryVisibleEl = container.querySelector('[data-preview-visible]');
+    const summaryTotalEl = container.querySelector('[data-preview-total]');
+    const summaryHighEl = container.querySelector('[data-preview-high]');
+    const summaryHighPercentEl = container.querySelector('[data-preview-high-percent]');
+    const summaryTopTagEl = container.querySelector('[data-preview-top-tag]');
+    const summaryTopTagCountEl = container.querySelector('[data-preview-top-tag-count]');
+    const summaryNewestEl = container.querySelector('[data-preview-newest]');
+    const summaryNewestRelativeEl = container.querySelector('[data-preview-newest-relative]');
+    const metaRoot = container.querySelector('[data-preview-meta]');
+    const metaOriginEl = container.querySelector('[data-preview-origin]');
+    const metaRefreshedEl = container.querySelector('[data-preview-refreshed]');
+    const metaRelativeEl = container.querySelector('[data-preview-relative]');
 
     const state = {
       rows: [],
@@ -826,6 +961,8 @@
       limit: DEFAULT_PREVIEW_LIMIT,
       origin: 'network',
       fetchedAt: null,
+      stats: null,
+      previewPool: 0,
     };
 
     if (limitSelect) {
@@ -863,6 +1000,125 @@
         return `${message} Cached snapshot${describeCacheAge()}—refreshing data in the background…`;
       }
       return message;
+    };
+
+    const updateMeta = () => {
+      if (!metaRoot) return;
+      const showMeta = state.rows.length > 0 || typeof state.fetchedAt === 'number';
+      metaRoot.hidden = !showMeta;
+
+      if (metaOriginEl) {
+        let originLabel = 'Live data';
+        if (state.origin === 'cache') originLabel = 'Cached snapshot';
+        else if (state.origin === 'cache-stale') originLabel = 'Stale snapshot';
+        metaOriginEl.textContent = originLabel;
+        metaOriginEl.dataset.state = state.origin;
+      }
+
+      if (metaRefreshedEl) {
+        if (typeof state.fetchedAt === 'number') {
+          const absolute = formatAbsoluteTimestamp(state.fetchedAt);
+          metaRefreshedEl.textContent = absolute || '—';
+          metaRefreshedEl.dateTime = new Date(state.fetchedAt).toISOString();
+        } else {
+          metaRefreshedEl.textContent = '—';
+          metaRefreshedEl.removeAttribute('dateTime');
+        }
+      }
+
+      if (metaRelativeEl) {
+        if (typeof state.fetchedAt === 'number') {
+          const relative = formatRelativeTimeFromNow(state.fetchedAt);
+          metaRelativeEl.textContent = relative ? `(${relative})` : '';
+        } else {
+          metaRelativeEl.textContent = '';
+        }
+      }
+    };
+
+    const updateSummary = (visibleRows) => {
+      if (!summaryRoot) return;
+      const totalRows = state.rows.length;
+      const datasetSources = state.stats?.activeSources;
+      const previewPool = state.previewPool ?? totalRows;
+      const showSummary = totalRows > 0;
+      summaryRoot.hidden = !showSummary;
+      if (!showSummary) return;
+
+      const visibleCount = Array.isArray(visibleRows) ? visibleRows.length : 0;
+      if (summaryVisibleEl) {
+        summaryVisibleEl.textContent = formatNumber(visibleCount);
+      }
+      if (summaryTotalEl) {
+        const totalValue = datasetSources != null ? datasetSources : previewPool;
+        summaryTotalEl.textContent = formatNumber(totalValue);
+      }
+
+      const highCount = (visibleRows || []).reduce((acc, row) => {
+        return confidenceRankForRow(row) >= 3 ? acc + 1 : acc;
+      }, 0);
+      if (summaryHighEl) {
+        summaryHighEl.textContent = formatNumber(highCount);
+      }
+      if (summaryHighPercentEl) {
+        const percent = visibleCount ? Math.round((highCount / visibleCount) * 100) : 0;
+        summaryHighPercentEl.textContent = `${percent}%`;
+      }
+
+      const tagCounts = new Map();
+      (visibleRows || []).forEach((row) => {
+        if (!row?.tags?.length) return;
+        row.tags.forEach((tag, index) => {
+          const key = row.tagsLower?.[index] || tag.toLowerCase();
+          if (!tagCounts.has(key)) {
+            tagCounts.set(key, { label: tag, count: 0 });
+          }
+          tagCounts.get(key).count += 1;
+        });
+      });
+
+      let topTagEntry = null;
+      tagCounts.forEach((entry) => {
+        if (
+          !topTagEntry ||
+          entry.count > topTagEntry.count ||
+          (entry.count === topTagEntry.count && entry.label.localeCompare(topTagEntry.label) < 0)
+        ) {
+          topTagEntry = entry;
+        }
+      });
+
+      if (summaryTopTagEl) {
+        summaryTopTagEl.textContent = topTagEntry ? topTagEntry.label : 'No tags across highlighted sources';
+      }
+      if (summaryTopTagCountEl) {
+        summaryTopTagCountEl.textContent = topTagEntry
+          ? `${formatNumber(topTagEntry.count)} source${topTagEntry.count === 1 ? '' : 's'}`
+          : '—';
+      }
+
+      let newestRow = null;
+      (visibleRows || []).forEach((row) => {
+        if (!row) return;
+        if (!newestRow) {
+          newestRow = row;
+          return;
+        }
+        const currentTime = row.firstSeenTime ?? -Infinity;
+        const newestTime = newestRow.firstSeenTime ?? -Infinity;
+        if (currentTime > newestTime) {
+          newestRow = row;
+        }
+      });
+
+      if (summaryNewestEl) {
+        summaryNewestEl.textContent = newestRow?.firstSeen ?? '—';
+      }
+      if (summaryNewestRelativeEl) {
+        summaryNewestRelativeEl.textContent = newestRow?.firstSeenTime
+          ? formatRelativeTimeFromNow(newestRow.firstSeenTime) || ''
+          : '';
+      }
     };
 
     const copyToClipboard = async (text) => {
@@ -1012,7 +1268,12 @@
       if (!rows.length) {
         if (tbody) tbody.innerHTML = '';
         if (table) table.hidden = true;
-        setStatus(augmentStatusMessage('No indicators available right now. Check back shortly.'), 'empty');
+        setStatus(
+          augmentStatusMessage('No source highlights available right now. Check back shortly.'),
+          'empty'
+        );
+        updateSummary([]);
+        updateMeta();
         return;
       }
 
@@ -1040,22 +1301,26 @@
         const qualifier = summaryParts.length ? ` for ${summaryParts.join(', ')}` : '';
         setStatus(
           augmentStatusMessage(
-            `No indicators match the current filters${qualifier}. Adjust filters or refresh the feed.`
+            `No source highlights match the current filters${qualifier}. Adjust filters or refresh the feed.`
           ),
           'empty'
         );
+        updateSummary([]);
+        updateMeta();
         return;
       }
 
       renderRows(filtered);
       if (table) table.hidden = false;
+      updateSummary(filtered);
+      updateMeta();
       const summaryParts = [];
       if (state.filter !== 'all') summaryParts.push(`type: ${buildSummaryLabel(filterSelect, state.filter)}`);
       if (state.tagFilter !== 'all') summaryParts.push(`tag: ${buildSummaryLabel(tagFilterSelect, state.tagFilter)}`);
       if (searchTerm) summaryParts.push(`search: “${state.search.trim()}”`);
       const qualifier = summaryParts.length ? ` (${summaryParts.join(', ')})` : '';
       setStatus(
-        augmentStatusMessage(`Showing ${filtered.length} of ${rows.length} curated indicators${qualifier}.`),
+        augmentStatusMessage(`Showing ${filtered.length} of ${rows.length} source highlights${qualifier}.`),
         'ready'
       );
     };
@@ -1143,7 +1408,7 @@
       setBusy(true);
       table.hidden = true;
       tbody.innerHTML = '';
-      setStatus(silent ? 'Refreshing live data…' : 'Loading live data…', 'loading');
+      setStatus(silent ? 'Refreshing source highlights…' : 'Loading source highlights…', 'loading');
 
       const controls = [filterSelect, tagFilterSelect, limitSelect, searchInput, refreshButton];
       controls.forEach((control) => {
@@ -1158,6 +1423,11 @@
         state.rows = previewRows;
         state.origin = dataset.origin || 'network';
         state.fetchedAt = typeof dataset.fetchedAt === 'number' ? dataset.fetchedAt : null;
+        state.stats = dataset.stats || state.stats;
+        const sourcePool = countDistinctSources(dataset.previewEntries);
+        const fallbackPool = countDistinctSources(previewRows);
+        state.previewPool = sourcePool > 0 ? sourcePool : fallbackPool;
+        updateMeta();
         populateFilterOptions(previewRows);
         applyFilter();
         if (forceRefresh || !isCacheOrigin(dataset.origin)) {
@@ -1168,8 +1438,15 @@
         state.rows = [];
         state.origin = 'network';
         state.fetchedAt = null;
+        state.stats = null;
+        state.previewPool = 0;
         if (tbody) tbody.innerHTML = '';
-        setStatus('Unable to load the preview. Try again shortly or download the full feed below.', 'error');
+        setStatus(
+          'Unable to load the source preview. Try again shortly or download the full feed below.',
+          'error'
+        );
+        updateSummary([]);
+        if (metaRoot) metaRoot.hidden = true;
       } finally {
         controls.forEach((control) => {
           if (!control) return;
@@ -1250,6 +1527,11 @@
       state.rows = previewRows;
       state.origin = dataset.origin || 'network';
       state.fetchedAt = typeof dataset.fetchedAt === 'number' ? dataset.fetchedAt : null;
+      state.stats = dataset.stats || state.stats;
+      const sourcePool = countDistinctSources(dataset.previewEntries);
+      const fallbackPool = countDistinctSources(previewRows);
+      state.previewPool = sourcePool > 0 ? sourcePool : fallbackPool;
+      updateMeta();
       populateFilterOptions(previewRows);
       applyFilter();
     });
