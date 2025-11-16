@@ -449,6 +449,8 @@
       const fallback = normaliseString(value);
       return fallback || '—';
     }
+    const absolute = formatAbsoluteTimestamp(parsed.time);
+    if (absolute) return absolute;
     const parts = isoToParts(parsed.iso);
     if (parts.date && parts.time) {
       return `${parts.date} ${parts.time}`;
@@ -861,6 +863,86 @@
     };
   };
 
+  const initialiseStatusBanner = () => {
+    const root = document.querySelector('[data-site-status-root]');
+    if (!root) return;
+
+    const statusLabel = root.querySelector('[data-site-status-label]');
+    const originEl = root.querySelector('[data-site-origin]');
+    const windowEl = root.querySelector('[data-site-window]');
+    const generatedEl = root.querySelector('[data-site-generated]');
+    const updatedEl = root.querySelector('[data-site-updated]');
+    const refreshButton = root.querySelector('[data-site-refresh]');
+
+    const setState = (dataset) => {
+      const stats = dataset?.stats || {};
+      const origin = dataset?.origin || 'network';
+      const fetchedAt = typeof dataset?.fetchedAt === 'number' ? dataset.fetchedAt : null;
+      const total = stats?.total ?? 0;
+
+      root.dataset.state = origin;
+
+      if (statusLabel) {
+        statusLabel.textContent = total > 0 ? 'Dashboard is ready with fresh indicators' : 'Preparing dashboard…';
+      }
+
+      if (originEl) {
+        let originLabel = 'Live dataset';
+        if (origin === 'cache') originLabel = 'Cached snapshot';
+        else if (origin === 'cache-stale') originLabel = 'Stale snapshot';
+        originEl.textContent = originLabel;
+      }
+
+      if (windowEl) {
+        windowEl.textContent = stats.collectionWindow ?? '—';
+      }
+
+      if (generatedEl) {
+        generatedEl.textContent = formatTimestampForDisplay(stats.generatedAt);
+      }
+
+      if (updatedEl) {
+        if (typeof fetchedAt === 'number') {
+          const absolute = formatAbsoluteTimestamp(fetchedAt);
+          const relative = formatRelativeTimeFromNow(fetchedAt);
+          updatedEl.textContent = absolute ? `${absolute}${relative ? ` (${relative})` : ''}` : '—';
+        } else {
+          updatedEl.textContent = '—';
+        }
+      }
+    };
+
+    const handleError = () => {
+      root.dataset.state = 'error';
+      if (statusLabel) {
+        statusLabel.textContent = 'Unable to load the latest dataset right now';
+      }
+      if (originEl) originEl.textContent = 'Unavailable';
+      if (windowEl) windowEl.textContent = '—';
+      if (generatedEl) generatedEl.textContent = '—';
+      if (updatedEl) updatedEl.textContent = '—';
+    };
+
+    if (refreshButton) {
+      refreshButton.addEventListener('click', () => {
+        root.dataset.state = 'refreshing';
+        if (statusLabel) statusLabel.textContent = 'Refreshing data…';
+        loadDataset({ forceRefresh: true })
+          .then(({ dataset }) => setState(dataset))
+          .catch(handleError);
+      });
+    }
+
+    loadDataset()
+      .then(({ dataset }) => setState(dataset))
+      .catch(handleError);
+
+    subscribeToDataset((dataset) => {
+      if (!dataset) return;
+      setState(dataset);
+    });
+  };
+
   const applyStats = (stats) => {
     setStatText('total-indicators', formatNumber(stats.total));
     setStatText('duplicates-removed', formatNumber(stats.duplicatesRemoved));
@@ -871,7 +953,7 @@
     setStatText('feeds-online', feedsText);
 
     setStatText('collection-window', stats.collectionWindow ?? '—');
-    setStatText('generated-at', stats.generatedAt ?? '—');
+    setStatText('generated-at', formatTimestampForDisplay(stats.generatedAt));
 
     setStatText('earliest-first-seen-date', stats.earliestFirstSeen.date ?? '—');
     setStatText('earliest-first-seen-time', stats.earliestFirstSeen.time ?? '—');
@@ -1563,6 +1645,7 @@
     }
   };
 
+  initialiseStatusBanner();
   loadStats();
   initialisePreview();
 })();

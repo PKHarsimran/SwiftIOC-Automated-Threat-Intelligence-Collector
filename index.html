@@ -3,72 +3,97 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>SwiftIOC Dashboard Redirect</title>
-    <meta name="description" content="Jump to the SwiftIOC GitHub Pages dashboard that visualises the latest automated threat intelligence collection run.">
+    <title>SwiftIOC GitHub Pages</title>
+    <meta
+      name="description"
+      content="Jump straight into the SwiftIOC GitHub Pages dashboard with fresh indicators, downloads, and diagnostics."
+    >
     <meta http-equiv="refresh" content="3; url=public/">
     <link rel="canonical" href="public/">
     <meta name="theme-color" content="#0f172a">
     <style>
       :root {
         color-scheme: dark light;
+        font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
       }
       body {
-        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
         margin: 0;
-        padding: 2rem;
+        padding: clamp(1.25rem, 3vw, 2.5rem);
         display: flex;
         min-height: 100vh;
         align-items: center;
         justify-content: center;
-        background: radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.12), transparent 55%), #0f172a;
+        background: radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.12), transparent 55%),
+          radial-gradient(circle at 80% 10%, rgba(168, 85, 247, 0.12), transparent 50%),
+          #0f172a;
         color: #e2e8f0;
       }
       a {
         color: #38bdf8;
       }
       .card {
-        max-width: 38rem;
-        background: rgba(15, 23, 42, 0.88);
-        padding: 2.5rem;
+        width: min(960px, 100%);
+        background: rgba(15, 23, 42, 0.9);
+        padding: clamp(1.75rem, 3vw, 2.5rem);
         border-radius: 1.25rem;
-        box-shadow: 0 24px 55px rgba(15, 23, 42, 0.5);
-        text-align: left;
+        box-shadow: 0 24px 55px rgba(15, 23, 42, 0.55);
+        display: grid;
+        gap: clamp(1rem, 2vw, 1.5rem);
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      }
+      .card-header {
+        grid-column: 1 / -1;
         display: flex;
         flex-direction: column;
-        gap: 1.25rem;
+        gap: 0.6rem;
       }
       h1 {
-        font-size: 1.6rem;
+        font-size: clamp(1.6rem, 3vw, 2rem);
         margin: 0;
       }
       p {
         margin: 0;
         line-height: 1.6;
+        color: rgba(226, 232, 240, 0.82);
       }
-      ul {
-        margin: 0;
-        padding-left: 1.1rem;
-        display: grid;
-        gap: 0.35rem;
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.35rem 0.75rem;
+        background: rgba(56, 189, 248, 0.1);
+        border-radius: 999px;
+        font-weight: 600;
+        color: #38bdf8;
+        width: fit-content;
+      }
+      .pill::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #22d3ee;
+        box-shadow: 0 0 0 6px rgba(56, 189, 248, 0.18);
       }
       .actions {
         display: flex;
         flex-wrap: wrap;
-        gap: 0.65rem;
+        gap: 0.75rem;
       }
       .button-link {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 0.6rem 1rem;
+        padding: 0.65rem 1.1rem;
         border-radius: 999px;
-        font-weight: 600;
+        font-weight: 700;
         text-decoration: none;
-        transition: background 0.2s ease;
+        transition: transform 0.2s ease, background 0.2s ease;
       }
       .button-link.primary {
         background: #38bdf8;
         color: #0b1324;
+        box-shadow: 0 14px 30px rgba(14, 165, 233, 0.35);
       }
       .button-link.secondary {
         border: 1px solid rgba(148, 163, 184, 0.35);
@@ -78,36 +103,111 @@
       .button-link:hover,
       .button-link:focus-visible {
         background: rgba(56, 189, 248, 0.15);
+        transform: translateY(-1px);
       }
       .button-link.primary:hover,
       .button-link.primary:focus-visible {
         background: #0ea5e9;
         color: #f8fafc;
       }
+      .list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 0.6rem;
+      }
+      .list strong {
+        color: #f8fafc;
+      }
+      .link-grid {
+        display: grid;
+        gap: 0.75rem;
+      }
+      .note {
+        grid-column: 1 / -1;
+        padding: 1rem 1.25rem;
+        border-radius: 0.9rem;
+        background: rgba(56, 189, 248, 0.08);
+        border: 1px solid rgba(56, 189, 248, 0.25);
+      }
+      .footnote {
+        grid-column: 1 / -1;
+        font-size: 0.95rem;
+        color: rgba(226, 232, 240, 0.78);
+      }
+
+      @media (max-width: 640px) {
+        body {
+          padding: 1.25rem;
+        }
+
+        .card {
+          grid-template-columns: 1fr;
+          padding: 1.5rem;
+          border-radius: 1rem;
+        }
+
+        .card-header {
+          gap: 0.4rem;
+        }
+
+        .actions {
+          width: 100%;
+        }
+
+        .actions .button-link {
+          flex: 1 1 45%;
+          min-width: 0;
+          text-align: center;
+        }
+      }
     </style>
   </head>
   <body>
     <div class="card">
-      <h1>Redirecting to the SwiftIOC Dashboard</h1>
-      <p>
-        You are being routed to the GitHub Pages experience that showcases the most recent SwiftIOC
-        automated threat intelligence collection run. The full dashboard includes live metrics,
-        download-ready feeds, and operational recommendations.
-      </p>
-      <ul>
-        <li>Need the data immediately? Jump straight to the <a href="public/#actions">download area</a>.</li>
-        <li>Curious how the pipeline works? Review the <a href="README.md">implementation guide</a>.</li>
-        <li>Prefer diagnostics? Open the <a href="public/diagnostics/summary.html">collection summary</a>.</li>
-      </ul>
-      <div class="actions">
-        <a class="button-link primary" href="public/">Open dashboard now</a>
-        <a class="button-link secondary" href="https://github.com/SecurityRiskAdvisors/SwiftIOC-Automated-Threat-Intelligence-Collector">
-          View repository
-        </a>
+      <div class="card-header">
+        <span class="pill">GitHub Pages ready</span>
+        <h1>Redirecting to the SwiftIOC dashboard</h1>
+        <p>
+          You will land on the GitHub Pages experience that showcases the latest automated threat
+          intelligence collection run. Stay here to choose where to begin if you want to skip the redirect.
+        </p>
       </div>
-      <p>
-        No automatic redirect? Use the buttons above. This landing page waits a few seconds before
-        sending you along so you can choose the best starting point.
+      <div class="link-grid">
+        <div>
+          <h2>Start with the dashboard</h2>
+          <p>
+            Explore live metrics, a curated preview of per-source highlights, and recommendations tailored for
+            GitHub Pages deployments.
+          </p>
+          <div class="actions">
+            <a class="button-link primary" href="public/">Open dashboard</a>
+            <a class="button-link secondary" href="public/#actions">Skip to downloads</a>
+          </div>
+        </div>
+        <div>
+          <h2>Shortcuts</h2>
+          <ul class="list">
+            <li><strong>Diagnostics:</strong> Inspect collection health via the <a href="public/diagnostics/summary.html">diagnostics summary</a>.</li>
+            <li><strong>Implementation:</strong> Review how the pipeline works in the <a href="README.md">README guide</a>.</li>
+            <li>
+              <strong>Repository:</strong> Open the project on GitHub to file issues or contribute via the
+              <a href="https://github.com/SecurityRiskAdvisors/SwiftIOC-Automated-Threat-Intelligence-Collector">public repo</a>.
+            </li>
+          </ul>
+          <div class="actions">
+            <a class="button-link secondary" href="https://github.com/SecurityRiskAdvisors/SwiftIOC-Automated-Threat-Intelligence-Collector">View repository</a>
+          </div>
+        </div>
+      </div>
+      <div class="note">
+        <strong>Heads up:</strong> A three-second redirect is active. Use the buttons above if you want to
+        jump directly to the section that matters most.
+      </div>
+      <p class="footnote">
+        SwiftIOC publishes fresh indicators, deduplicates noise, and leaves everything in the open. Bookmark this
+        page to keep tabs on the GitHub Pages build and quickly reach data exports during incidents.
       </p>
     </div>
   </body>
