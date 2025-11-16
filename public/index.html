@@ -44,6 +44,34 @@
         </nav>
       </header>
 
+      <section class="status-banner" data-site-status-root aria-live="polite">
+        <div class="status-leading">
+          <span class="status-dot" aria-hidden="true"></span>
+          <div>
+            <p class="status-title" data-site-status-label>Preparing dashboard…</p>
+            <p class="status-subtitle">
+              <span data-site-updated>Awaiting dataset</span>
+              <span class="status-divider" aria-hidden="true">•</span>
+              <span data-site-origin>Live dataset</span>
+            </p>
+          </div>
+        </div>
+        <div class="status-meta">
+          <div class="status-meta-item">
+            <span class="meta-label">Generated</span>
+            <span data-site-generated>—</span>
+          </div>
+          <div class="status-meta-item">
+            <span class="meta-label">Window</span>
+            <span data-site-window>—</span>
+          </div>
+        </div>
+        <div class="status-actions">
+          <button type="button" class="button-link secondary" data-site-refresh>Refresh data</button>
+          <a class="button-link secondary" href="diagnostics/summary.html">Open diagnostics</a>
+        </div>
+      </section>
+
       <main id="main" class="page-main" tabindex="-1">
         <section id="overview" class="hero">
           <div class="hero-body">
