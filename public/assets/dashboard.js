@@ -883,7 +883,8 @@
       root.dataset.state = origin;
 
       if (statusLabel) {
-        statusLabel.textContent = total > 0 ? 'Dashboard is ready with fresh indicators' : 'Preparing dashboard…';
+        statusLabel.textContent =
+          total > 0 ? 'Dashboard is ready with fresh indicators' : 'Preparing dashboard…';
       }
 
       if (originEl) {
@@ -944,12 +945,17 @@
   };
 
   const applyStats = (stats) => {
+    if (!stats) return;
+
     setStatText('total-indicators', formatNumber(stats.total));
     setStatText('duplicates-removed', formatNumber(stats.duplicatesRemoved));
     setStatText('active-sources', formatNumber(stats.activeSources));
     setStatText('indicator-types', formatNumber(stats.indicatorTypes));
 
-    const feedsText = `${formatNumber(stats.activeSources)} active source${stats.activeSources === 1 ? '' : 's'}`;
+    const feedsText =
+      stats.activeSources != null
+        ? `${formatNumber(stats.activeSources)} active source${stats.activeSources === 1 ? '' : 's'}`
+        : '—';
     setStatText('feeds-online', feedsText);
 
     setStatText('collection-window', stats.collectionWindow ?? '—');
@@ -1235,7 +1241,6 @@
       }
     };
 
-
     const renderRows = (rows) => {
       if (!tbody) return;
       tbody.innerHTML = '';
@@ -1392,9 +1397,12 @@
         return;
       }
 
-      renderRows(filtered);
+      // Respect state.limit when actually rendering on the single screen
+      const limited = filtered.slice(0, state.limit);
+
+      renderRows(limited);
       if (table) table.hidden = false;
-      updateSummary(filtered);
+      updateSummary(limited);
       updateMeta();
       const summaryParts = [];
       if (state.filter !== 'all') summaryParts.push(`type: ${buildSummaryLabel(filterSelect, state.filter)}`);
@@ -1402,7 +1410,9 @@
       if (searchTerm) summaryParts.push(`search: “${state.search.trim()}”`);
       const qualifier = summaryParts.length ? ` (${summaryParts.join(', ')})` : '';
       setStatus(
-        augmentStatusMessage(`Showing ${filtered.length} of ${rows.length} source highlights${qualifier}.`),
+        augmentStatusMessage(
+          `Showing ${limited.length} of ${filtered.length} matching source highlights${qualifier}.`
+        ),
         'ready'
       );
     };
@@ -1624,25 +1634,8 @@
       });
     }
 
-    const triggerInitialLoad = () => {
-      loadPreview();
-    };
-
-    const hasIntersectionObserver = typeof window !== 'undefined' && 'IntersectionObserver' in window;
-    if (hasIntersectionObserver) {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          if (entries.some((entry) => entry.isIntersecting)) {
-            observer.disconnect();
-            triggerInitialLoad();
-          }
-        },
-        { rootMargin: '0px 0px 200px 0px' }
-      );
-      observer.observe(container);
-    } else {
-      triggerInitialLoad();
-    }
+    // For single-screen dashboard, just load immediately (no IntersectionObserver lazy load)
+    loadPreview();
   };
 
   initialiseStatusBanner();
