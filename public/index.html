@@ -18,6 +18,300 @@
     <meta property="twitter:card" content="summary_large_image" />
     <link rel="preload" href="assets/styles.css" as="style" />
     <link rel="stylesheet" href="assets/styles.css" />
+
+    <!-- Layout overrides to make it a single-screen dashboard -->
+    <style>
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        overflow: hidden; /* No page scroll on desktop */
+      }
+
+      .page-wrapper {
+        min-height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .page-header {
+        flex-shrink: 0;
+      }
+
+      .top-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-inline: 1.5rem;
+      }
+
+      .top-nav .nav-links {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        font-size: 0.85rem;
+      }
+
+      .status-banner {
+        padding-inline: 1.5rem;
+      }
+
+      .page-main {
+        flex: 1;
+        padding: 0.75rem 1.5rem 1rem;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+
+      .hero {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1.5rem;
+        padding: 0.75rem 0 0.75rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+      }
+
+      .hero-body {
+        max-width: 60%;
+      }
+
+      .hero-aside {
+        max-width: 40%;
+      }
+
+      .hero-meta {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+      }
+
+      .hero-actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 0.5rem;
+      }
+
+      .dashboard-grid {
+        flex: 1;
+        min-height: 0;
+        display: grid;
+        grid-template-columns: 1.6fr 1.4fr;
+        grid-template-rows: repeat(3, minmax(0, 1fr));
+        gap: 0.75rem;
+        padding-top: 0.75rem;
+      }
+
+      .panel {
+        background: rgba(15, 23, 42, 0.85);
+        border-radius: 0.75rem;
+        padding: 0.75rem 0.9rem;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        min-height: 0;
+      }
+
+      .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 0.35rem;
+      }
+
+      .panel-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+      }
+
+      .panel-subtitle {
+        font-size: 0.75rem;
+        opacity: 0.8;
+      }
+
+      .panel-body {
+        flex: 1;
+        min-height: 0;
+      }
+
+      .panel-scroll {
+        overflow: auto; /* Scroll inside the card if content overflows */
+      }
+
+      .metrics-grid,
+      .timeline-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.5rem;
+      }
+
+      .metric-card {
+        padding: 0.55rem 0.6rem;
+        border-radius: 0.5rem;
+        background: rgba(15, 23, 42, 0.95);
+      }
+
+      .metric-card h3 {
+        font-size: 0.8rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .metric-value {
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+
+      .metric-detail {
+        font-size: 0.7rem;
+        opacity: 0.8;
+      }
+
+      .table-card {
+        height: 100%;
+      }
+
+      .table-card table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.75rem;
+      }
+
+      .table-card th,
+      .table-card td {
+        padding: 0.3rem 0.35rem;
+      }
+
+      .table-card thead {
+        position: sticky;
+        top: 0;
+        background: rgba(15, 23, 42, 1);
+      }
+
+      .numeric {
+        text-align: right;
+      }
+
+      .preview-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.4rem;
+        flex-wrap: wrap;
+      }
+
+      .preview-table-wrapper {
+        flex: 1;
+        min-height: 0;
+      }
+
+      .preview-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.72rem;
+      }
+
+      .preview-table th,
+      .preview-table td {
+        padding: 0.25rem 0.35rem;
+      }
+
+      .preview-status {
+        font-size: 0.75rem;
+        opacity: 0.85;
+        margin-top: 0.3rem;
+      }
+
+      .actions-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.45rem;
+      }
+
+      .action-card {
+        padding: 0.5rem 0.55rem;
+        border-radius: 0.5rem;
+        background: rgba(15, 23, 42, 0.95);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 0.35rem;
+      }
+
+      .action-card h3 {
+        font-size: 0.8rem;
+        margin-bottom: 0.2rem;
+      }
+
+      .action-description {
+        font-size: 0.7rem;
+        opacity: 0.85;
+      }
+
+      .action-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+      }
+
+      .step-list,
+      .faq-group,
+      .recommendations-grid {
+        font-size: 0.75rem;
+      }
+
+      .step-list {
+        list-style: decimal;
+        padding-left: 1.25rem;
+      }
+
+      .step-list li + li {
+        margin-top: 0.3rem;
+      }
+
+      .faq-group details {
+        margin-bottom: 0.25rem;
+      }
+
+      .recommendations-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.3rem;
+      }
+
+      .footer {
+        flex-shrink: 0;
+        padding: 0.5rem 1.5rem 0.75rem;
+        font-size: 0.75rem;
+        opacity: 0.85;
+        border-top: 1px solid rgba(148, 163, 184, 0.25);
+      }
+
+      .footer-links {
+        margin-top: 0.25rem;
+      }
+
+      /* Make it usable on small screens: allow page scroll below 1024px */
+      @media (max-width: 1024px) {
+        body {
+          overflow: auto;
+        }
+        .page-main {
+          height: auto;
+        }
+        .dashboard-grid {
+          display: block;
+        }
+        .panel {
+          margin-bottom: 0.75rem;
+          height: auto;
+        }
+      }
+    </style>
   </head>
   <body data-ioc-root=".">
     <a href="#main" class="skip-link">Skip to main content</a>
@@ -30,47 +324,44 @@
           </a>
           <div class="nav-links">
             <a href="#overview">Overview</a>
-            <a href="#highlights">Highlights</a>
-            <a href="#timeline">Timeline</a>
-            <a href="#playbook">Playbook</a>
-            <a href="#sources">Sources</a>
-            <a href="#indicator-types">Types</a>
-            <a href="#preview">Preview</a>
-            <a href="#actions">Downloads</a>
-            <a href="#recommendations">Recommendations</a>
-            <a href="#faq">FAQ</a>
+            <a href="#panel-metrics">Highlights</a>
+            <a href="#panel-timeline">Timeline</a>
+            <a href="#panel-sources">Sources</a>
+            <a href="#panel-preview">Preview</a>
+            <a href="#panel-actions">Downloads</a>
+            <a href="#panel-playbook">Playbook & FAQ</a>
             <a href="diagnostics/summary.html">Diagnostics</a>
           </div>
         </nav>
-      </header>
 
-      <section class="status-banner" data-site-status-root aria-live="polite">
-        <div class="status-leading">
-          <span class="status-dot" aria-hidden="true"></span>
-          <div>
-            <p class="status-title" data-site-status-label>Preparing dashboard…</p>
-            <p class="status-subtitle">
-              <span data-site-updated>Awaiting dataset</span>
-              <span class="status-divider" aria-hidden="true">•</span>
-              <span data-site-origin>Live dataset</span>
-            </p>
+        <section class="status-banner" data-site-status-root aria-live="polite">
+          <div class="status-leading">
+            <span class="status-dot" aria-hidden="true"></span>
+            <div>
+              <p class="status-title" data-site-status-label>Preparing dashboard…</p>
+              <p class="status-subtitle">
+                <span data-site-updated>Awaiting dataset</span>
+                <span class="status-divider" aria-hidden="true">•</span>
+                <span data-site-origin>Live dataset</span>
+              </p>
+            </div>
           </div>
-        </div>
-        <div class="status-meta">
-          <div class="status-meta-item">
-            <span class="meta-label">Generated</span>
-            <span data-site-generated>—</span>
+          <div class="status-meta">
+            <div class="status-meta-item">
+              <span class="meta-label">Generated</span>
+              <span data-site-generated>—</span>
+            </div>
+            <div class="status-meta-item">
+              <span class="meta-label">Window</span>
+              <span data-site-window>—</span>
+            </div>
           </div>
-          <div class="status-meta-item">
-            <span class="meta-label">Window</span>
-            <span data-site-window>—</span>
+          <div class="status-actions">
+            <button type="button" class="button-link secondary" data-site-refresh>Refresh data</button>
+            <a class="button-link secondary" href="diagnostics/summary.html">Open diagnostics</a>
           </div>
-        </div>
-        <div class="status-actions">
-          <button type="button" class="button-link secondary" data-site-refresh>Refresh data</button>
-          <a class="button-link secondary" href="diagnostics/summary.html">Open diagnostics</a>
-        </div>
-      </section>
+        </section>
+      </header>
 
       <main id="main" class="page-main" tabindex="-1">
         <section id="overview" class="hero">
@@ -78,8 +369,8 @@
             <p class="eyebrow">Automated Threat Intelligence Collector</p>
             <h1>SwiftIOC Threat Intelligence Snapshot</h1>
             <p class="hero-lede">
-              Automatically generated from the latest SwiftIOC collection run. Use this dashboard for
-              instant situational awareness, source health, and quick access to download-ready feeds.
+              Automatically generated from the latest SwiftIOC collection run. Use this dashboard for instant
+              situational awareness, source health, and download-ready feeds.
             </p>
             <ul class="hero-meta">
               <li>
@@ -96,8 +387,8 @@
               </li>
             </ul>
             <div class="hero-actions">
-              <a class="button-link" href="#preview">Live preview</a>
-              <a class="button-link secondary" href="#actions">Download data</a>
+              <a class="button-link" href="#panel-preview">Live preview</a>
+              <a class="button-link secondary" href="#panel-actions">Download data</a>
             </div>
           </div>
           <div class="hero-aside">
@@ -113,486 +404,390 @@
           </div>
         </section>
 
-        <section id="highlights" class="section">
-          <div class="section-heading">
-            <h2>Operational highlights</h2>
-            <p>Key metrics that summarise the current indicator landscape across all enabled feeds.</p>
-          </div>
-          <div class="section-content section-scroll">
-            <div class="metrics-grid">
-              <article class="metric-card">
-                <h3>Total indicators</h3>
-                <p class="metric-value" data-stat="total-indicators">—</p>
-                <p class="metric-detail">Unique IOCs collected during the latest cycle.</p>
-              </article>
-              <article class="metric-card">
-                <h3>Sources reporting</h3>
-                <p class="metric-value" data-stat="active-sources">—</p>
-                <p class="metric-detail">Active intelligence feeds that produced data this run.</p>
-              </article>
-              <article class="metric-card">
-                <h3>Indicator types</h3>
-                <p class="metric-value" data-stat="indicator-types">—</p>
-                <p class="metric-detail">Distinct IOC formats discovered across the feeds.</p>
-              </article>
-              <article class="metric-card">
-                <h3>Duplicates removed</h3>
-                <p class="metric-value" data-stat="duplicates-removed">—</p>
-                <p class="metric-detail">Indicators deduplicated to maintain a clean dataset.</p>
-              </article>
+        <!-- Single-screen dashboard grid -->
+        <div class="dashboard-grid">
+          <!-- Metrics & Highlights -->
+          <section id="panel-metrics" class="panel">
+            <div class="panel-header">
+              <h2 class="panel-title">Operational highlights</h2>
+              <p class="panel-subtitle">Snapshot of the current indicator landscape.</p>
             </div>
-          </div>
-        </section>
-
-        <section id="timeline" class="section">
-          <div class="section-heading">
-            <h2>Collection timeline</h2>
-            <p>Understand recency and overlap across sources to plan enrichment and response.</p>
-          </div>
-          <div class="section-content section-scroll">
-            <div class="metrics-grid timeline-grid">
-              <article class="metric-card">
-                <h3>Earliest first seen</h3>
-                <p class="metric-value">
-                  <span data-stat="earliest-first-seen-date">—</span>
-                  <span class="metric-subvalue" data-stat="earliest-first-seen-time">—</span>
-                </p>
-                <p class="metric-detail">Oldest IOC sighting retained in the active window.</p>
-              </article>
-              <article class="metric-card">
-                <h3>Newest first seen</h3>
-                <p class="metric-value">
-                  <span data-stat="newest-first-seen-date">—</span>
-                  <span class="metric-subvalue" data-stat="newest-first-seen-time">—</span>
-                </p>
-                <p class="metric-detail">Most recent IOC discovery across all sources.</p>
-              </article>
-              <article class="metric-card">
-                <h3>Multi-source overlaps</h3>
-                <p class="metric-value" data-stat="multi-source-overlaps">—</p>
-                <p class="metric-detail">Indicators independently confirmed by more than one feed.</p>
-              </article>
-            </div>
-          </div>
-        </section>
-
-        <section id="playbook" class="section section-alt">
-          <div class="section-heading">
-            <h2>Operational playbook</h2>
-            <p>
-              A lightweight, repeatable workflow that helps responders keep SwiftIOC data fresh, actionable,
-              and measurable inside their existing tooling.
-            </p>
-          </div>
-          <div class="section-content section-scroll">
-            <ol class="step-list">
-              <li class="step-card">
-                <div class="step-badge" aria-hidden="true">1</div>
-                <div class="step-content">
-                  <h3>Validate freshness and scope</h3>
-                  <p>
-                    Start each review by confirming the collection window and overlaps so downstream teams
-                    know exactly how recent and comprehensive the data is.
-                  </p>
-                  <ul class="step-actions">
-                    <li>Compare <a href="#timeline">timeline</a> metrics with your detection coverage SLAs.</li>
-                    <li>Alert stakeholders if the multi-source overlap count drops unexpectedly.</li>
-                    <li>Bookmark the diagnostics summary for quick health checks during incidents.</li>
-                  </ul>
-                </div>
-              </li>
-              <li class="step-card">
-                <div class="step-badge" aria-hidden="true">2</div>
-                <div class="step-content">
-                  <h3>Promote the right exports</h3>
-                  <p>
-                    Select the format that best aligns with your automation stack and make it part of a
-                    scheduled sync so analysts always see the latest indicators.
-                  </p>
-                  <ul class="step-actions">
-                    <li>Use the JSON feed for orchestration platforms and enrichment microservices.</li>
-                    <li>Stream the JSONL file into data lakes to preserve historical context.</li>
-                    <li>Create a GitHub Action that publishes CSV/TSV artifacts for SIEM uploads.</li>
-                  </ul>
-                </div>
-              </li>
-              <li class="step-card">
-                <div class="step-badge" aria-hidden="true">3</div>
-                <div class="step-content">
-                  <h3>Close the loop with feedback</h3>
-                  <p>
-                    Track which sources and indicator types deliver the most value so you can iterate on the
-                    playbook and retire noisy feeds.
-                  </p>
-                  <ul class="step-actions">
-                    <li>Map <a href="#sources">source totals</a> to your internal asset or client groups.</li>
-                    <li>Collect analyst feedback directly inside pull requests for new source onboarding.</li>
-                    <li>Document high-confidence tags and share them with your threat hunting community.</li>
-                  </ul>
-                </div>
-              </li>
-            </ol>
-          </div>
-        </section>
-
-        <section id="sources" class="section">
-          <div class="section-heading">
-            <h2>Per-source totals</h2>
-            <p>See which feeds are contributing the most intelligence at a glance.</p>
-          </div>
-          <div class="section-content section-scroll">
-            <div class="table-card">
-              <table>
-                <thead>
-                  <tr>
-                    <th scope="col">Source</th>
-                    <th scope="col" class="numeric">Indicators</th>
-                  </tr>
-                </thead>
-                <tbody data-table="sources">
-                  <tr>
-                    <td data-title="Source" colspan="2">Loading sources…</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <section id="indicator-types" class="section">
-          <div class="section-heading">
-            <h2>Indicator types</h2>
-            <p>Breakdown of IOC formats to support filtering and response planning.</p>
-          </div>
-          <div class="section-content section-scroll">
-            <div class="table-card">
-              <table>
-                <thead>
-                  <tr>
-                    <th scope="col">Type</th>
-                    <th scope="col" class="numeric">Indicators</th>
-                  </tr>
-                </thead>
-                <tbody data-table="types">
-                  <tr>
-                    <td data-title="Type" colspan="2">Loading indicator types…</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <section id="top-tags" class="section">
-          <div class="section-heading">
-            <h2>Top tags</h2>
-            <p>Most prevalent threat tags assigned to indicators in the latest sweep.</p>
-          </div>
-          <div class="section-content section-scroll">
-            <div class="table-card">
-              <table>
-                <thead>
-                  <tr>
-                    <th scope="col">Tag</th>
-                    <th scope="col" class="numeric">Indicators</th>
-                  </tr>
-                </thead>
-                <tbody data-table="tags">
-                  <tr>
-                    <td data-title="Tag" colspan="2">Loading tags…</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <section id="preview" class="section data-preview">
-          <div class="section-heading">
-            <h2>Live source preview</h2>
-            <p>Review the strongest, highest-confidence signal from each reporting source before downloading.</p>
-          </div>
-          <div class="section-content section-scroll">
-          <div
-            class="preview-panel"
-            data-preview-container
-            role="region"
-            aria-live="polite"
-            aria-busy="false"
-          >
-            <div class="preview-summary" data-preview-summary hidden>
-              <article class="summary-card">
-                <p class="summary-label">Sources highlighted</p>
-                <p class="summary-value" data-preview-visible>—</p>
-                <p class="summary-subvalue">
-                  out of <span data-preview-total>—</span> reporting sources
-                </p>
-              </article>
-              <article class="summary-card">
-                <p class="summary-label">High-confidence sources</p>
-                <p class="summary-value" data-preview-high>—</p>
-                <p class="summary-subvalue">
-                  <span data-preview-high-percent>—</span> of highlighted
-                </p>
-              </article>
-              <article class="summary-card">
-                <p class="summary-label">Most common tag</p>
-                <p class="summary-value" data-preview-top-tag>—</p>
-                <p class="summary-subvalue" data-preview-top-tag-count>—</p>
-              </article>
-              <article class="summary-card">
-                <p class="summary-label">Freshest sighting</p>
-                <p class="summary-value" data-preview-newest>—</p>
-                <p class="summary-subvalue" data-preview-newest-relative></p>
-              </article>
-            </div>
-            <div class="preview-meta" data-preview-meta hidden>
-              <span class="preview-meta-pill" data-preview-origin>Live data</span>
-              <span class="preview-meta-detail">
-                Updated <time data-preview-refreshed>—</time>
-                <span class="preview-meta-relative" data-preview-relative></span>
-              </span>
-            </div>
-            <div class="preview-toolbar">
-              <div class="toolbar-controls">
-                <label class="toolbar-group" for="preview-filter">
-                  <span>Filter by type</span>
-                  <select id="preview-filter" data-preview-filter disabled>
-                    <option value="all">All types</option>
-                  </select>
-                </label>
-                <label class="toolbar-group" for="preview-tag-filter">
-                  <span>Focus on tag</span>
-                  <select id="preview-tag-filter" data-preview-tag-filter disabled>
-                    <option value="all">All tags</option>
-                  </select>
-                </label>
-                <label class="toolbar-group" for="preview-limit">
-                  <span>Rows</span>
-                  <select id="preview-limit" data-preview-limit>
-                    <option value="12">12</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
-                  </select>
-                </label>
+            <div class="panel-body panel-scroll">
+              <div class="metrics-grid">
+                <article class="metric-card">
+                  <h3>Total indicators</h3>
+                  <p class="metric-value" data-stat="total-indicators">—</p>
+                  <p class="metric-detail">Unique IOCs collected during the latest cycle.</p>
+                </article>
+                <article class="metric-card">
+                  <h3>Sources reporting</h3>
+                  <p class="metric-value" data-stat="active-sources">—</p>
+                  <p class="metric-detail">Active intelligence feeds that produced data.</p>
+                </article>
+                <article class="metric-card">
+                  <h3>Indicator types</h3>
+                  <p class="metric-value" data-stat="indicator-types">—</p>
+                  <p class="metric-detail">Distinct IOC formats discovered across feeds.</p>
+                </article>
+                <article class="metric-card">
+                  <h3>Duplicates removed</h3>
+                  <p class="metric-value" data-stat="duplicates-removed">—</p>
+                  <p class="metric-detail">Indicators deduplicated to keep the set clean.</p>
+                </article>
               </div>
+            </div>
+          </section>
+
+          <!-- Timeline -->
+          <section id="panel-timeline" class="panel">
+            <div class="panel-header">
+              <h2 class="panel-title">Collection timeline</h2>
+              <p class="panel-subtitle">Recency and multi-source overlaps.</p>
+            </div>
+            <div class="panel-body panel-scroll">
+              <div class="timeline-grid metrics-grid">
+                <article class="metric-card">
+                  <h3>Earliest first seen</h3>
+                  <p class="metric-value">
+                    <span data-stat="earliest-first-seen-date">—</span>
+                    <span class="metric-subvalue" data-stat="earliest-first-seen-time">—</span>
+                  </p>
+                  <p class="metric-detail">Oldest IOC sighting in the active window.</p>
+                </article>
+                <article class="metric-card">
+                  <h3>Newest first seen</h3>
+                  <p class="metric-value">
+                    <span data-stat="newest-first-seen-date">—</span>
+                    <span class="metric-subvalue" data-stat="newest-first-seen-time">—</span>
+                  </p>
+                  <p class="metric-detail">Most recent IOC discovery across sources.</p>
+                </article>
+                <article class="metric-card">
+                  <h3>Multi-source overlaps</h3>
+                  <p class="metric-value" data-stat="multi-source-overlaps">—</p>
+                  <p class="metric-detail">Indicators confirmed by more than one feed.</p>
+                </article>
+              </div>
+            </div>
+          </section>
+
+          <!-- Sources & Types -->
+          <section id="panel-sources" class="panel">
+            <div class="panel-header">
+              <h2 class="panel-title">Sources & indicator types</h2>
+              <p class="panel-subtitle">Feed contribution and IOC mix.</p>
+            </div>
+            <div class="panel-body panel-scroll">
+              <div class="table-card">
+                <h3 class="panel-subtitle">Per-source totals</h3>
+                <table aria-label="Per-source totals">
+                  <thead>
+                    <tr>
+                      <th scope="col">Source</th>
+                      <th scope="col" class="numeric">Indicators</th>
+                    </tr>
+                  </thead>
+                  <tbody data-table="sources">
+                    <tr>
+                      <td data-title="Source" colspan="2">Loading sources…</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="table-card" style="margin-top:0.5rem;">
+                <h3 class="panel-subtitle">Indicator types</h3>
+                <table aria-label="Indicator types">
+                  <thead>
+                    <tr>
+                      <th scope="col">Type</th>
+                      <th scope="col" class="numeric">Indicators</th>
+                    </tr>
+                  </thead>
+                  <tbody data-table="types">
+                    <tr>
+                      <td data-title="Type" colspan="2">Loading indicator types…</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- Top tags -->
+          <section class="panel">
+            <div class="panel-header">
+              <h2 class="panel-title">Top tags</h2>
+              <p class="panel-subtitle">Most prevalent threat labels.</p>
+            </div>
+            <div class="panel-body panel-scroll">
+              <div class="table-card">
+                <table aria-label="Top tags">
+                  <thead>
+                    <tr>
+                      <th scope="col">Tag</th>
+                      <th scope="col" class="numeric">Indicators</th>
+                    </tr>
+                  </thead>
+                  <tbody data-table="tags">
+                    <tr>
+                      <td data-title="Tag" colspan="2">Loading tags…</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- Live preview -->
+          <section id="panel-preview" class="panel data-preview">
+            <div class="panel-header">
+              <h2 class="panel-title">Live source preview</h2>
+              <p class="panel-subtitle">One representative IOC per reporting source.</p>
+            </div>
+            <div
+              class="panel-body preview-panel panel-scroll"
+              data-preview-container
+              role="region"
+              aria-live="polite"
+              aria-busy="false"
+            >
+              <div class="preview-summary" data-preview-summary hidden>
+                <article class="summary-card">
+                  <p class="summary-label">Sources highlighted</p>
+                  <p class="summary-value" data-preview-visible>—</p>
+                  <p class="summary-subvalue">
+                    out of <span data-preview-total>—</span> reporting sources
+                  </p>
+                </article>
+                <article class="summary-card">
+                  <p class="summary-label">High-confidence sources</p>
+                  <p class="summary-value" data-preview-high>—</p>
+                  <p class="summary-subvalue">
+                    <span data-preview-high-percent>—</span> of highlighted
+                  </p>
+                </article>
+                <article class="summary-card">
+                  <p class="summary-label">Most common tag</p>
+                  <p class="summary-value" data-preview-top-tag>—</p>
+                  <p class="summary-subvalue" data-preview-top-tag-count>—</p>
+                </article>
+                <article class="summary-card">
+                  <p class="summary-label">Freshest sighting</p>
+                  <p class="summary-value" data-preview-newest>—</p>
+                  <p class="summary-subvalue" data-preview-newest-relative></p>
+                </article>
+              </div>
+              <div class="preview-meta" data-preview-meta hidden>
+                <span class="preview-meta-pill" data-preview-origin>Live data</span>
+                <span class="preview-meta-detail">
+                  Updated <time data-preview-refreshed>—</time>
+                  <span class="preview-meta-relative" data-preview-relative></span>
+                </span>
+              </div>
+              <div class="preview-toolbar">
+                <div class="toolbar-controls">
+                  <label class="toolbar-group" for="preview-filter">
+                    <span>Type</span>
+                    <select id="preview-filter" data-preview-filter disabled>
+                      <option value="all">All types</option>
+                    </select>
+                  </label>
+                  <label class="toolbar-group" for="preview-tag-filter">
+                    <span>Tag</span>
+                    <select id="preview-tag-filter" data-preview-tag-filter disabled>
+                      <option value="all">All tags</option>
+                    </select>
+                  </label>
+                  <label class="toolbar-group" for="preview-limit">
+                    <span>Rows</span>
+                    <select id="preview-limit" data-preview-limit>
+                      <option value="12">12</option>
+                      <option value="25">25</option>
+                      <option value="50">50</option>
+                    </select>
+                  </label>
+                </div>
                 <div class="toolbar-actions">
                   <label class="toolbar-group" for="preview-search">
-                    <span>Search highlights</span>
-                  <input
-                    id="preview-search"
-                    type="search"
-                    name="preview-search"
-                    placeholder="Indicator, tag, source, or type"
-                    autocomplete="off"
-                    data-preview-search
-                  />
-                </label>
-                <button type="button" class="button-link secondary" data-preview-refresh>
-                  Refresh preview
-                </button>
+                    <span>Search</span>
+                    <input
+                      id="preview-search"
+                      type="search"
+                      name="preview-search"
+                      placeholder="Indicator, tag, source, type"
+                      autocomplete="off"
+                      data-preview-search
+                    />
+                  </label>
+                  <button type="button" class="button-link secondary" data-preview-refresh>
+                    Refresh preview
+                  </button>
+                </div>
               </div>
+              <div class="preview-table-wrapper">
+                <table class="preview-table" data-preview-table hidden>
+                  <thead>
+                    <tr>
+                      <th scope="col">Indicator</th>
+                      <th scope="col">Type</th>
+                      <th scope="col">Source</th>
+                      <th scope="col">First seen</th>
+                      <th scope="col">Confidence</th>
+                      <th scope="col">Tags</th>
+                    </tr>
+                  </thead>
+                  <tbody data-preview-body></tbody>
+                </table>
+                <div class="preview-status" data-preview-status role="status">
+                  Preparing live preview…
+                </div>
+              </div>
+              <p class="preview-footnote" style="font-size:0.7rem; margin-top:0.4rem;">
+                The preview uses cached leaders per source for instant loads and shares the same dataset as
+                the metrics above. Use the downloads panel for full coverage.
+              </p>
             </div>
-            <div class="preview-table-wrapper">
-              <table class="preview-table" data-preview-table hidden>
-                <thead>
-                  <tr>
-                    <th scope="col">Indicator</th>
-                    <th scope="col">Type</th>
-                    <th scope="col">Source</th>
-                    <th scope="col">First seen</th>
-                    <th scope="col">Confidence</th>
-                    <th scope="col">Tags</th>
-                  </tr>
-                </thead>
-                <tbody data-preview-body></tbody>
-              </table>
-              <div class="preview-status" data-preview-status role="status">Preparing live preview…</div>
-            </div>
-            <p class="preview-footnote">
-              The preview surfaces one leader per source using cached data for instant loads, refreshes in
-              the background, and shares the same dataset as the metrics above. Grab the full dataset below
-              when you need complete coverage.
-            </p>
-          </div>
-          </div>
-        </section>
+          </section>
 
-        <section id="actions" class="section">
-          <div class="section-heading">
-            <h2>Data actions</h2>
-            <p>Choose the format that best fits your workflow before exporting the latest dataset.</p>
-          </div>
-          <div class="section-content section-scroll">
-            <div class="actions-grid">
-            <article class="action-card">
-              <div>
-                <h3>Download CSV</h3>
-                <p class="action-description">
-                  Exports all current indicators in comma-separated format. Ideal for spreadsheets, SIEM
-                  ingestion, and manual review.
-                </p>
-              </div>
-              <div class="action-links">
-                <a class="button-link" href="iocs/latest.csv">Get CSV</a>
-              </div>
-            </article>
-            <article class="action-card">
-              <div>
-                <h3>Download TSV</h3>
-                <p class="action-description">
-                  Tab-delimited indicators for tooling that expects whitespace-separated values with
-                  consistent quoting.
-                </p>
-              </div>
-              <div class="action-links">
-                <a class="button-link" href="iocs/latest.tsv">Get TSV</a>
-              </div>
-            </article>
-            <article class="action-card">
-              <div>
-                <h3>JSON feed</h3>
-                <p class="action-description">
-                  Machine-readable JSON document containing the full indicator payload, suitable for
-                  scripting and automation.
-                </p>
-              </div>
-              <div class="action-links">
-                <a class="button-link" href="iocs/latest.json">Download JSON</a>
-                <a class="button-link secondary" href="iocs/latest.jsonl">Stream (JSONL)</a>
-              </div>
-            </article>
-            <article class="action-card">
-              <div>
-                <h3>STIX 2.1 bundle</h3>
-                <p class="action-description">
-                  Standards-compliant STIX bundle for sharing threat intelligence with TIPs and platforms
-                  that ingest STIX objects.
-                </p>
-              </div>
-              <div class="action-links">
-                <a class="button-link" href="iocs/stix2.json">Download STIX</a>
-              </div>
-            </article>
-            <article class="action-card">
-              <div>
-                <h3>Diagnostics report</h3>
-                <p class="action-description">
-                  Dive deeper into collection health, failures, and per-source diagnostics to troubleshoot
-                  feed availability.
-                </p>
-              </div>
-              <div class="action-links">
-                <a class="button-link" href="diagnostics/summary.html">View diagnostics</a>
-              </div>
-            </article>
-            <article class="action-card">
-              <div>
-                <h3>Raw data directory</h3>
-                <p class="action-description">
-                  Browse the published IOC folder directly to integrate with external tooling or scripted
-                  downloads.
-                </p>
-              </div>
-              <div class="action-links">
-                <a class="button-link secondary" href="iocs/">Open directory</a>
-              </div>
-            </article>
+          <!-- Actions + playbook/FAQ/recs -->
+          <section id="panel-actions" class="panel">
+            <div class="panel-header">
+              <h2 class="panel-title">Data actions & playbook</h2>
+              <p class="panel-subtitle">Export formats and GitHub Pages guidance.</p>
             </div>
-          </div>
-        </section>
+            <div class="panel-body panel-scroll">
+              <div class="actions-grid">
+                <article class="action-card">
+                  <div>
+                    <h3>Download CSV</h3>
+                    <p class="action-description">
+                      All indicators as CSV for spreadsheets, SIEM ingestion, and manual review.
+                    </p>
+                  </div>
+                  <div class="action-links">
+                    <a class="button-link" href="iocs/latest.csv">Get CSV</a>
+                  </div>
+                </article>
+                <article class="action-card">
+                  <div>
+                    <h3>Download TSV</h3>
+                    <p class="action-description">
+                      Tab-delimited indicators for tooling expecting whitespace-separated values.
+                    </p>
+                  </div>
+                  <div class="action-links">
+                    <a class="button-link" href="iocs/latest.tsv">Get TSV</a>
+                  </div>
+                </article>
+                <article class="action-card">
+                  <div>
+                    <h3>JSON feed</h3>
+                    <p class="action-description">
+                      Full JSON payload for scripting and automation workflows.
+                    </p>
+                  </div>
+                  <div class="action-links">
+                    <a class="button-link" href="iocs/latest.json">Download JSON</a>
+                    <a class="button-link secondary" href="iocs/latest.jsonl">Stream (JSONL)</a>
+                  </div>
+                </article>
+                <article class="action-card">
+                  <div>
+                    <h3>STIX 2.1 bundle</h3>
+                    <p class="action-description">
+                      Standards-compliant STIX bundle for TIPs and STIX-native platforms.
+                    </p>
+                  </div>
+                  <div class="action-links">
+                    <a class="button-link" href="iocs/stix2.json">Download STIX</a>
+                  </div>
+                </article>
+                <article class="action-card">
+                  <div>
+                    <h3>Diagnostics report</h3>
+                    <p class="action-description">
+                      Investigate collection health, failures, and per-source diagnostics.
+                    </p>
+                  </div>
+                  <div class="action-links">
+                    <a class="button-link" href="diagnostics/summary.html">View diagnostics</a>
+                  </div>
+                </article>
+                <article class="action-card">
+                  <div>
+                    <h3>Raw data directory</h3>
+                    <p class="action-description">
+                      Browse the IOC directory directly for scripted integrations.
+                    </p>
+                  </div>
+                  <div class="action-links">
+                    <a class="button-link secondary" href="iocs/">Open directory</a>
+                  </div>
+                </article>
+              </div>
 
-        <section id="recommendations" class="section section-alt">
-          <div class="section-heading">
-            <h2>Recommendations for GitHub Pages deployments</h2>
-            <p>
-              Keep the published dashboard trustworthy and easy to evangelise with these lightweight
-              improvements tailored for GitHub Pages hosting.
-            </p>
-          </div>
-          <div class="section-content section-scroll">
-            <div class="recommendations-grid">
-            <article class="recommendation-card">
-              <h3>Automate publishing</h3>
-              <p>
-                Use a scheduled GitHub Action that runs the SwiftIOC collector, commits the refreshed
-                <code>public/</code> artefacts, and triggers a Pages deploy so the site never goes stale.
-              </p>
-              <ul>
-                <li>Store API secrets as GitHub Action secrets with least-privilege scopes.</li>
-                <li>Attach a job summary that links directly back to the latest dashboard build.</li>
-              </ul>
-            </article>
-            <article class="recommendation-card">
-              <h3>Deliver rich previews</h3>
-              <p>
-                Add Open Graph images to <code>public/assets/</code> and reference them via metadata so
-                sharing the dashboard in Slack or Teams displays an informative preview.
-              </p>
-              <ul>
-                <li>Generate the image as part of the pipeline to highlight total indicators and freshness.</li>
-                <li>Optimise the asset below 512&nbsp;KB to keep GitHub Pages fast.</li>
-              </ul>
-            </article>
-            <article class="recommendation-card">
-              <h3>Instrument engagement</h3>
-              <p>
-                Track which download options are most popular by wiring privacy-friendly analytics such as
-                Plausible or Azure Application Insights through a consent-aware toggle.
-              </p>
-              <ul>
-                <li>Sample page views per environment instead of collecting user-level data.</li>
-                <li>Expose opt-in messaging so defenders understand the measurement scope.</li>
-              </ul>
-            </article>
-            <article class="recommendation-card">
-              <h3>Boost discoverability</h3>
-              <p>
-                Publish a <code>security.txt</code> and sitemap.xml alongside the dashboard to help external
-                teams and search engines locate support contacts and machine-readable content.
-              </p>
-              <ul>
-                <li>Reference the security contact in your organisation profile and repository README.</li>
-                <li>Mirror the sitemap generation inside the SwiftIOC pipeline for zero-maintenance updates.</li>
-              </ul>
-            </article>
-            </div>
-          </div>
-        </section>
+              <hr style="margin:0.5rem 0; opacity:0.3;" />
 
-        <section id="faq" class="section">
-          <div class="section-heading">
-            <h2>Frequently asked questions</h2>
-            <p>Share these quick answers with stakeholders rolling out the GitHub Pages dashboard.</p>
-          </div>
-          <div class="section-content section-scroll">
-            <div class="faq-group">
-            <details>
-              <summary>How often should the dashboard refresh?</summary>
-              <p>
-                Align the schedule with your highest-priority detection workflows. Many teams rebuild the
-                site hourly during active incidents and at least daily during steady state operations.
-              </p>
-            </details>
-            <details>
-              <summary>Can we restrict access to the published data?</summary>
-              <p>
-                GitHub Pages is public by design. If you require access controls, mirror the generated
-                <code>public/</code> directory to a private S3 bucket or internal static site hosting
-                service and reuse these assets there.
-              </p>
-            </details>
-            <details>
-              <summary>Where should contributors report issues?</summary>
-              <p>
-                Encourage teams to open GitHub issues in the repository so feedback stays close to the
-                infrastructure-as-code. The <a href="diagnostics/summary.html">diagnostics report</a>
-                helps triage whether the problem stems from data quality or hosting.
-              </p>
-            </details>
+              <section id="playbook">
+                <h3 style="font-size:0.8rem; margin-bottom:0.25rem;">Operational playbook</h3>
+                <ol class="step-list">
+                  <li>
+                    Validate freshness and scope using the timeline and overlaps to align with detection
+                    SLAs.
+                  </li>
+                  <li>
+                    Promote the right export (CSV, JSON, STIX) into scheduled sync jobs so analysts always
+                    see the latest indicators.
+                  </li>
+                  <li>
+                    Close the loop by tracking which sources, types, and tags drive the highest value and
+                    retire noisy feeds.
+                  </li>
+                </ol>
+              </section>
+
+              <section id="recommendations" style="margin-top:0.35rem;">
+                <h3 style="font-size:0.8rem; margin-bottom:0.25rem;">
+                  GitHub Pages deployment tips
+                </h3>
+                <div class="recommendations-grid">
+                  <p>• Automate publishing via scheduled GitHub Actions with least-privilege secrets.</p>
+                  <p>• Add Open Graph images so Slack/Teams links show indicator counts and freshness.</p>
+                  <p>• Instrument downloads with privacy-friendly analytics (e.g., Plausible).</p>
+                  <p>• Publish <code>security.txt</code> and sitemap.xml alongside the dashboard.</p>
+                </div>
+              </section>
+
+              <section id="faq" style="margin-top:0.35rem;">
+                <h3 style="font-size:0.8rem; margin-bottom:0.25rem;">FAQ</h3>
+                <div class="faq-group">
+                  <details>
+                    <summary>How often should the dashboard refresh?</summary>
+                    <p>
+                      Align the schedule with your detection workflows. Many teams rebuild hourly during
+                      incidents and at least daily during steady state.
+                    </p>
+                  </details>
+                  <details>
+                    <summary>Can we restrict access to the data?</summary>
+                    <p>
+                      GitHub Pages is public. For access controls, mirror the generated
+                      <code>public/</code> directory to a private bucket or internal static host.
+                    </p>
+                  </details>
+                  <details>
+                    <summary>Where do contributors report issues?</summary>
+                    <p>
+                      Use GitHub issues in this repository so feedback stays close to the IaC. The
+                      <a href="diagnostics/summary.html">diagnostics report</a> helps separate data quality
+                      from hosting issues.
+                    </p>
+                  </details>
+                </div>
+              </section>
             </div>
-          </div>
-        </section>
+          </section>
+        </div>
       </main>
 
       <footer class="footer">
