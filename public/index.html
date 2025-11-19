@@ -118,27 +118,29 @@
             <h2>Operational highlights</h2>
             <p>Key metrics that summarise the current indicator landscape across all enabled feeds.</p>
           </div>
-          <div class="metrics-grid">
-            <article class="metric-card">
-              <h3>Total indicators</h3>
-              <p class="metric-value" data-stat="total-indicators">—</p>
-              <p class="metric-detail">Unique IOCs collected during the latest cycle.</p>
-            </article>
-            <article class="metric-card">
-              <h3>Sources reporting</h3>
-              <p class="metric-value" data-stat="active-sources">—</p>
-              <p class="metric-detail">Active intelligence feeds that produced data this run.</p>
-            </article>
-            <article class="metric-card">
-              <h3>Indicator types</h3>
-              <p class="metric-value" data-stat="indicator-types">—</p>
-              <p class="metric-detail">Distinct IOC formats discovered across the feeds.</p>
-            </article>
-            <article class="metric-card">
-              <h3>Duplicates removed</h3>
-              <p class="metric-value" data-stat="duplicates-removed">—</p>
-              <p class="metric-detail">Indicators deduplicated to maintain a clean dataset.</p>
-            </article>
+          <div class="section-content section-scroll">
+            <div class="metrics-grid">
+              <article class="metric-card">
+                <h3>Total indicators</h3>
+                <p class="metric-value" data-stat="total-indicators">—</p>
+                <p class="metric-detail">Unique IOCs collected during the latest cycle.</p>
+              </article>
+              <article class="metric-card">
+                <h3>Sources reporting</h3>
+                <p class="metric-value" data-stat="active-sources">—</p>
+                <p class="metric-detail">Active intelligence feeds that produced data this run.</p>
+              </article>
+              <article class="metric-card">
+                <h3>Indicator types</h3>
+                <p class="metric-value" data-stat="indicator-types">—</p>
+                <p class="metric-detail">Distinct IOC formats discovered across the feeds.</p>
+              </article>
+              <article class="metric-card">
+                <h3>Duplicates removed</h3>
+                <p class="metric-value" data-stat="duplicates-removed">—</p>
+                <p class="metric-detail">Indicators deduplicated to maintain a clean dataset.</p>
+              </article>
+            </div>
           </div>
         </section>
 
@@ -147,28 +149,30 @@
             <h2>Collection timeline</h2>
             <p>Understand recency and overlap across sources to plan enrichment and response.</p>
           </div>
-          <div class="metrics-grid timeline-grid">
-            <article class="metric-card">
-              <h3>Earliest first seen</h3>
-              <p class="metric-value">
-                <span data-stat="earliest-first-seen-date">—</span>
-                <span class="metric-subvalue" data-stat="earliest-first-seen-time">—</span>
-              </p>
-              <p class="metric-detail">Oldest IOC sighting retained in the active window.</p>
-            </article>
-            <article class="metric-card">
-              <h3>Newest first seen</h3>
-              <p class="metric-value">
-                <span data-stat="newest-first-seen-date">—</span>
-                <span class="metric-subvalue" data-stat="newest-first-seen-time">—</span>
-              </p>
-              <p class="metric-detail">Most recent IOC discovery across all sources.</p>
-            </article>
-            <article class="metric-card">
-              <h3>Multi-source overlaps</h3>
-              <p class="metric-value" data-stat="multi-source-overlaps">—</p>
-              <p class="metric-detail">Indicators independently confirmed by more than one feed.</p>
-            </article>
+          <div class="section-content section-scroll">
+            <div class="metrics-grid timeline-grid">
+              <article class="metric-card">
+                <h3>Earliest first seen</h3>
+                <p class="metric-value">
+                  <span data-stat="earliest-first-seen-date">—</span>
+                  <span class="metric-subvalue" data-stat="earliest-first-seen-time">—</span>
+                </p>
+                <p class="metric-detail">Oldest IOC sighting retained in the active window.</p>
+              </article>
+              <article class="metric-card">
+                <h3>Newest first seen</h3>
+                <p class="metric-value">
+                  <span data-stat="newest-first-seen-date">—</span>
+                  <span class="metric-subvalue" data-stat="newest-first-seen-time">—</span>
+                </p>
+                <p class="metric-detail">Most recent IOC discovery across all sources.</p>
+              </article>
+              <article class="metric-card">
+                <h3>Multi-source overlaps</h3>
+                <p class="metric-value" data-stat="multi-source-overlaps">—</p>
+                <p class="metric-detail">Indicators independently confirmed by more than one feed.</p>
+              </article>
+            </div>
           </div>
         </section>
 
@@ -180,53 +184,55 @@
               and measurable inside their existing tooling.
             </p>
           </div>
-          <ol class="step-list">
-            <li class="step-card">
-              <div class="step-badge" aria-hidden="true">1</div>
-              <div class="step-content">
-                <h3>Validate freshness and scope</h3>
-                <p>
-                  Start each review by confirming the collection window and overlaps so downstream teams
-                  know exactly how recent and comprehensive the data is.
-                </p>
-                <ul class="step-actions">
-                  <li>Compare <a href="#timeline">timeline</a> metrics with your detection coverage SLAs.</li>
-                  <li>Alert stakeholders if the multi-source overlap count drops unexpectedly.</li>
-                  <li>Bookmark the diagnostics summary for quick health checks during incidents.</li>
-                </ul>
-              </div>
-            </li>
-            <li class="step-card">
-              <div class="step-badge" aria-hidden="true">2</div>
-              <div class="step-content">
-                <h3>Promote the right exports</h3>
-                <p>
-                  Select the format that best aligns with your automation stack and make it part of a
-                  scheduled sync so analysts always see the latest indicators.
-                </p>
-                <ul class="step-actions">
-                  <li>Use the JSON feed for orchestration platforms and enrichment microservices.</li>
-                  <li>Stream the JSONL file into data lakes to preserve historical context.</li>
-                  <li>Create a GitHub Action that publishes CSV/TSV artifacts for SIEM uploads.</li>
-                </ul>
-              </div>
-            </li>
-            <li class="step-card">
-              <div class="step-badge" aria-hidden="true">3</div>
-              <div class="step-content">
-                <h3>Close the loop with feedback</h3>
-                <p>
-                  Track which sources and indicator types deliver the most value so you can iterate on the
-                  playbook and retire noisy feeds.
-                </p>
-                <ul class="step-actions">
-                  <li>Map <a href="#sources">source totals</a> to your internal asset or client groups.</li>
-                  <li>Collect analyst feedback directly inside pull requests for new source onboarding.</li>
-                  <li>Document high-confidence tags and share them with your threat hunting community.</li>
-                </ul>
-              </div>
-            </li>
-          </ol>
+          <div class="section-content section-scroll">
+            <ol class="step-list">
+              <li class="step-card">
+                <div class="step-badge" aria-hidden="true">1</div>
+                <div class="step-content">
+                  <h3>Validate freshness and scope</h3>
+                  <p>
+                    Start each review by confirming the collection window and overlaps so downstream teams
+                    know exactly how recent and comprehensive the data is.
+                  </p>
+                  <ul class="step-actions">
+                    <li>Compare <a href="#timeline">timeline</a> metrics with your detection coverage SLAs.</li>
+                    <li>Alert stakeholders if the multi-source overlap count drops unexpectedly.</li>
+                    <li>Bookmark the diagnostics summary for quick health checks during incidents.</li>
+                  </ul>
+                </div>
+              </li>
+              <li class="step-card">
+                <div class="step-badge" aria-hidden="true">2</div>
+                <div class="step-content">
+                  <h3>Promote the right exports</h3>
+                  <p>
+                    Select the format that best aligns with your automation stack and make it part of a
+                    scheduled sync so analysts always see the latest indicators.
+                  </p>
+                  <ul class="step-actions">
+                    <li>Use the JSON feed for orchestration platforms and enrichment microservices.</li>
+                    <li>Stream the JSONL file into data lakes to preserve historical context.</li>
+                    <li>Create a GitHub Action that publishes CSV/TSV artifacts for SIEM uploads.</li>
+                  </ul>
+                </div>
+              </li>
+              <li class="step-card">
+                <div class="step-badge" aria-hidden="true">3</div>
+                <div class="step-content">
+                  <h3>Close the loop with feedback</h3>
+                  <p>
+                    Track which sources and indicator types deliver the most value so you can iterate on the
+                    playbook and retire noisy feeds.
+                  </p>
+                  <ul class="step-actions">
+                    <li>Map <a href="#sources">source totals</a> to your internal asset or client groups.</li>
+                    <li>Collect analyst feedback directly inside pull requests for new source onboarding.</li>
+                    <li>Document high-confidence tags and share them with your threat hunting community.</li>
+                  </ul>
+                </div>
+              </li>
+            </ol>
+          </div>
         </section>
 
         <section id="sources" class="section">
@@ -234,20 +240,22 @@
             <h2>Per-source totals</h2>
             <p>See which feeds are contributing the most intelligence at a glance.</p>
           </div>
-          <div class="table-card">
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">Source</th>
-                  <th scope="col" class="numeric">Indicators</th>
-                </tr>
-              </thead>
-              <tbody data-table="sources">
-                <tr>
-                  <td data-title="Source" colspan="2">Loading sources…</td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="section-content section-scroll">
+            <div class="table-card">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Source</th>
+                    <th scope="col" class="numeric">Indicators</th>
+                  </tr>
+                </thead>
+                <tbody data-table="sources">
+                  <tr>
+                    <td data-title="Source" colspan="2">Loading sources…</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </section>
 
@@ -256,20 +264,22 @@
             <h2>Indicator types</h2>
             <p>Breakdown of IOC formats to support filtering and response planning.</p>
           </div>
-          <div class="table-card">
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">Type</th>
-                  <th scope="col" class="numeric">Indicators</th>
-                </tr>
-              </thead>
-              <tbody data-table="types">
-                <tr>
-                  <td data-title="Type" colspan="2">Loading indicator types…</td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="section-content section-scroll">
+            <div class="table-card">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Type</th>
+                    <th scope="col" class="numeric">Indicators</th>
+                  </tr>
+                </thead>
+                <tbody data-table="types">
+                  <tr>
+                    <td data-title="Type" colspan="2">Loading indicator types…</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </section>
 
@@ -278,20 +288,22 @@
             <h2>Top tags</h2>
             <p>Most prevalent threat tags assigned to indicators in the latest sweep.</p>
           </div>
-          <div class="table-card">
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">Tag</th>
-                  <th scope="col" class="numeric">Indicators</th>
-                </tr>
-              </thead>
-              <tbody data-table="tags">
-                <tr>
-                  <td data-title="Tag" colspan="2">Loading tags…</td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="section-content section-scroll">
+            <div class="table-card">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Tag</th>
+                    <th scope="col" class="numeric">Indicators</th>
+                  </tr>
+                </thead>
+                <tbody data-table="tags">
+                  <tr>
+                    <td data-title="Tag" colspan="2">Loading tags…</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </section>
 
@@ -300,6 +312,7 @@
             <h2>Live source preview</h2>
             <p>Review the strongest, highest-confidence signal from each reporting source before downloading.</p>
           </div>
+          <div class="section-content section-scroll">
           <div
             class="preview-panel"
             data-preview-container
@@ -402,6 +415,7 @@
               when you need complete coverage.
             </p>
           </div>
+          </div>
         </section>
 
         <section id="actions" class="section">
@@ -409,7 +423,8 @@
             <h2>Data actions</h2>
             <p>Choose the format that best fits your workflow before exporting the latest dataset.</p>
           </div>
-          <div class="actions-grid">
+          <div class="section-content section-scroll">
+            <div class="actions-grid">
             <article class="action-card">
               <div>
                 <h3>Download CSV</h3>
@@ -483,6 +498,7 @@
                 <a class="button-link secondary" href="iocs/">Open directory</a>
               </div>
             </article>
+            </div>
           </div>
         </section>
 
@@ -494,7 +510,8 @@
               improvements tailored for GitHub Pages hosting.
             </p>
           </div>
-          <div class="recommendations-grid">
+          <div class="section-content section-scroll">
+            <div class="recommendations-grid">
             <article class="recommendation-card">
               <h3>Automate publishing</h3>
               <p>
@@ -539,6 +556,7 @@
                 <li>Mirror the sitemap generation inside the SwiftIOC pipeline for zero-maintenance updates.</li>
               </ul>
             </article>
+            </div>
           </div>
         </section>
 
@@ -547,7 +565,8 @@
             <h2>Frequently asked questions</h2>
             <p>Share these quick answers with stakeholders rolling out the GitHub Pages dashboard.</p>
           </div>
-          <div class="faq-group">
+          <div class="section-content section-scroll">
+            <div class="faq-group">
             <details>
               <summary>How often should the dashboard refresh?</summary>
               <p>
@@ -571,6 +590,7 @@
                 helps triage whether the problem stems from data quality or hosting.
               </p>
             </details>
+            </div>
           </div>
         </section>
       </main>
