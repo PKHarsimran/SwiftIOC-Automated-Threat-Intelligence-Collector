@@ -19,7 +19,7 @@
     <link rel="preload" href="assets/styles.css" as="style" />
     <link rel="stylesheet" href="assets/styles.css" />
 
-    <!-- Layout overrides to make it a single-screen dashboard -->
+    <!-- Layout overrides to make it a single-screen dashboard, aligned with global styles -->
     <style>
       html,
       body {
@@ -35,6 +35,7 @@
         min-height: 100%;
         display: flex;
         flex-direction: column;
+        gap: 0;
       }
 
       .page-header {
@@ -46,6 +47,7 @@
         align-items: center;
         justify-content: space-between;
         padding-inline: 1.5rem;
+        padding-block: 0.9rem;
       }
 
       .top-nav .nav-links {
@@ -57,6 +59,7 @@
 
       .status-banner {
         padding-inline: 1.5rem;
+        margin-top: 0.75rem;
       }
 
       .page-main {
@@ -65,15 +68,19 @@
         display: flex;
         flex-direction: column;
         min-height: 0;
+        gap: 0.75rem;
       }
 
       .hero {
         display: flex;
         align-items: flex-start;
         justify-content: space-between;
-        gap: 1.5rem;
-        padding: 0.75rem 0 0.75rem;
-        border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+        gap: 1.75rem;
+        padding: 0.75rem 0 0.85rem;
+        border-bottom: 1px solid var(--border-soft);
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
       }
 
       .hero-body {
@@ -86,7 +93,7 @@
 
       .hero-meta {
         display: flex;
-        gap: 1.5rem;
+        gap: 1.25rem;
         flex-wrap: wrap;
       }
 
@@ -94,6 +101,7 @@
         display: flex;
         gap: 0.75rem;
         margin-top: 0.5rem;
+        flex-wrap: wrap;
       }
 
       .dashboard-grid {
@@ -102,18 +110,20 @@
         display: grid;
         grid-template-columns: 1.6fr 1.4fr;
         grid-template-rows: repeat(3, minmax(0, 1fr));
-        gap: 0.75rem;
+        gap: 0.8rem;
         padding-top: 0.75rem;
       }
 
       .panel {
-        background: rgba(15, 23, 42, 0.85);
-        border-radius: 0.75rem;
+        background: var(--surface-color);
+        border-radius: 0.9rem;
         padding: 0.75rem 0.9rem;
         display: flex;
         flex-direction: column;
         min-width: 0;
         min-height: 0;
+        border: 1px solid var(--border-soft);
+        box-shadow: 0 16px 32px rgba(2, 6, 23, 0.4);
       }
 
       .panel-header {
@@ -121,6 +131,7 @@
         justify-content: space-between;
         align-items: baseline;
         margin-bottom: 0.35rem;
+        gap: 0.5rem;
       }
 
       .panel-title {
@@ -130,7 +141,7 @@
 
       .panel-subtitle {
         font-size: 0.75rem;
-        opacity: 0.8;
+        opacity: 0.85;
       }
 
       .panel-body {
@@ -146,13 +157,15 @@
       .timeline-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 0.5rem;
+        gap: 0.6rem;
       }
 
       .metric-card {
-        padding: 0.55rem 0.6rem;
-        border-radius: 0.5rem;
-        background: rgba(15, 23, 42, 0.95);
+        padding: 0.6rem 0.7rem;
+        border-radius: 0.7rem;
+        background: linear-gradient(150deg, rgba(148, 163, 184, 0.14), rgba(15, 23, 42, 0.9));
+        border: 1px solid var(--border-soft);
+        box-shadow: 0 12px 28px rgba(2, 6, 23, 0.35);
       }
 
       .metric-card h3 {
@@ -161,17 +174,21 @@
       }
 
       .metric-value {
-        font-size: 1.1rem;
+        font-size: 1.15rem;
         font-weight: 600;
       }
 
       .metric-detail {
-        font-size: 0.7rem;
-        opacity: 0.8;
+        font-size: 0.72rem;
+        opacity: 0.86;
       }
 
       .table-card {
         height: 100%;
+        border-radius: 0.7rem;
+        border: 1px solid var(--border-soft);
+        background: rgba(15, 23, 42, 0.9);
+        overflow: hidden;
       }
 
       .table-card table {
@@ -180,19 +197,25 @@
         font-size: 0.75rem;
       }
 
-      .table-card th,
-      .table-card td {
-        padding: 0.3rem 0.35rem;
-      }
-
       .table-card thead {
         position: sticky;
         top: 0;
-        background: rgba(15, 23, 42, 1);
+        background: rgba(15, 23, 42, 0.98);
+      }
+
+      .table-card th,
+      .table-card td {
+        padding: 0.3rem 0.4rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.25);
       }
 
       .numeric {
         text-align: right;
+      }
+
+      .preview-panel {
+        padding: 0.9rem;
+        border-radius: 0.9rem;
       }
 
       .preview-toolbar {
@@ -222,24 +245,26 @@
 
       .preview-status {
         font-size: 0.75rem;
-        opacity: 0.85;
-        margin-top: 0.3rem;
+        opacity: 0.9;
+        margin-top: 0.35rem;
       }
 
       .actions-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 0.45rem;
+        gap: 0.5rem;
       }
 
       .action-card {
-        padding: 0.5rem 0.55rem;
-        border-radius: 0.5rem;
+        padding: 0.55rem 0.65rem;
+        border-radius: 0.7rem;
         background: rgba(15, 23, 42, 0.95);
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        gap: 0.35rem;
+        gap: 0.4rem;
+        border: 1px solid var(--border-soft);
+        box-shadow: 0 12px 28px rgba(2, 6, 23, 0.35);
       }
 
       .action-card h3 {
@@ -248,8 +273,8 @@
       }
 
       .action-description {
-        font-size: 0.7rem;
-        opacity: 0.85;
+        font-size: 0.72rem;
+        opacity: 0.9;
       }
 
       .action-links {
@@ -285,14 +310,14 @@
 
       .footer {
         flex-shrink: 0;
-        padding: 0.5rem 1.5rem 0.75rem;
-        font-size: 0.75rem;
-        opacity: 0.85;
-        border-top: 1px solid rgba(148, 163, 184, 0.25);
+        padding: 0.6rem 1.5rem 0.9rem;
+        font-size: 0.78rem;
+        opacity: 0.9;
+        border-top: 1px solid var(--border-soft);
       }
 
       .footer-links {
-        margin-top: 0.25rem;
+        margin-top: 0.3rem;
       }
 
       /* Make it usable on small screens: allow page scroll below 1024px */
@@ -300,15 +325,56 @@
         body {
           overflow: auto;
         }
+
         .page-main {
           height: auto;
         }
+
         .dashboard-grid {
           display: block;
         }
+
         .panel {
           margin-bottom: 0.75rem;
           height: auto;
+        }
+
+        .hero {
+          flex-direction: column;
+          border-bottom: 1px solid var(--border-soft);
+        }
+
+        .hero-body,
+        .hero-aside {
+          max-width: 100%;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .top-nav {
+          padding-inline: 1rem;
+        }
+
+        .status-banner {
+          padding-inline: 1rem;
+        }
+
+        .page-main {
+          padding-inline: 1rem;
+        }
+
+        .hero {
+          padding-top: 0.5rem;
+        }
+
+        .actions-grid {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+
+      @media (max-width: 540px) {
+        .footer {
+          padding-inline: 1rem;
         }
       }
     </style>
@@ -329,7 +395,7 @@
             <a href="#panel-sources">Sources</a>
             <a href="#panel-preview">Preview</a>
             <a href="#panel-actions">Downloads</a>
-            <a href="#panel-playbook">Playbook & FAQ</a>
+            <a href="#panel-playbook">Playbook &amp; FAQ</a>
             <a href="diagnostics/summary.html">Diagnostics</a>
           </div>
         </nav>
@@ -474,7 +540,7 @@
           <!-- Sources & Types -->
           <section id="panel-sources" class="panel">
             <div class="panel-header">
-              <h2 class="panel-title">Sources & indicator types</h2>
+              <h2 class="panel-title">Sources &amp; indicator types</h2>
               <p class="panel-subtitle">Feed contribution and IOC mix.</p>
             </div>
             <div class="panel-body panel-scroll">
@@ -652,7 +718,7 @@
           <!-- Actions + playbook/FAQ/recs -->
           <section id="panel-actions" class="panel">
             <div class="panel-header">
-              <h2 class="panel-title">Data actions & playbook</h2>
+              <h2 class="panel-title">Data actions &amp; playbook</h2>
               <p class="panel-subtitle">Export formats and GitHub Pages guidance.</p>
             </div>
             <div class="panel-body panel-scroll">
@@ -726,9 +792,9 @@
                 </article>
               </div>
 
-              <hr style="margin:0.5rem 0; opacity:0.3;" />
+              <hr style="margin:0.6rem 0; opacity:0.25;" />
 
-              <section id="playbook">
+              <section id="panel-playbook">
                 <h3 style="font-size:0.8rem; margin-bottom:0.25rem;">Operational playbook</h3>
                 <ol class="step-list">
                   <li>
