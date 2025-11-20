@@ -110,7 +110,7 @@
         min-height: 0;
       }
 
-      /* Top metrics strip */
+      /* Key metrics strip */
       .metrics-strip {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -189,10 +189,8 @@
 
       /* Live IOC table panel (left) */
       .preview-panel {
-        padding: 0;
-        border-radius: 0;
-        border: none;
-        box-shadow: none;
+        display: flex;
+        flex-direction: column;
         gap: 0.45rem;
       }
 
@@ -201,13 +199,20 @@
         gap: 0.4rem;
       }
 
+      .preview-toolbar .toolbar-controls,
+      .preview-toolbar .toolbar-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
       .preview-toolbar .toolbar-group {
         gap: 0.2rem;
         font-size: 0.78rem;
       }
 
       .preview-toolbar select,
-      .preview-toolbar input[type="search"] {
+      .preview-toolbar input[type='search'] {
         padding-block: 0.35rem;
         padding-inline: 0.55rem;
         border-radius: 0.6rem;
@@ -221,7 +226,7 @@
         border: 1px solid var(--border-soft);
         background: rgba(15, 23, 42, 0.94);
         overflow: auto;
-        max-height: 540px;
+        max-height: 60vh; /* scales with viewport */
       }
 
       .preview-table {
@@ -248,9 +253,10 @@
         margin: 0.35rem 0.1rem 0;
       }
 
+      /* Hide the extra "summary" meta for now – just table + filters */
       .preview-summary,
       .preview-meta {
-        display: none !important; /* keep hooks but hide them for a cleaner look */
+        display: none !important;
       }
 
       /* Right column: sources / types / tags */
@@ -325,6 +331,9 @@
         border: 1px solid var(--border-soft);
         box-shadow: 0 10px 22px rgba(2, 6, 23, 0.45);
         gap: 0.35rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
       }
 
       .action-card h3 {
@@ -335,6 +344,12 @@
       .action-description {
         font-size: 0.72rem;
         color: var(--text-muted);
+      }
+
+      .action-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
       }
 
       .action-links .button-link {
