@@ -1,21 +1,28 @@
 (function () {
+  'use strict';
+
   const IOC_ROOT = document.body?.dataset.iocRoot || '.';
   const DEFAULT_PREVIEW_LIMIT = 12;
   const PREVIEW_LOOKAHEAD_MULTIPLIER = 12;
-  const PREVIEW_CACHE_LIMIT = Math.max(DEFAULT_PREVIEW_LIMIT * PREVIEW_LOOKAHEAD_MULTIPLIER, 240);
+  const PREVIEW_CACHE_LIMIT = Math.max(
+    DEFAULT_PREVIEW_LIMIT * PREVIEW_LOOKAHEAD_MULTIPLIER,
+    240
+  );
   const INDICATORS_JSONL_URL = `${IOC_ROOT}/iocs/latest.jsonl`;
   const INDICATORS_JSON_FALLBACK_URL = `${IOC_ROOT}/iocs/latest.json`;
   const PREVIEW_STREAM_URL = INDICATORS_JSONL_URL;
   const DATASET_STORAGE_KEY = 'swiftioc-dashboard-cache-v1';
-  const DATASET_CACHE_TTL = 5 * 60 * 1000;
+  const DATASET_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
   const numberFormatter = new Intl.NumberFormat('en-US');
   const formatNumber = (value) => numberFormatter.format(value ?? 0);
 
   const relativeTimeFormatter =
-    typeof Intl !== 'undefined' && typeof Intl.RelativeTimeFormat === 'function'
+    typeof Intl !== 'undefined' &&
+    typeof Intl.RelativeTimeFormat === 'function'
       ? new Intl.RelativeTimeFormat('en', { numeric: 'auto' })
       : null;
+
   const relativeDivisions = [
     { amount: 60, unit: 'second' },
     { amount: 60, unit: 'minute' },
@@ -27,8 +34,12 @@
   ];
 
   const dateTimeFormatter =
-    typeof Intl !== 'undefined' && typeof Intl.DateTimeFormat === 'function'
-      ? new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short' })
+    typeof Intl !== 'undefined' &&
+    typeof Intl.DateTimeFormat === 'function'
+      ? new Intl.DateTimeFormat('en-US', {
+          dateStyle: 'medium',
+          timeStyle: 'short',
+        })
       : null;
 
   const formatRelativeTimeFromNow = (timestamp) => {
@@ -54,12 +65,11 @@
 
   const normaliseString = (value) => (value ?? '').toString().trim();
   const normaliseLower = (value) => normaliseString(value).toLowerCase();
+
   const coalesceString = (...values) => {
     for (const value of values) {
       const normalised = normaliseString(value);
-      if (normalised) {
-        return normalised;
-      }
+      if (normalised) return normalised;
     }
     return '';
   };
@@ -83,12 +93,15 @@
   const confidenceRankForValue = (confidence) => {
     const value = normaliseLower(confidence);
     if (!value) return 0;
+
     if (value.includes('very high') || value.includes('critical')) return 4;
     if (value.includes('high')) return 3;
     if (value.includes('medium') || value.includes('moderate')) return 2;
     if (value.includes('low')) return 1;
+
     const numeric = Number.parseFloat(value);
     if (Number.isFinite(numeric)) {
+      if (numeric >= 90) return 4;
       if (numeric >= 80) return 3;
       if (numeric >= 50) return 2;
       if (numeric > 0) return 1;
@@ -99,7 +112,9 @@
   const confidenceRankForRow = (row) => {
     if (!row) return 0;
     if (typeof row.confidenceRank === 'number') return row.confidenceRank;
-    const rank = confidenceRankForValue(row.confidenceLower || row.confidence);
+    const rank = confidenceRankForValue(
+      row.confidenceLower || row.confidence
+    );
     row.confidenceRank = rank;
     return rank;
   };
@@ -108,13 +123,21 @@
     if (!a && !b) return 0;
     if (!a) return 1;
     if (!b) return -1;
+
     const rankDiff = confidenceRankForRow(b) - confidenceRankForRow(a);
     if (rankDiff !== 0) return rankDiff;
+
     const timeDiff = (b.firstSeenTime ?? 0) - (a.firstSeenTime ?? 0);
     if (timeDiff !== 0) return timeDiff;
-    const sourceDiff = normaliseString(a.source).localeCompare(normaliseString(b.source));
+
+    const sourceDiff = normaliseString(a.source).localeCompare(
+      normaliseString(b.source)
+    );
     if (sourceDiff !== 0) return sourceDiff;
-    return normaliseString(a.indicator).localeCompare(normaliseString(b.indicator));
+
+    return normaliseString(a.indicator).localeCompare(
+      normaliseString(b.indicator)
+    );
   };
 
   const selectBestPerSource = (rows) => {
@@ -170,7 +193,10 @@
         window.sessionStorage.removeItem(testKey);
         storage = window.sessionStorage;
       } catch (error) {
-        console.warn('Session storage unavailable for dataset caching', error);
+        console.warn(
+          'Session storage unavailable for dataset caching',
+          error
+        );
         storage = null;
       }
       return storage;
@@ -187,14 +213,21 @@
           target.removeItem(DATASET_STORAGE_KEY);
           return null;
         }
-        if (typeof parsed.timestamp !== 'number' || typeof parsed.dataset !== 'object' || !parsed.dataset) {
+        if (
+          typeof parsed.timestamp !== 'number' ||
+          typeof parsed.dataset !== 'object' ||
+          !parsed.dataset
+        ) {
           target.removeItem(DATASET_STORAGE_KEY);
           return null;
         }
         const dataset = parsed.dataset;
         const age = Date.now() - parsed.timestamp;
         const stale = age > DATASET_CACHE_TTL;
-        dataset.fetchedAt = typeof dataset.fetchedAt === 'number' ? dataset.fetchedAt : parsed.timestamp;
+        dataset.fetchedAt =
+          typeof dataset.fetchedAt === 'number'
+            ? dataset.fetchedAt
+            : parsed.timestamp;
         dataset.origin = stale ? 'cache-stale' : 'cache';
         return dataset;
       } catch (error) {
@@ -202,7 +235,10 @@
         try {
           target.removeItem(DATASET_STORAGE_KEY);
         } catch (cleanupError) {
-          console.warn('Failed to clear corrupt dataset cache', cleanupError);
+          console.warn(
+            'Failed to clear corrupt dataset cache',
+            cleanupError
+          );
         }
         return null;
       }
@@ -215,7 +251,10 @@
         const datasetToStore = {
           ...dataset,
           origin: 'network',
-          fetchedAt: typeof dataset.fetchedAt === 'number' ? dataset.fetchedAt : Date.now(),
+          fetchedAt:
+            typeof dataset.fetchedAt === 'number'
+              ? dataset.fetchedAt
+              : Date.now(),
         };
         const payload = JSON.stringify({
           timestamp: Date.now(),
@@ -244,9 +283,7 @@
 
   const extractTags = (value) => {
     if (!value) return [];
-    if (Array.isArray(value)) {
-      return uniqueStrings(value);
-    }
+    if (Array.isArray(value)) return uniqueStrings(value);
     if (typeof value === 'string') {
       return uniqueStrings(value.split(/[,;\|]/));
     }
@@ -259,7 +296,7 @@
   const safeParseJson = (line) => {
     try {
       return JSON.parse(line);
-    } catch (error) {
+    } catch {
       return null;
     }
   };
@@ -285,14 +322,19 @@
     };
   };
 
-  const getStatTargets = (name) => document.querySelectorAll(`[data-stat="${name}"]`);
+  const getStatTargets = (name) =>
+    document.querySelectorAll(`[data-stat="${name}"]`);
+
   const setStatText = (name, value) => {
-    getStatTargets(name).forEach((element) => {
+    const targets = getStatTargets(name);
+    targets.forEach((element) => {
       element.textContent = value ?? '—';
     });
   };
 
-  const getTableTargets = (name) => Array.from(document.querySelectorAll(`[data-table="${name}"]`));
+  const getTableTargets = (name) =>
+    Array.from(document.querySelectorAll(`[data-table="${name}"]`));
+
   const populateTable = (name, rows, emptyMessage) => {
     getTableTargets(name).forEach((tbody) => {
       if (!tbody) return;
@@ -300,7 +342,8 @@
       if (!rows.length) {
         const tr = document.createElement('tr');
         const td = document.createElement('td');
-        const columnCount = tbody.closest('table')?.querySelectorAll('thead th').length ?? 1;
+        const columnCount =
+          tbody.closest('table')?.querySelectorAll('thead th').length ?? 1;
         td.setAttribute('colspan', columnCount);
         td.textContent = emptyMessage;
         tr.appendChild(td);
@@ -365,7 +408,10 @@
           byType.set(type, (byType.get(type) || 0) + 1);
         }
         if (indicator) {
-          indicatorCounts.set(indicator, (indicatorCounts.get(indicator) || 0) + 1);
+          indicatorCounts.set(
+            indicator,
+            (indicatorCounts.get(indicator) || 0) + 1
+          );
           if (source) {
             if (!indicatorSources.has(indicator)) {
               indicatorSources.set(indicator, new Set());
@@ -397,12 +443,22 @@
         registerTags(row);
       },
       finalize() {
-        const sortedSources = Array.from(bySource.entries()).sort((a, b) => b[1] - a[1]);
-        const sortedTypes = Array.from(byType.entries()).sort((a, b) => b[1] - a[1]);
-        const sortedTags = Array.from(tags.entries()).sort((a, b) => b[1] - a[1]).slice(0, 10);
+        const sortedSources = Array.from(bySource.entries()).sort(
+          (a, b) => b[1] - a[1]
+        );
+        const sortedTypes = Array.from(byType.entries()).sort(
+          (a, b) => b[1] - a[1]
+        );
+        const sortedTags = Array.from(tags.entries())
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 10);
 
-        const earliestParts = earliestFirstSeen ? isoToParts(earliestFirstSeen.iso) : { date: null, time: null };
-        const newestParts = newestFirstSeen ? isoToParts(newestFirstSeen.iso) : { date: null, time: null };
+        const earliestParts = earliestFirstSeen
+          ? isoToParts(earliestFirstSeen.iso)
+          : { date: null, time: null };
+        const newestParts = newestFirstSeen
+          ? isoToParts(newestFirstSeen.iso)
+          : { date: null, time: null };
 
         let collectionWindow = null;
         if (earliestParts.date && newestParts.date) {
@@ -415,7 +471,9 @@
 
         const uniqueIndicators = indicatorCounts.size;
         const duplicatesRemoved = Math.max(total - uniqueIndicators, 0);
-        const multiSourceOverlaps = Array.from(indicatorSources.values()).filter((sources) => sources.size > 1).length;
+        const multiSourceOverlaps = Array.from(
+          indicatorSources.values()
+        ).filter((sources) => sources.size > 1).length;
 
         return {
           total,
@@ -452,17 +510,13 @@
     const absolute = formatAbsoluteTimestamp(parsed.time);
     if (absolute) return absolute;
     const parts = isoToParts(parsed.iso);
-    if (parts.date && parts.time) {
-      return `${parts.date} ${parts.time}`;
-    }
-    if (parts.date) {
-      return parts.date;
-    }
+    if (parts.date && parts.time) return `${parts.date} ${parts.time}`;
+    if (parts.date) return parts.date;
     return parsed.iso;
   };
 
   const selectDiverseRows = (rows, limit) => {
-    const candidates = selectBestPerSource(rows);
+    const candidates = selectBestPerSource(rows || []);
     if (!candidates.length) return [];
 
     const max = Math.max(Number(limit) || DEFAULT_PREVIEW_LIMIT, 1);
@@ -477,7 +531,9 @@
 
       remaining.forEach((row, index) => {
         if (!row) return;
-        const newTags = row.tagsLower.filter((tag) => !usedTags.has(tag)).length;
+        const newTags = row.tagsLower.filter(
+          (tag) => !usedTags.has(tag)
+        ).length;
         if (bestIndex === -1) {
           bestIndex = index;
           bestRow = row;
@@ -490,15 +546,16 @@
           bestNewTags = newTags;
           return;
         }
-        if (newTags === bestNewTags && compareRowStrength(row, bestRow) < 0) {
+        if (
+          newTags === bestNewTags &&
+          compareRowStrength(row, bestRow) < 0
+        ) {
           bestIndex = index;
           bestRow = row;
         }
       });
 
-      if (bestIndex === -1) {
-        break;
-      }
+      if (bestIndex === -1) break;
 
       const [chosen] = remaining.splice(bestIndex, 1);
       if (!chosen) break;
@@ -521,6 +578,7 @@
 
   const preparePreviewRow = (row) => {
     if (!row || typeof row !== 'object') return null;
+
     const indicator = coalesceString(
       row.indicator,
       row.observable,
@@ -591,6 +649,10 @@
     );
     const firstSeenParsed = parseTimestamp(firstSeenRaw);
 
+    const firstSeenDisplay = formatTimestampForDisplay(
+      firstSeenParsed?.iso ?? firstSeenRaw
+    );
+
     return {
       indicator,
       indicatorLower: indicator.toLowerCase(),
@@ -598,14 +660,21 @@
       typeKey: typeRaw ? typeRaw.toLowerCase() : 'unknown',
       source: sourceRaw || '—',
       sourceLower: sourceRaw ? sourceRaw.toLowerCase() : '',
-      firstSeen: formatTimestampForDisplay(firstSeenParsed?.iso ?? firstSeenRaw),
+      firstSeen: firstSeenDisplay,
       firstSeenTime: firstSeenParsed?.time ?? null,
       confidence: confidenceRaw || '—',
       confidenceLower: confidenceRaw ? confidenceRaw.toLowerCase() : '',
       confidenceRank: confidenceRankForValue(confidenceRaw),
       tags,
       tagsLower: tags.map((tag) => tag.toLowerCase()),
-      searchBlob: [indicator, typeRaw, sourceRaw, confidenceRaw, firstSeenRaw, ...tags]
+      searchBlob: [
+        indicator,
+        typeRaw,
+        sourceRaw,
+        confidenceRaw,
+        firstSeenRaw,
+        ...tags,
+      ]
         .filter(Boolean)
         .map((value) => value.toLowerCase())
         .join(' '),
@@ -613,11 +682,10 @@
   };
 
   const confidenceClassFor = (confidence) => {
-    const value = normaliseLower(confidence);
-    if (!value) return null;
-    if (value.includes('high')) return 'confidence-high';
-    if (value.includes('medium')) return 'confidence-medium';
-    if (value.includes('low')) return 'confidence-low';
+    const rank = confidenceRankForValue(confidence);
+    if (rank >= 4 || rank === 3) return 'confidence-high';
+    if (rank === 2) return 'confidence-medium';
+    if (rank === 1) return 'confidence-low';
     return null;
   };
 
@@ -637,19 +705,16 @@
       if (!parsed) return false;
       const shouldStop = handleRow(parsed) === true;
       processed += 1;
-      if (shouldStop) {
-        return true;
-      }
+      if (shouldStop) return true;
       return processed >= limit;
     };
 
+    // Fallback for older browsers / environments
     if (!response.body || !response.body.getReader) {
       const text = await response.text();
       const lines = text.split(/\r?\n/);
       for (const line of lines) {
-        if (processLine(line)) {
-          break;
-        }
+        if (processLine(line)) break;
       }
       return processed;
     }
@@ -674,9 +739,7 @@
       }
 
       const remainder = buffer.trim();
-      if (remainder) {
-        processLine(remainder);
-      }
+      if (remainder) processLine(remainder);
     } finally {
       if (reader.releaseLock) {
         reader.releaseLock();
@@ -686,17 +749,23 @@
     return processed;
   };
 
-  const isCacheOrigin = (origin) => origin === 'cache' || origin === 'cache-stale';
+  const isCacheOrigin = (origin) =>
+    origin === 'cache' || origin === 'cache-stale';
 
   const computeDatasetKey = (dataset) => {
     if (!dataset || typeof dataset !== 'object') return null;
     if (typeof dataset.fetchedAt === 'number') {
       return `fetched:${dataset.fetchedAt}`;
     }
-    if (dataset.stats?.generatedAt) return `generated:${dataset.stats.generatedAt}`;
-    if (dataset.stats?.collectionWindow) return `window:${dataset.stats.collectionWindow}`;
+    if (dataset.stats?.generatedAt) {
+      return `generated:${dataset.stats.generatedAt}`;
+    }
+    if (dataset.stats?.collectionWindow) {
+      return `window:${dataset.stats.collectionWindow}`;
+    }
     if (dataset.previewEntries?.length) {
-      return `preview:${dataset.previewEntries[0].indicatorLower ?? dataset.previewEntries[0].indicator}`;
+      const first = dataset.previewEntries[0];
+      return `preview:${first.indicatorLower ?? first.indicator}`;
     }
     return null;
   };
@@ -740,7 +809,9 @@
   };
 
   const fetchDatasetFromJson = async () => {
-    const response = await fetch(INDICATORS_JSON_FALLBACK_URL, { cache: 'no-store' });
+    const response = await fetch(INDICATORS_JSON_FALLBACK_URL, {
+      cache: 'no-store',
+    });
     if (!response.ok) {
       throw new Error(`Failed to fetch preview fallback (${response.status})`);
     }
@@ -784,9 +855,16 @@
     if (!previewEntries.length) {
       try {
         const fallback = await fetchDatasetFromJson();
-        return { stats, previewEntries: fallback.previewEntries, source: fallback.source };
+        return {
+          stats,
+          previewEntries: fallback.previewEntries,
+          source: fallback.source,
+        };
       } catch (fallbackError) {
-        console.warn('Failed to augment preview entries via JSON fallback', fallbackError);
+        console.warn(
+          'Failed to augment preview entries via JSON fallback',
+          fallbackError
+        );
       }
     }
 
@@ -801,7 +879,10 @@
       datasetStorage.write(enriched);
       return enriched;
     } catch (streamError) {
-      console.warn('Streaming dataset failed, falling back to JSON', streamError);
+      console.warn(
+        'Streaming dataset failed, falling back to JSON',
+        streamError
+      );
       const dataset = await fetchDatasetFromJson();
       const enriched = { ...dataset, origin: 'network', fetchedAt };
       datasetStorage.write(enriched);
@@ -830,7 +911,10 @@
                 return dataset;
               })
               .catch((error) => {
-                console.warn('Background dataset refresh failed', error);
+                console.warn(
+                  'Background dataset refresh failed',
+                  error
+                );
                 return null;
               })
               .finally(() => {
@@ -853,10 +937,16 @@
     return datasetCache.promise;
   };
 
-  const loadDataset = async ({ previewLimit = DEFAULT_PREVIEW_LIMIT, forceRefresh = false } = {}) => {
+  const loadDataset = async ({
+    previewLimit = DEFAULT_PREVIEW_LIMIT,
+    forceRefresh = false,
+  } = {}) => {
     const dataset = await resolveDataset({ forceRefresh });
     const desired = Math.max(Number(previewLimit) || DEFAULT_PREVIEW_LIMIT, 1);
-    const previewRows = selectDiverseRows(dataset.previewEntries, desired);
+    const previewSource = Array.isArray(dataset.previewEntries)
+      ? dataset.previewEntries
+      : [];
+    const previewRows = selectDiverseRows(previewSource, desired);
     return {
       dataset,
       previewRows,
@@ -877,14 +967,17 @@
     const setState = (dataset) => {
       const stats = dataset?.stats || {};
       const origin = dataset?.origin || 'network';
-      const fetchedAt = typeof dataset?.fetchedAt === 'number' ? dataset.fetchedAt : null;
+      const fetchedAt =
+        typeof dataset?.fetchedAt === 'number' ? dataset.fetchedAt : null;
       const total = stats?.total ?? 0;
 
       root.dataset.state = origin;
 
       if (statusLabel) {
         statusLabel.textContent =
-          total > 0 ? 'Dashboard is ready with fresh indicators' : 'Preparing dashboard…';
+          total > 0
+            ? 'Dashboard is ready with fresh indicators'
+            : 'Preparing dashboard…';
       }
 
       if (originEl) {
@@ -899,14 +992,18 @@
       }
 
       if (generatedEl) {
-        generatedEl.textContent = formatTimestampForDisplay(stats.generatedAt);
+        generatedEl.textContent = formatTimestampForDisplay(
+          stats.generatedAt
+        );
       }
 
       if (updatedEl) {
         if (typeof fetchedAt === 'number') {
           const absolute = formatAbsoluteTimestamp(fetchedAt);
           const relative = formatRelativeTimeFromNow(fetchedAt);
-          updatedEl.textContent = absolute ? `${absolute}${relative ? ` (${relative})` : ''}` : '—';
+          updatedEl.textContent = absolute
+            ? `${absolute}${relative ? ` (${relative})` : ''}`
+            : '—';
         } else {
           updatedEl.textContent = '—';
         }
@@ -916,7 +1013,8 @@
     const handleError = () => {
       root.dataset.state = 'error';
       if (statusLabel) {
-        statusLabel.textContent = 'Unable to load the latest dataset right now';
+        statusLabel.textContent =
+          'Unable to load the latest dataset right now';
       }
       if (originEl) originEl.textContent = 'Unavailable';
       if (windowEl) windowEl.textContent = '—';
@@ -954,34 +1052,77 @@
 
     const feedsText =
       stats.activeSources != null
-        ? `${formatNumber(stats.activeSources)} active source${stats.activeSources === 1 ? '' : 's'}`
+        ? `${formatNumber(stats.activeSources)} active source${
+            stats.activeSources === 1 ? '' : 's'
+          }`
         : '—';
     setStatText('feeds-online', feedsText);
 
-    setStatText('collection-window', stats.collectionWindow ?? '—');
-    setStatText('generated-at', formatTimestampForDisplay(stats.generatedAt));
+    setStatText(
+      'collection-window',
+      stats.collectionWindow ?? '—'
+    );
+    setStatText(
+      'generated-at',
+      formatTimestampForDisplay(stats.generatedAt)
+    );
 
-    setStatText('earliest-first-seen-date', stats.earliestFirstSeen.date ?? '—');
-    setStatText('earliest-first-seen-time', stats.earliestFirstSeen.time ?? '—');
-    setStatText('newest-first-seen-date', stats.newestFirstSeen.date ?? '—');
-    setStatText('newest-first-seen-time', stats.newestFirstSeen.time ?? '—');
-    setStatText('multi-source-overlaps', formatNumber(stats.multiSourceOverlaps));
+    setStatText(
+      'earliest-first-seen-date',
+      stats.earliestFirstSeen.date ?? '—'
+    );
+    setStatText(
+      'earliest-first-seen-time',
+      stats.earliestFirstSeen.time ?? '—'
+    );
+    setStatText(
+      'newest-first-seen-date',
+      stats.newestFirstSeen.date ?? '—'
+    );
+    setStatText(
+      'newest-first-seen-time',
+      stats.newestFirstSeen.time ?? '—'
+    );
+    setStatText(
+      'multi-source-overlaps',
+      formatNumber(stats.multiSourceOverlaps)
+    );
 
     const sourceRows = stats.bySource.map(([source, count]) => [
       { title: 'Source', value: source },
-      { title: 'Indicators', value: formatNumber(count), numeric: true },
+      {
+        title: 'Indicators',
+        value: formatNumber(count),
+        numeric: true,
+      },
     ]);
-    populateTable('sources', sourceRows, 'No source data available.');
+    populateTable(
+      'sources',
+      sourceRows,
+      'No source data available.'
+    );
 
     const typeRows = stats.byType.map(([type, count]) => [
       { title: 'Type', value: type },
-      { title: 'Indicators', value: formatNumber(count), numeric: true },
+      {
+        title: 'Indicators',
+        value: formatNumber(count),
+        numeric: true,
+      },
     ]);
-    populateTable('types', typeRows, 'No indicator type data available.');
+    populateTable(
+      'types',
+      typeRows,
+      'No indicator type data available.'
+    );
 
     const tagRows = stats.topTags.map(([tag, count]) => [
       { title: 'Tag', value: tag },
-      { title: 'Indicators', value: formatNumber(count), numeric: true },
+      {
+        title: 'Indicators',
+        value: formatNumber(count),
+        numeric: true,
+      },
     ]);
     populateTable('tags', tagRows, 'No tags available yet.');
   };
@@ -1022,24 +1163,54 @@
     const table = container.querySelector('[data-preview-table]');
     const tbody = container.querySelector('[data-preview-body]');
     const statusEl = container.querySelector('[data-preview-status]');
-    const filterSelect = container.querySelector('[data-preview-filter]');
-    const tagFilterSelect = container.querySelector('[data-preview-tag-filter]');
-    const limitSelect = container.querySelector('[data-preview-limit]');
-    const searchInput = container.querySelector('[data-preview-search]');
-    const refreshButton = container.querySelector('[data-preview-refresh]');
-    const summaryRoot = container.querySelector('[data-preview-summary]');
-    const summaryVisibleEl = container.querySelector('[data-preview-visible]');
-    const summaryTotalEl = container.querySelector('[data-preview-total]');
-    const summaryHighEl = container.querySelector('[data-preview-high]');
-    const summaryHighPercentEl = container.querySelector('[data-preview-high-percent]');
-    const summaryTopTagEl = container.querySelector('[data-preview-top-tag]');
-    const summaryTopTagCountEl = container.querySelector('[data-preview-top-tag-count]');
-    const summaryNewestEl = container.querySelector('[data-preview-newest]');
-    const summaryNewestRelativeEl = container.querySelector('[data-preview-newest-relative]');
-    const metaRoot = container.querySelector('[data-preview-meta]');
-    const metaOriginEl = container.querySelector('[data-preview-origin]');
-    const metaRefreshedEl = container.querySelector('[data-preview-refreshed]');
-    const metaRelativeEl = container.querySelector('[data-preview-relative]');
+    const filterSelect =
+      container.querySelector('[data-preview-filter]');
+    const tagFilterSelect = container.querySelector(
+      '[data-preview-tag-filter]'
+    );
+    const limitSelect =
+      container.querySelector('[data-preview-limit]');
+    const searchInput =
+      container.querySelector('[data-preview-search]');
+    const refreshButton = container.querySelector(
+      '[data-preview-refresh]'
+    );
+    const summaryRoot = container.querySelector(
+      '[data-preview-summary]'
+    );
+    const summaryVisibleEl = container.querySelector(
+      '[data-preview-visible]'
+    );
+    const summaryTotalEl = container.querySelector(
+      '[data-preview-total]'
+    );
+    const summaryHighEl =
+      container.querySelector('[data-preview-high]');
+    const summaryHighPercentEl = container.querySelector(
+      '[data-preview-high-percent]'
+    );
+    const summaryTopTagEl = container.querySelector(
+      '[data-preview-top-tag]'
+    );
+    const summaryTopTagCountEl = container.querySelector(
+      '[data-preview-top-tag-count]'
+    );
+    const summaryNewestEl = container.querySelector(
+      '[data-preview-newest]'
+    );
+    const summaryNewestRelativeEl = container.querySelector(
+      '[data-preview-newest-relative]'
+    );
+    const metaRoot =
+      container.querySelector('[data-preview-meta]');
+    const metaOriginEl =
+      container.querySelector('[data-preview-origin]');
+    const metaRefreshedEl = container.querySelector(
+      '[data-preview-refreshed]'
+    );
+    const metaRelativeEl = container.querySelector(
+      '[data-preview-relative]'
+    );
 
     const state = {
       rows: [],
@@ -1092,13 +1263,16 @@
 
     const updateMeta = () => {
       if (!metaRoot) return;
-      const showMeta = state.rows.length > 0 || typeof state.fetchedAt === 'number';
+      const showMeta =
+        state.rows.length > 0 ||
+        typeof state.fetchedAt === 'number';
       metaRoot.hidden = !showMeta;
 
       if (metaOriginEl) {
         let originLabel = 'Live data';
         if (state.origin === 'cache') originLabel = 'Cached snapshot';
-        else if (state.origin === 'cache-stale') originLabel = 'Stale snapshot';
+        else if (state.origin === 'cache-stale')
+          originLabel = 'Stale snapshot';
         metaOriginEl.textContent = originLabel;
         metaOriginEl.dataset.state = state.origin;
       }
@@ -1107,10 +1281,12 @@
         if (typeof state.fetchedAt === 'number') {
           const absolute = formatAbsoluteTimestamp(state.fetchedAt);
           metaRefreshedEl.textContent = absolute || '—';
-          metaRefreshedEl.dateTime = new Date(state.fetchedAt).toISOString();
+          const iso = new Date(state.fetchedAt).toISOString();
+          // set attribute instead of property for robustness
+          metaRefreshedEl.setAttribute('data-datetime', iso);
         } else {
           metaRefreshedEl.textContent = '—';
-          metaRefreshedEl.removeAttribute('dateTime');
+          metaRefreshedEl.removeAttribute('data-datetime');
         }
       }
 
@@ -1133,12 +1309,15 @@
       summaryRoot.hidden = !showSummary;
       if (!showSummary) return;
 
-      const visibleCount = Array.isArray(visibleRows) ? visibleRows.length : 0;
+      const visibleCount = Array.isArray(visibleRows)
+        ? visibleRows.length
+        : 0;
       if (summaryVisibleEl) {
         summaryVisibleEl.textContent = formatNumber(visibleCount);
       }
       if (summaryTotalEl) {
-        const totalValue = datasetSources != null ? datasetSources : previewPool;
+        const totalValue =
+          datasetSources != null ? datasetSources : previewPool;
         summaryTotalEl.textContent = formatNumber(totalValue);
       }
 
@@ -1149,7 +1328,9 @@
         summaryHighEl.textContent = formatNumber(highCount);
       }
       if (summaryHighPercentEl) {
-        const percent = visibleCount ? Math.round((highCount / visibleCount) * 100) : 0;
+        const percent = visibleCount
+          ? Math.round((highCount / visibleCount) * 100)
+          : 0;
         summaryHighPercentEl.textContent = `${percent}%`;
       }
 
@@ -1170,18 +1351,23 @@
         if (
           !topTagEntry ||
           entry.count > topTagEntry.count ||
-          (entry.count === topTagEntry.count && entry.label.localeCompare(topTagEntry.label) < 0)
+          (entry.count === topTagEntry.count &&
+            entry.label.localeCompare(topTagEntry.label) < 0)
         ) {
           topTagEntry = entry;
         }
       });
 
       if (summaryTopTagEl) {
-        summaryTopTagEl.textContent = topTagEntry ? topTagEntry.label : 'No tags across highlighted sources';
+        summaryTopTagEl.textContent = topTagEntry
+          ? topTagEntry.label
+          : 'No tags across highlighted sources';
       }
       if (summaryTopTagCountEl) {
         summaryTopTagCountEl.textContent = topTagEntry
-          ? `${formatNumber(topTagEntry.count)} source${topTagEntry.count === 1 ? '' : 's'}`
+          ? `${formatNumber(
+              topTagEntry.count
+            )} source${topTagEntry.count === 1 ? '' : 's'}`
           : '—';
       }
 
@@ -1200,11 +1386,14 @@
       });
 
       if (summaryNewestEl) {
-        summaryNewestEl.textContent = newestRow?.firstSeen ?? '—';
+        summaryNewestEl.textContent =
+          newestRow?.firstSeen ?? '—';
       }
       if (summaryNewestRelativeEl) {
         summaryNewestRelativeEl.textContent = newestRow?.firstSeenTime
-          ? formatRelativeTimeFromNow(newestRow.firstSeenTime) || ''
+          ? formatRelativeTimeFromNow(
+              newestRow.firstSeenTime
+            ) || ''
           : '';
       }
     };
@@ -1217,7 +1406,10 @@
           return true;
         }
       } catch (error) {
-        console.warn('Clipboard API failed, falling back to execCommand', error);
+        console.warn(
+          'Clipboard API failed, falling back to execCommand',
+          error
+        );
       }
 
       let textarea;
@@ -1264,7 +1456,10 @@
         const copyButton = document.createElement('button');
         copyButton.type = 'button';
         copyButton.className = 'copy-indicator';
-        copyButton.setAttribute('aria-label', `Copy indicator ${row.indicator}`);
+        copyButton.setAttribute(
+          'aria-label',
+          `Copy indicator ${row.indicator}`
+        );
 
         const setButtonState = (buttonState) => {
           copyButton.dataset.state = buttonState;
@@ -1288,7 +1483,10 @@
             const success = await copyToClipboard(row.indicator);
             setButtonState(success ? 'copied' : 'error');
           } catch (error) {
-            console.error('Failed to copy indicator to clipboard', error);
+            console.error(
+              'Failed to copy indicator to clipboard',
+              error
+            );
             setButtonState('error');
           }
           setTimeout(() => {
@@ -1313,7 +1511,11 @@
         tr.appendChild(makeCell('Source', row.source));
         tr.appendChild(makeCell('First seen', row.firstSeen));
 
-        const confidenceCell = makeCell('Confidence', row.confidence, 'confidence-cell');
+        const confidenceCell = makeCell(
+          'Confidence',
+          row.confidence,
+          'confidence-cell'
+        );
         const confidenceClass = confidenceClassFor(row.confidence);
         if (confidenceClass) {
           confidenceCell.classList.add(confidenceClass);
@@ -1356,7 +1558,9 @@
         if (tbody) tbody.innerHTML = '';
         if (table) table.hidden = true;
         setStatus(
-          augmentStatusMessage('No source highlights available right now. Check back shortly.'),
+          augmentStatusMessage(
+            'No source highlights available right now. Check back shortly.'
+          ),
           'empty'
         );
         updateSummary([]);
@@ -1369,7 +1573,10 @@
         if (state.filter !== 'all' && row.typeKey !== state.filter) {
           return false;
         }
-        if (state.tagFilter !== 'all' && !row.tagsLower.includes(state.tagFilter)) {
+        if (
+          state.tagFilter !== 'all' &&
+          !row.tagsLower.includes(state.tagFilter)
+        ) {
           return false;
         }
         if (searchTerm && !row.searchBlob.includes(searchTerm)) {
@@ -1382,10 +1589,25 @@
         if (tbody) tbody.innerHTML = '';
         if (table) table.hidden = true;
         const summaryParts = [];
-        if (state.filter !== 'all') summaryParts.push(`type: ${buildSummaryLabel(filterSelect, state.filter)}`);
-        if (state.tagFilter !== 'all') summaryParts.push(`tag: ${buildSummaryLabel(tagFilterSelect, state.tagFilter)}`);
-        if (searchTerm) summaryParts.push(`search: “${state.search.trim()}”`);
-        const qualifier = summaryParts.length ? ` for ${summaryParts.join(', ')}` : '';
+        if (state.filter !== 'all')
+          summaryParts.push(
+            `type: ${buildSummaryLabel(
+              filterSelect,
+              state.filter
+            )}`
+          );
+        if (state.tagFilter !== 'all')
+          summaryParts.push(
+            `tag: ${buildSummaryLabel(
+              tagFilterSelect,
+              state.tagFilter
+            )}`
+          );
+        if (searchTerm)
+          summaryParts.push(`search: “${state.search.trim()}”`);
+        const qualifier = summaryParts.length
+          ? ` for ${summaryParts.join(', ')}`
+          : '';
         setStatus(
           augmentStatusMessage(
             `No source highlights match the current filters${qualifier}. Adjust filters or refresh the feed.`
@@ -1397,7 +1619,6 @@
         return;
       }
 
-      // Respect state.limit when actually rendering on the single screen
       const limited = filtered.slice(0, state.limit);
 
       renderRows(limited);
@@ -1405,10 +1626,25 @@
       updateSummary(limited);
       updateMeta();
       const summaryParts = [];
-      if (state.filter !== 'all') summaryParts.push(`type: ${buildSummaryLabel(filterSelect, state.filter)}`);
-      if (state.tagFilter !== 'all') summaryParts.push(`tag: ${buildSummaryLabel(tagFilterSelect, state.tagFilter)}`);
-      if (searchTerm) summaryParts.push(`search: “${state.search.trim()}”`);
-      const qualifier = summaryParts.length ? ` (${summaryParts.join(', ')})` : '';
+      if (state.filter !== 'all')
+        summaryParts.push(
+          `type: ${buildSummaryLabel(
+            filterSelect,
+            state.filter
+          )}`
+        );
+      if (state.tagFilter !== 'all')
+        summaryParts.push(
+          `tag: ${buildSummaryLabel(
+            tagFilterSelect,
+            state.tagFilter
+          )}`
+        );
+      if (searchTerm)
+        summaryParts.push(`search: “${state.search.trim()}”`);
+      const qualifier = summaryParts.length
+        ? ` (${summaryParts.join(', ')})`
+        : '';
       setStatus(
         augmentStatusMessage(
           `Showing ${limited.length} of ${filtered.length} matching source highlights${qualifier}.`
@@ -1421,7 +1657,8 @@
       if (!select) return;
       const option = document.createElement('option');
       option.value = value;
-      option.textContent = count != null ? `${label} (${count})` : label;
+      option.textContent =
+        count != null ? `${label} (${count})` : label;
       option.dataset.label = label;
       select.appendChild(option);
     };
@@ -1433,24 +1670,43 @@
         rows.forEach((row) => {
           const key = row.typeKey || 'unknown';
           if (!counts.has(key)) {
-            counts.set(key, { label: row.type === '—' ? 'Unknown' : row.type, count: 0 });
+            counts.set(key, {
+              label: row.type === '—' ? 'Unknown' : row.type,
+              count: 0,
+            });
           }
           counts.get(key).count += 1;
         });
 
         filterSelect.innerHTML = '';
-        addOption(filterSelect, 'all', 'All types', rows.length);
+        addOption(
+          filterSelect,
+          'all',
+          'All types',
+          rows.length
+        );
         Array.from(counts.entries())
           .sort((a, b) => {
-            if (b[1].count !== a[1].count) return b[1].count - a[1].count;
+            if (b[1].count !== a[1].count) {
+              return b[1].count - a[1].count;
+            }
             return a[1].label.localeCompare(b[1].label);
           })
           .forEach(([value, data]) => {
-            addOption(filterSelect, value, data.label, data.count);
+            addOption(
+              filterSelect,
+              value,
+              data.label,
+              data.count
+            );
           });
 
-        const availableValues = new Set(Array.from(counts.keys()).concat(['all']));
-        filterSelect.value = availableValues.has(previous) ? previous : 'all';
+        const availableValues = new Set(
+          Array.from(counts.keys()).concat(['all'])
+        );
+        filterSelect.value = availableValues.has(previous)
+          ? previous
+          : 'all';
         state.filter = filterSelect.value;
         filterSelect.disabled = rows.length === 0;
       }
@@ -1470,18 +1726,34 @@
 
         const uniqueTagCount = tagCounts.size;
         tagFilterSelect.innerHTML = '';
-        addOption(tagFilterSelect, 'all', 'All tags', uniqueTagCount);
+        addOption(
+          tagFilterSelect,
+          'all',
+          'All tags',
+          uniqueTagCount
+        );
         Array.from(tagCounts.entries())
           .sort((a, b) => {
-            if (b[1].count !== a[1].count) return b[1].count - a[1].count;
+            if (b[1].count !== a[1].count) {
+              return b[1].count - a[1].count;
+            }
             return a[1].label.localeCompare(b[1].label);
           })
           .forEach(([value, data]) => {
-            addOption(tagFilterSelect, value, data.label, data.count);
+            addOption(
+              tagFilterSelect,
+              value,
+              data.label,
+              data.count
+            );
           });
 
-        const availableTags = new Set(Array.from(tagCounts.keys()).concat(['all']));
-        tagFilterSelect.value = availableTags.has(previousTag) ? previousTag : 'all';
+        const availableTags = new Set(
+          Array.from(tagCounts.keys()).concat(['all'])
+        );
+        tagFilterSelect.value = availableTags.has(previousTag)
+          ? previousTag
+          : 'all';
         state.tagFilter = tagFilterSelect.value;
         tagFilterSelect.disabled = uniqueTagCount === 0;
       }
@@ -1494,15 +1766,29 @@
       }
     };
 
-    const loadPreview = async ({ silent = false, forceRefresh = false } = {}) => {
+    const loadPreview = async ({
+      silent = false,
+      forceRefresh = false,
+    } = {}) => {
       if (!table || !tbody) return;
 
       setBusy(true);
       table.hidden = true;
       tbody.innerHTML = '';
-      setStatus(silent ? 'Refreshing source highlights…' : 'Loading source highlights…', 'loading');
+      setStatus(
+        silent
+          ? 'Refreshing source highlights…'
+          : 'Loading source highlights…',
+        'loading'
+      );
 
-      const controls = [filterSelect, tagFilterSelect, limitSelect, searchInput, refreshButton];
+      const controls = [
+        filterSelect,
+        tagFilterSelect,
+        limitSelect,
+        searchInput,
+        refreshButton,
+      ];
       controls.forEach((control) => {
         if (control) control.disabled = true;
       });
@@ -1514,11 +1800,17 @@
         });
         state.rows = previewRows;
         state.origin = dataset.origin || 'network';
-        state.fetchedAt = typeof dataset.fetchedAt === 'number' ? dataset.fetchedAt : null;
+        state.fetchedAt =
+          typeof dataset.fetchedAt === 'number'
+            ? dataset.fetchedAt
+            : null;
         state.stats = dataset.stats || state.stats;
-        const sourcePool = countDistinctSources(dataset.previewEntries);
+        const sourcePool = countDistinctSources(
+          dataset.previewEntries || []
+        );
         const fallbackPool = countDistinctSources(previewRows);
-        state.previewPool = sourcePool > 0 ? sourcePool : fallbackPool;
+        state.previewPool =
+          sourcePool > 0 ? sourcePool : fallbackPool;
         updateMeta();
         populateFilterOptions(previewRows);
         applyFilter();
@@ -1546,7 +1838,9 @@
             control.disabled = state.rows.length === 0;
           } else if (control === tagFilterSelect) {
             control.disabled =
-              state.rows.length === 0 || !tagFilterSelect.options || tagFilterSelect.options.length <= 1;
+              state.rows.length === 0 ||
+              !tagFilterSelect.options ||
+              tagFilterSelect.options.length <= 1;
           } else if (control === searchInput) {
             control.disabled = state.rows.length === 0;
             if (!control.disabled) {
@@ -1615,14 +1909,23 @@
     subscribeToDataset((dataset) => {
       if (!dataset || !table || !tbody) return;
       if (isCacheOrigin(dataset.origin)) return;
-      const previewRows = selectDiverseRows(dataset.previewEntries, state.limit);
+      const previewRows = selectDiverseRows(
+        dataset.previewEntries || [],
+        state.limit
+      );
       state.rows = previewRows;
       state.origin = dataset.origin || 'network';
-      state.fetchedAt = typeof dataset.fetchedAt === 'number' ? dataset.fetchedAt : null;
+      state.fetchedAt =
+        typeof dataset.fetchedAt === 'number'
+          ? dataset.fetchedAt
+          : null;
       state.stats = dataset.stats || state.stats;
-      const sourcePool = countDistinctSources(dataset.previewEntries);
+      const sourcePool = countDistinctSources(
+        dataset.previewEntries || []
+      );
       const fallbackPool = countDistinctSources(previewRows);
-      state.previewPool = sourcePool > 0 ? sourcePool : fallbackPool;
+      state.previewPool =
+        sourcePool > 0 ? sourcePool : fallbackPool;
       updateMeta();
       populateFilterOptions(previewRows);
       applyFilter();
@@ -1634,7 +1937,7 @@
       });
     }
 
-    // For single-screen dashboard, just load immediately (no IntersectionObserver lazy load)
+    // For single-screen dashboard, just load immediately
     loadPreview();
   };
 
