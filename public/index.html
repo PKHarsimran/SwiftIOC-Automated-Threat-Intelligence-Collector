@@ -6,13 +6,13 @@
     <title>SwiftIOC Threat Intelligence Dashboard</title>
     <meta
       name="description"
-      content="Live snapshot of the most recent SwiftIOC automated threat intelligence collection run."
+      content="Live SwiftIOC threat intelligence snapshot with indicators, source breakdowns, tags, and exports."
     />
     <meta name="theme-color" content="#0f172a" />
     <meta property="og:title" content="SwiftIOC Threat Intelligence Dashboard" />
     <meta
       property="og:description"
-      content="Inspect the freshest SwiftIOC indicators and source breakdowns in a single live view."
+      content="Inspect the freshest SwiftIOC indicators and source breakdowns in a compact live dashboard."
     />
     <meta property="og:type" content="website" />
     <meta property="twitter:card" content="summary_large_image" />
@@ -20,7 +20,7 @@
     <link rel="preload" href="assets/styles.css" as="style" />
     <link rel="stylesheet" href="assets/styles.css" />
 
-    <!-- Layout overrides: compact, responsive, scrollable -->
+    <!-- Layout overrides: compact, scrollable, single-page dashboard -->
     <style>
       html,
       body {
@@ -30,57 +30,66 @@
 
       body {
         margin: 0;
-        overflow-y: auto; /* page scroll enabled */
+        overflow-y: auto;
       }
 
       .page-wrapper {
+        max-width: 1280px;
+        margin: 0 auto;
         min-height: 100vh;
         display: flex;
         flex-direction: column;
         gap: 0.75rem;
-        padding-top: 0.9rem;
-        padding-bottom: 1.25rem;
+        padding: 0.75rem 1.25rem 1.25rem;
       }
 
-      /* Sticky compact header */
+      /* Sticky, compact header with blur */
       .page-header {
         position: sticky;
         top: 0;
         z-index: 40;
-        padding: 0 1.25rem 0.55rem;
+        padding-bottom: 0.55rem;
         background: linear-gradient(
           to bottom,
-          rgba(15, 23, 42, 0.96),
-          rgba(15, 23, 42, 0.88),
+          rgba(15, 23, 42, 0.98),
+          rgba(15, 23, 42, 0.92),
           transparent
         );
         backdrop-filter: blur(14px);
       }
 
       .top-nav {
-        padding: 0.4rem 0.9rem;
+        padding: 0.45rem 0.9rem;
         border-radius: 0.9rem;
         border: 1px solid var(--border-soft);
-        background: rgba(6, 11, 26, 0.82);
-        box-shadow: 0 14px 30px rgba(2, 6, 23, 0.55);
-        gap: 0.9rem;
+        background: rgba(6, 11, 26, 0.88);
+        box-shadow: 0 12px 28px rgba(2, 6, 23, 0.6);
+        gap: 0.8rem;
       }
 
-      .top-nav .nav-links {
+      .brand-mark {
+        font-size: 1rem;
+      }
+
+      .brand-tagline {
+        font-size: 0.75rem;
+      }
+
+      .nav-links {
         gap: 0.45rem;
         font-size: 0.8rem;
       }
 
-      .top-nav .nav-links a {
+      .nav-links a {
         padding: 0.35rem 0.75rem;
       }
 
       .status-banner {
-        margin-top: 0.6rem;
+        margin-top: 0.55rem;
         padding: 0.6rem 0.85rem;
         border-radius: 0.9rem;
-        box-shadow: 0 12px 26px rgba(2, 6, 23, 0.5);
-        grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.1fr) auto;
+        box-shadow: 0 12px 24px rgba(2, 6, 23, 0.55);
+        grid-template-columns: minmax(0, 1.7fr) minmax(0, 1.1fr) auto;
       }
 
       .status-title {
@@ -103,14 +112,14 @@
 
       .page-main {
         flex: 1;
-        padding: 0 1.25rem;
         display: flex;
         flex-direction: column;
         gap: 0.75rem;
         min-height: 0;
+        scroll-margin-top: 90px; /* so anchors don’t hide under sticky header */
       }
 
-      /* Key metrics strip */
+      /* Metrics strip */
       .metrics-strip {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -118,15 +127,15 @@
       }
 
       .metrics-strip .metric-card {
-        padding: 0.55rem 0.7rem;
-        border-radius: 0.7rem;
-        background: linear-gradient(150deg, rgba(148, 163, 184, 0.16), rgba(15, 23, 42, 0.9));
+        padding: 0.6rem 0.75rem;
+        border-radius: 0.75rem;
+        background: linear-gradient(145deg, rgba(148, 163, 184, 0.18), rgba(15, 23, 42, 0.96));
         border: 1px solid var(--border-soft);
         box-shadow: 0 10px 24px rgba(2, 6, 23, 0.5);
       }
 
       .metrics-strip .metric-card h3 {
-        font-size: 0.75rem;
+        font-size: 0.78rem;
         margin-bottom: 0.15rem;
       }
 
@@ -140,12 +149,13 @@
         color: var(--text-muted);
       }
 
-      /* Main dashboard grid */
+      /* Main dashboard section */
       .dashboard-main {
         display: grid;
         grid-template-columns: minmax(0, 1.7fr) minmax(0, 1.3fr);
         gap: 0.75rem;
         align-items: stretch;
+        min-height: 0;
       }
 
       .panel {
@@ -157,7 +167,7 @@
         min-width: 0;
         min-height: 0;
         border: 1px solid var(--border-soft);
-        box-shadow: 0 16px 38px rgba(2, 6, 23, 0.5);
+        box-shadow: 0 16px 36px rgba(2, 6, 23, 0.5);
       }
 
       .panel-header {
@@ -184,7 +194,7 @@
       }
 
       .panel-scroll {
-        overflow: auto;
+        overflow: hidden; /* internal elements manage scroll; avoids double scrollbars */
       }
 
       /* Live IOC table panel (left) */
@@ -195,8 +205,12 @@
       }
 
       .preview-toolbar {
-        margin-bottom: 0.3rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
         gap: 0.4rem;
+        margin-bottom: 0.3rem;
+        flex-wrap: wrap;
       }
 
       .preview-toolbar .toolbar-controls,
@@ -207,8 +221,11 @@
       }
 
       .preview-toolbar .toolbar-group {
+        display: flex;
+        flex-direction: column;
         gap: 0.2rem;
         font-size: 0.78rem;
+        min-width: 140px;
       }
 
       .preview-toolbar select,
@@ -224,9 +241,9 @@
         min-height: 0;
         border-radius: 0.7rem;
         border: 1px solid var(--border-soft);
-        background: rgba(15, 23, 42, 0.94);
+        background: rgba(15, 23, 42, 0.96);
         overflow: auto;
-        max-height: 60vh; /* scales with viewport */
+        max-height: 60vh; /* scales with viewport height */
       }
 
       .preview-table {
@@ -248,12 +265,16 @@
         border-bottom: 1px solid rgba(148, 163, 184, 0.22);
       }
 
+      .preview-table tbody tr:hover {
+        background: rgba(56, 189, 248, 0.12);
+      }
+
       .preview-status {
         font-size: 0.75rem;
         margin: 0.35rem 0.1rem 0;
       }
 
-      /* Hide the extra "summary" meta for now – just table + filters */
+      /* Hide high-level summary chips – pure data view */
       .preview-summary,
       .preview-meta {
         display: none !important;
@@ -264,19 +285,31 @@
         display: grid;
         grid-template-rows: minmax(0, 1.2fr) minmax(0, 1fr);
         gap: 0.7rem;
+        min-height: 0;
       }
 
       .side-top {
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
         gap: 0.6rem;
+        min-height: 0;
+      }
+
+      .side-panel .panel-body {
+        overflow: hidden;
+      }
+
+      .table-label {
+        font-size: 0.76rem;
+        margin: 0 0 0.2rem;
+        color: var(--text-muted);
       }
 
       .table-card {
         height: 100%;
         border-radius: 0.7rem;
         border: 1px solid var(--border-soft);
-        background: rgba(15, 23, 42, 0.93);
+        background: rgba(15, 23, 42, 0.94);
         overflow: auto;
       }
 
@@ -299,21 +332,23 @@
         border-bottom: 1px solid rgba(148, 163, 184, 0.22);
       }
 
+      .table-card tbody tr:hover {
+        background: rgba(56, 189, 248, 0.08);
+      }
+
       .numeric {
         text-align: right;
       }
 
-      .table-label {
-        font-size: 0.76rem;
-        margin: 0 0 0.2rem;
-        color: var(--text-muted);
+      .tags-panel .panel-body {
+        overflow: hidden;
       }
 
       .tags-panel .table-card {
         max-height: 260px;
       }
 
-      /* Exports section – compact row, still scrolls with page */
+      /* Exports section – compact row, scrolls with page */
       #exports {
         margin-top: 0.4rem;
       }
@@ -327,7 +362,7 @@
       .action-card {
         padding: 0.55rem 0.6rem;
         border-radius: 0.75rem;
-        background: rgba(15, 23, 42, 0.95);
+        background: rgba(15, 23, 42, 0.96);
         border: 1px solid var(--border-soft);
         box-shadow: 0 10px 22px rgba(2, 6, 23, 0.45);
         gap: 0.35rem;
@@ -357,8 +392,15 @@
         font-size: 0.78rem;
       }
 
+      /* Hide footer text – keep page purely dashboard/data */
       .footer {
-        display: none; /* no extra copy, just the data */
+        display: none;
+      }
+
+      /* Accessibility: skip link visibility tweak for sticky header */
+      .skip-link:focus {
+        top: 0.75rem;
+        left: 1.25rem;
       }
 
       /* Responsive adjustments */
@@ -375,30 +417,28 @@
           grid-template-rows: auto auto;
         }
 
-        .side-top {
-          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-        }
-
         .preview-table-wrapper {
           max-height: 480px;
         }
 
-        .page-header {
-          padding-inline: 1rem;
-        }
-
-        .page-main {
+        .page-wrapper {
           padding-inline: 1rem;
         }
       }
 
-      @media (max-width: 800px) {
-        .side-top {
-          grid-template-columns: minmax(0, 1fr);
+      @media (max-width: 900px) {
+        .status-banner {
+          grid-template-columns: 1fr;
+          align-items: flex-start;
+          row-gap: 0.5rem;
         }
 
-        .actions-grid {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
+        .status-meta {
+          justify-content: flex-start;
+        }
+
+        .status-actions {
+          justify-content: flex-start;
         }
 
         .top-nav {
@@ -407,13 +447,26 @@
           gap: 0.4rem;
         }
 
-        .top-nav .nav-links {
+        .nav-links {
           flex-wrap: wrap;
           justify-content: flex-start;
         }
+
+        .side-top {
+          grid-template-columns: minmax(0, 1fr);
+        }
+
+        .actions-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
       }
 
-      @media (max-width: 600px) {
+      @media (max-width: 640px) {
+        .page-header {
+          position: static;
+          backdrop-filter: none;
+        }
+
         .metrics-strip {
           grid-template-columns: minmax(0, 1fr);
         }
@@ -422,8 +475,8 @@
           grid-template-columns: minmax(0, 1fr);
         }
 
-        .page-header {
-          position: static;
+        .preview-table-wrapper {
+          max-height: 420px;
         }
       }
     </style>
@@ -498,7 +551,7 @@
         </section>
 
         <!-- Main dashboard -->
-        <section class="dashboard-main" aria-label="Live data">
+        <section class="dashboard-main" aria-label="Live data view">
           <!-- Left: Live table -->
           <section class="panel data-preview" aria-label="Live indicators">
             <div class="panel-header">
@@ -506,7 +559,7 @@
               <p class="panel-subtitle">Filter and search the latest SwiftIOC feed.</p>
             </div>
             <div
-              class="panel-body preview-panel panel-scroll"
+              class="panel-body preview-panel"
               data-preview-container
               role="region"
               aria-live="polite"
@@ -581,7 +634,7 @@
                 <div class="panel-header">
                   <h2 class="panel-title">Sources</h2>
                 </div>
-                <div class="panel-body panel-scroll">
+                <div class="panel-body">
                   <p class="table-label">Per-source totals</p>
                   <div class="table-card">
                     <table aria-label="Per-source totals">
@@ -605,7 +658,7 @@
                 <div class="panel-header">
                   <h2 class="panel-title">Types</h2>
                 </div>
-                <div class="panel-body panel-scroll">
+                <div class="panel-body">
                   <p class="table-label">Indicator types</p>
                   <div class="table-card">
                     <table aria-label="Indicator types">
@@ -630,7 +683,7 @@
               <div class="panel-header">
                 <h2 class="panel-title">Tags</h2>
               </div>
-              <div class="panel-body panel-scroll">
+              <div class="panel-body">
                 <p class="table-label">Top tags</p>
                 <div class="table-card">
                   <table aria-label="Top tags">
@@ -656,7 +709,7 @@
         <section id="exports" class="panel" aria-label="Exports">
           <div class="panel-header">
             <h2 class="panel-title">Exports</h2>
-            <p class="panel-subtitle">Download the full set.</p>
+            <p class="panel-subtitle">Download the full dataset.</p>
           </div>
           <div class="panel-body">
             <div class="actions-grid">
@@ -681,7 +734,7 @@
               <article class="action-card">
                 <div>
                   <h3>JSON / JSONL</h3>
-                  <p class="action-description">For scripting & pipelines.</p>
+                  <p class="action-description">Ideal for scripts and pipelines.</p>
                 </div>
                 <div class="action-links">
                   <a class="button-link" href="iocs/latest.json">JSON</a>
