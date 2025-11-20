@@ -1,18 +1,30 @@
 (function () {
   'use strict';
 
+  /* ==========================================================================
+   *  CONFIG & CONSTANTS
+   * ========================================================================= */
+
   const IOC_ROOT = document.body?.dataset.iocRoot || '.';
+
   const DEFAULT_PREVIEW_LIMIT = 12;
   const PREVIEW_LOOKAHEAD_MULTIPLIER = 12;
   const PREVIEW_CACHE_LIMIT = Math.max(
     DEFAULT_PREVIEW_LIMIT * PREVIEW_LOOKAHEAD_MULTIPLIER,
     240
   );
+
   const INDICATORS_JSONL_URL = `${IOC_ROOT}/iocs/latest.jsonl`;
   const INDICATORS_JSON_FALLBACK_URL = `${IOC_ROOT}/iocs/latest.json`;
   const PREVIEW_STREAM_URL = INDICATORS_JSONL_URL;
+
   const DATASET_STORAGE_KEY = 'swiftioc-dashboard-cache-v1';
   const DATASET_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+  const UNKNOWN_SOURCE_KEY = '__swiftioc-unknown-source__';
+
+  /* ==========================================================================
+   *  FORMATTERS
+   * ========================================================================= */
 
   const numberFormatter = new Intl.NumberFormat('en-US');
   const formatNumber = (value) => numberFormatter.format(value ?? 0);
@@ -46,6 +58,7 @@
     if (!relativeTimeFormatter || typeof timestamp !== 'number') return null;
     const now = Date.now();
     let delta = Math.round((timestamp - now) / 1000);
+
     for (const division of relativeDivisions) {
       if (Math.abs(delta) < division.amount || division.amount === Infinity) {
         return relativeTimeFormatter.format(delta, division.unit);
@@ -62,6 +75,28 @@
     if (dateTimeFormatter) return dateTimeFormatter.format(date);
     return date.toISOString();
   };
+
+  const formatTimestampForDisplay = (value) => {
+    const parsed = parseTimestamp(value);
+    if (!parsed) {
+      const fallback = normaliseString(value);
+      return fallback || '—';
+    }
+    const absolute = formatAbsoluteTimestamp(parsed.time);
+    if (absolute) return absolute;
+    const parts = isoToParts(parsed.iso);
+    if (parts.date && parts.time) return `${parts.date} ${parts.time}`;
+    if (parts.date) return parts.date;
+    return parsed.iso;
+  };
+
+  /* ==========================================================================
+   *  BASIC HELPERS
+   * ========================================================================= */
+
+  const qs = (selector, root = document) => root.querySelector(selector);
+  const qsa = (selector, root = document) =>
+    Array.from(root.querySelectorAll(selector));
 
   const normaliseString = (value) => (value ?? '').toString().trim();
   const normaliseLower = (value) => normaliseString(value).toLowerCase();
@@ -86,211 +121,6 @@
       result.push(normalised);
     });
     return result;
-  };
-
-  const UNKNOWN_SOURCE_KEY = '__swiftioc-unknown-source__';
-
-  const confidenceRankForValue = (confidence) => {
-    const value = normaliseLower(confidence);
-    if (!value) return 0;
-
-    if (value.includes('very high') || value.includes('critical')) return 4;
-    if (value.includes('high')) return 3;
-    if (value.includes('medium') || value.includes('moderate')) return 2;
-    if (value.includes('low')) return 1;
-
-    const numeric = Number.parseFloat(value);
-    if (Number.isFinite(numeric)) {
-      if (numeric >= 90) return 4;
-      if (numeric >= 80) return 3;
-      if (numeric >= 50) return 2;
-      if (numeric > 0) return 1;
-    }
-    return 0;
-  };
-
-  const confidenceRankForRow = (row) => {
-    if (!row) return 0;
-    if (typeof row.confidenceRank === 'number') return row.confidenceRank;
-    const rank = confidenceRankForValue(
-      row.confidenceLower || row.confidence
-    );
-    row.confidenceRank = rank;
-    return rank;
-  };
-
-  const compareRowStrength = (a, b) => {
-    if (!a && !b) return 0;
-    if (!a) return 1;
-    if (!b) return -1;
-
-    const rankDiff = confidenceRankForRow(b) - confidenceRankForRow(a);
-    if (rankDiff !== 0) return rankDiff;
-
-    const timeDiff = (b.firstSeenTime ?? 0) - (a.firstSeenTime ?? 0);
-    if (timeDiff !== 0) return timeDiff;
-
-    const sourceDiff = normaliseString(a.source).localeCompare(
-      normaliseString(b.source)
-    );
-    if (sourceDiff !== 0) return sourceDiff;
-
-    return normaliseString(a.indicator).localeCompare(
-      normaliseString(b.indicator)
-    );
-  };
-
-  const selectBestPerSource = (rows) => {
-    if (!Array.isArray(rows) || !rows.length) return [];
-    const best = new Map();
-    rows.forEach((row) => {
-      if (!row) return;
-      const key = row.sourceLower || UNKNOWN_SOURCE_KEY;
-      const current = best.get(key);
-      if (!current || compareRowStrength(row, current) < 0) {
-        best.set(key, row);
-      }
-    });
-    return Array.from(best.values()).sort(compareRowStrength);
-  };
-
-  const countDistinctSources = (rows) => {
-    if (!Array.isArray(rows) || !rows.length) return 0;
-    const seen = new Set();
-    rows.forEach((row) => {
-      if (!row) return;
-      const key = row.sourceLower || UNKNOWN_SOURCE_KEY;
-      seen.add(key);
-    });
-    return seen.size;
-  };
-
-  const datasetListeners = new Set();
-  const subscribeToDataset = (listener) => {
-    if (typeof listener !== 'function') {
-      return () => {};
-    }
-    datasetListeners.add(listener);
-    return () => {
-      datasetListeners.delete(listener);
-    };
-  };
-
-  const createDatasetStorage = () => {
-    let storageChecked = false;
-    let storage = null;
-
-    const resolveStorage = () => {
-      if (storageChecked) return storage;
-      storageChecked = true;
-      try {
-        if (typeof window === 'undefined' || !window.sessionStorage) {
-          storage = null;
-          return storage;
-        }
-        const testKey = `${DATASET_STORAGE_KEY}__test`;
-        window.sessionStorage.setItem(testKey, '1');
-        window.sessionStorage.removeItem(testKey);
-        storage = window.sessionStorage;
-      } catch (error) {
-        console.warn(
-          'Session storage unavailable for dataset caching',
-          error
-        );
-        storage = null;
-      }
-      return storage;
-    };
-
-    const read = () => {
-      const target = resolveStorage();
-      if (!target) return null;
-      try {
-        const raw = target.getItem(DATASET_STORAGE_KEY);
-        if (!raw) return null;
-        const parsed = JSON.parse(raw);
-        if (!parsed || typeof parsed !== 'object') {
-          target.removeItem(DATASET_STORAGE_KEY);
-          return null;
-        }
-        if (
-          typeof parsed.timestamp !== 'number' ||
-          typeof parsed.dataset !== 'object' ||
-          !parsed.dataset
-        ) {
-          target.removeItem(DATASET_STORAGE_KEY);
-          return null;
-        }
-        const dataset = parsed.dataset;
-        const age = Date.now() - parsed.timestamp;
-        const stale = age > DATASET_CACHE_TTL;
-        dataset.fetchedAt =
-          typeof dataset.fetchedAt === 'number'
-            ? dataset.fetchedAt
-            : parsed.timestamp;
-        dataset.origin = stale ? 'cache-stale' : 'cache';
-        return dataset;
-      } catch (error) {
-        console.warn('Failed to read cached dataset', error);
-        try {
-          target.removeItem(DATASET_STORAGE_KEY);
-        } catch (cleanupError) {
-          console.warn(
-            'Failed to clear corrupt dataset cache',
-            cleanupError
-          );
-        }
-        return null;
-      }
-    };
-
-    const write = (dataset) => {
-      const target = resolveStorage();
-      if (!target || !dataset) return;
-      try {
-        const datasetToStore = {
-          ...dataset,
-          origin: 'network',
-          fetchedAt:
-            typeof dataset.fetchedAt === 'number'
-              ? dataset.fetchedAt
-              : Date.now(),
-        };
-        const payload = JSON.stringify({
-          timestamp: Date.now(),
-          dataset: datasetToStore,
-        });
-        target.setItem(DATASET_STORAGE_KEY, payload);
-      } catch (error) {
-        console.warn('Failed to persist dataset cache', error);
-      }
-    };
-
-    const clear = () => {
-      const target = resolveStorage();
-      if (!target) return;
-      try {
-        target.removeItem(DATASET_STORAGE_KEY);
-      } catch (error) {
-        console.warn('Failed to clear dataset cache', error);
-      }
-    };
-
-    return { read, write, clear };
-  };
-
-  const datasetStorage = createDatasetStorage();
-
-  const extractTags = (value) => {
-    if (!value) return [];
-    if (Array.isArray(value)) return uniqueStrings(value);
-    if (typeof value === 'string') {
-      return uniqueStrings(value.split(/[,;\|]/));
-    }
-    if (typeof value === 'object') {
-      return uniqueStrings(Object.values(value));
-    }
-    return [];
   };
 
   const safeParseJson = (line) => {
@@ -322,48 +152,173 @@
     };
   };
 
-  const getStatTargets = (name) =>
-    document.querySelectorAll(`[data-stat="${name}"]`);
+  /* ==========================================================================
+   *  CONFIDENCE RANKING
+   * ========================================================================= */
 
-  const setStatText = (name, value) => {
-    const targets = getStatTargets(name);
-    targets.forEach((element) => {
-      element.textContent = value ?? '—';
-    });
+  const confidenceRankForValue = (confidence) => {
+    const value = normaliseLower(confidence);
+    if (!value) return 0;
+
+    if (value.includes('very high') || value.includes('critical')) return 4;
+    if (value.includes('high')) return 3;
+    if (value.includes('medium') || value.includes('moderate')) return 2;
+    if (value.includes('low')) return 1;
+
+    const numeric = Number.parseFloat(value);
+    if (Number.isFinite(numeric)) {
+      if (numeric >= 90) return 4;
+      if (numeric >= 80) return 3;
+      if (numeric >= 50) return 2;
+      if (numeric > 0) return 1;
+    }
+    return 0;
   };
 
-  const getTableTargets = (name) =>
-    Array.from(document.querySelectorAll(`[data-table="${name}"]`));
+  const confidenceRankForRow = (row) => {
+    if (!row) return 0;
+    if (typeof row.confidenceRank === 'number') return row.confidenceRank;
+    const rank = confidenceRankForValue(row.confidenceLower || row.confidence);
+    row.confidenceRank = rank;
+    return rank;
+  };
 
-  const populateTable = (name, rows, emptyMessage) => {
-    getTableTargets(name).forEach((tbody) => {
-      if (!tbody) return;
-      tbody.innerHTML = '';
-      if (!rows.length) {
-        const tr = document.createElement('tr');
-        const td = document.createElement('td');
-        const columnCount =
-          tbody.closest('table')?.querySelectorAll('thead th').length ?? 1;
-        td.setAttribute('colspan', columnCount);
-        td.textContent = emptyMessage;
-        tr.appendChild(td);
-        tbody.appendChild(tr);
-        return;
+  const confidenceClassFor = (confidence) => {
+    const rank = confidenceRankForValue(confidence);
+    if (rank >= 3) return 'confidence-high';
+    if (rank === 2) return 'confidence-medium';
+    if (rank === 1) return 'confidence-low';
+    return null;
+  };
+
+  /* ==========================================================================
+   *  TAGS
+   * ========================================================================= */
+
+  const extractTags = (value) => {
+    if (!value) return [];
+    if (Array.isArray(value)) return uniqueStrings(value);
+    if (typeof value === 'string') return uniqueStrings(value.split(/[,;\|]/));
+    if (typeof value === 'object') return uniqueStrings(Object.values(value));
+    return [];
+  };
+
+  /* ==========================================================================
+   *  DATASET CACHE (sessionStorage)
+   * ========================================================================= */
+
+  const createDatasetStorage = () => {
+    let storageChecked = false;
+    let storage = null;
+
+    const resolveStorage = () => {
+      if (storageChecked) return storage;
+      storageChecked = true;
+
+      try {
+        if (typeof window === 'undefined' || !window.sessionStorage) {
+          storage = null;
+          return storage;
+        }
+        const testKey = `${DATASET_STORAGE_KEY}__test`;
+        window.sessionStorage.setItem(testKey, '1');
+        window.sessionStorage.removeItem(testKey);
+        storage = window.sessionStorage;
+      } catch (error) {
+        console.warn('Session storage unavailable for dataset caching', error);
+        storage = null;
       }
+      return storage;
+    };
 
-      rows.forEach((cells) => {
-        const tr = document.createElement('tr');
-        cells.forEach((cell) => {
-          const td = document.createElement('td');
-          td.dataset.title = cell.title;
-          if (cell.numeric) td.classList.add('numeric');
-          td.textContent = cell.value;
-          tr.appendChild(td);
+    const read = () => {
+      const target = resolveStorage();
+      if (!target) return null;
+
+      try {
+        const raw = target.getItem(DATASET_STORAGE_KEY);
+        if (!raw) return null;
+
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== 'object') {
+          target.removeItem(DATASET_STORAGE_KEY);
+          return null;
+        }
+
+        if (
+          typeof parsed.timestamp !== 'number' ||
+          typeof parsed.dataset !== 'object' ||
+          !parsed.dataset
+        ) {
+          target.removeItem(DATASET_STORAGE_KEY);
+          return null;
+        }
+
+        const dataset = parsed.dataset;
+        const age = Date.now() - parsed.timestamp;
+        const stale = age > DATASET_CACHE_TTL;
+
+        dataset.fetchedAt =
+          typeof dataset.fetchedAt === 'number'
+            ? dataset.fetchedAt
+            : parsed.timestamp;
+        dataset.origin = stale ? 'cache-stale' : 'cache';
+
+        return dataset;
+      } catch (error) {
+        console.warn('Failed to read cached dataset', error);
+        try {
+          target.removeItem(DATASET_STORAGE_KEY);
+        } catch (cleanupError) {
+          console.warn('Failed to clear corrupt dataset cache', cleanupError);
+        }
+        return null;
+      }
+    };
+
+    const write = (dataset) => {
+      const target = resolveStorage();
+      if (!target || !dataset) return;
+
+      try {
+        const datasetToStore = {
+          ...dataset,
+          origin: 'network',
+          fetchedAt:
+            typeof dataset.fetchedAt === 'number'
+              ? dataset.fetchedAt
+              : Date.now(),
+        };
+
+        const payload = JSON.stringify({
+          timestamp: Date.now(),
+          dataset: datasetToStore,
         });
-        tbody.appendChild(tr);
-      });
-    });
+
+        target.setItem(DATASET_STORAGE_KEY, payload);
+      } catch (error) {
+        console.warn('Failed to persist dataset cache', error);
+      }
+    };
+
+    const clear = () => {
+      const target = resolveStorage();
+      if (!target) return;
+      try {
+        target.removeItem(DATASET_STORAGE_KEY);
+      } catch (error) {
+        console.warn('Failed to clear dataset cache', error);
+      }
+    };
+
+    return { read, write, clear };
   };
+
+  const datasetStorage = createDatasetStorage();
+
+  /* ==========================================================================
+   *  STATS ACCUMULATION
+   * ========================================================================= */
 
   const createStatsAccumulator = () => {
     const bySource = new Map();
@@ -371,12 +326,11 @@
     const tags = new Map();
     const indicatorCounts = new Map();
     const indicatorSources = new Map();
+
     let earliestFirstSeen = null;
     let newestFirstSeen = null;
     let latestObservation = null;
     let total = 0;
-
-    const normalise = normaliseString;
 
     const registerTags = (row) => {
       const combinedTags = uniqueStrings([
@@ -386,6 +340,7 @@
         ...extractTags(row?.classifications),
         ...extractTags(row?.malware_family),
       ]);
+
       combinedTags.forEach((tag) => {
         tags.set(tag, (tags.get(tag) || 0) + 1);
       });
@@ -397,9 +352,9 @@
 
         total += 1;
 
-        const source = normalise(row.source);
-        const type = normalise(row.type);
-        const indicator = normalise(row.indicator);
+        const source = normaliseString(row.source);
+        const type = normaliseString(row.type);
+        const indicator = normaliseString(row.indicator);
 
         if (source) {
           bySource.set(source, (bySource.get(source) || 0) + 1);
@@ -407,6 +362,7 @@
         if (type) {
           byType.set(type, (byType.get(type) || 0) + 1);
         }
+
         if (indicator) {
           indicatorCounts.set(
             indicator,
@@ -434,6 +390,7 @@
             latestObservation = firstSeen;
           }
         }
+
         if (lastSeen) {
           if (!latestObservation || lastSeen.time > latestObservation.time) {
             latestObservation = lastSeen;
@@ -442,6 +399,7 @@
 
         registerTags(row);
       },
+
       finalize() {
         const sortedSources = Array.from(bySource.entries()).sort(
           (a, b) => b[1] - a[1]
@@ -456,6 +414,7 @@
         const earliestParts = earliestFirstSeen
           ? isoToParts(earliestFirstSeen.iso)
           : { date: null, time: null };
+
         const newestParts = newestFirstSeen
           ? isoToParts(newestFirstSeen.iso)
           : { date: null, time: null };
@@ -501,18 +460,103 @@
     return acc.finalize();
   };
 
-  const formatTimestampForDisplay = (value) => {
-    const parsed = parseTimestamp(value);
-    if (!parsed) {
-      const fallback = normaliseString(value);
-      return fallback || '—';
-    }
-    const absolute = formatAbsoluteTimestamp(parsed.time);
-    if (absolute) return absolute;
-    const parts = isoToParts(parsed.iso);
-    if (parts.date && parts.time) return `${parts.date} ${parts.time}`;
-    if (parts.date) return parts.date;
-    return parsed.iso;
+  /* ==========================================================================
+   *  TABLE + STAT DOM HELPERS
+   * ========================================================================= */
+
+  const getStatTargets = (name) =>
+    qsa(`[data-stat="${name}"]`, document);
+
+  const setStatText = (name, value) => {
+    getStatTargets(name).forEach((el) => {
+      el.textContent = value ?? '—';
+    });
+  };
+
+  const getTableTargets = (name) =>
+    qsa(`[data-table="${name}"]`, document);
+
+  const populateTable = (name, rows, emptyMessage) => {
+    getTableTargets(name).forEach((tbody) => {
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (!rows.length) {
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        const columnCount =
+          tbody.closest('table')?.querySelectorAll('thead th').length ?? 1;
+        td.setAttribute('colspan', columnCount);
+        td.textContent = emptyMessage;
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+        return;
+      }
+
+      rows.forEach((cells) => {
+        const tr = document.createElement('tr');
+        cells.forEach((cell) => {
+          const td = document.createElement('td');
+          td.dataset.title = cell.title;
+          if (cell.numeric) td.classList.add('numeric');
+          td.textContent = cell.value;
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+    });
+  };
+
+  /* ==========================================================================
+   *  PREVIEW ROWS + SELECTION
+   * ========================================================================= */
+
+  const compareRowStrength = (a, b) => {
+    if (!a && !b) return 0;
+    if (!a) return 1;
+    if (!b) return -1;
+
+    const rankDiff = confidenceRankForRow(b) - confidenceRankForRow(a);
+    if (rankDiff !== 0) return rankDiff;
+
+    const timeDiff = (b.firstSeenTime ?? 0) - (a.firstSeenTime ?? 0);
+    if (timeDiff !== 0) return timeDiff;
+
+    const sourceDiff = normaliseString(a.source).localeCompare(
+      normaliseString(b.source)
+    );
+    if (sourceDiff !== 0) return sourceDiff;
+
+    return normaliseString(a.indicator).localeCompare(
+      normaliseString(b.indicator)
+    );
+  };
+
+  const selectBestPerSource = (rows) => {
+    if (!Array.isArray(rows) || !rows.length) return [];
+
+    const best = new Map();
+    rows.forEach((row) => {
+      if (!row) return;
+      const key = row.sourceLower || UNKNOWN_SOURCE_KEY;
+      const current = best.get(key);
+      if (!current || compareRowStrength(row, current) < 0) {
+        best.set(key, row);
+      }
+    });
+
+    return Array.from(best.values()).sort(compareRowStrength);
+  };
+
+  const countDistinctSources = (rows) => {
+    if (!Array.isArray(rows) || !rows.length) return 0;
+    const seen = new Set();
+    rows.forEach((row) => {
+      if (!row) return;
+      const key = row.sourceLower || UNKNOWN_SOURCE_KEY;
+      seen.add(key);
+    });
+    return seen.size;
   };
 
   const selectDiverseRows = (rows, limit) => {
@@ -534,18 +578,21 @@
         const newTags = row.tagsLower.filter(
           (tag) => !usedTags.has(tag)
         ).length;
+
         if (bestIndex === -1) {
           bestIndex = index;
           bestRow = row;
           bestNewTags = newTags;
           return;
         }
+
         if (newTags > bestNewTags) {
           bestIndex = index;
           bestRow = row;
           bestNewTags = newTags;
           return;
         }
+
         if (
           newTags === bestNewTags &&
           compareRowStrength(row, bestRow) < 0
@@ -559,6 +606,7 @@
 
       const [chosen] = remaining.splice(bestIndex, 1);
       if (!chosen) break;
+
       selected.push(chosen);
       chosen.tagsLower.forEach((tag) => usedTags.add(tag));
     }
@@ -648,7 +696,6 @@
       row.seen
     );
     const firstSeenParsed = parseTimestamp(firstSeenRaw);
-
     const firstSeenDisplay = formatTimestampForDisplay(
       firstSeenParsed?.iso ?? firstSeenRaw
     );
@@ -681,13 +728,9 @@
     };
   };
 
-  const confidenceClassFor = (confidence) => {
-    const rank = confidenceRankForValue(confidence);
-    if (rank >= 4 || rank === 3) return 'confidence-high';
-    if (rank === 2) return 'confidence-medium';
-    if (rank === 1) return 'confidence-low';
-    return null;
-  };
+  /* ==========================================================================
+   *  STREAM JSONL
+   * ========================================================================= */
 
   const streamJsonLines = async (url, { limit = Infinity, onRow } = {}) => {
     const response = await fetch(url, { cache: 'no-store' });
@@ -709,7 +752,7 @@
       return processed >= limit;
     };
 
-    // Fallback for older browsers / environments
+    // Fallback for environments without streaming
     if (!response.body || !response.body.getReader) {
       const text = await response.text();
       const lines = text.split(/\r?\n/);
@@ -727,9 +770,11 @@
       while (true) {
         const { value, done } = await reader.read();
         if (done) break;
+
         buffer += decoder.decode(value, { stream: true });
         const parts = buffer.split(/\r?\n/);
         buffer = parts.pop() ?? '';
+
         for (const part of parts) {
           if (processLine(part)) {
             await reader.cancel().catch(() => {});
@@ -749,39 +794,22 @@
     return processed;
   };
 
+  /* ==========================================================================
+   *  DATASET FETCH + NOTIFICATION
+   * ========================================================================= */
+
+  const datasetListeners = new Set();
+  const subscribeToDataset = (listener) => {
+    if (typeof listener !== 'function') return () => {};
+    datasetListeners.add(listener);
+    return () => datasetListeners.delete(listener);
+  };
+
   const isCacheOrigin = (origin) =>
     origin === 'cache' || origin === 'cache-stale';
 
-  const computeDatasetKey = (dataset) => {
-    if (!dataset || typeof dataset !== 'object') return null;
-    if (typeof dataset.fetchedAt === 'number') {
-      return `fetched:${dataset.fetchedAt}`;
-    }
-    if (dataset.stats?.generatedAt) {
-      return `generated:${dataset.stats.generatedAt}`;
-    }
-    if (dataset.stats?.collectionWindow) {
-      return `window:${dataset.stats.collectionWindow}`;
-    }
-    if (dataset.previewEntries?.length) {
-      const first = dataset.previewEntries[0];
-      return `preview:${first.indicatorLower ?? first.indicator}`;
-    }
-    return null;
-  };
-
-  let lastNotificationKey = null;
-
-  const datasetCache = {
-    promise: null,
-    refreshing: null,
-  };
-
   const notifyDatasetListeners = (dataset) => {
     if (!dataset || isCacheOrigin(dataset.origin)) return;
-    const key = computeDatasetKey(dataset) ?? '__swiftioc-null-key__';
-    if (key === lastNotificationKey) return;
-    lastNotificationKey = key;
     datasetListeners.forEach((listener) => {
       try {
         listener(dataset);
@@ -791,9 +819,13 @@
     });
   };
 
+  const datasetCache = {
+    promise: null,
+    refreshing: null,
+  };
+
   const wrapDatasetPromise = (promise) => {
-    let wrapped;
-    wrapped = promise
+    const wrapped = promise
       .then((dataset) => {
         notifyDatasetListeners(dataset);
         return dataset;
@@ -804,6 +836,7 @@
         }
         throw error;
       });
+
     datasetCache.promise = wrapped;
     return wrapped;
   };
@@ -815,11 +848,14 @@
     if (!response.ok) {
       throw new Error(`Failed to fetch preview fallback (${response.status})`);
     }
+
     const indicators = await response.json();
     const iterable = Array.isArray(indicators) ? indicators : [];
     const stats = computeStatsFromIterable(iterable);
+
     const previewEntries = [];
     const seen = new Set();
+
     for (const row of iterable) {
       if (previewEntries.length >= PREVIEW_CACHE_LIMIT) break;
       const entry = preparePreviewRow(row);
@@ -828,6 +864,7 @@
       seen.add(entry.indicatorLower);
       previewEntries.push(entry);
     }
+
     return { stats, previewEntries, source: 'json' };
   };
 
@@ -839,6 +876,7 @@
     await streamJsonLines(PREVIEW_STREAM_URL, {
       onRow: (row) => {
         accumulator.ingest(row);
+
         if (previewEntries.length < PREVIEW_CACHE_LIMIT) {
           const entry = preparePreviewRow(row);
           if (entry && !seen.has(entry.indicatorLower)) {
@@ -846,6 +884,7 @@
             previewEntries.push(entry);
           }
         }
+
         return false;
       },
     });
@@ -879,10 +918,7 @@
       datasetStorage.write(enriched);
       return enriched;
     } catch (streamError) {
-      console.warn(
-        'Streaming dataset failed, falling back to JSON',
-        streamError
-      );
+      console.warn('Streaming dataset failed, falling back to JSON', streamError);
       const dataset = await fetchDatasetFromJson();
       const enriched = { ...dataset, origin: 'network', fetchedAt };
       datasetStorage.write(enriched);
@@ -902,19 +938,16 @@
         const cached = datasetStorage.read();
         if (cached) {
           const resolved = wrapDatasetPromise(Promise.resolve(cached));
+
+          // Background refresh
           if (!datasetCache.refreshing) {
             const refresh = fetchFreshDataset()
               .then((dataset) => {
-                if (dataset) {
-                  wrapDatasetPromise(Promise.resolve(dataset));
-                }
+                if (dataset) wrapDatasetPromise(Promise.resolve(dataset));
                 return dataset;
               })
               .catch((error) => {
-                console.warn(
-                  'Background dataset refresh failed',
-                  error
-                );
+                console.warn('Background dataset refresh failed', error);
                 return null;
               })
               .finally(() => {
@@ -922,8 +955,10 @@
                   datasetCache.refreshing = null;
                 }
               });
+
             datasetCache.refreshing = refresh;
           }
+
           return resolved;
         }
       }
@@ -942,27 +977,30 @@
     forceRefresh = false,
   } = {}) => {
     const dataset = await resolveDataset({ forceRefresh });
+
     const desired = Math.max(Number(previewLimit) || DEFAULT_PREVIEW_LIMIT, 1);
     const previewSource = Array.isArray(dataset.previewEntries)
       ? dataset.previewEntries
       : [];
     const previewRows = selectDiverseRows(previewSource, desired);
-    return {
-      dataset,
-      previewRows,
-    };
+
+    return { dataset, previewRows };
   };
 
+  /* ==========================================================================
+   *  STATUS BANNER
+   * ========================================================================= */
+
   const initialiseStatusBanner = () => {
-    const root = document.querySelector('[data-site-status-root]');
+    const root = qs('[data-site-status-root]');
     if (!root) return;
 
-    const statusLabel = root.querySelector('[data-site-status-label]');
-    const originEl = root.querySelector('[data-site-origin]');
-    const windowEl = root.querySelector('[data-site-window]');
-    const generatedEl = root.querySelector('[data-site-generated]');
-    const updatedEl = root.querySelector('[data-site-updated]');
-    const refreshButton = root.querySelector('[data-site-refresh]');
+    const statusLabel = qs('[data-site-status-label]', root);
+    const originEl = qs('[data-site-origin]', root);
+    const windowEl = qs('[data-site-window]', root);
+    const generatedEl = qs('[data-site-generated]', root);
+    const updatedEl = qs('[data-site-updated]', root);
+    const refreshButton = qs('[data-site-refresh]', root);
 
     const setState = (dataset) => {
       const stats = dataset?.stats || {};
@@ -992,9 +1030,7 @@
       }
 
       if (generatedEl) {
-        generatedEl.textContent = formatTimestampForDisplay(
-          stats.generatedAt
-        );
+        generatedEl.textContent = formatTimestampForDisplay(stats.generatedAt);
       }
 
       if (updatedEl) {
@@ -1026,6 +1062,7 @@
       refreshButton.addEventListener('click', () => {
         root.dataset.state = 'refreshing';
         if (statusLabel) statusLabel.textContent = 'Refreshing data…';
+
         loadDataset({ forceRefresh: true })
           .then(({ dataset }) => setState(dataset))
           .catch(handleError);
@@ -1041,6 +1078,10 @@
       setState(dataset);
     });
   };
+
+  /* ==========================================================================
+   *  STATS PANEL
+   * ========================================================================= */
 
   const applyStats = (stats) => {
     if (!stats) return;
@@ -1058,10 +1099,7 @@
         : '—';
     setStatText('feeds-online', feedsText);
 
-    setStatText(
-      'collection-window',
-      stats.collectionWindow ?? '—'
-    );
+    setStatText('collection-window', stats.collectionWindow ?? '—');
     setStatText(
       'generated-at',
       formatTimestampForDisplay(stats.generatedAt)
@@ -1090,39 +1128,19 @@
 
     const sourceRows = stats.bySource.map(([source, count]) => [
       { title: 'Source', value: source },
-      {
-        title: 'Indicators',
-        value: formatNumber(count),
-        numeric: true,
-      },
+      { title: 'Indicators', value: formatNumber(count), numeric: true },
     ]);
-    populateTable(
-      'sources',
-      sourceRows,
-      'No source data available.'
-    );
+    populateTable('sources', sourceRows, 'No source data available.');
 
     const typeRows = stats.byType.map(([type, count]) => [
       { title: 'Type', value: type },
-      {
-        title: 'Indicators',
-        value: formatNumber(count),
-        numeric: true,
-      },
+      { title: 'Indicators', value: formatNumber(count), numeric: true },
     ]);
-    populateTable(
-      'types',
-      typeRows,
-      'No indicator type data available.'
-    );
+    populateTable('types', typeRows, 'No indicator type data available.');
 
     const tagRows = stats.topTags.map(([tag, count]) => [
       { title: 'Tag', value: tag },
-      {
-        title: 'Indicators',
-        value: formatNumber(count),
-        numeric: true,
-      },
+      { title: 'Indicators', value: formatNumber(count), numeric: true },
     ]);
     populateTable('tags', tagRows, 'No tags available yet.');
   };
@@ -1156,61 +1174,47 @@
     applyStats(dataset.stats);
   });
 
+  /* ==========================================================================
+   *  PREVIEW PANEL
+   * ========================================================================= */
+
   const initialisePreview = () => {
-    const container = document.querySelector('[data-preview-container]');
+    const container = qs('[data-preview-container]');
     if (!container) return;
 
-    const table = container.querySelector('[data-preview-table]');
-    const tbody = container.querySelector('[data-preview-body]');
-    const statusEl = container.querySelector('[data-preview-status]');
-    const filterSelect =
-      container.querySelector('[data-preview-filter]');
-    const tagFilterSelect = container.querySelector(
-      '[data-preview-tag-filter]'
+    const table = qs('[data-preview-table]', container);
+    const tbody = qs('[data-preview-body]', container);
+    const statusEl = qs('[data-preview-status]', container);
+
+    const filterSelect = qs('[data-preview-filter]', container);
+    const tagFilterSelect = qs('[data-preview-tag-filter]', container);
+    const limitSelect = qs('[data-preview-limit]', container);
+    const searchInput = qs('[data-preview-search]', container);
+    const refreshButton = qs('[data-preview-refresh]', container);
+
+    const summaryRoot = qs('[data-preview-summary]', container);
+    const summaryVisibleEl = qs('[data-preview-visible]', container);
+    const summaryTotalEl = qs('[data-preview-total]', container);
+    const summaryHighEl = qs('[data-preview-high]', container);
+    const summaryHighPercentEl = qs(
+      '[data-preview-high-percent]',
+      container
     );
-    const limitSelect =
-      container.querySelector('[data-preview-limit]');
-    const searchInput =
-      container.querySelector('[data-preview-search]');
-    const refreshButton = container.querySelector(
-      '[data-preview-refresh]'
+    const summaryTopTagEl = qs('[data-preview-top-tag]', container);
+    const summaryTopTagCountEl = qs(
+      '[data-preview-top-tag-count]',
+      container
     );
-    const summaryRoot = container.querySelector(
-      '[data-preview-summary]'
+    const summaryNewestEl = qs('[data-preview-newest]', container);
+    const summaryNewestRelativeEl = qs(
+      '[data-preview-newest-relative]',
+      container
     );
-    const summaryVisibleEl = container.querySelector(
-      '[data-preview-visible]'
-    );
-    const summaryTotalEl = container.querySelector(
-      '[data-preview-total]'
-    );
-    const summaryHighEl =
-      container.querySelector('[data-preview-high]');
-    const summaryHighPercentEl = container.querySelector(
-      '[data-preview-high-percent]'
-    );
-    const summaryTopTagEl = container.querySelector(
-      '[data-preview-top-tag]'
-    );
-    const summaryTopTagCountEl = container.querySelector(
-      '[data-preview-top-tag-count]'
-    );
-    const summaryNewestEl = container.querySelector(
-      '[data-preview-newest]'
-    );
-    const summaryNewestRelativeEl = container.querySelector(
-      '[data-preview-newest-relative]'
-    );
-    const metaRoot =
-      container.querySelector('[data-preview-meta]');
-    const metaOriginEl =
-      container.querySelector('[data-preview-origin]');
-    const metaRefreshedEl = container.querySelector(
-      '[data-preview-refreshed]'
-    );
-    const metaRelativeEl = container.querySelector(
-      '[data-preview-relative]'
-    );
+
+    const metaRoot = qs('[data-preview-meta]', container);
+    const metaOriginEl = qs('[data-preview-origin]', container);
+    const metaRefreshedEl = qs('[data-preview-refreshed]', container);
+    const metaRelativeEl = qs('[data-preview-relative]', container);
 
     const state = {
       rows: [],
@@ -1253,10 +1257,10 @@
 
     const augmentStatusMessage = (message) => {
       if (state.origin === 'cache-stale') {
-        return `${message} Cached snapshot${describeCacheAge()} is older than our refresh window—fetching fresh data…`;
+        return `${message} Cached snapshot${describeCacheAge()} is older than the refresh window—fetching fresh data…`;
       }
       if (state.origin === 'cache') {
-        return `${message} Cached snapshot${describeCacheAge()}—refreshing data in the background…`;
+        return `${message} Cached snapshot${describeCacheAge()}—refreshing in the background…`;
       }
       return message;
     };
@@ -1264,15 +1268,13 @@
     const updateMeta = () => {
       if (!metaRoot) return;
       const showMeta =
-        state.rows.length > 0 ||
-        typeof state.fetchedAt === 'number';
+        state.rows.length > 0 || typeof state.fetchedAt === 'number';
       metaRoot.hidden = !showMeta;
 
       if (metaOriginEl) {
         let originLabel = 'Live data';
         if (state.origin === 'cache') originLabel = 'Cached snapshot';
-        else if (state.origin === 'cache-stale')
-          originLabel = 'Stale snapshot';
+        else if (state.origin === 'cache-stale') originLabel = 'Stale snapshot';
         metaOriginEl.textContent = originLabel;
         metaOriginEl.dataset.state = state.origin;
       }
@@ -1282,7 +1284,6 @@
           const absolute = formatAbsoluteTimestamp(state.fetchedAt);
           metaRefreshedEl.textContent = absolute || '—';
           const iso = new Date(state.fetchedAt).toISOString();
-          // set attribute instead of property for robustness
           metaRefreshedEl.setAttribute('data-datetime', iso);
         } else {
           metaRefreshedEl.textContent = '—';
@@ -1302,16 +1303,19 @@
 
     const updateSummary = (visibleRows) => {
       if (!summaryRoot) return;
+
       const totalRows = state.rows.length;
       const datasetSources = state.stats?.activeSources;
       const previewPool = state.previewPool ?? totalRows;
       const showSummary = totalRows > 0;
+
       summaryRoot.hidden = !showSummary;
       if (!showSummary) return;
 
       const visibleCount = Array.isArray(visibleRows)
         ? visibleRows.length
         : 0;
+
       if (summaryVisibleEl) {
         summaryVisibleEl.textContent = formatNumber(visibleCount);
       }
@@ -1324,6 +1328,7 @@
       const highCount = (visibleRows || []).reduce((acc, row) => {
         return confidenceRankForRow(row) >= 3 ? acc + 1 : acc;
       }, 0);
+
       if (summaryHighEl) {
         summaryHighEl.textContent = formatNumber(highCount);
       }
@@ -1363,6 +1368,7 @@
           ? topTagEntry.label
           : 'No tags across highlighted sources';
       }
+
       if (summaryTopTagCountEl) {
         summaryTopTagCountEl.textContent = topTagEntry
           ? `${formatNumber(
@@ -1386,30 +1392,25 @@
       });
 
       if (summaryNewestEl) {
-        summaryNewestEl.textContent =
-          newestRow?.firstSeen ?? '—';
+        summaryNewestEl.textContent = newestRow?.firstSeen ?? '—';
       }
       if (summaryNewestRelativeEl) {
         summaryNewestRelativeEl.textContent = newestRow?.firstSeenTime
-          ? formatRelativeTimeFromNow(
-              newestRow.firstSeenTime
-            ) || ''
+          ? formatRelativeTimeFromNow(newestRow.firstSeenTime) || ''
           : '';
       }
     };
 
     const copyToClipboard = async (text) => {
       if (!text) return false;
+
       try {
         if (navigator.clipboard?.writeText) {
           await navigator.clipboard.writeText(text);
           return true;
         }
       } catch (error) {
-        console.warn(
-          'Clipboard API failed, falling back to execCommand',
-          error
-        );
+        console.warn('Clipboard API failed, falling back to execCommand', error);
       }
 
       let textarea;
@@ -1438,6 +1439,7 @@
       tbody.innerHTML = '';
 
       const fragment = document.createDocumentFragment();
+
       rows.forEach((row) => {
         const tr = document.createElement('tr');
 
@@ -1483,10 +1485,7 @@
             const success = await copyToClipboard(row.indicator);
             setButtonState(success ? 'copied' : 'error');
           } catch (error) {
-            console.error(
-              'Failed to copy indicator to clipboard',
-              error
-            );
+            console.error('Failed to copy indicator to clipboard', error);
             setButtonState('error');
           }
           setTimeout(() => {
@@ -1517,13 +1516,12 @@
           'confidence-cell'
         );
         const confidenceClass = confidenceClassFor(row.confidence);
-        if (confidenceClass) {
-          confidenceCell.classList.add(confidenceClass);
-        }
+        if (confidenceClass) confidenceCell.classList.add(confidenceClass);
         tr.appendChild(confidenceCell);
 
         const tagsCell = document.createElement('td');
         tagsCell.dataset.title = 'Tags';
+
         if (row.tags.length) {
           const tagList = document.createElement('div');
           tagList.className = 'tag-list';
@@ -1537,8 +1535,8 @@
         } else {
           tagsCell.textContent = '—';
         }
-        tr.appendChild(tagsCell);
 
+        tr.appendChild(tagsCell);
         fragment.appendChild(tr);
       });
 
@@ -1557,6 +1555,7 @@
       if (!rows.length) {
         if (tbody) tbody.innerHTML = '';
         if (table) table.hidden = true;
+
         setStatus(
           augmentStatusMessage(
             'No source highlights available right now. Check back shortly.'
@@ -1570,44 +1569,37 @@
 
       const searchTerm = state.search.trim().toLowerCase();
       const filtered = rows.filter((row) => {
-        if (state.filter !== 'all' && row.typeKey !== state.filter) {
-          return false;
-        }
+        if (state.filter !== 'all' && row.typeKey !== state.filter) return false;
         if (
           state.tagFilter !== 'all' &&
           !row.tagsLower.includes(state.tagFilter)
         ) {
           return false;
         }
-        if (searchTerm && !row.searchBlob.includes(searchTerm)) {
-          return false;
-        }
+        if (searchTerm && !row.searchBlob.includes(searchTerm)) return false;
         return true;
       });
 
       if (!filtered.length) {
         if (tbody) tbody.innerHTML = '';
         if (table) table.hidden = true;
+
         const summaryParts = [];
         if (state.filter !== 'all')
           summaryParts.push(
-            `type: ${buildSummaryLabel(
-              filterSelect,
-              state.filter
-            )}`
+            `type: ${buildSummaryLabel(filterSelect, state.filter)}`
           );
         if (state.tagFilter !== 'all')
           summaryParts.push(
-            `tag: ${buildSummaryLabel(
-              tagFilterSelect,
-              state.tagFilter
-            )}`
+            `tag: ${buildSummaryLabel(tagFilterSelect, state.tagFilter)}`
           );
         if (searchTerm)
           summaryParts.push(`search: “${state.search.trim()}”`);
+
         const qualifier = summaryParts.length
           ? ` for ${summaryParts.join(', ')}`
           : '';
+
         setStatus(
           augmentStatusMessage(
             `No source highlights match the current filters${qualifier}. Adjust filters or refresh the feed.`
@@ -1625,26 +1617,23 @@
       if (table) table.hidden = false;
       updateSummary(limited);
       updateMeta();
+
       const summaryParts = [];
       if (state.filter !== 'all')
         summaryParts.push(
-          `type: ${buildSummaryLabel(
-            filterSelect,
-            state.filter
-          )}`
+          `type: ${buildSummaryLabel(filterSelect, state.filter)}`
         );
       if (state.tagFilter !== 'all')
         summaryParts.push(
-          `tag: ${buildSummaryLabel(
-            tagFilterSelect,
-            state.tagFilter
-          )}`
+          `tag: ${buildSummaryLabel(tagFilterSelect, state.tagFilter)}`
         );
       if (searchTerm)
         summaryParts.push(`search: “${state.search.trim()}”`);
+
       const qualifier = summaryParts.length
         ? ` (${summaryParts.join(', ')})`
         : '';
+
       setStatus(
         augmentStatusMessage(
           `Showing ${limited.length} of ${filtered.length} matching source highlights${qualifier}.`
@@ -1667,6 +1656,7 @@
       if (filterSelect) {
         const previous = state.filter;
         const counts = new Map();
+
         rows.forEach((row) => {
           const key = row.typeKey || 'unknown';
           if (!counts.has(key)) {
@@ -1679,12 +1669,8 @@
         });
 
         filterSelect.innerHTML = '';
-        addOption(
-          filterSelect,
-          'all',
-          'All types',
-          rows.length
-        );
+        addOption(filterSelect, 'all', 'All types', rows.length);
+
         Array.from(counts.entries())
           .sort((a, b) => {
             if (b[1].count !== a[1].count) {
@@ -1693,12 +1679,7 @@
             return a[1].label.localeCompare(b[1].label);
           })
           .forEach(([value, data]) => {
-            addOption(
-              filterSelect,
-              value,
-              data.label,
-              data.count
-            );
+            addOption(filterSelect, value, data.label, data.count);
           });
 
         const availableValues = new Set(
@@ -1714,6 +1695,7 @@
       if (tagFilterSelect) {
         const previousTag = state.tagFilter;
         const tagCounts = new Map();
+
         rows.forEach((row) => {
           row.tags.forEach((tag, index) => {
             const key = row.tagsLower[index];
@@ -1726,12 +1708,8 @@
 
         const uniqueTagCount = tagCounts.size;
         tagFilterSelect.innerHTML = '';
-        addOption(
-          tagFilterSelect,
-          'all',
-          'All tags',
-          uniqueTagCount
-        );
+        addOption(tagFilterSelect, 'all', 'All tags', uniqueTagCount);
+
         Array.from(tagCounts.entries())
           .sort((a, b) => {
             if (b[1].count !== a[1].count) {
@@ -1740,12 +1718,7 @@
             return a[1].label.localeCompare(b[1].label);
           })
           .forEach(([value, data]) => {
-            addOption(
-              tagFilterSelect,
-              value,
-              data.label,
-              data.count
-            );
+            addOption(tagFilterSelect, value, data.label, data.count);
           });
 
         const availableTags = new Set(
@@ -1766,6 +1739,14 @@
       }
     };
 
+    const toggleControls = (disabled) => {
+      [filterSelect, tagFilterSelect, limitSelect, searchInput, refreshButton]
+        .filter(Boolean)
+        .forEach((control) => {
+          control.disabled = disabled;
+        });
+    };
+
     const loadPreview = async ({
       silent = false,
       forceRefresh = false,
@@ -1775,29 +1756,19 @@
       setBusy(true);
       table.hidden = true;
       tbody.innerHTML = '';
+
       setStatus(
-        silent
-          ? 'Refreshing source highlights…'
-          : 'Loading source highlights…',
+        silent ? 'Refreshing source highlights…' : 'Loading source highlights…',
         'loading'
       );
-
-      const controls = [
-        filterSelect,
-        tagFilterSelect,
-        limitSelect,
-        searchInput,
-        refreshButton,
-      ];
-      controls.forEach((control) => {
-        if (control) control.disabled = true;
-      });
+      toggleControls(true);
 
       try {
         const { dataset, previewRows } = await loadDataset({
           previewLimit: state.limit,
           forceRefresh,
         });
+
         state.rows = previewRows;
         state.origin = dataset.origin || 'network';
         state.fetchedAt =
@@ -1805,15 +1776,15 @@
             ? dataset.fetchedAt
             : null;
         state.stats = dataset.stats || state.stats;
-        const sourcePool = countDistinctSources(
-          dataset.previewEntries || []
-        );
+
+        const sourcePool = countDistinctSources(dataset.previewEntries || []);
         const fallbackPool = countDistinctSources(previewRows);
-        state.previewPool =
-          sourcePool > 0 ? sourcePool : fallbackPool;
+        state.previewPool = sourcePool > 0 ? sourcePool : fallbackPool;
+
         updateMeta();
         populateFilterOptions(previewRows);
         applyFilter();
+
         if (forceRefresh || !isCacheOrigin(dataset.origin)) {
           applyStats(dataset.stats);
         }
@@ -1832,28 +1803,31 @@
         updateSummary([]);
         if (metaRoot) metaRoot.hidden = true;
       } finally {
-        controls.forEach((control) => {
-          if (!control) return;
-          if (control === filterSelect) {
-            control.disabled = state.rows.length === 0;
-          } else if (control === tagFilterSelect) {
-            control.disabled =
-              state.rows.length === 0 ||
-              !tagFilterSelect.options ||
-              tagFilterSelect.options.length <= 1;
-          } else if (control === searchInput) {
-            control.disabled = state.rows.length === 0;
-            if (!control.disabled) {
-              control.value = state.search;
-            }
-          } else {
-            control.disabled = false;
+        // re-enable with specific logic
+        if (filterSelect) filterSelect.disabled = state.rows.length === 0;
+
+        if (tagFilterSelect) {
+          tagFilterSelect.disabled =
+            state.rows.length === 0 ||
+            !tagFilterSelect.options ||
+            tagFilterSelect.options.length <= 1;
+        }
+
+        if (searchInput) {
+          searchInput.disabled = state.rows.length === 0;
+          if (!searchInput.disabled) {
+            searchInput.value = state.search;
           }
-        });
+        }
+
+        if (limitSelect) limitSelect.disabled = false;
+        if (refreshButton) refreshButton.disabled = false;
+
         setBusy(false);
       }
     };
 
+    // Event wiring
     if (filterSelect) {
       filterSelect.addEventListener('change', (event) => {
         state.filter = event.target.value;
@@ -1909,10 +1883,12 @@
     subscribeToDataset((dataset) => {
       if (!dataset || !table || !tbody) return;
       if (isCacheOrigin(dataset.origin)) return;
+
       const previewRows = selectDiverseRows(
         dataset.previewEntries || [],
         state.limit
       );
+
       state.rows = previewRows;
       state.origin = dataset.origin || 'network';
       state.fetchedAt =
@@ -1920,12 +1896,11 @@
           ? dataset.fetchedAt
           : null;
       state.stats = dataset.stats || state.stats;
-      const sourcePool = countDistinctSources(
-        dataset.previewEntries || []
-      );
+
+      const sourcePool = countDistinctSources(dataset.previewEntries || []);
       const fallbackPool = countDistinctSources(previewRows);
-      state.previewPool =
-        sourcePool > 0 ? sourcePool : fallbackPool;
+      state.previewPool = sourcePool > 0 ? sourcePool : fallbackPool;
+
       updateMeta();
       populateFilterOptions(previewRows);
       applyFilter();
@@ -1937,9 +1912,13 @@
       });
     }
 
-    // For single-screen dashboard, just load immediately
+    // Single-screen dashboard: load immediately
     loadPreview();
   };
+
+  /* ==========================================================================
+   *  BOOTSTRAP
+   * ========================================================================= */
 
   initialiseStatusBanner();
   loadStats();
