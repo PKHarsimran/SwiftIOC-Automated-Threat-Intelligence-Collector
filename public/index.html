@@ -22,6 +22,12 @@
 
     <!-- Layout overrides: compact, scrollable, single-page dashboard -->
     <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
       html,
       body {
         height: auto;
@@ -65,6 +71,9 @@
         background: rgba(6, 11, 26, 0.88);
         box-shadow: 0 12px 28px rgba(2, 6, 23, 0.6);
         gap: 0.8rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
       }
 
       .brand-mark {
@@ -76,8 +85,10 @@
       }
 
       .nav-links {
+        display: flex;
         gap: 0.45rem;
         font-size: 0.8rem;
+        flex-wrap: wrap;
       }
 
       .nav-links a {
@@ -89,7 +100,10 @@
         padding: 0.6rem 0.85rem;
         border-radius: 0.9rem;
         box-shadow: 0 12px 24px rgba(2, 6, 23, 0.55);
+        display: grid;
         grid-template-columns: minmax(0, 1.7fr) minmax(0, 1.1fr) auto;
+        align-items: center;
+        gap: 0.5rem;
       }
 
       .status-title {
@@ -102,6 +116,25 @@
 
       .status-meta {
         font-size: 0.8rem;
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.85rem;
+        flex-wrap: wrap;
+      }
+
+      .status-meta-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+      }
+
+      .meta-label {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+      }
+
+      .status-actions {
+        display: flex;
         justify-content: flex-end;
       }
 
@@ -129,7 +162,11 @@
       .metrics-strip .metric-card {
         padding: 0.6rem 0.75rem;
         border-radius: 0.75rem;
-        background: linear-gradient(145deg, rgba(148, 163, 184, 0.18), rgba(15, 23, 42, 0.96));
+        background: linear-gradient(
+          145deg,
+          rgba(148, 163, 184, 0.18),
+          rgba(15, 23, 42, 0.96)
+        );
         border: 1px solid var(--border-soft);
         box-shadow: 0 10px 24px rgba(2, 6, 23, 0.5);
       }
@@ -191,10 +228,6 @@
       .panel-body {
         flex: 1;
         min-height: 0;
-      }
-
-      .panel-scroll {
-        overflow: hidden; /* internal elements manage scroll; avoids double scrollbars */
       }
 
       /* Live IOC table panel (left) */
@@ -399,8 +432,10 @@
 
       /* Accessibility: skip link visibility tweak for sticky header */
       .skip-link:focus {
+        position: absolute;
         top: 0.75rem;
         left: 1.25rem;
+        z-index: 50;
       }
 
       /* Responsive adjustments */
@@ -485,7 +520,11 @@
     <a href="#main" class="skip-link">Skip to main content</a>
     <div class="page-wrapper">
       <header class="page-header">
-        <nav class="top-nav" aria-label="Primary navigation">
+        <nav
+          class="top-nav"
+          aria-label="Primary navigation"
+          role="navigation"
+        >
           <a class="brand" href="./">
             <span class="brand-mark">SwiftIOC</span>
             <span class="brand-tagline">Automated Threat Intel</span>
@@ -497,7 +536,11 @@
           </div>
         </nav>
 
-        <section class="status-banner" data-site-status-root aria-live="polite">
+        <section
+          class="status-banner"
+          data-site-status-root
+          aria-live="polite"
+        >
           <div class="status-leading">
             <span class="status-dot" aria-hidden="true"></span>
             <div>
@@ -520,12 +563,24 @@
             </div>
           </div>
           <div class="status-actions">
-            <button type="button" class="button-link secondary" data-site-refresh>Refresh</button>
+            <button
+              type="button"
+              class="button-link secondary"
+              data-site-refresh
+            >
+              Refresh
+            </button>
           </div>
         </section>
       </header>
 
-      <main id="main" class="page-main" tabindex="-1">
+      <main
+        id="main"
+        class="page-main"
+        tabindex="-1"
+        role="main"
+        aria-label="SwiftIOC threat intelligence dashboard"
+      >
         <!-- Key metrics -->
         <section class="metrics-strip" aria-label="Key metrics">
           <article class="metric-card">
@@ -556,7 +611,9 @@
           <section class="panel data-preview" aria-label="Live indicators">
             <div class="panel-header">
               <h2 class="panel-title">Live indicators</h2>
-              <p class="panel-subtitle">Filter and search the latest SwiftIOC feed.</p>
+              <p class="panel-subtitle">
+                Filter and search the latest SwiftIOC feed.
+              </p>
             </div>
             <div
               class="panel-body preview-panel"
@@ -575,7 +632,11 @@
                   </label>
                   <label class="toolbar-group" for="preview-tag-filter">
                     <span>Tag</span>
-                    <select id="preview-tag-filter" data-preview-tag-filter disabled>
+                    <select
+                      id="preview-tag-filter"
+                      data-preview-tag-filter
+                      disabled
+                    >
                       <option value="all">All tags</option>
                     </select>
                   </label>
@@ -600,14 +661,23 @@
                       data-preview-search
                     />
                   </label>
-                  <button type="button" class="button-link secondary" data-preview-refresh>
+                  <button
+                    type="button"
+                    class="button-link secondary"
+                    data-preview-refresh
+                  >
                     Refresh
                   </button>
                 </div>
               </div>
 
               <div class="preview-table-wrapper">
-                <table class="preview-table" data-preview-table hidden>
+                <table
+                  class="preview-table"
+                  data-preview-table
+                  hidden
+                  aria-label="Live indicators table"
+                >
                   <thead>
                     <tr>
                       <th scope="col">Indicator</th>
@@ -620,7 +690,11 @@
                   </thead>
                   <tbody data-preview-body></tbody>
                 </table>
-                <div class="preview-status" data-preview-status role="status">
+                <div
+                  class="preview-status"
+                  data-preview-status
+                  role="status"
+                >
                   Preparing live preview…
                 </div>
               </div>
@@ -725,7 +799,9 @@
               <article class="action-card">
                 <div>
                   <h3>TSV</h3>
-                  <p class="action-description">Tab-separated indicators.</p>
+                  <p class="action-description">
+                    Tab-separated indicators.
+                  </p>
                 </div>
                 <div class="action-links">
                   <a class="button-link" href="iocs/latest.tsv">Download TSV</a>
@@ -734,11 +810,16 @@
               <article class="action-card">
                 <div>
                   <h3>JSON / JSONL</h3>
-                  <p class="action-description">Ideal for scripts and pipelines.</p>
+                  <p class="action-description">
+                    Ideal for scripts and pipelines.
+                  </p>
                 </div>
                 <div class="action-links">
                   <a class="button-link" href="iocs/latest.json">JSON</a>
-                  <a class="button-link secondary" href="iocs/latest.jsonl">JSONL</a>
+                  <a
+                    class="button-link secondary"
+                    href="iocs/latest.jsonl"
+                  >JSONL</a>
                 </div>
               </article>
               <article class="action-card">
@@ -747,7 +828,9 @@
                   <p class="action-description">STIX 2.1 bundle.</p>
                 </div>
                 <div class="action-links">
-                  <a class="button-link" href="iocs/stix2.json">STIX bundle</a>
+                  <a class="button-link" href="iocs/stix2.json"
+                    >STIX bundle</a
+                  >
                 </div>
               </article>
             </div>
