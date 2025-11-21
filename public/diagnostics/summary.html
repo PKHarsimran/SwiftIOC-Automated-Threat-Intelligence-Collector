@@ -3,479 +3,397 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>SwiftIOC Diagnostics Summary</title>
+    <title>SwiftIOC Run Diagnostics</title>
     <meta
       name="description"
-      content="Diagnostics view for the latest SwiftIOC IOC aggregation run, including run health, source breakdowns, types, and tags."
+      content="SwiftIOC collection run diagnostics with per-source counts, type breakdowns, and tag distribution."
     />
+    <meta name="theme-color" content="#0f172a" />
+    <meta property="og:title" content="SwiftIOC Run Diagnostics" />
+    <meta
+      property="og:description"
+      content="Inspect the health and composition of the latest SwiftIOC collection run."
+    />
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="../assets/styles.css" />
 
     <style>
-      html,
-      body {
-        height: auto;
-        min-height: 100%;
-      }
-
-      body {
-        margin: 0;
-        overflow-y: auto;
-      }
+      /* Page-specific layout for diagnostics view */
 
       .page-wrapper {
-        max-width: 1200px;
-        margin: 0 auto;
         min-height: 100vh;
-        padding: 0.75rem 1.25rem 1.25rem;
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
+        padding: 1.25rem 1.5rem 2.25rem;
+        max-width: 1200px;
       }
 
-      .skip-link {
-        position: absolute;
-        left: -999px;
-        top: 0.75rem;
-        padding: 0.6rem 0.9rem;
-        background: #111827;
-        color: var(--text-color);
-        border-radius: 0.6rem;
-        z-index: 100;
-      }
-
-      .skip-link:focus {
-        left: 1.25rem;
-      }
-
-      /* Sticky header + nav */
       .page-header {
-        position: sticky;
-        top: 0;
-        z-index: 35;
-        padding-bottom: 0.6rem;
-        background: linear-gradient(
-          to bottom,
-          rgba(15, 23, 42, 0.98),
-          rgba(15, 23, 42, 0.94),
-          transparent
-        );
-        backdrop-filter: blur(14px);
+        padding-inline: 0.1rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .page-header-main {
+        gap: 0.75rem;
+      }
+
+      .page-header h1 {
+        margin-bottom: 0.2rem;
+      }
+
+      .page-header-subtitle {
+        max-width: 40rem;
       }
 
       .top-nav {
-        padding: 0.45rem 0.9rem;
-        border-radius: 0.9rem;
-        border: 1px solid var(--border-soft);
-        background: rgba(6, 11, 26, 0.9);
-        box-shadow: 0 10px 26px rgba(2, 6, 23, 0.6);
-        display: flex;
-        align-items: center;
-        gap: 0.6rem;
-        flex-wrap: wrap;
+        margin-bottom: 0.85rem;
       }
 
-      .brand-mark {
-        font-size: 1rem;
+      .status-banner {
+        margin-bottom: 1rem;
       }
 
-      .brand-tagline {
-        font-size: 0.75rem;
+      .diagnostics-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.1fr);
+        gap: 1rem;
+        align-items: flex-start;
       }
 
-      .nav-links {
-        margin-left: auto;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.4rem;
-        font-size: 0.8rem;
+      .diagnostics-grid .panel {
+        height: 100%;
       }
 
-      .nav-links a {
-        padding: 0.32rem 0.7rem;
-      }
-
-      .header-content {
-        margin-top: 0.6rem;
-        padding: 0.6rem 0.1rem 0.1rem;
-      }
-
-      .section-title {
-        margin: 0 0 0.2rem;
-        font-size: 1.25rem;
-        font-weight: 600;
-      }
-
-      .section-subtitle {
-        margin: 0 0 0.25rem;
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        max-width: 60ch;
-      }
-
-      .updated-at {
+      .timeline-list {
+        list-style: none;
         margin: 0;
-        font-size: 0.78rem;
-        color: var(--text-muted);
+        padding: 0;
+        display: grid;
+        gap: 0.55rem;
       }
 
-      main {
-        flex: 1;
+      .timeline-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.1rem;
+      }
+
+      .timeline-label {
+        font-size: 0.72rem;
+        color: var(--text-soft);
+      }
+
+      .timeline-value {
+        font-size: 0.86rem;
+        font-weight: 500;
+        color: var(--text-strong);
+      }
+
+      .timeline-relative {
+        font-size: 0.7rem;
+        color: var(--accent-soft);
+      }
+
+      .summary-section {
         display: flex;
         flex-direction: column;
         gap: 1rem;
       }
 
-      section {
-        scroll-margin-top: 90px; /* avoid being hidden behind sticky header */
+      .summary-section .metrics-strip {
+        margin-bottom: 0;
       }
 
-      /* Cards for stats / actions */
-      .card-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 0.75rem;
+      .summary-section .metrics-strip .metric-card {
+        min-height: 0;
       }
 
-      .stat-card {
-        border-radius: 0.85rem;
-        border: 1px solid var(--border-soft);
-        background: rgba(15, 23, 42, 0.92);
-        box-shadow: 0 10px 26px rgba(2, 6, 23, 0.5);
-        padding: 0.8rem 0.95rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.35rem;
-      }
-
-      .stat-card h3 {
-        margin: 0;
-        font-size: 0.9rem;
-        font-weight: 600;
-      }
-
-      .stat-value {
-        font-size: 1.3rem;
-        font-weight: 600;
-      }
-
-      .stat-card .action-description {
-        font-size: 0.78rem;
-        color: var(--text-muted);
-        margin: 0;
-      }
-
-      .badge {
-        display: inline-flex;
-        align-items: center;
-        padding: 0.15rem 0.45rem;
-        border-radius: 999px;
-        border: 1px solid var(--border-soft);
-        font-size: 0.75rem;
-        background: rgba(15, 23, 42, 0.9);
-        color: var(--text-muted);
-      }
-
-      /* Tables */
-      .table-card {
-        border-radius: 0.85rem;
-        border: 1px solid var(--border-soft);
-        background: rgba(15, 23, 42, 0.92);
-        box-shadow: 0 10px 26px rgba(2, 6, 23, 0.5);
+      .panel-body .table-card {
+        max-height: 17.5rem;
         overflow: auto;
       }
 
-      .table-card table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 0.78rem;
+      .next-steps-list {
+        margin-top: 0.3rem;
       }
 
-      .table-card thead {
-        background: rgba(15, 23, 42, 0.98);
-        position: sticky;
-        top: 0;
-        z-index: 1;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        font-size: 0.74rem;
-      }
-
-      .table-card th,
-      .table-card td {
-        padding: 0.4rem 0.7rem;
-        border-bottom: 1px solid rgba(148, 163, 184, 0.25);
-      }
-
-      .table-card tbody tr:hover {
-        background: rgba(56, 189, 248, 0.12);
-      }
-
-      .numeric {
-        text-align: right;
-      }
-
-      /* Actions / next steps */
-      .actions-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 0.75rem;
-      }
-
-      .action-card {
-        border-radius: 0.85rem;
-        border: 1px solid var(--border-soft);
-        background: rgba(15, 23, 42, 0.92);
-        box-shadow: 0 10px 26px rgba(2, 6, 23, 0.5);
-        padding: 0.8rem 0.95rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.4rem;
-      }
-
-      .action-card h3 {
-        margin: 0;
-        font-size: 0.9rem;
-      }
-
-      .action-description {
-        font-size: 0.78rem;
-        color: var(--text-muted);
-        margin: 0;
-      }
-
-      .action-links {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.4rem;
-      }
-
-      .action-links .button-link {
-        padding: 0.35rem 0.9rem;
-        font-size: 0.8rem;
-      }
-
-      .footer {
-        margin-top: 0.5rem;
-        padding-top: 0.6rem;
-        border-top: 1px solid var(--border-color);
-        font-size: 0.78rem;
-        color: var(--text-muted);
-      }
-
-      /* Responsive tweaks */
-      @media (max-width: 900px) {
-        .top-nav {
-          flex-direction: column;
-          align-items: flex-start;
+      @media (max-width: 960px) {
+        .diagnostics-grid {
+          grid-template-columns: minmax(0, 1fr);
         }
 
-        .nav-links {
-          margin-left: 0;
+        .panel-body .table-card {
+          max-height: none;
         }
       }
 
       @media (max-width: 640px) {
-        .page-header {
-          position: static;
-          backdrop-filter: none;
+        .page-wrapper {
+          padding-inline: 0.9rem;
         }
 
-        .page-wrapper {
-          padding-inline: 1rem;
+        .page-header {
+          padding-inline: 0;
+        }
+
+        .page-header-main {
+          flex-direction: column;
+          align-items: flex-start;
         }
       }
     </style>
   </head>
   <body data-ioc-root="..">
-    <a href="#main" class="skip-link">Skip to main content</a>
     <div class="page-wrapper">
-      <header class="page-header">
-        <nav class="top-nav" aria-label="Diagnostics navigation">
-          <a class="brand" href="../index.html">
-            <span class="brand-mark">SwiftIOC</span>
-            <span class="brand-tagline">Diagnostics</span>
-          </a>
-          <div class="nav-links">
-            <a href="#run-health">Run health</a>
-            <a href="#timeline">Timeline</a>
-            <a href="#sources">Sources</a>
-            <a href="#indicator-types">Types</a>
-            <a href="#tags">Tags</a>
-          </div>
-        </nav>
+      <nav class="top-nav" aria-label="SwiftIOC navigation">
+        <a class="brand" href="../index.html">
+          <span class="brand-mark">SwiftIOC</span>
+          <span class="brand-tagline">Diagnostics</span>
+        </a>
+        <div class="nav-links">
+          <a href="../index.html">Live snapshot</a>
+          <a href="#run-health">Run health</a>
+          <a href="#timeline">Timeline</a>
+          <a href="#sources">Sources</a>
+          <a href="#indicator-types">Types</a>
+          <a href="#tags">Tags</a>
+        </div>
+      </nav>
 
-        <div class="header-content">
-          <h1 class="section-title">SwiftIOC IOC Summary</h1>
-          <p class="section-subtitle">
-            Breakdown of the most recent SwiftIOC aggregation: run health, source performance, types, and tags.
-          </p>
-          <p class="updated-at">Generated <span data-stat="generated-at">—</span></p>
+      <header class="page-header">
+        <div class="page-header-main">
+          <div>
+            <h1 class="section-title">SwiftIOC Run Diagnostics</h1>
+            <p class="page-header-subtitle">
+              Inspect the overall health, time window, and composition of the
+              latest SwiftIOC collection run.
+            </p>
+          </div>
         </div>
       </header>
 
-      <main id="main">
-        <section id="run-health">
-          <h2 class="section-title">Run health snapshot</h2>
-          <div class="card-grid">
-            <article class="stat-card">
-              <h3>Total indicators</h3>
-              <div class="stat-value" data-stat="total-indicators">—</div>
-              <p class="action-description">
-                Indicators published after normalisation and de-duplication.
+      <section
+        class="status-banner"
+        data-site-status-root
+        aria-label="Collection status"
+      >
+        <div class="status-badge" data-site-status-badge>
+          <span class="status-dot"></span>
+          <span class="status-label" data-site-status-label>Checking run…</span>
+        </div>
+        <div class="status-meta">
+          <div>
+            <span class="status-meta-label">Generated:</span>
+            <span class="status-meta-value" data-site-generated>—</span>
+          </div>
+          <div>
+            <span class="status-meta-label">Updated:</span>
+            <span class="status-meta-value" data-site-updated>—</span>
+          </div>
+          <div>
+            <span class="status-meta-label">Window:</span>
+            <span class="status-meta-value" data-site-window>—</span>
+          </div>
+        </div>
+      </section>
+
+      <main class="diagnostics-grid">
+        <section
+          id="run-health"
+          class="panel"
+          aria-labelledby="run-health-heading"
+        >
+          <div class="panel-header">
+            <div>
+              <h2 id="run-health-heading" class="panel-title">Run health</h2>
+              <p class="panel-subtitle">
+                High-level metrics for the most recent SwiftIOC collection run.
               </p>
-            </article>
-            <article class="stat-card">
-              <h3>Duplicates removed</h3>
-              <div class="stat-value" data-stat="duplicates-removed">—</div>
-              <p class="action-description">
-                Values filtered out as duplicates across sources.
-              </p>
-            </article>
-            <article class="stat-card">
-              <h3>Active sources</h3>
-              <div class="stat-value" data-stat="active-sources">—</div>
-              <p class="action-description">
-                Feeds that successfully produced data in this run.
-              </p>
-            </article>
-            <article class="stat-card">
-              <h3>Indicator types</h3>
-              <div class="stat-value" data-stat="indicator-types">—</div>
-              <p class="action-description">
-                Distinct IOC formats in the aggregated dataset.
-              </p>
-            </article>
+            </div>
+          </div>
+          <div class="panel-body summary-section">
+            <section class="metrics-strip" aria-label="Run metrics">
+              <article class="metric-card">
+                <p class="metric-label">Total indicators</p>
+                <p class="metric-value" data-stat="total-indicators">—</p>
+                <p class="metric-caption">After duplicate removal</p>
+              </article>
+
+              <article class="metric-card">
+                <p class="metric-label">Duplicates removed</p>
+                <p class="metric-value" data-stat="duplicates-removed">—</p>
+                <p class="metric-caption">
+                  Collapsed during collection &amp; normalisation
+                </p>
+              </article>
+
+              <article class="metric-card">
+                <p class="metric-label">Active sources</p>
+                <p class="metric-value" data-stat="active-sources">—</p>
+                <p class="metric-caption" data-stat="feeds-online">
+                  Sources contributing to this run
+                </p>
+              </article>
+
+              <article class="metric-card">
+                <p class="metric-label">Indicator types</p>
+                <p class="metric-value" data-stat="indicator-types">—</p>
+                <p class="metric-caption">IPs, domains, URLs, hashes, …</p>
+              </article>
+            </section>
+
+            <section
+              id="timeline"
+              aria-labelledby="timeline-heading"
+              class="panel-like"
+            >
+              <h3 id="timeline-heading" class="subsection-title">
+                Time window
+              </h3>
+              <ul class="timeline-list">
+                <li class="timeline-item">
+                  <span class="timeline-label">Earliest first seen</span>
+                  <span class="timeline-value" data-stat="earliest-first-seen">
+                    <span data-stat="earliest-first-seen-date">—</span>
+                    <span>·</span>
+                    <span data-stat="earliest-first-seen-time">—</span>
+                  </span>
+                  <span
+                    class="timeline-relative"
+                    data-stat="earliest-first-seen-relative"
+                    >—</span
+                  >
+                </li>
+                <li class="timeline-item">
+                  <span class="timeline-label">Newest first seen</span>
+                  <span class="timeline-value" data-stat="newest-first-seen">
+                    <span data-stat="newest-first-seen-date">—</span>
+                    <span>·</span>
+                    <span data-stat="newest-first-seen-time">—</span>
+                  </span>
+                  <span
+                    class="timeline-relative"
+                    data-stat="newest-first-seen-relative"
+                    >—</span
+                  >
+                </li>
+                <li class="timeline-item">
+                  <span class="timeline-label">Collection window</span>
+                  <span class="timeline-value" data-stat="collection-window"
+                    >—</span
+                  >
+                </li>
+              </ul>
+            </section>
           </div>
         </section>
 
-        <section id="timeline">
-          <h2 class="section-title">Timeline details</h2>
-          <div class="card-grid">
-            <article class="stat-card">
-              <h3>Earliest first seen</h3>
-              <div class="stat-value">
-                <span data-stat="earliest-first-seen-date">—</span><br />
-                <span class="badge" data-stat="earliest-first-seen-time">—</span>
+        <section
+          class="panel"
+          id="sources"
+          aria-labelledby="sources-heading"
+        >
+          <div class="panel-header">
+            <div>
+              <h2 id="sources-heading" class="panel-title">
+                Composition breakdown
+              </h2>
+              <p class="panel-subtitle">
+                Per-source counts, indicator types, and tags for this run.
+              </p>
+            </div>
+          </div>
+
+          <div class="panel-body">
+            <div class="table-card" aria-label="Sources table">
+              <div class="table-card-header">
+                <h3>Sources</h3>
+                <p>Active feeds and their indicator counts.</p>
               </div>
-              <p class="action-description">
-                Oldest IOC retained in the current analysis window.
-              </p>
-            </article>
-            <article class="stat-card">
-              <h3>Newest first seen</h3>
-              <div class="stat-value">
-                <span data-stat="newest-first-seen-date">—</span><br />
-                <span class="badge" data-stat="newest-first-seen-time">—</span>
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Source</th>
+                    <th scope="col">Indicators</th>
+                    <th scope="col">Share</th>
+                  </tr>
+                </thead>
+                <tbody data-table="sources"></tbody>
+              </table>
+            </div>
+
+            <div
+              class="table-card"
+              id="indicator-types"
+              aria-labelledby="indicator-types-heading"
+            >
+              <div class="table-card-header">
+                <h3 id="indicator-types-heading">Types</h3>
+                <p>Indicator types participating in this run.</p>
               </div>
-              <p class="action-description">
-                Most recent IOC observed across all active sources.
-              </p>
-            </article>
-            <article class="stat-card">
-              <h3>Multi-source overlaps</h3>
-              <div class="stat-value" data-stat="multi-source-overlaps">—</div>
-              <p class="action-description">
-                IOCs independently confirmed by more than one feed.
-              </p>
-            </article>
-          </div>
-        </section>
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Type</th>
+                    <th scope="col">Count</th>
+                    <th scope="col">Share</th>
+                  </tr>
+                </thead>
+                <tbody data-table="types"></tbody>
+              </table>
+            </div>
 
-        <section id="sources">
-          <h2 class="section-title">Per-source totals</h2>
-          <p class="section-subtitle">
-            Use these counts to see which feeds are most active or may need follow-up.
-          </p>
-          <div class="table-card">
-            <table aria-label="Per-source totals">
-              <thead>
-                <tr>
-                  <th scope="col">Source</th>
-                  <th scope="col" class="numeric">Indicators</th>
-                </tr>
-              </thead>
-              <tbody data-table="sources">
-                <tr>
-                  <td data-title="Source" colspan="2">Loading sources…</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <section id="indicator-types">
-          <h2 class="section-title">Indicator types</h2>
-          <div class="table-card">
-            <table aria-label="Indicator types">
-              <thead>
-                <tr>
-                  <th scope="col">Type</th>
-                  <th scope="col" class="numeric">Indicators</th>
-                </tr>
-              </thead>
-              <tbody data-table="types">
-                <tr>
-                  <td data-title="Type" colspan="2">Loading indicator types…</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <section id="tags">
-          <h2 class="section-title">Top tags</h2>
-          <p class="section-subtitle">
-            Tags highlight dominant families, tools, or campaigns linked to the collected IOCs.
-          </p>
-          <div class="table-card">
-            <table aria-label="Top tags">
-              <thead>
-                <tr>
-                  <th scope="col">Tag</th>
-                  <th scope="col" class="numeric">Indicators</th>
-                </tr>
-              </thead>
-              <tbody data-table="tags">
-                <tr>
-                  <td data-title="Tag" colspan="2">Loading tags…</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <section id="follow-up">
-          <h2 class="section-title">Next steps</h2>
-          <div class="actions-grid">
-            <article class="action-card">
-              <h3>Download raw data</h3>
-              <p class="action-description">
-                Open the IOC directory for bulk analysis or integration with other tooling.
-              </p>
-              <div class="action-links">
-                <a class="button-link" href="../iocs/">Open IOC directory</a>
+            <div
+              class="table-card"
+              id="tags"
+              aria-labelledby="tags-heading"
+            >
+              <div class="table-card-header">
+                <h3 id="tags-heading">Tags</h3>
+                <p>Top tags across all indicators.</p>
               </div>
-            </article>
-            <article class="action-card">
-              <h3>Back to snapshot</h3>
-              <p class="action-description">
-                Return to the main SwiftIOC dashboard for the high-level view.
-              </p>
-              <div class="action-links">
-                <a class="button-link" href="../index.html">Back to dashboard</a>
-              </div>
-            </article>
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Tag</th>
+                    <th scope="col">Count</th>
+                    <th scope="col">Share</th>
+                  </tr>
+                </thead>
+                <tbody data-table="tags"></tbody>
+              </table>
+            </div>
           </div>
         </section>
       </main>
 
-      <footer class="footer">
-        <p>
-          This diagnostics view reflects the latest SwiftIOC run only. For history, use archived exports or rerun the
-          collection pipeline.
-        </p>
-      </footer>
+      <section class="panel" aria-labelledby="next-steps-heading">
+        <div class="panel-header">
+          <div>
+            <h2 id="next-steps-heading" class="panel-title">Next steps</h2>
+            <p class="panel-subtitle">
+              Move from diagnostics into deeper investigation or SIEM import.
+            </p>
+          </div>
+        </div>
+        <div class="panel-body">
+          <ul class="next-steps-list">
+            <li>
+              Explore the raw IOC files in
+              <a href="../iocs/">the <code>/iocs</code> directory</a>.
+            </li>
+            <li>
+              Return to the
+              <a href="../index.html">live SwiftIOC dashboard</a> for quick
+              filtering and search.
+            </li>
+            <li>
+              Wire these feeds into your SIEM, TIP, or enrichment workflows
+              using CSV, JSONL, or STIX 2.1.
+            </li>
+          </ul>
+        </div>
+      </section>
     </div>
+
     <script defer src="../assets/dashboard.js"></script>
   </body>
 </html>
