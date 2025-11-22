@@ -231,6 +231,21 @@
     };
   };
 
+  const formatDatePartsFromSeconds = (seconds) => {
+    if (typeof seconds !== 'number') return null;
+    return formatDateParts(seconds * 1000);
+  };
+
+  const formatDateTimeLabel = (parts) => {
+    if (!parts) return '—';
+    const date = normaliseString(parts.date);
+    const time = normaliseString(parts.time);
+    if (date && time) return `${date} ${time}`;
+    if (date) return date;
+    if (time) return time;
+    return '—';
+  };
+
   /* ==========================================================================
    *  CONFIDENCE
    * ========================================================================= */
@@ -306,6 +321,8 @@
 
     let earliestFirstSeen = null;
     let newestFirstSeen = null;
+    let earliestLastSeen = null;
+    let newestLastSeen = null;
 
     const registerFirstSeen = (value) => {
       const parsed = parseTimestamp(value);
@@ -316,6 +333,18 @@
       }
       if (!newestFirstSeen || time > newestFirstSeen) {
         newestFirstSeen = time;
+      }
+    };
+
+    const registerLastSeen = (value) => {
+      const parsed = parseTimestamp(value);
+      if (!parsed) return;
+      const time = parsed.time;
+      if (!earliestLastSeen || time < earliestLastSeen) {
+        earliestLastSeen = time;
+      }
+      if (!newestLastSeen || time > newestLastSeen) {
+        newestLastSeen = time;
       }
     };
 
@@ -341,6 +370,7 @@
       }
 
       registerFirstSeen(row.firstSeen || row.first_seen);
+      registerLastSeen(row.lastSeen || row.last_seen);
 
       const combinedTags = uniqueStrings([
         ...extractTags(row?.tags),
@@ -356,23 +386,40 @@
     };
 
     const finalise = () => {
-      const earliest = earliestFirstSeen
-        ? formatDateParts(earliestFirstSeen * 1000)
-        : { date: '—', time: '—', relative: '—' };
+      const earliestFirstSeenParts =
+        formatDatePartsFromSeconds(earliestFirstSeen) || {
+          date: '—',
+          time: '—',
+          relative: '—',
+        };
 
-      const newest = newestFirstSeen
-        ? formatDateParts(newestFirstSeen * 1000)
-        : { date: '—', time: '—', relative: '—' };
+      const newestFirstSeenParts =
+        formatDatePartsFromSeconds(newestFirstSeen) || {
+          date: '—',
+          time: '—',
+          relative: '—',
+        };
+
+      const earliestLastSeenParts = formatDatePartsFromSeconds(earliestLastSeen);
+      const newestLastSeenParts = formatDatePartsFromSeconds(newestLastSeen);
 
       let collectionWindow = '—';
-      if (earliestFirstSeen && newestFirstSeen) {
-        const earliestLabel = dateFormatter
-          ? dateFormatter.format(new Date(earliestFirstSeen * 1000))
-          : earliest.date;
-        const newestLabel = dateFormatter
-          ? dateFormatter.format(new Date(newestFirstSeen * 1000))
-          : newest.date;
-        collectionWindow = `${earliestLabel} → ${newestLabel}`;
+      const windowStart = earliestFirstSeen || earliestLastSeen;
+      const windowEnd = newestLastSeen || newestFirstSeen;
+      if (windowStart && windowEnd) {
+        const startLabel = dateFormatter
+          ? dateFormatter.format(new Date(windowStart * 1000))
+          : formatDateTimeLabel(
+              formatDatePartsFromSeconds(windowStart) ||
+                formatDateParts(windowStart * 1000)
+            );
+        const endLabel = dateFormatter
+          ? dateFormatter.format(new Date(windowEnd * 1000))
+          : formatDateTimeLabel(
+              formatDatePartsFromSeconds(windowEnd) ||
+                formatDateParts(windowEnd * 1000)
+            );
+        collectionWindow = `${startLabel} → ${endLabel}`;
       }
 
       return {
@@ -381,8 +428,14 @@
         activeSources: sources.size,
         indicatorTypes: types.size,
         tags,
-        earliestFirstSeen: earliest,
-        newestFirstSeen: newest,
+        earliestFirstSeen: earliestFirstSeenParts,
+        newestFirstSeen: newestFirstSeenParts,
+        earliestLastSeen: earliestLastSeenParts,
+        newestLastSeen: newestLastSeenParts,
+        earliestFirstSeenTs: earliestFirstSeen,
+        newestFirstSeenTs: newestFirstSeen,
+        earliestLastSeenTs: earliestLastSeen,
+        newestLastSeenTs: newestLastSeen,
         collectionWindow,
       };
     };
@@ -661,6 +714,14 @@
       row.created_at ??
       row.created;
 
+    const lastSeen =
+      row.last_seen ??
+      row.lastSeen ??
+      row.last_observed ??
+      row.lastSeenAt ??
+      row.updated_at ??
+      row.modified;
+
     const confidence = confidenceRaw || null;
 
     const normalised = {
@@ -672,6 +733,7 @@
       tags,
       tagsLower,
       firstSeen,
+      lastSeen,
       isDuplicate: Boolean(row.is_duplicate || row.duplicate),
       raw: row,
     };
@@ -914,8 +976,21 @@
    *  GLOBAL STATS + TABLES
    * ========================================================================= */
 
-  const applyStats = (stats) => {
+  const applyStats = (stats, dataset) => {
     if (!stats) return;
+
+    const fetchedLabel =
+      dataset?.fetchedAt != null
+        ? formatTimestampForDisplay(dataset.fetchedAt / 1000)
+        : null;
+
+    const generatedLabel = formatDateTimeLabel(
+      stats.newestFirstSeen || stats.newestLastSeen
+    );
+
+    const generatedStat =
+      generatedLabel !== '—' ? generatedLabel : fetchedLabel || '—';
+    setStatText('generated-at', generatedStat);
 
     setStatText('total-indicators', formatNumber(stats.total));
     setStatText('duplicates-removed', formatNumber(stats.duplicatesRemoved));
@@ -1019,16 +1094,27 @@
         labelEl.textContent = originLabel;
       }
 
-      const genTimestamp =
-        dataset.fetchedAt != null ? dataset.fetchedAt : Date.now();
-      const genDisplay = formatTimestampForDisplay(genTimestamp / 1000);
+      const generatedLabel = formatDateTimeLabel(
+        stats.newestFirstSeen || stats.newestLastSeen
+      );
+      const updatedLabel = formatDateTimeLabel(
+        stats.newestLastSeen || stats.newestFirstSeen
+      );
+
+      const timestampFallback = formatTimestampForDisplay(
+        (dataset.fetchedAt != null ? dataset.fetchedAt : Date.now()) / 1000
+      );
 
       if (generatedEl) {
-        generatedEl.textContent = genDisplay;
+        generatedEl.textContent = generatedLabel !== '—'
+          ? generatedLabel
+          : timestampFallback;
       }
 
       if (updatedEl) {
-        updatedEl.textContent = genDisplay;
+        updatedEl.textContent = updatedLabel !== '—'
+          ? updatedLabel
+          : timestampFallback;
       }
 
       if (windowEl) {
@@ -1055,7 +1141,7 @@
       const { dataset } = await loadDataset({
         previewLimit: DEFAULT_PREVIEW_LIMIT,
       });
-      applyStats(dataset.stats);
+      applyStats(dataset.stats, dataset);
     } catch (error) {
       console.error('Unable to load initial stats', error);
     }
@@ -1636,7 +1722,7 @@
         applyFilter();
 
         if (forceRefresh || !isCacheOrigin(dataset.origin)) {
-          applyStats(dataset.stats);
+          applyStats(dataset.stats, dataset);
         }
       } catch (error) {
         console.error('Unable to load live preview data', error);
@@ -1748,7 +1834,7 @@
       if (isCacheOrigin(dataset.origin)) return;
 
       state.stats = dataset.stats || state.stats;
-      applyStats(dataset.stats);
+      applyStats(dataset.stats, dataset);
     });
 
     // Single-screen dashboard: load immediately
