@@ -5,7 +5,10 @@
    *  CONFIG & CONSTANTS
    * ========================================================================= */
 
-  const IOC_ROOT = document.body?.dataset.iocRoot || '.';
+  const resolveIocUrl = (path) => {
+    const base = document.body?.dataset.iocRoot || './';
+    return new URL(path, new URL(base, window.location.href)).toString();
+  };
 
   const DEFAULT_PREVIEW_LIMIT = 12;
   const PREVIEW_LOOKAHEAD_MULTIPLIER = 12;
@@ -14,8 +17,8 @@
     240
   );
 
-  const INDICATORS_JSONL_URL = `${IOC_ROOT}/iocs/latest.jsonl`;
-  const INDICATORS_JSON_FALLBACK_URL = `${IOC_ROOT}/iocs/latest.json`;
+  const INDICATORS_JSONL_URL = resolveIocUrl('iocs/latest.jsonl');
+  const INDICATORS_JSON_FALLBACK_URL = resolveIocUrl('iocs/latest.json');
   const PREVIEW_STREAM_URL = INDICATORS_JSONL_URL;
 
   const DATASET_STORAGE_KEY = 'swiftioc-dashboard-cache-v1';
