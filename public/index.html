@@ -281,6 +281,24 @@
         overflow: auto;
       }
 
+      .table-card-actions {
+        margin-top: 0.35rem;
+        display: none;
+        flex-direction: column;
+        gap: 0.35rem;
+      }
+
+      .table-card-actions .button {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .table-card-hint {
+        margin: 0;
+        font-size: 0.68rem;
+        color: var(--text-soft);
+      }
+
       .exports-grid {
         display: flex;
         flex-wrap: wrap;
@@ -765,6 +783,20 @@
                 </thead>
                 <tbody data-table="sources"></tbody>
               </table>
+              <div class="table-card-actions">
+                <button
+                  type="button"
+                  class="button ghost"
+                  data-table-toggle="sources"
+                  aria-expanded="false"
+                >
+                  Show all sources
+                </button>
+                <p class="table-card-hint">
+                  On phones we only show the top entries. Expand to browse the full
+                  list without endless scrolling.
+                </p>
+              </div>
             </div>
 
             <div
@@ -786,6 +818,19 @@
                 </thead>
                 <tbody data-table="types"></tbody>
               </table>
+              <div class="table-card-actions">
+                <button
+                  type="button"
+                  class="button ghost"
+                  data-table-toggle="types"
+                  aria-expanded="false"
+                >
+                  Show all types
+                </button>
+                <p class="table-card-hint">
+                  Expand for the full breakdown when you want the detailed view.
+                </p>
+              </div>
             </div>
 
             <div
@@ -807,6 +852,20 @@
                 </thead>
                 <tbody data-table="tags"></tbody>
               </table>
+              <div class="table-card-actions">
+                <button
+                  type="button"
+                  class="button ghost"
+                  data-table-toggle="tags"
+                  aria-expanded="false"
+                >
+                  Show all tags
+                </button>
+                <p class="table-card-hint">
+                  Open the full tag list in-place instead of scrolling through an
+                  endless stack on smaller screens.
+                </p>
+              </div>
             </div>
           </div>
         </section>

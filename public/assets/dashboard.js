@@ -563,6 +563,79 @@
   };
 
   /* ==========================================================================
+   *  MOBILE TABLE LIMITER
+   * ========================================================================= */
+
+  const TABLE_MOBILE_BREAKPOINT = 760;
+  const TABLE_MOBILE_PREVIEW_LIMIT = 6;
+  const tableStates = new Map();
+
+  const isMobileTableViewport = () =>
+    typeof window !== 'undefined' &&
+    window.matchMedia(`(max-width: ${TABLE_MOBILE_BREAKPOINT}px)`).matches;
+
+  const clampTableRows = (name) => {
+    const state = tableStates.get(name) || { expanded: false };
+    const isMobile = isMobileTableViewport();
+    const limit = TABLE_MOBILE_PREVIEW_LIMIT;
+
+    const rows = getTableTargets(name).flatMap((tbody) =>
+      Array.from(tbody?.querySelectorAll('tr') || [])
+    );
+
+    const shouldHideButton = !isMobile || rows.length <= limit;
+
+    rows.forEach((tr, index) => {
+      const hide = isMobile && !state.expanded && index >= limit;
+      tr.hidden = hide;
+      tr.classList.toggle('is-collapsed', hide);
+    });
+
+    qsa(`[data-table-toggle="${name}"]`).forEach((button) => {
+      if (shouldHideButton) {
+        button.hidden = true;
+        return;
+      }
+
+      button.hidden = false;
+      button.setAttribute('aria-expanded', state.expanded ? 'true' : 'false');
+
+      const remaining = Math.max(rows.length - limit, 0);
+      const collapsedLabel =
+        remaining > 0
+          ? `Show all ${rows.length} entries`
+          : 'Show full table';
+      const expandedLabel = `Collapse to top ${limit}`;
+
+      button.textContent = state.expanded ? expandedLabel : collapsedLabel;
+    });
+  };
+
+  const initialiseTableToggles = () => {
+    qsa('[data-table-toggle]').forEach((button) => {
+      const name = button?.dataset?.tableToggle;
+      if (!name) return;
+
+      if (!tableStates.has(name)) {
+        tableStates.set(name, { expanded: false });
+      }
+
+      button.addEventListener('click', () => {
+        const current = tableStates.get(name) || { expanded: false };
+        tableStates.set(name, { expanded: !current.expanded });
+        clampTableRows(name);
+      });
+    });
+
+    const mediaQuery = window.matchMedia(
+      `(max-width: ${TABLE_MOBILE_BREAKPOINT}px)`
+    );
+    mediaQuery.addEventListener('change', () => {
+      ['sources', 'types', 'tags'].forEach((name) => clampTableRows(name));
+    });
+  };
+
+  /* ==========================================================================
    *  JSON/JSONL PARSING
    * ========================================================================= */
 
@@ -1142,6 +1215,7 @@
 
     if (sourceRows.length) {
       populateTable('sources', sourceRows, 'No active sources in this run.');
+      clampTableRows('sources');
     }
 
     if (typeRows.length) {
@@ -1150,11 +1224,15 @@
         typeRows,
         'No indicator types could be derived.'
       );
+      clampTableRows('types');
     }
 
     if (tagRows.length) {
       populateTable('tags', tagRows, 'No tags were present across indicators.');
+      clampTableRows('tags');
     }
+
+    ['sources', 'types', 'tags'].forEach(clampTableRows);
   };
 
   /* ==========================================================================
@@ -1961,6 +2039,7 @@
    *  BOOTSTRAP
    * ========================================================================= */
 
+  initialiseTableToggles();
   initialiseStatusBanner();
   loadStats();
   initialisePreview();
