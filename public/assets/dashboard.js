@@ -925,10 +925,15 @@
 
   const resolveDataset = async ({ forceRefresh = false } = {}) => {
     const wrapDatasetPromise = (promise) =>
-      promise.then((dataset) => {
-        notifyDatasetListeners(dataset);
-        return dataset;
-      });
+      promise
+        .then((dataset) => {
+          notifyDatasetListeners(dataset);
+          return dataset;
+        })
+        .catch((error) => {
+          datasetCache.promise = null;
+          throw error;
+        });
 
     const fetchFreshDataset = async () => {
       const { entries } = await fetchDataset(PREVIEW_CACHE_LIMIT);
@@ -1485,6 +1490,24 @@
       indicatorCode.textContent = row.indicator ?? '—';
 
       indicatorMain.appendChild(indicatorCode);
+
+      const indicatorMeta = document.createElement('div');
+      indicatorMeta.className = 'preview-indicator-meta';
+
+      const makeMetaPill = (label, value) => {
+        const span = document.createElement('span');
+        span.className = `preview-meta-pill${label ? ` meta-${label}` : ''}`;
+        span.textContent = value ?? '—';
+        return span;
+      };
+
+      indicatorMeta.appendChild(makeMetaPill('type', row.type || 'unknown'));
+      indicatorMeta.appendChild(makeMetaPill('source', row.source || 'unknown'));
+      indicatorMeta.appendChild(
+        makeMetaPill('confidence', row.confidence || 'n/a')
+      );
+
+      indicatorMain.appendChild(indicatorMeta);
 
       if (row.tags && row.tags.length) {
         const tagsWrapper = document.createElement('div');
