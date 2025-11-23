@@ -810,12 +810,12 @@
     });
 
     const compareRows = (a, b) => {
-      const confidenceDiff = confidenceRankForRow(b) - confidenceRankForRow(a);
-      if (confidenceDiff !== 0) return confidenceDiff;
-
       const recencyA = derivePreviewTimestamp(a) ?? -Infinity;
       const recencyB = derivePreviewTimestamp(b) ?? -Infinity;
       if (recencyA !== recencyB) return recencyB - recencyA;
+
+      const confidenceDiff = confidenceRankForRow(b) - confidenceRankForRow(a);
+      if (confidenceDiff !== 0) return confidenceDiff;
 
       const duplicateDiff = Number(a.isDuplicate) - Number(b.isDuplicate);
       if (duplicateDiff !== 0) return duplicateDiff;
@@ -999,6 +999,25 @@
         };
 
         datasetCache.promise = Promise.resolve(dataset);
+
+        if (!datasetCache.refreshing) {
+          const refresh = wrapDatasetPromise(fetchFreshDataset())
+            .then((fresh) => {
+              datasetCache.promise = Promise.resolve(fresh);
+              return fresh;
+            })
+            .catch((error) => {
+              console.warn('Background refresh from cache failed', error);
+              return null;
+            })
+            .finally(() => {
+              if (datasetCache.refreshing === refresh) {
+                datasetCache.refreshing = null;
+              }
+            });
+
+          datasetCache.refreshing = refresh;
+        }
         return dataset;
       }
     }

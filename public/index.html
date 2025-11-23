@@ -112,6 +112,7 @@
         width: 100%;
         border-collapse: collapse;
         font-size: 0.72rem;
+        transition: background 0.15s ease;
       }
 
       .preview-table th,
@@ -265,6 +266,91 @@
 
         .summary-tables .table-card {
           max-height: none;
+        }
+      }
+
+      @media (max-width: 760px) {
+        .dashboard-main {
+          gap: 0.75rem;
+        }
+
+        .preview-summary {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.4rem;
+        }
+
+        .preview-summary-meta {
+          display: grid;
+          width: 100%;
+          gap: 0.35rem;
+        }
+
+        .preview-table-wrapper {
+          max-height: none;
+        }
+
+        .preview-table {
+          display: block;
+        }
+
+        .preview-table thead {
+          display: none;
+        }
+
+        .preview-table tbody {
+          display: grid;
+          gap: 0.65rem;
+        }
+
+        .preview-table tr {
+          display: grid;
+          gap: 0.4rem;
+          padding: 0.65rem 0.7rem;
+          border-radius: 0.9rem;
+          border: 1px solid var(--border-soft);
+          box-shadow: 0 14px 30px rgba(15, 23, 42, 0.65);
+          background: rgba(15, 23, 42, 0.98);
+        }
+
+        .preview-table tr:nth-child(2n) td,
+        .preview-table tr:hover td {
+          background: transparent;
+        }
+
+        .preview-indicator {
+          align-items: flex-start;
+          gap: 0.55rem;
+        }
+
+        .preview-indicator-main code {
+          white-space: normal;
+          word-break: break-word;
+        }
+
+        .preview-indicator-copy button {
+          width: 100%;
+          justify-content: center;
+        }
+
+        .preview-table td {
+          display: grid;
+          grid-template-columns: minmax(5rem, 6rem) minmax(0, 1fr);
+          align-items: baseline;
+          gap: 0.35rem;
+          padding: 0;
+          border: none;
+        }
+
+        .preview-table td[data-title]::before {
+          display: block;
+          font-weight: 600;
+          color: var(--text-soft);
+          letter-spacing: 0.01em;
+        }
+
+        td.numeric {
+          text-align: left;
         }
       }
 
