@@ -563,6 +563,79 @@
   };
 
   /* ==========================================================================
+   *  MOBILE TABLE LIMITER
+   * ========================================================================= */
+
+  const TABLE_MOBILE_BREAKPOINT = 760;
+  const TABLE_MOBILE_PREVIEW_LIMIT = 6;
+  const tableStates = new Map();
+
+  const isMobileTableViewport = () =>
+    typeof window !== 'undefined' &&
+    window.matchMedia(`(max-width: ${TABLE_MOBILE_BREAKPOINT}px)`).matches;
+
+  const clampTableRows = (name) => {
+    const state = tableStates.get(name) || { expanded: false };
+    const isMobile = isMobileTableViewport();
+    const limit = TABLE_MOBILE_PREVIEW_LIMIT;
+
+    const rows = getTableTargets(name).flatMap((tbody) =>
+      Array.from(tbody?.querySelectorAll('tr') || [])
+    );
+
+    const shouldHideButton = !isMobile || rows.length <= limit;
+
+    rows.forEach((tr, index) => {
+      const hide = isMobile && !state.expanded && index >= limit;
+      tr.hidden = hide;
+      tr.classList.toggle('is-collapsed', hide);
+    });
+
+    qsa(`[data-table-toggle="${name}"]`).forEach((button) => {
+      if (shouldHideButton) {
+        button.hidden = true;
+        return;
+      }
+
+      button.hidden = false;
+      button.setAttribute('aria-expanded', state.expanded ? 'true' : 'false');
+
+      const remaining = Math.max(rows.length - limit, 0);
+      const collapsedLabel =
+        remaining > 0
+          ? `Show all ${rows.length} entries`
+          : 'Show full table';
+      const expandedLabel = `Collapse to top ${limit}`;
+
+      button.textContent = state.expanded ? expandedLabel : collapsedLabel;
+    });
+  };
+
+  const initialiseTableToggles = () => {
+    qsa('[data-table-toggle]').forEach((button) => {
+      const name = button?.dataset?.tableToggle;
+      if (!name) return;
+
+      if (!tableStates.has(name)) {
+        tableStates.set(name, { expanded: false });
+      }
+
+      button.addEventListener('click', () => {
+        const current = tableStates.get(name) || { expanded: false };
+        tableStates.set(name, { expanded: !current.expanded });
+        clampTableRows(name);
+      });
+    });
+
+    const mediaQuery = window.matchMedia(
+      `(max-width: ${TABLE_MOBILE_BREAKPOINT}px)`
+    );
+    mediaQuery.addEventListener('change', () => {
+      ['sources', 'types', 'tags'].forEach((name) => clampTableRows(name));
+    });
+  };
+
+  /* ==========================================================================
    *  JSON/JSONL PARSING
    * ========================================================================= */
 
@@ -810,12 +883,12 @@
     });
 
     const compareRows = (a, b) => {
-      const confidenceDiff = confidenceRankForRow(b) - confidenceRankForRow(a);
-      if (confidenceDiff !== 0) return confidenceDiff;
-
       const recencyA = derivePreviewTimestamp(a) ?? -Infinity;
       const recencyB = derivePreviewTimestamp(b) ?? -Infinity;
       if (recencyA !== recencyB) return recencyB - recencyA;
+
+      const confidenceDiff = confidenceRankForRow(b) - confidenceRankForRow(a);
+      if (confidenceDiff !== 0) return confidenceDiff;
 
       const duplicateDiff = Number(a.isDuplicate) - Number(b.isDuplicate);
       if (duplicateDiff !== 0) return duplicateDiff;
@@ -925,10 +998,15 @@
 
   const resolveDataset = async ({ forceRefresh = false } = {}) => {
     const wrapDatasetPromise = (promise) =>
-      promise.then((dataset) => {
-        notifyDatasetListeners(dataset);
-        return dataset;
-      });
+      promise
+        .then((dataset) => {
+          notifyDatasetListeners(dataset);
+          return dataset;
+        })
+        .catch((error) => {
+          datasetCache.promise = null;
+          throw error;
+        });
 
     const fetchFreshDataset = async () => {
       const { entries } = await fetchDataset(PREVIEW_CACHE_LIMIT);
@@ -999,6 +1077,25 @@
         };
 
         datasetCache.promise = Promise.resolve(dataset);
+
+        if (!datasetCache.refreshing) {
+          const refresh = wrapDatasetPromise(fetchFreshDataset())
+            .then((fresh) => {
+              datasetCache.promise = Promise.resolve(fresh);
+              return fresh;
+            })
+            .catch((error) => {
+              console.warn('Background refresh from cache failed', error);
+              return null;
+            })
+            .finally(() => {
+              if (datasetCache.refreshing === refresh) {
+                datasetCache.refreshing = null;
+              }
+            });
+
+          datasetCache.refreshing = refresh;
+        }
         return dataset;
       }
     }
@@ -1118,6 +1215,7 @@
 
     if (sourceRows.length) {
       populateTable('sources', sourceRows, 'No active sources in this run.');
+      clampTableRows('sources');
     }
 
     if (typeRows.length) {
@@ -1126,11 +1224,15 @@
         typeRows,
         'No indicator types could be derived.'
       );
+      clampTableRows('types');
     }
 
     if (tagRows.length) {
       populateTable('tags', tagRows, 'No tags were present across indicators.');
+      clampTableRows('tags');
     }
+
+    ['sources', 'types', 'tags'].forEach(clampTableRows);
   };
 
   /* ==========================================================================
@@ -1466,6 +1568,24 @@
       indicatorCode.textContent = row.indicator ?? '—';
 
       indicatorMain.appendChild(indicatorCode);
+
+      const indicatorMeta = document.createElement('div');
+      indicatorMeta.className = 'preview-indicator-meta';
+
+      const makeMetaPill = (label, value) => {
+        const span = document.createElement('span');
+        span.className = `preview-meta-pill${label ? ` meta-${label}` : ''}`;
+        span.textContent = value ?? '—';
+        return span;
+      };
+
+      indicatorMeta.appendChild(makeMetaPill('type', row.type || 'unknown'));
+      indicatorMeta.appendChild(makeMetaPill('source', row.source || 'unknown'));
+      indicatorMeta.appendChild(
+        makeMetaPill('confidence', row.confidence || 'n/a')
+      );
+
+      indicatorMain.appendChild(indicatorMeta);
 
       if (row.tags && row.tags.length) {
         const tagsWrapper = document.createElement('div');
@@ -1919,6 +2039,7 @@
    *  BOOTSTRAP
    * ========================================================================= */
 
+  initialiseTableToggles();
   initialiseStatusBanner();
   loadStats();
   initialisePreview();
