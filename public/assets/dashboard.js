@@ -187,7 +187,12 @@
 
   const formatAbsoluteTimestamp = (timestamp) => {
     if (typeof timestamp !== 'number') return null;
-    const date = new Date(timestamp);
+
+    // Timestamps throughout the dashboard are normalised to seconds.
+    // Ensure we convert to milliseconds for Date() to avoid 1970-era fallbacks
+    // when recent epoch seconds are mistakenly treated as milliseconds.
+    const millis = timestamp > 1e12 ? timestamp : timestamp * 1000;
+    const date = new Date(millis);
     if (Number.isNaN(date.getTime())) return null;
     if (dateTimeFormatter) return dateTimeFormatter.format(date);
     return date.toISOString();
@@ -1529,7 +1534,8 @@
         }, 1600);
       });
 
-      indicatorWrapper.appendChild(copyButton);
+      indicatorCopy.appendChild(copyButton);
+      indicatorWrapper.appendChild(indicatorCopy);
       indicatorCell.appendChild(indicatorWrapper);
       tr.appendChild(indicatorCell);
 
@@ -1863,7 +1869,7 @@
         const value = parseInt(limitSelect.value, 10);
         if (!Number.isNaN(value) && value > 0) {
           state.limit = value;
-          applyFilter();
+          loadPreview({ silent: true });
         }
       });
     }

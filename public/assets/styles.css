@@ -666,6 +666,41 @@ code {
   gap: 0.45rem;
 }
 
+/* Keep the live preview table tidy on wide screens */
+.preview-table {
+  table-layout: auto;
+}
+
+.preview-table th:nth-child(2),
+.preview-table th:nth-child(3),
+.preview-table th:nth-child(4),
+.preview-table th:nth-child(5),
+.preview-table td:nth-child(2),
+.preview-table td:nth-child(3),
+.preview-table td:nth-child(4),
+.preview-table td:nth-child(5) {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.preview-table td:nth-child(2),
+.preview-table td:nth-child(3),
+.preview-table th:nth-child(2),
+.preview-table th:nth-child(3) {
+  max-width: 10.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.preview-indicator {
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.preview-indicator-copy {
+  flex-shrink: 0;
+}
+
 /* Scrollbar polish for the heavy IOC views */
 .preview-table-wrapper,
 .table-card {
