@@ -133,7 +133,7 @@ Prerequisites:
 
 ```bash
 # 1. Clone and enter the repository
-git clone https://github.com/<your-username>/SwiftIOC-Automated-Threat-Intelligence-Collector.git
+git clone https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector.git
 cd SwiftIOC-Automated-Threat-Intelligence-Collector
 
 # 2. (Optional) Create and activate a virtual environment
