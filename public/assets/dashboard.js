@@ -166,13 +166,13 @@
     const year = 365 * day;
 
     const divisions = [
-      { amount: 60, unit: 'seconds' },
-      { amount: 60, unit: 'minutes' },
-      { amount: 24, unit: 'hours' },
-      { amount: 7, unit: 'days' },
-      { amount: 4.34524, unit: 'weeks' },
-      { amount: 12, unit: 'months' },
-      { amount: Infinity, unit: 'years' },
+      { amount: 60, unit: 'second' },
+      { amount: 60, unit: 'minute' },
+      { amount: 24, unit: 'hour' },
+      { amount: 7, unit: 'day' },
+      { amount: 4.34524, unit: 'week' },
+      { amount: 12, unit: 'month' },
+      { amount: Infinity, unit: 'year' },
     ];
 
     let delta = Math.round(diff / 1000);
@@ -187,7 +187,12 @@
 
   const formatAbsoluteTimestamp = (timestamp) => {
     if (typeof timestamp !== 'number') return null;
-    const date = new Date(timestamp);
+
+    // Timestamps throughout the dashboard are normalised to seconds.
+    // Ensure we convert to milliseconds for Date() to avoid 1970-era fallbacks
+    // when recent epoch seconds are mistakenly treated as milliseconds.
+    const millis = timestamp > 1e12 ? timestamp : timestamp * 1000;
+    const date = new Date(millis);
     if (Number.isNaN(date.getTime())) return null;
     if (dateTimeFormatter) return dateTimeFormatter.format(date);
     return date.toISOString();
@@ -1529,7 +1534,8 @@
         }, 1600);
       });
 
-      indicatorWrapper.appendChild(copyButton);
+      indicatorCopy.appendChild(copyButton);
+      indicatorWrapper.appendChild(indicatorCopy);
       indicatorCell.appendChild(indicatorWrapper);
       tr.appendChild(indicatorCell);
 
@@ -1863,7 +1869,7 @@
         const value = parseInt(limitSelect.value, 10);
         if (!Number.isNaN(value) && value > 0) {
           state.limit = value;
-          applyFilter();
+          loadPreview({ silent: true });
         }
       });
     }
