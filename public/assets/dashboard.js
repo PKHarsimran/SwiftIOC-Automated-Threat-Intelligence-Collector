@@ -166,13 +166,13 @@
     const year = 365 * day;
 
     const divisions = [
-      { amount: 60, unit: 'seconds' },
-      { amount: 60, unit: 'minutes' },
-      { amount: 24, unit: 'hours' },
-      { amount: 7, unit: 'days' },
-      { amount: 4.34524, unit: 'weeks' },
-      { amount: 12, unit: 'months' },
-      { amount: Infinity, unit: 'years' },
+      { amount: 60, unit: 'second' },
+      { amount: 60, unit: 'minute' },
+      { amount: 24, unit: 'hour' },
+      { amount: 7, unit: 'day' },
+      { amount: 4.34524, unit: 'week' },
+      { amount: 12, unit: 'month' },
+      { amount: Infinity, unit: 'year' },
     ];
 
     let delta = Math.round(diff / 1000);
