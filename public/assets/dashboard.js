@@ -1040,28 +1040,24 @@
       );
     }
 
-    if (stats.sourcesTable) {
-      populateTable(
-        'sources',
-        stats.sourcesTable,
-        'No active sources in this run.'
-      );
+    const sourceRows = stats.sourcesTable || dataset?.sourcesTable || [];
+    const typeRows = stats.typesTable || dataset?.typesTable || [];
+    const tagRows = stats.tagsTable || dataset?.tagsTable || [];
+
+    if (sourceRows.length) {
+      populateTable('sources', sourceRows, 'No active sources in this run.');
     }
 
-    if (stats.typesTable) {
+    if (typeRows.length) {
       populateTable(
         'types',
-        stats.typesTable,
+        typeRows,
         'No indicator types could be derived.'
       );
     }
 
-    if (stats.tagsTable) {
-      populateTable(
-        'tags',
-        stats.tagsTable,
-        'No tags were present across indicators.'
-      );
+    if (tagRows.length) {
+      populateTable('tags', tagRows, 'No tags were present across indicators.');
     }
   };
 
