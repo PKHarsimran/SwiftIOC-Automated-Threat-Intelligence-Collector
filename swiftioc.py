@@ -312,7 +312,7 @@ def fetch_cisa_kev(url: str, ref_url: str, source: str, ws: datetime) -> List[In
     for it in data.get("vulnerabilities", []) or []:
         cve = it.get("cveID")
         pub = parse_dt(it.get("dateAdded"))
-        if not cve or (pub and pub < ws):
+        if not cve:
             continue
         out.append(
             Indicator(
