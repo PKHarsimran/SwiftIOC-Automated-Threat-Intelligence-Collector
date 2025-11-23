@@ -1529,7 +1529,8 @@
         }, 1600);
       });
 
-      indicatorWrapper.appendChild(copyButton);
+      indicatorCopy.appendChild(copyButton);
+      indicatorWrapper.appendChild(indicatorCopy);
       indicatorCell.appendChild(indicatorWrapper);
       tr.appendChild(indicatorCell);
 
@@ -1863,7 +1864,7 @@
         const value = parseInt(limitSelect.value, 10);
         if (!Number.isNaN(value) && value > 0) {
           state.limit = value;
-          applyFilter();
+          loadPreview({ silent: true });
         }
       });
     }
