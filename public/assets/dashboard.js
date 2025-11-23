@@ -810,12 +810,12 @@
     });
 
     const compareRows = (a, b) => {
-      const confidenceDiff = confidenceRankForRow(b) - confidenceRankForRow(a);
-      if (confidenceDiff !== 0) return confidenceDiff;
-
       const recencyA = derivePreviewTimestamp(a) ?? -Infinity;
       const recencyB = derivePreviewTimestamp(b) ?? -Infinity;
       if (recencyA !== recencyB) return recencyB - recencyA;
+
+      const confidenceDiff = confidenceRankForRow(b) - confidenceRankForRow(a);
+      if (confidenceDiff !== 0) return confidenceDiff;
 
       const duplicateDiff = Number(a.isDuplicate) - Number(b.isDuplicate);
       if (duplicateDiff !== 0) return duplicateDiff;
@@ -925,10 +925,15 @@
 
   const resolveDataset = async ({ forceRefresh = false } = {}) => {
     const wrapDatasetPromise = (promise) =>
-      promise.then((dataset) => {
-        notifyDatasetListeners(dataset);
-        return dataset;
-      });
+      promise
+        .then((dataset) => {
+          notifyDatasetListeners(dataset);
+          return dataset;
+        })
+        .catch((error) => {
+          datasetCache.promise = null;
+          throw error;
+        });
 
     const fetchFreshDataset = async () => {
       const { entries } = await fetchDataset(PREVIEW_CACHE_LIMIT);
@@ -999,6 +1004,25 @@
         };
 
         datasetCache.promise = Promise.resolve(dataset);
+
+        if (!datasetCache.refreshing) {
+          const refresh = wrapDatasetPromise(fetchFreshDataset())
+            .then((fresh) => {
+              datasetCache.promise = Promise.resolve(fresh);
+              return fresh;
+            })
+            .catch((error) => {
+              console.warn('Background refresh from cache failed', error);
+              return null;
+            })
+            .finally(() => {
+              if (datasetCache.refreshing === refresh) {
+                datasetCache.refreshing = null;
+              }
+            });
+
+          datasetCache.refreshing = refresh;
+        }
         return dataset;
       }
     }
@@ -1466,6 +1490,24 @@
       indicatorCode.textContent = row.indicator ?? '—';
 
       indicatorMain.appendChild(indicatorCode);
+
+      const indicatorMeta = document.createElement('div');
+      indicatorMeta.className = 'preview-indicator-meta';
+
+      const makeMetaPill = (label, value) => {
+        const span = document.createElement('span');
+        span.className = `preview-meta-pill${label ? ` meta-${label}` : ''}`;
+        span.textContent = value ?? '—';
+        return span;
+      };
+
+      indicatorMeta.appendChild(makeMetaPill('type', row.type || 'unknown'));
+      indicatorMeta.appendChild(makeMetaPill('source', row.source || 'unknown'));
+      indicatorMeta.appendChild(
+        makeMetaPill('confidence', row.confidence || 'n/a')
+      );
+
+      indicatorMain.appendChild(indicatorMeta);
 
       if (row.tags && row.tags.length) {
         const tagsWrapper = document.createElement('div');

@@ -25,6 +25,7 @@ ready-to-use examples for rapid deployment in modern DevSecOps workflows.
 - [CLI reference](#-cli-reference)
 - [Outputs & diagnostics](#-outputs--diagnostics)
 - [Running in GitHub Actions](#-running-in-github-actions)
+- [GitHub Pages preview & publishing](#-github-pages-preview--publishing)
 - [Auto-generated IOC summary](#auto-generated-ioc-summary)
 
 ## 🔍 SwiftIOC at a glance
@@ -238,7 +239,33 @@ public/
 
 The diagnostics include per-source counts, duplicate statistics, earliest and
 latest timestamps, and any recorded failures. These summaries are useful for CI
-status checks and dashboards. 
+status checks and dashboards.
+
+## 🌍 GitHub Pages preview & publishing
+SwiftIOC ships with a Pages-ready dashboard so the collected indicators can be
+browsed without additional tooling. The project uses `public/` as both the
+artifact directory and the published site root:
+
+- `public/index.html` renders the live preview, source breakdowns, tag counts,
+  and export links using the JSON/JSONL outputs produced by `swiftioc.py`.
+- `index.html` at the repository root provides a branded landing page that
+  redirects to `public/` after a short delay while offering quick links for
+  manual navigation.
+
+To publish on GitHub Pages:
+
+1. Run the collector locally or in CI to populate `public/` (see
+   [Quick start](#-quick-start)).
+2. Commit the generated artifacts or upload them as a workflow artifact (as
+   shown in [Running in GitHub Actions](#-running-in-github-actions)).
+3. Enable GitHub Pages with the **GitHub Actions** source so deployments pick up
+   the latest `public/` output automatically.
+
+The dashboard prioritises freshness by sorting preview rows by newest timestamp
+first, then confidence, ensuring visitors see the latest IOCs at the top of the
+feed. Mobile breakpoints convert the preview table into card-style rows for a
+phone-friendly experience, and all metadata is defanged to stay safe for casual
+browsing.
 
 ## ⚙️ Running in GitHub Actions
 SwiftIOC runs cleanly inside GitHub Actions and emits artifacts that can be
