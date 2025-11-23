@@ -187,7 +187,7 @@
 
   const formatAbsoluteTimestamp = (timestamp) => {
     if (typeof timestamp !== 'number') return null;
-    const date = new Date(timestamp);
+    const date = new Date(timestamp * 1000);
     if (Number.isNaN(date.getTime())) return null;
     if (dateTimeFormatter) return dateTimeFormatter.format(date);
     return date.toISOString();
@@ -727,6 +727,13 @@
 
     const confidence = confidenceRaw || null;
 
+    const firstSeenParsed = parseTimestamp(firstSeen);
+    const lastSeenParsed = parseTimestamp(lastSeen);
+    const bestTimestamp = lastSeenParsed?.time ?? firstSeenParsed?.time ?? null;
+
+    const firstSeenDisplay = formatTimestampForDisplay(firstSeen ?? lastSeen);
+    const lastSeenDisplay = formatTimestampForDisplay(lastSeen ?? firstSeen);
+
     const normalised = {
       indicator,
       type: typeRaw || 'unknown',
@@ -737,6 +744,9 @@
       tagsLower,
       firstSeen,
       lastSeen,
+      firstSeenDisplay,
+      lastSeenDisplay,
+      bestTimestamp,
       isDuplicate: Boolean(row.is_duplicate || row.duplicate),
       raw: row,
     };
@@ -772,6 +782,99 @@
   const datasetCache = {
     promise: null,
     refreshing: null,
+  };
+
+  const derivePreviewTimestamp = (row) => {
+    if (!row || typeof row !== 'object') return null;
+    if (typeof row.bestTimestamp === 'number') return row.bestTimestamp;
+    const lastSeenParsed = parseTimestamp(row.lastSeen);
+    const firstSeenParsed = parseTimestamp(row.firstSeen);
+    const bestTimestamp = lastSeenParsed?.time ?? firstSeenParsed?.time ?? null;
+    row.bestTimestamp = bestTimestamp;
+    return bestTimestamp;
+  };
+
+  const hotTagPatterns = [
+    /cve-?\d{4}-\d{3,7}/i,
+    /zero[- ]?day/i,
+    /exploit/i,
+    /ransom/i,
+    /stealer/i,
+    /loader/i,
+    /backdoor/i,
+    /botnet/i,
+    /apt/i,
+    /phishing/i,
+    /ddos/i,
+  ];
+
+  const hasHotTags = (row) => {
+    if (!row || !row.tags || !row.tags.length) return false;
+    return row.tags.some((tag) => hotTagPatterns.some((rx) => rx.test(tag)));
+  };
+
+  const scorePreviewRow = (row, nowSeconds) => {
+    const confidenceScore = confidenceRankForRow(row) * 1000;
+
+    const timestamp = derivePreviewTimestamp(row);
+    const ageHours =
+      typeof timestamp === 'number'
+        ? Math.max((nowSeconds - timestamp) / 3600, 0)
+        : Number.POSITIVE_INFINITY;
+    const recencyScore = Number.isFinite(ageHours)
+      ? Math.max(0, 720 - ageHours) // prefer items from the last ~30 days
+      : -1000;
+
+    const threatBoost = hasHotTags(row) ? 200 : 0;
+    const duplicatePenalty = row.isDuplicate ? -150 : 0;
+
+    return confidenceScore + recencyScore + threatBoost + duplicatePenalty;
+  };
+
+  const selectPreviewRows = (rows, limit) => {
+    if (!Array.isArray(rows) || rows.length === 0 || limit <= 0) return [];
+
+    const groups = new Map();
+    rows.forEach((row) => {
+      const key = normaliseLower(row.source) || 'unknown';
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(row);
+    });
+
+    const nowSeconds = Math.round(Date.now() / 1000);
+    const compareRows = (a, b) => {
+      const scoreA = scorePreviewRow(a, nowSeconds);
+      const scoreB = scorePreviewRow(b, nowSeconds);
+
+      if (scoreA !== scoreB) return scoreB - scoreA;
+
+      const recencyA = derivePreviewTimestamp(a) ?? -Infinity;
+      const recencyB = derivePreviewTimestamp(b) ?? -Infinity;
+      if (recencyA !== recencyB) return recencyB - recencyA;
+
+      return (a.indicator || '').localeCompare(b.indicator || '');
+    };
+
+    groups.forEach((list) => list.sort(compareRows));
+
+    const orderedGroups = Array.from(groups.values()).sort((a, b) =>
+      compareRows(a[0], b[0])
+    );
+
+    const selected = [];
+    while (selected.length < limit && orderedGroups.length) {
+      for (let i = 0; i < orderedGroups.length && selected.length < limit; i += 1) {
+        const group = orderedGroups[i];
+        if (!group.length) continue;
+        selected.push(group.shift());
+        if (!group.length) {
+          orderedGroups.splice(i, 1);
+          i -= 1;
+        }
+      }
+    }
+
+    return selected;
   };
 
   const loadFromStorage = () => {
@@ -860,7 +963,7 @@
       });
 
     const fetchFreshDataset = async () => {
-      const { entries, previewEntries } = await fetchDataset(PREVIEW_CACHE_LIMIT);
+      const { entries } = await fetchDataset(PREVIEW_CACHE_LIMIT);
 
       const statsAccumulator = createStatsAccumulator();
       const tableAggregators = createTableAggregators();
@@ -876,12 +979,10 @@
 
       const stats = statsAccumulator.finalise();
 
-      const previewEntriesNormalised = [];
-      for (const row of previewEntries) {
-        const normalised = normaliseRow(row);
-        if (!normalised) continue;
-        previewEntriesNormalised.push(normalised);
-      }
+      const previewEntriesNormalised = selectPreviewRows(
+        normalisedEntries,
+        PREVIEW_CACHE_LIMIT
+      );
 
       const dataset = {
         origin: 'network',
@@ -918,7 +1019,10 @@
         const dataset = {
           origin: cached.origin,
           entries: normalisedEntries,
-          previewEntries: normalisedEntries.slice(0, PREVIEW_CACHE_LIMIT),
+          previewEntries: selectPreviewRows(
+            normalisedEntries,
+            PREVIEW_CACHE_LIMIT
+          ),
           stats,
           fetchedAt: cached.fetchedAt,
           sourcesTable: tableAggregators.toSourceRows(),
@@ -1040,28 +1144,24 @@
       );
     }
 
-    if (stats.sourcesTable) {
-      populateTable(
-        'sources',
-        stats.sourcesTable,
-        'No active sources in this run.'
-      );
+    const sourceRows = stats.sourcesTable || dataset?.sourcesTable || [];
+    const typeRows = stats.typesTable || dataset?.typesTable || [];
+    const tagRows = stats.tagsTable || dataset?.tagsTable || [];
+
+    if (sourceRows.length) {
+      populateTable('sources', sourceRows, 'No active sources in this run.');
     }
 
-    if (stats.typesTable) {
+    if (typeRows.length) {
       populateTable(
         'types',
-        stats.typesTable,
+        typeRows,
         'No indicator types could be derived.'
       );
     }
 
-    if (stats.tagsTable) {
-      populateTable(
-        'tags',
-        stats.tagsTable,
-        'No tags were present across indicators.'
-      );
+    if (tagRows.length) {
+      populateTable('tags', tagRows, 'No tags were present across indicators.');
     }
   };
 
@@ -1480,7 +1580,9 @@
 
       tr.appendChild(makeCell('Type', row.type));
       tr.appendChild(makeCell('Source', row.source));
-      tr.appendChild(makeCell('First seen', row.firstSeen));
+      tr.appendChild(
+        makeCell('First seen', row.firstSeenDisplay ?? row.firstSeen)
+      );
 
       const confidenceClass = confidenceClassFor(row.confidence);
       const confidenceLabel = row.confidence || '—';
@@ -1798,7 +1900,9 @@
         const value = parseInt(limitSelect.value, 10);
         if (!Number.isNaN(value) && value > 0) {
           state.limit = value;
-          applyFilter();
+          if (!state.loading) {
+            loadPreview({ silent: true });
+          }
         }
       });
     }
