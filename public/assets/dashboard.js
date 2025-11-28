@@ -862,14 +862,20 @@
     refreshing: null,
   };
 
-  const derivePreviewTimestamp = (row) => {
-    if (!row || typeof row !== 'object') return null;
-    if (typeof row.bestTimestamp === 'number') return row.bestTimestamp;
+  const derivePreviewTimestamps = (row) => {
+    if (!row || typeof row !== 'object') return { recency: null, lastSeen: null };
+    if (row.previewTimestamps) return row.previewTimestamps;
+
     const lastSeenParsed = parseTimestamp(row.lastSeen);
     const firstSeenParsed = parseTimestamp(row.firstSeen);
-    const bestTimestamp = lastSeenParsed?.time ?? firstSeenParsed?.time ?? null;
-    row.bestTimestamp = bestTimestamp;
-    return bestTimestamp;
+
+    const recency = firstSeenParsed?.time ?? lastSeenParsed?.time ?? null;
+
+    row.previewTimestamps = {
+      recency,
+      lastSeen: lastSeenParsed?.time ?? null,
+    };
+    return row.previewTimestamps;
   };
 
   const selectPreviewRows = (rows, limit) => {
@@ -883,12 +889,19 @@
     });
 
     const compareRows = (a, b) => {
-      const recencyA = derivePreviewTimestamp(a) ?? -Infinity;
-      const recencyB = derivePreviewTimestamp(b) ?? -Infinity;
-      if (recencyA !== recencyB) return recencyB - recencyA;
-
       const confidenceDiff = confidenceRankForRow(b) - confidenceRankForRow(a);
       if (confidenceDiff !== 0) return confidenceDiff;
+
+      const timestampsA = derivePreviewTimestamps(a);
+      const timestampsB = derivePreviewTimestamps(b);
+
+      const recencyA = timestampsA.recency ?? -Infinity;
+      const recencyB = timestampsB.recency ?? -Infinity;
+      if (recencyA !== recencyB) return recencyB - recencyA;
+
+      const lastSeenA = timestampsA.lastSeen ?? -Infinity;
+      const lastSeenB = timestampsB.lastSeen ?? -Infinity;
+      if (lastSeenA !== lastSeenB) return lastSeenB - lastSeenA;
 
       const duplicateDiff = Number(a.isDuplicate) - Number(b.isDuplicate);
       if (duplicateDiff !== 0) return duplicateDiff;

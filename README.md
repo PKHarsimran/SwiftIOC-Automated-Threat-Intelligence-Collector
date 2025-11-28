@@ -1,5 +1,9 @@
 # ⚡ SwiftIOC – Open Source Automated Threat Intelligence Collector
 
+[![CI – SwiftIOC](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/ci.yml/badge.svg)](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/codeql.yml/badge.svg)](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/codeql.yml)
+[![Security Policy](https://img.shields.io/badge/security-SECURITY.md-informational)](./SECURITY.md)
+
 SwiftIOC is an open-source Python threat intelligence automation toolkit that
 keeps recent Indicators of Compromise (IOCs) in machine-readable formats. The
 lightweight collector (`swiftioc.py`) ingests threat feeds via YAML
@@ -16,6 +20,7 @@ ready-to-use examples for rapid deployment in modern DevSecOps workflows.
 ## 📚 Table of contents
 - [SwiftIOC at a glance](#-swiftioc-at-a-glance)
 - [Features](#-features)
+- [GitHub project health](#-github-project-health)
 - [Supported threat intelligence sources](#-supported-threat-intelligence-sources)
 - [Use cases & SEO-friendly keywords](#-use-cases--seo-friendly-keywords)
 - [Repository layout](#-repository-layout)
@@ -41,7 +46,7 @@ high-fidelity IOCs from authoritative sources. The project emphasises:
 - **YAML-driven feeds** – feed metadata lives in `sources.yml` so collections can
   be changed without touching Python code. The example file includes adapters for
   CISA KEV, URLhaus, MalwareBazaar, ThreatFox, Feodo Tracker, SSLBL JA3, Spamhaus
-  DROP, OpenPhish, CINS Army, and Tor exit lists. 
+  DROP, OpenPhish, CINS Army, and Tor exit lists.
 - **Indicator normalisation** – every indicator is represented by the
   `Indicator` dataclass and classified (IPv4/IPv6, URL, domain, hash, CVE, etc.)
   before being written to disk. 
@@ -56,7 +61,16 @@ high-fidelity IOCs from authoritative sources. The project emphasises:
   installed; use `--skip-rss` (or `--ci-safe`) to run without the dependency.
 - **CI-friendly defaults** – JSON logging, deterministic output paths, and
   guard-rail flags (`--fail-on-empty`, `--fail-if-stale`, `--grace-on-404`) make
-  the collector predictable in automation. 
+  the collector predictable in automation.
+
+## 🛡️ GitHub project health
+- **Continuous integration** – the `CI – SwiftIOC` workflow lint-checks the
+  Python codebase, validates types, audits dependencies, and exercises the
+  collector end-to-end on every push and pull request.
+- **CodeQL scanning** – GitHub's CodeQL workflow analyses the repository for
+  common security issues to keep the collector safe for automation.
+- **Security policy** – coordinated vulnerability disclosures are handled via
+  [`SECURITY.md`](SECURITY.md) with direct contact guidance for maintainers.
 
 ## 🌐 Supported threat intelligence sources
 SwiftIOC ships with parsers and adapters for widely referenced cyber threat
