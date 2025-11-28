@@ -883,12 +883,12 @@
     });
 
     const compareRows = (a, b) => {
+      const confidenceDiff = confidenceRankForRow(b) - confidenceRankForRow(a);
+      if (confidenceDiff !== 0) return confidenceDiff;
+
       const recencyA = derivePreviewTimestamp(a) ?? -Infinity;
       const recencyB = derivePreviewTimestamp(b) ?? -Infinity;
       if (recencyA !== recencyB) return recencyB - recencyA;
-
-      const confidenceDiff = confidenceRankForRow(b) - confidenceRankForRow(a);
-      if (confidenceDiff !== 0) return confidenceDiff;
 
       const duplicateDiff = Number(a.isDuplicate) - Number(b.isDuplicate);
       if (duplicateDiff !== 0) return duplicateDiff;
