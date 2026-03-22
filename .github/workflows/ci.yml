@@ -2,41 +2,49 @@ name: CI – SwiftIOC
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     paths:
       - "swiftioc.py"
       - "sources*.yml"
       - "requirements.txt"
       - ".github/workflows/ci.yml"
   pull_request:
-    branches: [ main ]
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  PYTHON_VERSION: "3.11"
 
 permissions:
   contents: read
 
+concurrency:
+  group: ci-swiftioc-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
+    name: Lint, audit, and self-test
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
+
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
-          python-version: "3.11"
-
-      - name: Cache pip
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: requirements.txt
 
       - name: Install dependencies
+        shell: bash
         run: |
-          python -m pip install -U pip
+          set -Eeuo pipefail
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install ruff pyright pip-audit
 
@@ -53,20 +61,29 @@ jobs:
         run: python swiftioc.py --self-test
 
       - name: Dry run (skip RSS, short window)
+        shell: bash
         run: |
+          set -Eeuo pipefail
           mkdir -p public/diagnostics/raw
-          python swiftioc.py -v --out-dir public --sources sources.example.yml \
-            --window-hours 6 --skip-rss \
-            --log-file public/diagnostics/run.log --log-format json --log-file-level DEBUG \
+          python swiftioc.py -v \
+            --out-dir public \
+            --sources sources.example.yml \
+            --window-hours 6 \
+            --skip-rss \
+            --log-file public/diagnostics/run.log \
+            --log-format json \
+            --log-file-level DEBUG \
             --save-raw-dir public/diagnostics/raw \
             --diag-json public/diagnostics/run.json \
             --report public/diagnostics/REPORT.md
 
       - name: Upload diagnostics
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ci-artifacts
+          retention-days: 7
+          if-no-files-found: warn
           path: |
-            public/diagnostics/*
-            public/iocs/*
-          if-no-files-found: ignore
+            public/diagnostics/**
+            public/iocs/**
