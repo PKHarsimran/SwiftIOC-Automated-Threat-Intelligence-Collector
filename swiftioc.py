@@ -236,7 +236,17 @@ def build_session() -> requests.Session:
     from urllib3.util import Retry
     from requests.adapters import HTTPAdapter
     s = requests.Session()
-    adapter = HTTPAdapter(max_retries=Retry(total=3, backoff_factor=0.6, status_forcelist=(429, 500, 502, 503, 504)))
+    adapter = HTTPAdapter(
+    max_retries=Retry(
+        total=5,
+        connect=5,
+        read=5,
+        backoff_factor=1.0,
+        status_forcelist=(429, 500, 502, 503, 504, 520, 521, 522, 523, 524),
+        allowed_methods=frozenset({"GET", "HEAD"}),
+        raise_on_status=False,
+    )
+)
     s.mount("http://", adapter)
     s.mount("https://", adapter)
     return s
@@ -534,33 +544,51 @@ def fetch_threatfox_export_json(url: str, ref_url: str, source: str, ws: datetim
 
 
 @register_parser("feodo_ipblocklist")
-def fetch_feodo_ipblocklist(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
+def fetch_feodo_ipblocklist(
+    url: str,
+    ref_url: str,
+    source: str,
+    ws: datetime,
+    *,
+    disable_window: bool = True,
+) -> List[Indicator]:
     text = ensure_text(http_get(url, name=source))
     out: List[Indicator] = []
     now = now_utc()
+
     for row in csv.reader(io.StringIO(text)):
         if not row:
             continue
+
         header_token = row[0].strip().lower()
         if header_token.startswith("#") or header_token in {"first_seen_utc", "timestamp"}:
             continue
+
         try:
             seen = parse_dt(row[0])
             ip = row[1].strip()
             family = row[5].strip() if len(row) > 5 else ""
         except Exception:
             continue
-        if seen and seen < ws:
+
+        if not disable_window and seen and seen < ws:
             continue
+
         out.append(
             Indicator(
-                indicator=defang_min(ip), type="ipv4", source=source,
-                first_seen=iso(seen or now), last_seen=iso(now),
-                confidence="high", tlp="CLEAR",
+                indicator=defang_min(ip),
+                type="ipv4",
+                source=source,
+                first_seen=iso(seen or now),
+                last_seen=iso(now),
+                confidence="high",
+                tlp="CLEAR",
                 tags=",".join(filter(None, ["feodo", "c2", family])),
-                reference=ref_url or "", context="Feodo Tracker C2 IP",
+                reference=ref_url or "",
+                context="Feodo Tracker C2 IP",
             )
         )
+
     return out
 
 
@@ -571,35 +599,48 @@ def _fetch_sslbl_ja3(
     ws: datetime,
     *,
     kind: str,
+    disable_window: bool = True,
 ) -> List[Indicator]:
     text = ensure_text(http_get(url, name=source))
     out: List[Indicator] = []
     now = now_utc()
+
     for row in csv.reader(io.StringIO(text)):
         if not row:
             continue
+
         header_token = row[0].strip().lower()
         if header_token.startswith("#") or header_token in {"first_seen", "timestamp"}:
             continue
+
         ja = row[1].strip() if len(row) > 1 else None
         if not ja:
             continue
+
         if not JA3_RE.fullmatch(ja.strip()):
-            # Skip malformed entries and ensure we only publish valid JA3 hashes
             continue
+
         first_seen = parse_dt(row[0]) if row[0] else None
-        if first_seen and first_seen < ws:
+        if not disable_window and first_seen and first_seen < ws:
             continue
+
         desc = row[2] if len(row) > 2 else ""
+
         out.append(
             Indicator(
-                indicator=ja.lower(), type=("ja3" if kind == "ja3" else "ja3s"), source=source,
-                first_seen=iso(first_seen or now), last_seen=iso(now),
-                confidence="medium", tlp="CLEAR",
+                indicator=ja.lower(),
+                type=("ja3" if kind == "ja3" else "ja3s"),
+                source=source,
+                first_seen=iso(first_seen or now),
+                last_seen=iso(now),
+                confidence="medium",
+                tlp="CLEAR",
                 tags=",".join(filter(None, ["sslbl", "tls", "fingerprint", desc])),
-                reference=ref_url or "", context=f"SSLBL {('JA3' if kind=='ja3' else 'JA3S')} fingerprint",
+                reference=ref_url or "",
+                context=f"SSLBL {('JA3' if kind == 'ja3' else 'JA3S')} fingerprint",
             )
         )
+
     return out
 
 
@@ -689,8 +730,8 @@ def fetch_phishstats(url: str, ref_url: str, source: str, ws: datetime) -> List[
         if not url_val:
             continue
         seen = parse_dt(choose(row, ("date", "first_seen", "submission_time", "created_at")))
-        if seen and seen < ws:
-            continue
+        if not disable_window and seen and seen < ws:
+    continue
         tags = {"phishing", "phishstats"}
         target = choose(row, ("target", "brand", "campaign"))
         if target:
@@ -761,20 +802,28 @@ def fetch_tor_exit(url: str, ref_url: str, source: str, ws: datetime) -> List[In
     text = ensure_text(http_get(url, name=source))
     out: List[Indicator] = []
     now = now_utc()
+
     for line in text.splitlines():
         line = line.strip()
         if not line or line.startswith("#"):
             continue
+
         if re.match(r"^(?:\d{1,3}\.){3}\d{1,3}$", line):
             out.append(
                 Indicator(
-                    indicator=defang_min(line), type="ipv4", source=source,
-                    first_seen=iso(now), last_seen=iso(now),
-                    confidence="low", tlp="CLEAR",
-                    tags="tor,exit-node", reference=ref_url or "",
+                    indicator=defang_min(line),
+                    type="ipv4",
+                    source=source,
+                    first_seen=iso(now),
+                    last_seen=iso(now),
+                    confidence="low",
+                    tlp="CLEAR",
+                    tags="tor,exit-node",
+                    reference=ref_url or "",
                     context="Tor exit node list",
                 )
-        )
+            )
+
     return out
 
 
@@ -1145,16 +1194,19 @@ def collect_from_yaml(
     failures: List[Dict[str, str]] = []
     raw_total = 0
 
-    # APIs
+        # APIs
     for api in cfg.get("apis", []) or []:
         name = api.get("name", "api")
         parse = api.get("parse")
         if not parse:
             continue
+
         url = api.get("url", "")
         ref = api.get("reference", url) or ""
         ws = start_for(name)
         got: List[Indicator] = []
+        options: Dict[str, Any] = {}
+
         try:
             t0 = time.perf_counter()
             parser_fn = resolve_parser(parse)
@@ -1164,23 +1216,38 @@ def collect_from_yaml(
                 for k in parser_sig.parameters
                 if k not in {"url", "ref_url", "source", "ws"}
             }
-            options: Dict[str, Any] = dict(api.get("options", {}))
-            for key in ("fallback_url", "graceful_404", "status_filter"):
+
+            options = dict(api.get("options", {}))
+            for key in (
+                "fallback_url",
+                "graceful_404",
+                "status_filter",
+                "disable_window",
+                "graceful_fail",
+            ):
                 if key in api and key not in options:
                     options[key] = api[key]
+
             if name in grace_on_404 and "graceful_404" in supported_kwargs:
                 options.setdefault("graceful_404", True)
+
             if "status_filter" in supported_kwargs:
                 options.setdefault("status_filter", urlhaus_status)
+
             filtered_options = {k: v for k, v in options.items() if k in supported_kwargs}
             got = parser_fn(url, ref, name, ws, **filtered_options)
+
             dt = time.perf_counter() - t0
             logger.debug("collect %s %d in %.2fs", name, len(got), dt)
             logger.debug("summary %s types=%s tags_top=%s", name, type_counts(got), top_tags(got))
+
         except Exception as e:
+            graceful_fail = bool(api.get("graceful_fail") or options.get("graceful_fail"))
             logger.warning("%s failed: %s", name, e)
-            failures.append({"source": name, "error": str(e)})
+            if not graceful_fail:
+                failures.append({"source": name, "error": str(e)})
             got = []
+
         got = cap(got)
         raw_total += len(got)
         indicators.extend(got)
@@ -1201,9 +1268,11 @@ def collect_from_yaml(
                 logger.debug("collect RSS %s %d in %.2fs", name, len(got), dt)
                 logger.debug("summary %s types=%s tags_top=%s", name, type_counts(got), top_tags(got))
             except Exception as e:
-                logger.warning("%s failed: %s", name, e)
-                failures.append({"source": name, "error": str(e)})
-                got = []
+    graceful_fail = bool(api.get("graceful_fail") or options.get("graceful_fail"))
+    logger.warning("%s failed: %s", name, e)
+    if not graceful_fail:
+        failures.append({"source": name, "error": str(e)})
+    got = []
             got = cap(got)
             raw_total += len(got)
             indicators.extend(got)
