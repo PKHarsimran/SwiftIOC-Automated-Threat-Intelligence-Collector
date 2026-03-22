@@ -11,27 +11,36 @@ on:
         description: "Filter URLhaus by status (any|online|offline)"
         required: false
         default: "online"
+
   schedule:
-    # Every 4 hours (adjust as you like)
     - cron: "0 */4 * * *"
 
+  pull_request:
+    branches:
+      - main
+
 permissions:
-  contents: write        # needed for auto-commit
-  pages: write           # needed if you enable GitHub Pages deploy
+  contents: write
+  pages: write
   id-token: write
 
 concurrency:
-  group: "collect-swiftioc"
+  group: collect-swiftioc-${{ github.ref }}
   cancel-in-progress: false
 
 env:
-  ENABLE_PAGES: "true"
+  PYTHON_VERSION: "3.11"
+  OUT_DIR: "public"
+  DIAG_DIR: "public/diagnostics"
+  IOC_DIR: "public/iocs"
+  CHANGELOG_DIR: "public/changelog"
+  RAW_DIR: "public/diagnostics/raw"
+  SOURCES_FILE: "sources.yml"
 
 jobs:
   collect:
+    name: Collect IOC feeds
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
     timeout-minutes: 20
 
     steps:
@@ -43,69 +52,122 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: requirements.txt
 
-      - name: Cache pip
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
-
-      - name: Install dependencies
+      - name: Ensure runtime directories
+        shell: bash
         run: |
-          python -m pip install -U pip
-          pip install -r requirements.txt
+          mkdir -p "$DIAG_DIR" "$RAW_DIR" "$IOC_DIR" "$CHANGELOG_DIR"
 
-      # Optional: supply your own UA list (put file in repo at ./data/user_agents.txt)
-      - name: Ensure diagnostics directories
-        run: |
-          mkdir -p public/diagnostics/raw
-          mkdir -p public/iocs
-          mkdir -p public/changelog
-          if [ ! -f sources.yml ] && [ -f sources.example.yml ]; then
-            cp sources.example.yml sources.yml
+          if [ ! -f "$SOURCES_FILE" ] && [ -f "sources.example.yml" ]; then
+            cp sources.example.yml "$SOURCES_FILE"
+            echo "Copied sources.example.yml -> $SOURCES_FILE"
           fi
 
-      - name: Run collector
-        id: run
+      - name: Validate required files
+        shell: bash
+        run: |
+          test -f swiftioc.py || { echo "swiftioc.py not found"; exit 1; }
+          test -f requirements.txt || { echo "requirements.txt not found"; exit 1; }
+          test -f "$SOURCES_FILE" || { echo "$SOURCES_FILE not found"; exit 1; }
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          pip install --retries 5 -r requirements.txt
+
+      - name: Run self-test
+        shell: bash
+        run: |
+          python swiftioc.py --self-test
+
+      - name: Show collector settings
+        shell: bash
         env:
           WINDOW_HOURS: ${{ github.event.inputs.window_hours || '48' }}
           URLHAUS_STATUS: ${{ github.event.inputs.urlhaus_status || 'online' }}
         run: |
-          set -e
+          echo "event_name=${{ github.event_name }}"
+          echo "ref=${{ github.ref }}"
+          echo "WINDOW_HOURS=$WINDOW_HOURS"
+          echo "URLHAUS_STATUS=$URLHAUS_STATUS"
+          echo "OUT_DIR=$OUT_DIR"
+          echo "SOURCES_FILE=$SOURCES_FILE"
+
+      - name: Run collector
+        id: collector
+        shell: bash
+        env:
+          WINDOW_HOURS: ${{ github.event.inputs.window_hours || '48' }}
+          URLHAUS_STATUS: ${{ github.event.inputs.urlhaus_status || 'online' }}
+        run: |
+          set -Eeuo pipefail
+
           python swiftioc.py -vv \
-            --out-dir public \
-            --sources sources.yml \
+            --out-dir "$OUT_DIR" \
+            --sources "$SOURCES_FILE" \
             --window-hours "$WINDOW_HOURS" \
             --urlhaus-status "$URLHAUS_STATUS" \
-            --log-file public/diagnostics/run.log \
+            --log-file "$DIAG_DIR/run.log" \
             --log-format json \
             --log-file-level DEBUG \
-            --save-raw-dir public/diagnostics/raw \
-            --diag-json public/diagnostics/run.json \
-            --report public/diagnostics/REPORT.md \
+            --save-raw-dir "$RAW_DIR" \
+            --diag-json "$DIAG_DIR/run.json" \
+            --report "$DIAG_DIR/REPORT.md" \
             --fail-on-empty urlhaus_recent_urls malwarebazaar_recent
 
       - name: Summarize IOC outputs
+        if: always()
+        shell: bash
         run: |
-          python scripts/summarize_iocs.py \
-            --diag public/diagnostics/run.json \
-            --ioc-jsonl public/iocs/latest.jsonl \
-            --out public/diagnostics/summary.md \
-            --index public/index.md
+          set -Eeuo pipefail
 
-      - name: Upload artifacts (diagnostics & outputs)
+          if [ -f "scripts/summarize_iocs.py" ] && [ -f "$DIAG_DIR/run.json" ] && [ -f "$IOC_DIR/latest.jsonl" ]; then
+            python scripts/summarize_iocs.py \
+              --diag "$DIAG_DIR/run.json" \
+              --ioc-jsonl "$IOC_DIR/latest.jsonl" \
+              --out "$DIAG_DIR/summary.md" \
+              --index "$OUT_DIR/index.md"
+          else
+            echo "Skipping summarize_iocs.py because one or more inputs are missing."
+          fi
+
+      - name: Show failure diagnostics
+        if: failure()
+        shell: bash
+        run: |
+          echo "Workflow failed. Showing recent diagnostics..."
+          [ -f "$DIAG_DIR/run.log" ] && tail -n 200 "$DIAG_DIR/run.log" || true
+          [ -f "$DIAG_DIR/REPORT.md" ] && tail -n 200 "$DIAG_DIR/REPORT.md" || true
+          [ -f "$DIAG_DIR/summary.md" ] && tail -n 200 "$DIAG_DIR/summary.md" || true
+
+      - name: Upload diagnostics and outputs
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: collect-artifacts-${{ github.run_number }}
+          name: swiftioc-artifacts-${{ github.run_number }}
+          retention-days: 14
+          if-no-files-found: warn
           path: |
-            public/diagnostics/*
-            public/iocs/*
-            public/changelog/*
-          if-no-files-found: ignore
+            public/diagnostics/**
+            public/iocs/**
+            public/changelog/**
+            public/index.md
+
+      - name: Upload built public site
+        if: success() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: swiftioc-public-site
+          retention-days: 3
+          if-no-files-found: error
+          path: public/**
 
       - name: Auto-commit updated outputs
+        if: success() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore(ioc): update feeds [skip ci]"
@@ -113,18 +175,35 @@ jobs:
             public/iocs/**
             public/changelog/**
             public/diagnostics/**
+            public/index.md
           commit_user_name: SwiftIOC Bot
           commit_user_email: actions@github.com
-          push_options: "--force-with-lease"
+          skip_dirty_check: false
+          skip_fetch: false
 
-      # --- Optional Pages publish ---
+  deploy-pages:
+    name: Deploy GitHub Pages
+    needs: collect
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && vars.ENABLE_PAGES != 'false'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+
+    steps:
+      - name: Download built public site
+        uses: actions/download-artifact@v4
+        with:
+          name: swiftioc-public-site
+          path: ./public
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
       - name: Upload artifact for GitHub Pages
-        if: env.ENABLE_PAGES == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./public
 
       - name: Deploy to GitHub Pages
-        if: env.ENABLE_PAGES == 'true'
         id: deployment
         uses: actions/deploy-pages@v4
