@@ -699,79 +699,52 @@ def fetch_openphish(url: str, ref_url: str, source: str, ws: datetime) -> List[I
     return out
 
 
-@register_parser("phishstats")
-def fetch_phishstats(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
+@register_parser("feodo_ipblocklist")
+def fetch_feodo_ipblocklist(
+    url: str,
+    ref_url: str,
+    source: str,
+    ws: datetime,
+    *,
+    disable_window: bool = True,
+) -> List[Indicator]:
     text = ensure_text(http_get(url, name=source))
-    try:
-        payload = json.loads(text)
-    except json.JSONDecodeError:
-        logger.warning("%s returned invalid JSON", source)
-        return []
-    if isinstance(payload, list):
-        records: Iterable[Any] = payload
-    elif isinstance(payload, dict):
-        records = payload.get("data") or []
-    else:
-        return []
-    now = now_utc()
     out: List[Indicator] = []
+    now = now_utc()
 
-    def choose(row: Dict[str, Any], keys: Iterable[str]) -> Optional[str]:
-        for key in keys:
-            val = row.get(key)
-            if isinstance(val, str) and val.strip():
-                return val
-        return None
+    for row in csv.reader(io.StringIO(text)):
+        if not row:
+            continue
 
-    for row in records:
-        if not isinstance(row, dict):
+        header_token = row[0].strip().lower()
+        if header_token.startswith("#") or header_token in {"first_seen_utc", "timestamp"}:
             continue
-        url_val = choose(row, ("url", "phish_url", "phishURL", "phish_url_https"))
-        if not url_val:
+
+        try:
+            seen = parse_dt(row[0])
+            ip = row[1].strip()
+            family = row[5].strip() if len(row) > 5 else ""
+        except Exception:
             continue
-        seen = parse_dt(choose(row, ("date", "first_seen", "submission_time", "created_at")))
+
         if not disable_window and seen and seen < ws:
-    continue
-        tags = {"phishing", "phishstats"}
-        target = choose(row, ("target", "brand", "campaign"))
-        if target:
-            tags.add(target.lower())
-        context_parts = ["PhishStats entry"]
-        if target:
-            context_parts.append(target)
-        context = ": ".join(context_parts)
-        ref = choose(row, ("phish_detail_url", "detail_url", "source")) or ref_url or ""
+            continue
+
         out.append(
             Indicator(
-                indicator=defang_min(url_val),
-                type="url",
+                indicator=defang_min(ip),
+                type="ipv4",
                 source=source,
                 first_seen=iso(seen or now),
                 last_seen=iso(now),
-                confidence="medium",
+                confidence="high",
                 tlp="CLEAR",
-                tags=",".join(sorted(tags)),
-                reference=ref,
-                context=context,
+                tags=",".join(filter(None, ["feodo", "c2", family])),
+                reference=ref_url or "",
+                context="Feodo Tracker C2 IP",
             )
         )
-        ip_val = choose(row, ("ip", "ip_address", "resolved_ip"))
-        if ip_val and classify(ip_val) in {"ipv4", "ipv6"}:
-            indicator_type = "ipv6" if ":" in ip_val else "ipv4"
-            out.append(
-                Indicator(
-                    indicator=defang_min(ip_val),
-                    type=indicator_type,
-                    source=source,
-                    first_seen=iso(seen or now),
-                    last_seen=iso(now),
-                    confidence="medium",
-                    tlp="CLEAR",
-                    tags=",".join(sorted(tags | {"infrastructure"})),
-                    reference=ref,
-                    context=f"PhishStats infrastructure for {url_val}",
-                )
-            )
+
     return out
 
 
