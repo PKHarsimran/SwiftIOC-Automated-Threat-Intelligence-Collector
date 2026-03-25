@@ -46,10 +46,11 @@ jobs:
           set -Eeuo pipefail
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pip-audit
 
       - name: Dependency audit
-        run: pip-audit --strict
+        uses: pypa/gh-action-pip-audit@v1.1.0
+        with:
+          inputs: requirements.txt
 
       - name: Install lint and type-check tools
         shell: bash
