@@ -40,22 +40,28 @@ jobs:
           cache: pip
           cache-dependency-path: requirements.txt
 
-      - name: Install dependencies
+      - name: Install runtime dependencies
         shell: bash
         run: |
           set -Eeuo pipefail
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install ruff pyright pip-audit
+          pip install pip-audit
+
+      - name: Dependency audit
+        run: pip-audit --strict
+
+      - name: Install lint and type-check tools
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          pip install ruff pyright
 
       - name: Ruff lint
         run: ruff check .
 
       - name: Pyright type check
         run: pyright
-
-      - name: Dependency audit
-        run: pip-audit --strict
 
       - name: Self-test
         run: python swiftioc.py --self-test
