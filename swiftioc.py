@@ -871,7 +871,7 @@ def fetch_rss(url: str, ref_url: str, source: str, ws: datetime, *, per_entry_ca
 
 
 # ---------------- universal parser ----------------
-@register_parser("universal", "auto", "generic")
+@register_parser("universal", "auto", "generic", "phishstats")
 def fetch_universal(
     url: str,
     ref_url: str,
