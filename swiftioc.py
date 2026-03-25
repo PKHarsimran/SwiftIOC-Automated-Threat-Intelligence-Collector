@@ -235,18 +235,19 @@ def extract_indicators_from_text(blob: str) -> List[Tuple[str, str]]:
 def build_session() -> requests.Session:
     from urllib3.util import Retry
     from requests.adapters import HTTPAdapter
+
     s = requests.Session()
     adapter = HTTPAdapter(
-    max_retries=Retry(
-        total=5,
-        connect=5,
-        read=5,
-        backoff_factor=1.0,
-        status_forcelist=(429, 500, 502, 503, 504, 520, 521, 522, 523, 524),
-        allowed_methods=frozenset({"GET", "HEAD"}),
-        raise_on_status=False,
+        max_retries=Retry(
+            total=5,
+            connect=5,
+            read=5,
+            backoff_factor=1.0,
+            status_forcelist=(429, 500, 502, 503, 504, 520, 521, 522, 523, 524),
+            allowed_methods=frozenset({"GET", "HEAD"}),
+            raise_on_status=False,
+        )
     )
-)
     s.mount("http://", adapter)
     s.mount("https://", adapter)
     return s
@@ -697,56 +698,6 @@ def fetch_openphish(url: str, ref_url: str, source: str, ws: datetime) -> List[I
             )
         )
     return out
-
-
-@register_parser("feodo_ipblocklist")
-def fetch_feodo_ipblocklist(
-    url: str,
-    ref_url: str,
-    source: str,
-    ws: datetime,
-    *,
-    disable_window: bool = True,
-) -> List[Indicator]:
-    text = ensure_text(http_get(url, name=source))
-    out: List[Indicator] = []
-    now = now_utc()
-
-    for row in csv.reader(io.StringIO(text)):
-        if not row:
-            continue
-
-        header_token = row[0].strip().lower()
-        if header_token.startswith("#") or header_token in {"first_seen_utc", "timestamp"}:
-            continue
-
-        try:
-            seen = parse_dt(row[0])
-            ip = row[1].strip()
-            family = row[5].strip() if len(row) > 5 else ""
-        except Exception:
-            continue
-
-        if not disable_window and seen and seen < ws:
-            continue
-
-        out.append(
-            Indicator(
-                indicator=defang_min(ip),
-                type="ipv4",
-                source=source,
-                first_seen=iso(seen or now),
-                last_seen=iso(now),
-                confidence="high",
-                tlp="CLEAR",
-                tags=",".join(filter(None, ["feodo", "c2", family])),
-                reference=ref_url or "",
-                context="Feodo Tracker C2 IP",
-            )
-        )
-
-    return out
-
 
 @register_parser("cins_army")
 def fetch_cins_army(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
@@ -1236,16 +1187,28 @@ def collect_from_yaml(
             ref = rss.get("reference", url) or ""
             try:
                 t0 = time.perf_counter()
-                got = fetch_rss(url, ref, name, start_for(name), tolerate_missing=ci_safe_rss)
+                got = fetch_rss(
+                    url,
+                    ref,
+                    name,
+                    start_for(name),
+                    tolerate_missing=ci_safe_rss,
+                )
                 dt = time.perf_counter() - t0
                 logger.debug("collect RSS %s %d in %.2fs", name, len(got), dt)
-                logger.debug("summary %s types=%s tags_top=%s", name, type_counts(got), top_tags(got))
+                logger.debug(
+                    "summary %s types=%s tags_top=%s",
+                    name,
+                    type_counts(got),
+                    top_tags(got),
+                )
             except Exception as e:
-    graceful_fail = bool(api.get("graceful_fail") or options.get("graceful_fail"))
-    logger.warning("%s failed: %s", name, e)
-    if not graceful_fail:
-        failures.append({"source": name, "error": str(e)})
-    got = []
+                graceful_fail = bool(rss.get("graceful_fail"))
+                logger.warning("%s failed: %s", name, e)
+                if not graceful_fail:
+                    failures.append({"source": name, "error": str(e)})
+                got = []
+
             got = cap(got)
             raw_total += len(got)
             indicators.extend(got)
