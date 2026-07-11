@@ -210,7 +210,8 @@ def test_collect_from_yaml_filters_false_positives(monkeypatch):
     )
     monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
     cfg = {"apis": [{"name": "tf", "parse": "threatfox_export_json", "url": "http://a"}]}
-    kwargs = dict(
+    rows, counts, stats = si.collect_from_yaml(
+        cfg,
         window_hours=24 * 3650,
         skip_rss=True,
         max_per_source=None,
@@ -220,14 +221,24 @@ def test_collect_from_yaml_filters_false_positives(monkeypatch):
         ci_safe_rss=False,
         max_workers=2,
     )
-    rows, counts, stats = si.collect_from_yaml(cfg, **kwargs)
     values = {si.refang(r.indicator) for r in rows}
     assert "8.8.8.8" in values
     assert "10.0.0.5" not in values  # private/bogon dropped
     assert stats["false_positives_removed"] == 1
 
     # Disabling the filter keeps everything.
-    rows2, _, stats2 = si.collect_from_yaml(cfg, fp_filter=False, **kwargs)
+    rows2, _, stats2 = si.collect_from_yaml(
+        cfg,
+        window_hours=24 * 3650,
+        skip_rss=True,
+        max_per_source=None,
+        urlhaus_status="any",
+        source_window={},
+        grace_on_404=set(),
+        ci_safe_rss=False,
+        max_workers=2,
+        fp_filter=False,
+    )
     assert stats2["false_positives_removed"] == 0
     assert len(rows2) == 2
 
@@ -338,15 +349,21 @@ def test_collect_from_yaml_single_worker_matches(monkeypatch):
     payload = json.dumps({"vulnerabilities": [{"cveID": "CVE-2025-0002", "dateAdded": "2025-01-01"}]})
     monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
     cfg = {"apis": [{"name": "kev", "parse": "kev", "url": "http://a"}]}
-    kwargs = dict(
-        window_hours=24 * 3650,
-        skip_rss=True,
-        max_per_source=None,
-        urlhaus_status="any",
-        source_window={},
-        grace_on_404=set(),
-        ci_safe_rss=False,
-    )
-    rows_parallel, _, _ = si.collect_from_yaml(cfg, max_workers=4, **kwargs)
-    rows_serial, _, _ = si.collect_from_yaml(cfg, max_workers=1, **kwargs)
+
+    def run(max_workers: int) -> list:
+        rows, _, _ = si.collect_from_yaml(
+            cfg,
+            window_hours=24 * 3650,
+            skip_rss=True,
+            max_per_source=None,
+            urlhaus_status="any",
+            source_window={},
+            grace_on_404=set(),
+            ci_safe_rss=False,
+            max_workers=max_workers,
+        )
+        return rows
+
+    rows_parallel = run(4)
+    rows_serial = run(1)
     assert [r.indicator for r in rows_parallel] == [r.indicator for r in rows_serial]
