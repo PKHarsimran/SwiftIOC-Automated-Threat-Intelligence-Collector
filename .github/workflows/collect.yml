@@ -15,9 +15,12 @@ on:
   schedule:
     - cron: "0 */4 * * *"
 
-  pull_request:
-    branches:
-      - main
+# Intentionally no `pull_request` trigger: this job runs the full collector
+# against every production feed (with --fail-on-empty guards) and auto-commits
+# + deploys on success. Running it on every PR push would hit live external
+# services on each commit and could fail PR checks for reasons unrelated to
+# the diff (e.g. a feed transiently returning zero indicators). ci.yml already
+# exercises the collector end-to-end via a scoped dry run for PR validation.
 
 permissions:
   contents: write
@@ -29,6 +32,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
   PYTHON_VERSION: "3.11"
   OUT_DIR: "public"
   DIAG_DIR: "public/diagnostics"
@@ -45,7 +49,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -146,7 +150,7 @@ jobs:
 
       - name: Upload diagnostics and outputs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: swiftioc-artifacts-${{ github.run_number }}
           retention-days: 14
@@ -158,8 +162,8 @@ jobs:
             public/index.md
 
       - name: Upload built public site
-        if: success() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-        uses: actions/upload-artifact@v4
+        if: success() && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v7
         with:
           name: swiftioc-public-site
           retention-days: 3
@@ -167,8 +171,8 @@ jobs:
           path: public/**
 
       - name: Auto-commit updated outputs
-        if: success() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-        uses: stefanzweifel/git-auto-commit-action@v5
+        if: success() && github.ref == 'refs/heads/main'
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "chore(ioc): update feeds [skip ci]"
           # Commit only the compact, human-facing artefacts. The bulky derived
@@ -189,26 +193,26 @@ jobs:
   deploy-pages:
     name: Deploy GitHub Pages
     needs: collect
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && vars.ENABLE_PAGES != 'false'
+    if: github.ref == 'refs/heads/main' && vars.ENABLE_PAGES != 'false'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
 
     steps:
       - name: Download built public site
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: swiftioc-public-site
           path: ./public
 
       - name: Configure Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Upload artifact for GitHub Pages
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: ./public
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

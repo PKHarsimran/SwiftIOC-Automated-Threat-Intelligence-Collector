@@ -50,6 +50,22 @@ def test_merge_conf_prefers_higher():
     assert si.merge_conf("medium", "medium") == "medium"
 
 
+def test_normalize_value_preserves_url_userinfo_and_port():
+    # Only the host must be lowercased; credentials and port are case/value
+    # sensitive and must survive untouched (Codex review finding).
+    out = si.normalize_value("url", "http://User:Secret@Evil.EXAMPLE:8080/Path?X=1")
+    assert out == "http://User:Secret@evil.example:8080/Path?X=1"
+
+
+def test_normalize_value_preserves_ipv6_literal_authority():
+    out = si.normalize_value("url", "http://[2001:DB8::1]:8080/x")
+    assert out == "http://[2001:db8::1]:8080/x"
+
+
+def test_normalize_value_no_userinfo():
+    assert si.normalize_value("url", "HTTPS://Evil.COM/Path") == "https://evil.com/Path"
+
+
 def test_extract_indicators_from_text():
     blob = "See https://evil.example.com and 8.8.8.8 plus CVE-2024-0001"
     found = dict((t, v) for t, v in si.extract_indicators_from_text(blob))
@@ -93,12 +109,16 @@ def test_write_stix_uses_valid_uuid_ids(tmp_path):
     assert bundle["type"] == "bundle"
     # Bundle id must carry a valid UUID.
     uuid.UUID(bundle["id"].split("--", 1)[1])
-    assert bundle["objects"], "expected at least one indicator object"
-    for obj in bundle["objects"]:
+    indicators = [o for o in bundle["objects"] if o["type"] == "indicator"]
+    assert len(indicators) == 3
+    for obj in indicators:
         assert obj["id"].startswith("indicator--")
         # Raises ValueError if the suffix is not a valid RFC 4122 UUID.
         uuid.UUID(obj["id"].split("--", 1)[1])
         assert obj["spec_version"] == "2.1"
+    # Every object id (incl. identity/marking) carries a valid UUID suffix.
+    for obj in bundle["objects"]:
+        uuid.UUID(obj["id"].split("--", 1)[1])
 
 
 def test_write_stix_ids_are_deterministic(tmp_path):
@@ -107,9 +127,12 @@ def test_write_stix_ids_are_deterministic(tmp_path):
     b = tmp_path / "b.json"
     si.write_stix(a, rows)
     si.write_stix(b, rows)
-    id_a = json.loads(a.read_text())["objects"][0]["id"]
-    id_b = json.loads(b.read_text())["objects"][0]["id"]
-    assert id_a == id_b
+
+    def indicator_id(path):
+        objs = json.loads(path.read_text())["objects"]
+        return next(o["id"] for o in objs if o["type"] == "indicator")
+
+    assert indicator_id(a) == indicator_id(b)
 
 
 # ----------------------------- changelog --------------------------------------
@@ -191,11 +214,20 @@ def test_collect_from_yaml_dedup_and_counts(monkeypatch):
     assert stats["raw_total"] == 2
 
 
-def test_collect_from_yaml_single_worker_matches(monkeypatch):
-    payload = json.dumps({"vulnerabilities": [{"cveID": "CVE-2025-0002", "dateAdded": "2025-01-01"}]})
+def test_collect_from_yaml_filters_false_positives(monkeypatch):
+    # ThreatFox-style payload mixing a real IP with a bogon/private one.
+    payload = json.dumps(
+        {
+            "data": [
+                {"ioc": "8.8.8.8", "ioc_type": "ipv4", "first_seen": "2025-01-01 00:00:00"},
+                {"ioc": "10.0.0.5", "ioc_type": "ipv4", "first_seen": "2025-01-01 00:00:00"},
+            ]
+        }
+    )
     monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
-    cfg = {"apis": [{"name": "kev", "parse": "kev", "url": "http://a"}]}
-    kwargs = dict(
+    cfg = {"apis": [{"name": "tf", "parse": "threatfox_export_json", "url": "http://a"}]}
+    rows, counts, stats = si.collect_from_yaml(
+        cfg,
         window_hours=24 * 3650,
         skip_rss=True,
         max_per_source=None,
@@ -203,7 +235,188 @@ def test_collect_from_yaml_single_worker_matches(monkeypatch):
         source_window={},
         grace_on_404=set(),
         ci_safe_rss=False,
+        max_workers=2,
     )
-    rows_parallel, _, _ = si.collect_from_yaml(cfg, max_workers=4, **kwargs)
-    rows_serial, _, _ = si.collect_from_yaml(cfg, max_workers=1, **kwargs)
+    values = {si.refang(r.indicator) for r in rows}
+    assert "8.8.8.8" in values
+    assert "10.0.0.5" not in values  # private/bogon dropped
+    assert stats["false_positives_removed"] == 1
+
+    # Disabling the filter keeps everything.
+    rows2, _, stats2 = si.collect_from_yaml(
+        cfg,
+        window_hours=24 * 3650,
+        skip_rss=True,
+        max_per_source=None,
+        urlhaus_status="any",
+        source_window={},
+        grace_on_404=set(),
+        ci_safe_rss=False,
+        max_workers=2,
+        fp_filter=False,
+    )
+    assert stats2["false_positives_removed"] == 0
+    assert len(rows2) == 2
+
+
+def test_domain_case_normalization_dedup(monkeypatch):
+    # Two RSS-free API sources emit the same domain in different casing.
+    def make_payload(host):
+        return json.dumps(
+            {"data": [{"ioc": host, "ioc_type": "domain", "first_seen": "2025-01-01 00:00:00"}]}
+        )
+
+    payloads = {"http://a": make_payload("Evil.COM"), "http://b": make_payload("evil.com")}
+    monkeypatch.setattr(si, "http_get", lambda url, *a, **k: payloads[url])
+    cfg = {
+        "apis": [
+            {"name": "a", "parse": "threatfox_export_json", "url": "http://a"},
+            {"name": "b", "parse": "threatfox_export_json", "url": "http://b"},
+        ]
+    }
+    rows, _, _ = si.collect_from_yaml(
+        cfg,
+        window_hours=24 * 3650,
+        skip_rss=True,
+        max_per_source=None,
+        urlhaus_status="any",
+        source_window={},
+        grace_on_404=set(),
+        ci_safe_rss=False,
+        max_workers=2,
+    )
+    assert len(rows) == 1  # cased duplicate merged
+    assert si.refang(rows[0].indicator) == "evil[.]com".replace("[.]", ".")
+
+
+def test_stix_covers_all_indicator_types(tmp_path):
+    rows = [
+        _sample_indicator(indicator="192.0.2.1", type="ipv4"),
+        _sample_indicator(indicator="203.0.113.0/24", type="ipv4_cidr"),
+        _sample_indicator(indicator="2001:db8::1", type="ipv6"),
+        _sample_indicator(indicator="example.org", type="domain"),
+        _sample_indicator(indicator="hxxps://bad[.]tld/x", type="url"),
+        _sample_indicator(indicator="a" * 128, type="sha512"),
+        _sample_indicator(indicator="user@evil.tld", type="email"),
+        _sample_indicator(indicator="CVE-2025-9999", type="cve"),
+        _sample_indicator(indicator="a" * 32, type="ja3"),
+        _sample_indicator(indicator="bc1qtest00000000000000000000000000", type="btc_address"),
+    ]
+    out = tmp_path / "stix2.json"
+    si.write_stix(out, rows)
+    bundle = json.loads(out.read_text(encoding="utf-8"))
+    by_type = {}
+    for obj in bundle["objects"]:
+        by_type.setdefault(obj["type"], []).append(obj)
+
+    # Provenance objects present.
+    assert len(by_type["identity"]) == 1
+    assert len(by_type["marking-definition"]) == 1
+    # CVE becomes a vulnerability SDO, not an indicator pattern.
+    assert len(by_type["vulnerability"]) == 1
+    assert by_type["vulnerability"][0]["name"] == "CVE-2025-9999"
+    # Every non-CVE indicator type produced an indicator object (9 of them).
+    assert len(by_type["indicator"]) == 9
+    for obj in by_type["indicator"]:
+        assert obj["created_by_ref"] == si.STIX_IDENTITY_ID
+        assert si.STIX_TLP_ID in obj["object_marking_refs"]
+        uuid.UUID(obj["id"].split("--", 1)[1])
+    # CIDR is emitted and refanged; url pattern is refanged.
+    patterns = " ".join(o["pattern"] for o in by_type["indicator"])
+    assert "203.0.113.0/24" in patterns
+    assert "https://bad.tld/x" in patterns
+    assert "SHA-512" in patterns
+    # btc_address has no core STIX 2.1 observable; must use a declared custom
+    # object rather than the non-existent `cryptocurrency-wallet` type
+    # (Codex review finding).
+    assert "x-swiftioc-btc-address:value" in patterns
+    assert "cryptocurrency-wallet" not in patterns
+
+
+def test_collect_from_yaml_caps_after_filtering_false_positives(monkeypatch):
+    # Regression: --max-per-source must not truncate before FP filtering runs,
+    # or early bogon rows can crowd out later legitimate ones (Codex review
+    # finding). Three private IPs followed by one public one, capped to 2.
+    payload = json.dumps(
+        {
+            "data": [
+                {"ioc": "10.0.0.1", "ioc_type": "ipv4", "first_seen": "2025-01-01 00:00:00"},
+                {"ioc": "10.0.0.2", "ioc_type": "ipv4", "first_seen": "2025-01-01 00:00:00"},
+                {"ioc": "10.0.0.3", "ioc_type": "ipv4", "first_seen": "2025-01-01 00:00:00"},
+                {"ioc": "8.8.8.8", "ioc_type": "ipv4", "first_seen": "2025-01-01 00:00:00"},
+            ]
+        }
+    )
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
+    cfg = {"apis": [{"name": "tf", "parse": "threatfox_export_json", "url": "http://a"}]}
+    rows, counts, _ = si.collect_from_yaml(
+        cfg,
+        window_hours=24 * 3650,
+        skip_rss=True,
+        max_per_source=2,
+        urlhaus_status="any",
+        source_window={},
+        grace_on_404=set(),
+        ci_safe_rss=False,
+        max_workers=1,
+    )
+    values = {si.refang(r.indicator) for r in rows}
+    assert "8.8.8.8" in values  # would be truncated away if capped before filtering
+    assert counts["tf"] == 1
+
+
+def test_stix_bundle_validates_against_stix2_library(tmp_path):
+    stix2 = pytest.importorskip("stix2")
+    rows = [
+        _sample_indicator(indicator="192.0.2.1", type="ipv4"),
+        _sample_indicator(indicator="203.0.113.0/24", type="ipv4_cidr"),
+        _sample_indicator(indicator="example.org", type="domain"),
+        _sample_indicator(indicator="hxxps://bad[.]tld/x", type="url"),
+        _sample_indicator(indicator="a" * 64, type="sha256"),
+        _sample_indicator(indicator="user@evil.tld", type="email"),
+        _sample_indicator(indicator="CVE-2025-9999", type="cve"),
+        _sample_indicator(indicator="a" * 32, type="ja3"),
+    ]
+    out = tmp_path / "stix2.json"
+    si.write_stix(out, rows)
+    # allow_custom=True for the x-swiftioc-ja3 object; raises on any real
+    # spec violation (bad ids, marking, pattern syntax, ...).
+    bundle = stix2.parse(out.read_text(encoding="utf-8"), allow_custom=True)
+    assert len(bundle.objects) == len(rows) + 2  # + identity + marking
+
+
+def test_threatfox_and_feodo_parsers(monkeypatch):
+    tf = json.dumps({"data": [{"ioc": "evil.tld", "ioc_type": "domain", "first_seen": "2025-01-01 00:00:00", "malware": "x"}]})
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: tf)
+    out = si.fetch_threatfox_export_json("http://x", "ref", "tf", si.now_utc().replace(year=2000))
+    assert out and out[0].type == "domain"
+
+    feodo = "first_seen_utc,dst_ip,dst_port,c2_status,last_online,malware\n2025-01-01,5.5.5.5,443,online,2025-01-02,Emotet\n"
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: feodo)
+    out = si.fetch_feodo_ipblocklist("http://x", "ref", "feodo", si.now_utc())
+    assert out and out[0].type == "ipv4"
+    assert si.refang(out[0].indicator) == "5.5.5.5"
+
+
+def test_collect_from_yaml_single_worker_matches(monkeypatch):
+    payload = json.dumps({"vulnerabilities": [{"cveID": "CVE-2025-0002", "dateAdded": "2025-01-01"}]})
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
+    cfg = {"apis": [{"name": "kev", "parse": "kev", "url": "http://a"}]}
+
+    def run(max_workers: int) -> list:
+        rows, _, _ = si.collect_from_yaml(
+            cfg,
+            window_hours=24 * 3650,
+            skip_rss=True,
+            max_per_source=None,
+            urlhaus_status="any",
+            source_window={},
+            grace_on_404=set(),
+            ci_safe_rss=False,
+            max_workers=max_workers,
+        )
+        return rows
+
+    rows_parallel = run(4)
+    rows_serial = run(1)
     assert [r.indicator for r in rows_parallel] == [r.indicator for r in rows_serial]

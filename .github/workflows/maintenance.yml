@@ -24,7 +24,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -59,7 +59,7 @@ jobs:
 
       - name: Open or close zero-indicator alert issue
         if: steps.zero_check.outputs.has_enough_history == 'true'
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           NEEDS_ISSUE: ${{ steps.zero_check.outputs.needs_issue }}
           TOTALS: ${{ steps.zero_check.outputs.totals }}
@@ -129,7 +129,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 

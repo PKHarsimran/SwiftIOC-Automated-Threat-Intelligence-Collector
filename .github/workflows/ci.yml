@@ -34,7 +34,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -75,6 +75,13 @@ jobs:
 
       - name: Dry run (skip RSS, short window)
         shell: bash
+        # Hard backstop: this step hits every live feed in sources.example.yml
+        # (public threat-intel APIs, some of which rate-limit shared CI-runner
+        # IP ranges). The HTTP layer's own retry/timeout budget is now capped
+        # at ~85s per source, but this catches any pathological hang so the
+        # step fails fast with a clear timeout instead of silently consuming
+        # the whole job's 15-minute budget.
+        timeout-minutes: 6
         run: |
           set -Eeuo pipefail
           mkdir -p public/diagnostics/raw
@@ -92,7 +99,7 @@ jobs:
 
       - name: Upload diagnostics
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ci-artifacts
           retention-days: 7

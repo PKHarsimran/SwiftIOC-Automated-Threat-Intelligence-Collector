@@ -1,0 +1,27 @@
+name: Feature request
+description: Suggest an enhancement or a new feed source
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / motivation
+      description: What are you trying to accomplish? What's missing today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What would you like SwiftIOC to do?
+    validations:
+      required: true
+  - type: input
+    id: feed-url
+    attributes:
+      label: Feed URL (for new sources)
+      description: Public documentation or download URL, if requesting a new feed.
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
