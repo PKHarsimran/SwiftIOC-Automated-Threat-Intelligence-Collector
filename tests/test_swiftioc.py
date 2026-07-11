@@ -50,6 +50,22 @@ def test_merge_conf_prefers_higher():
     assert si.merge_conf("medium", "medium") == "medium"
 
 
+def test_normalize_value_preserves_url_userinfo_and_port():
+    # Only the host must be lowercased; credentials and port are case/value
+    # sensitive and must survive untouched (Codex review finding).
+    out = si.normalize_value("url", "http://User:Secret@Evil.EXAMPLE:8080/Path?X=1")
+    assert out == "http://User:Secret@evil.example:8080/Path?X=1"
+
+
+def test_normalize_value_preserves_ipv6_literal_authority():
+    out = si.normalize_value("url", "http://[2001:DB8::1]:8080/x")
+    assert out == "http://[2001:db8::1]:8080/x"
+
+
+def test_normalize_value_no_userinfo():
+    assert si.normalize_value("url", "HTTPS://Evil.COM/Path") == "https://evil.com/Path"
+
+
 def test_extract_indicators_from_text():
     blob = "See https://evil.example.com and 8.8.8.8 plus CVE-2024-0001"
     found = dict((t, v) for t, v in si.extract_indicators_from_text(blob))
@@ -310,6 +326,43 @@ def test_stix_covers_all_indicator_types(tmp_path):
     assert "203.0.113.0/24" in patterns
     assert "https://bad.tld/x" in patterns
     assert "SHA-512" in patterns
+    # btc_address has no core STIX 2.1 observable; must use a declared custom
+    # object rather than the non-existent `cryptocurrency-wallet` type
+    # (Codex review finding).
+    assert "x-swiftioc-btc-address:value" in patterns
+    assert "cryptocurrency-wallet" not in patterns
+
+
+def test_collect_from_yaml_caps_after_filtering_false_positives(monkeypatch):
+    # Regression: --max-per-source must not truncate before FP filtering runs,
+    # or early bogon rows can crowd out later legitimate ones (Codex review
+    # finding). Three private IPs followed by one public one, capped to 2.
+    payload = json.dumps(
+        {
+            "data": [
+                {"ioc": "10.0.0.1", "ioc_type": "ipv4", "first_seen": "2025-01-01 00:00:00"},
+                {"ioc": "10.0.0.2", "ioc_type": "ipv4", "first_seen": "2025-01-01 00:00:00"},
+                {"ioc": "10.0.0.3", "ioc_type": "ipv4", "first_seen": "2025-01-01 00:00:00"},
+                {"ioc": "8.8.8.8", "ioc_type": "ipv4", "first_seen": "2025-01-01 00:00:00"},
+            ]
+        }
+    )
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
+    cfg = {"apis": [{"name": "tf", "parse": "threatfox_export_json", "url": "http://a"}]}
+    rows, counts, _ = si.collect_from_yaml(
+        cfg,
+        window_hours=24 * 3650,
+        skip_rss=True,
+        max_per_source=2,
+        urlhaus_status="any",
+        source_window={},
+        grace_on_404=set(),
+        ci_safe_rss=False,
+        max_workers=1,
+    )
+    values = {si.refang(r.indicator) for r in rows}
+    assert "8.8.8.8" in values  # would be truncated away if capped before filtering
+    assert counts["tf"] == 1
 
 
 def test_stix_bundle_validates_against_stix2_library(tmp_path):

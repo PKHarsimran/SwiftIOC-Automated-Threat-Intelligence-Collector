@@ -156,18 +156,37 @@ def refang(text: str) -> str:
 _URL_HEAD_RE = re.compile(r"^(hxxps?|https?|ftp)(://)([^/]+)(.*)$", re.I)
 
 
+def _lower_authority_host(authority: str) -> str:
+    """Lowercase only the host portion of a URL authority component.
+
+    ``authority`` is ``[userinfo@]host[:port]``. Userinfo (which may carry a
+    case-sensitive username/password/token) is preserved verbatim; only the
+    host — and an IPv6 literal's brackets — are lowercased.
+    """
+    userinfo, at, hostport = authority.rpartition("@") if "@" in authority else ("", "", authority)
+    if hostport.startswith("["):
+        end = hostport.find("]")
+        if end != -1:
+            return userinfo + at + hostport[: end + 1].lower() + hostport[end + 1 :]
+        return userinfo + at + hostport.lower()
+    host, sep, port = hostport.partition(":")
+    return userinfo + at + host.lower() + sep + port
+
+
 def normalize_value(itype: str, value: str) -> str:
     """Canonicalise host casing so equivalent indicators dedup together.
 
     Domains are lowercased entirely; URLs have only their scheme and host
-    lowercased (paths and query strings are case-sensitive and left intact).
+    lowercased (userinfo, paths, and query strings are case-sensitive and left
+    intact — lowercasing credentials would both mangle them and risk merging
+    distinct indicators during dedup).
     """
     if itype == "domain":
         return value.lower()
     if itype == "url":
         m = _URL_HEAD_RE.match(value)
         if m:
-            return m.group(1).lower() + m.group(2) + m.group(3).lower() + m.group(4)
+            return m.group(1).lower() + m.group(2) + _lower_authority_host(m.group(3)) + m.group(4)
     return value
 
 
@@ -1338,17 +1357,17 @@ def collect_from_yaml(
             continue
         if result["failure"]:
             failures.append(result["failure"])
-        got = cap(result["indicators"])
-        # Canonicalise host casing, then drop bogon / benign false positives so
-        # per-source counts already reflect the values that survive to the feed.
+        # Canonicalise host casing and drop bogon / benign false positives
+        # *before* applying --max-per-source, so a cap doesn't get filled with
+        # early junk rows while later, legitimate indicators are truncated away.
         kept: List[Indicator] = []
-        for ind in got:
+        for ind in result["indicators"]:
             ind.indicator = normalize_value(ind.type, ind.indicator)
             if fp_filter and is_false_positive(ind.type, ind.indicator):
                 fp_removed += 1
                 continue
             kept.append(ind)
-        got = kept
+        got = cap(kept)
         raw_total += len(got)
         indicators.extend(got)
         counts[result["name"]] = len(got)
@@ -1419,8 +1438,10 @@ def _stix_pattern(itype: str, indicator: str) -> Optional[str]:
     """Build a STIX 2.1 comparison expression for an indicator, or None.
 
     Values are refanged and single quotes escaped so the pattern stays valid.
-    Types without a standard STIX observable (ja3/ja3s/btc) are emitted under an
-    ``x-swiftioc-*`` custom object so they are preserved rather than dropped.
+    Types without a core STIX 2.1 observable (ja3/ja3s/btc_address — none of
+    these are in the SCO registry) are emitted under an ``x-swiftioc-*``
+    custom object so they are preserved rather than dropped or mapped onto a
+    non-existent core type.
     """
     value = refang(indicator).replace("\\", "\\\\").replace("'", "\\'")
     if itype in {"ipv4", "ipv4_cidr"}:
@@ -1435,10 +1456,8 @@ def _stix_pattern(itype: str, indicator: str) -> Optional[str]:
         return f"[file:hashes.'{STIX_HASH_NAMES[itype]}' = '{value}']"
     if itype == "email":
         return f"[email-addr:value = '{value}']"
-    if itype == "btc_address":
-        return f"[cryptocurrency-wallet:value = '{value}']"
-    if itype in {"ja3", "ja3s"}:
-        return f"[x-swiftioc-{itype}:value = '{value}']"
+    if itype in {"ja3", "ja3s", "btc_address"}:
+        return f"[x-swiftioc-{itype.replace('_', '-')}:value = '{value}']"
     return None
 
 
