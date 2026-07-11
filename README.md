@@ -52,15 +52,22 @@ high-fidelity IOCs from authoritative sources. The project emphasises:
   before being written to disk. 
 - **Defanging & deduplication** – helper functions defang URLs/domains and
   remove duplicate indicators so that downstream tools receive safe, unique
-  values. 
+  values. Host casing is normalised before dedup so `Evil.COM` and `evil.com`
+  collapse to one record.
+- **False-positive filtering** – bogon IP ranges (private, loopback,
+  link-local, reserved, multicast) and well-known benign hosts (`example.com`,
+  `localhost`, `*.test`, …) are dropped automatically; disable with
+  `--no-fp-filter`. The count is reported in diagnostics.
 - **Concurrent collection** – sources are fetched in parallel (configurable via
   `--max-workers`), so a full run completes in a fraction of the time of a
   sequential fetch without changing the deterministic output.
 - **Multiple export formats** – each run emits CSV, TSV, JSON, JSON Lines, a
-  STIX 2.1 bundle, and a Markdown changelog. STIX identifiers are deterministic
-  RFC 4122 UUIDs (STIX 2.1 compliant) so re-imports stay idempotent in MISP,
-  OpenCTI, and similar platforms. The changelog is capped to the most recent
-  runs to keep it committable indefinitely.
+  STIX 2.1 bundle, and a Markdown changelog. The STIX bundle covers every
+  indicator type (IPs and CIDRs, domains, URLs, all hash sizes, emails, JA3/JA3S,
+  wallets) with deterministic RFC 4122 UUIDs, a producer `identity`, and a TLP
+  marking, so re-imports stay idempotent in MISP, OpenCTI, and similar platforms.
+  CVEs are emitted as `vulnerability` objects. The changelog is capped to the
+  most recent runs to keep it committable indefinitely.
 - **Rich diagnostics** – a JSON run summary, Markdown report, and per-source
   counts are generated automatically for audits and dashboards. 
 - **Optional RSS collection** – RSS feeds are processed when `feedparser` is
@@ -230,6 +237,7 @@ Run `python -m swiftioc --help` for the full list of switches. Highlights:
 | `--skip-rss` | Disable RSS processing entirely. |
 | `--max-per-source N` | Cap the number of indicators taken from each source. |
 | `--max-workers N` | Number of sources fetched concurrently (default `8`; use `1` to disable threading). |
+| `--no-fp-filter` | Disable bogon / false-positive filtering (keep private IPs, `example.com`, etc.). |
 | `--urlhaus-status {any,online,offline}` | Filter URLhaus indicators by status. |
 | `--source-window name=N` | Override the lookback window for specific sources. |
 | `--grace-on-404 name…` | Treat HTTP 404 for listed sources as a non-fatal empty result. |
@@ -384,7 +392,11 @@ pytest -q             # offline unit tests (parsers, STIX, dedup, changelog)
 
 The `tests/` suite is fully offline—parsers that would hit the network have
 their HTTP layer monkeypatched—so it is safe to run anywhere and catches feed
-format drift before it reaches production.
+format drift before it reaches production. When `stix2` is installed the suite
+also validates the generated bundle against the reference library.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add a new feed parser and the
+full contribution workflow.
 
 ---
 

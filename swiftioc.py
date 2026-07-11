@@ -30,6 +30,14 @@ ISO_FMT = "%Y-%m-%dT%H:%M:%SZ"
 
 # Stable namespace for deterministic STIX 2.1 identifiers (uuid5).
 STIX_NAMESPACE = uuid.uuid5(uuid.NAMESPACE_DNS, "swiftioc.threatintel")
+# Producer identity and the canonical shareable TLP marking. We use the
+# well-known TLP:WHITE object (id/created are fixed by the STIX spec): it is the
+# pre-2.1 name for TLP:CLEAR and is accepted by every STIX 2.0/2.1 tool, whereas
+# the newer TLP:CLEAR object is rejected by many current validators.
+STIX_IDENTITY_ID = f"identity--{uuid.uuid5(STIX_NAMESPACE, 'identity:swiftioc')}"
+STIX_TLP_ID = "marking-definition--613f2e26-407d-48c7-9eca-b8e91df99dc9"
+# STIX hashing-algorithm-ov names keyed by our internal hash type.
+STIX_HASH_NAMES = {"md5": "MD5", "sha1": "SHA-1", "sha256": "SHA-256", "sha512": "SHA-512"}
 
 # ---------------- UA pool ----------------
 DEFAULT_UAS = [
@@ -136,6 +144,33 @@ def defang_min(text: str) -> str:
     return text.replace(".", "[.]")
 
 
+def refang(text: str) -> str:
+    """Reverse :func:`defang_min` so a value can be matched or emitted raw."""
+    return (
+        text.replace("hxxps://", "https://")
+        .replace("hxxp://", "http://")
+        .replace("[.]", ".")
+    )
+
+
+_URL_HEAD_RE = re.compile(r"^(hxxps?|https?|ftp)(://)([^/]+)(.*)$", re.I)
+
+
+def normalize_value(itype: str, value: str) -> str:
+    """Canonicalise host casing so equivalent indicators dedup together.
+
+    Domains are lowercased entirely; URLs have only their scheme and host
+    lowercased (paths and query strings are case-sensitive and left intact).
+    """
+    if itype == "domain":
+        return value.lower()
+    if itype == "url":
+        m = _URL_HEAD_RE.match(value)
+        if m:
+            return m.group(1).lower() + m.group(2) + m.group(3).lower() + m.group(4)
+    return value
+
+
 JA3_RE = re.compile(r"^[a-fA-F0-9]{32}$")
 SHA512_RE = re.compile(r"^[a-fA-F0-9]{128}$")
 EMAIL_RE = re.compile(r"^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$", re.I)
@@ -194,6 +229,67 @@ def classify(v: str) -> Optional[str]:
 
 def merge_conf(a: str, b: str) -> str:
     return a if CONF_RANK.get(a, 0) >= CONF_RANK.get(b, 0) else b
+
+
+# ---------------- false-positive / bogon filtering ----------------
+# Values that are never actionable threat indicators and only add noise to a
+# feed. Bogon IP ranges (private, loopback, link-local, reserved, ...) are
+# detected structurally via the ipaddress module.
+FP_DOMAINS: Set[str] = {
+    "example.com", "example.org", "example.net", "example.edu",
+    "localhost", "localhost.localdomain", "test", "invalid", "local",
+}
+FP_DOMAIN_SUFFIXES: Tuple[str, ...] = (
+    ".example.com", ".example.org", ".example.net",
+    ".arpa", ".localhost", ".local", ".test", ".invalid",
+)
+FP_IPS: Set[str] = {"0.0.0.0", "255.255.255.255", "::", "::1"}
+
+
+def _ip_is_bogon(ip: str) -> bool:
+    try:
+        addr = ipaddress.ip_address(ip)
+    except ValueError:
+        return False
+    return bool(
+        addr.is_private or addr.is_loopback or addr.is_link_local
+        or addr.is_multicast or addr.is_reserved or addr.is_unspecified
+    )
+
+
+def _net_is_bogon(cidr: str) -> bool:
+    try:
+        net = ipaddress.ip_network(cidr, strict=False)
+    except ValueError:
+        return False
+    return bool(
+        net.is_private or net.is_loopback or net.is_link_local
+        or net.is_multicast or net.is_reserved or net.is_unspecified
+    )
+
+
+def _domain_is_fp(host: str) -> bool:
+    host = host.lower().rstrip(".")
+    if host in FP_DOMAINS:
+        return True
+    return any(host.endswith(suffix) for suffix in FP_DOMAIN_SUFFIXES)
+
+
+def is_false_positive(itype: str, value: str) -> bool:
+    """Return True for well-known benign values that should not enter the feed."""
+    raw = refang(value)
+    if itype in {"ipv4", "ipv6"}:
+        return raw in FP_IPS or _ip_is_bogon(raw)
+    if itype in {"ipv4_cidr", "ipv6_cidr"}:
+        return _net_is_bogon(raw)
+    if itype == "domain":
+        return _domain_is_fp(raw)
+    if itype == "url":
+        m = _URL_HEAD_RE.match(raw)
+        if m:
+            host = m.group(3).split("@")[-1].split(":")[0]
+            return host in FP_IPS or _ip_is_bogon(host) or _domain_is_fp(host)
+    return False
 
 
 # ---------------- indicator extraction helpers ----------------
@@ -1119,6 +1215,7 @@ def collect_from_yaml(
     grace_on_404: Set[str],
     ci_safe_rss: bool,
     max_workers: int = 8,
+    fp_filter: bool = True,
 ) -> Tuple[List[Indicator], Dict[str, int], Dict[str, Any]]:
     base_start = now_utc() - timedelta(hours=window_hours)
 
@@ -1235,12 +1332,23 @@ def collect_from_yaml(
     counts: Dict[str, int] = {}
     failures: List[Dict[str, str]] = []
     raw_total = 0
+    fp_removed = 0
     for result in results:
         if result is None:
             continue
         if result["failure"]:
             failures.append(result["failure"])
         got = cap(result["indicators"])
+        # Canonicalise host casing, then drop bogon / benign false positives so
+        # per-source counts already reflect the values that survive to the feed.
+        kept: List[Indicator] = []
+        for ind in got:
+            ind.indicator = normalize_value(ind.type, ind.indicator)
+            if fp_filter and is_false_positive(ind.type, ind.indicator):
+                fp_removed += 1
+                continue
+            kept.append(ind)
+        got = kept
         raw_total += len(got)
         indicators.extend(got)
         counts[result["name"]] = len(got)
@@ -1270,6 +1378,7 @@ def collect_from_yaml(
     stats: Dict[str, Any] = {
         "raw_total": raw_total,
         "failures": failures,
+        "false_positives_removed": fp_removed,
     }
     return final, counts, stats
 
@@ -1306,39 +1415,83 @@ def write_jsonl(path: Path, rows: List[Indicator]) -> None:
             f.write(json.dumps(asdict(r), ensure_ascii=False) + "\n")
 
 
+def _stix_pattern(itype: str, indicator: str) -> Optional[str]:
+    """Build a STIX 2.1 comparison expression for an indicator, or None.
+
+    Values are refanged and single quotes escaped so the pattern stays valid.
+    Types without a standard STIX observable (ja3/ja3s/btc) are emitted under an
+    ``x-swiftioc-*`` custom object so they are preserved rather than dropped.
+    """
+    value = refang(indicator).replace("\\", "\\\\").replace("'", "\\'")
+    if itype in {"ipv4", "ipv4_cidr"}:
+        return f"[ipv4-addr:value = '{value}']"
+    if itype in {"ipv6", "ipv6_cidr"}:
+        return f"[ipv6-addr:value = '{value}']"
+    if itype == "domain":
+        return f"[domain-name:value = '{value}']"
+    if itype == "url":
+        return f"[url:value = '{value}']"
+    if itype in STIX_HASH_NAMES:
+        return f"[file:hashes.'{STIX_HASH_NAMES[itype]}' = '{value}']"
+    if itype == "email":
+        return f"[email-addr:value = '{value}']"
+    if itype == "btc_address":
+        return f"[cryptocurrency-wallet:value = '{value}']"
+    if itype in {"ja3", "ja3s"}:
+        return f"[x-swiftioc-{itype}:value = '{value}']"
+    return None
+
+
 def write_stix(path: Path, rows: List[Indicator]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     now = iso(now_utc())
-    objects = []
+    common = {
+        "created": now,
+        "modified": now,
+        "created_by_ref": STIX_IDENTITY_ID,
+        "object_marking_refs": [STIX_TLP_ID],
+    }
+    # Producer identity + TLP:CLEAR marking so consumers have provenance.
+    objects: List[Dict[str, Any]] = [
+        {
+            "type": "identity", "spec_version": "2.1", "id": STIX_IDENTITY_ID,
+            "created": now, "modified": now, "name": "SwiftIOC", "identity_class": "system",
+        },
+        {
+            # Canonical TLP:WHITE marking (fixed id/created per the STIX spec).
+            "type": "marking-definition", "spec_version": "2.1", "id": STIX_TLP_ID,
+            "created": "2017-01-20T00:00:00.000Z", "definition_type": "tlp",
+            "name": "TLP:WHITE", "definition": {"tlp": "white"},
+        },
+    ]
     for r in rows:
-        pattern = None
-        if r.type in {"ipv4", "ipv6"}:
-            pattern = f"[ipv4-addr:value = '{r.indicator.replace('[.]', '.')}']" if r.type == "ipv4" else f"[ipv6-addr:value = '{r.indicator}']"
-        elif r.type == "domain":
-            pattern = f"[domain-name:value = '{r.indicator.replace('[.]', '.')}']"
-        elif r.type == "url":
-            p = r.indicator.replace("hxxp://", "http://").replace("hxxps://", "https://").replace("[.]", ".")
-            pattern = f"[url:value = '{p}']"
-        elif r.type in {"md5", "sha1", "sha256"}:
-            pattern = f"[file:hashes.'{r.type}' = '{r.indicator}']"
-        elif r.type == "cve":
-            pattern = f"[vulnerability:name = '{r.indicator}']"
-        if not pattern:
-            continue
-        # STIX 2.1 requires the id suffix to be an RFC 4122 UUID. Derive it
-        # deterministically from type+indicator so the same IOC keeps a stable id
-        # across runs (idempotent for downstream platforms like OpenCTI/MISP).
-        sid = uuid.uuid5(STIX_NAMESPACE, f"{r.type}:{r.indicator}")
-        objects.append(
-            {
-                "type": "indicator", "spec_version": "2.1",
-                "id": f"indicator--{sid}", "created": now, "modified": now,
-                "name": f"{r.type}:{r.indicator}", "pattern": pattern, "pattern_type": "stix",
-                "valid_from": r.first_seen, "confidence": 70 if r.confidence == "high" else 50 if r.confidence == "medium" else 30,
+        # CVEs are SDOs, not observable patterns: emit a proper vulnerability.
+        if r.type == "cve":
+            vid = uuid.uuid5(STIX_NAMESPACE, f"vulnerability:{r.indicator}")
+            objects.append({
+                "type": "vulnerability", "spec_version": "2.1",
+                "id": f"vulnerability--{vid}", **common,
+                "name": r.indicator,
+                "external_references": [{"source_name": "cve", "external_id": r.indicator}],
                 "labels": [t for t in r.tags.split(",") if t],
-                "x_swiftioc_source": r.source, "x_swiftioc_tlp": r.tlp, "x_swiftioc_reference": r.reference,
-            }
-        )
+                "x_swiftioc_source": r.source, "x_swiftioc_reference": r.reference,
+            })
+            continue
+        pattern = _stix_pattern(r.type, r.indicator)
+        if not pattern:
+            logger.debug("STIX: no pattern for type %s (%s)", r.type, r.indicator)
+            continue
+        # Deterministic RFC 4122 UUID so re-imports stay idempotent downstream.
+        sid = uuid.uuid5(STIX_NAMESPACE, f"{r.type}:{r.indicator}")
+        objects.append({
+            "type": "indicator", "spec_version": "2.1",
+            "id": f"indicator--{sid}", **common,
+            "name": f"{r.type}:{r.indicator}", "pattern": pattern, "pattern_type": "stix",
+            "valid_from": r.first_seen,
+            "confidence": 70 if r.confidence == "high" else 50 if r.confidence == "medium" else 30,
+            "labels": [t for t in r.tags.split(",") if t],
+            "x_swiftioc_source": r.source, "x_swiftioc_tlp": r.tlp, "x_swiftioc_reference": r.reference,
+        })
     bundle = {"type": "bundle", "id": f"bundle--{uuid.uuid5(STIX_NAMESPACE, 'bundle:' + now)}", "objects": objects}
     with path.open("w", encoding="utf-8") as f:
         json.dump(bundle, f, ensure_ascii=False, indent=2)
@@ -1448,6 +1601,8 @@ def main() -> int:
     ap.add_argument("--skip-rss", action="store_true")
     ap.add_argument("--max-per-source", type=int, default=None)
     ap.add_argument("--max-workers", type=int, default=8, help="Concurrent source fetches (1 disables threading)")
+    ap.add_argument("--no-fp-filter", dest="fp_filter", action="store_false", help="Disable bogon / false-positive filtering")
+    ap.set_defaults(fp_filter=True)
     ap.add_argument("--urlhaus-status", choices=["any", "online", "offline"], default="any")
     ap.add_argument("--source-window", action="append", default=[], help="Override lookback per source: name=HOURS")
     ap.add_argument("--fail-on-empty", nargs="*", default=None, help="Fail if any listed sources return zero")
@@ -1532,6 +1687,7 @@ def main() -> int:
         grace_on_404=set(args.grace_on_404 or []),
         ci_safe_rss=args.ci_safe,
         max_workers=args.max_workers,
+        fp_filter=args.fp_filter,
     )
 
     # outputs
@@ -1561,6 +1717,7 @@ def main() -> int:
         "total": len(rows),
         "total_before_dedup": raw_total,
         "duplicates_removed": duplicates_removed,
+        "false_positives_removed": stats.get("false_positives_removed", 0),
         "counts": counts,
         "type_counts": {k: v for k, v in type_totals},
         "earliest_first_seen": earliest,

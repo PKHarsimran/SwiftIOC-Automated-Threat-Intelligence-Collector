@@ -1,0 +1,38 @@
+name: Bug report
+description: Report a problem with the SwiftIOC collector
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for filing a bug! Please do **not** include secrets or private
+        feed URLs. For security vulnerabilities, follow SECURITY.md instead.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the bug and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: The exact command(s) you ran and any relevant `sources.yml`.
+      placeholder: |
+        python swiftioc.py --sources sources.yml --window-hours 48 ...
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / diagnostics
+      description: Relevant output, ideally from `--verbose` and `public/diagnostics/run.json`.
+      render: shell
+  - type: input
+    id: version
+    attributes:
+      label: Python version & OS
+      placeholder: "e.g. Python 3.11 on Ubuntu 22.04 / GitHub Actions"
+    validations:
+      required: true
