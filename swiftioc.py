@@ -367,10 +367,15 @@ def build_session() -> requests.Session:
     s = requests.Session()
     adapter = HTTPAdapter(
         max_retries=Retry(
-            total=5,
-            connect=5,
-            read=5,
-            backoff_factor=1.0,
+            # A single flaky/rate-limiting source (public threat feeds and
+            # shared CI-runner IP ranges do not mix well) must not be able to
+            # stall the whole run for minutes: worst case here is ~4 attempts
+            # * 20s timeout + ~3.5s of backoff sleep (~85s), versus the
+            # previous 6 attempts * 30s + ~31s backoff (~211s) per source.
+            total=3,
+            connect=3,
+            read=3,
+            backoff_factor=0.5,
             status_forcelist=(429, 500, 502, 503, 504, 520, 521, 522, 523, 524),
             allowed_methods=frozenset({"GET", "HEAD"}),
             raise_on_status=False,
@@ -410,7 +415,7 @@ def save_raw(name: str, content: str | bytes, kind: str) -> None:
         logger.debug("raw-save-failed %s: %s", name, e)
 
 
-def http_get(url: str, *, name: str, kind: str = "text", timeout: int = 30) -> str | bytes:
+def http_get(url: str, *, name: str, kind: str = "text", timeout: int = 20) -> str | bytes:
     s = ensure_session()
     headers = choose_ua()
     t0 = time.perf_counter()
