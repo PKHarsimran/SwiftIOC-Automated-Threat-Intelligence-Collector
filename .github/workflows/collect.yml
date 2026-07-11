@@ -45,12 +45,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
@@ -171,8 +171,13 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore(ioc): update feeds [skip ci]"
+          # Commit only the compact, human-facing artefacts. The bulky derived
+          # formats (latest.json, latest.tsv, stix2.json) are regenerated every
+          # run and published via GitHub Pages + workflow artifacts, so keeping
+          # them out of git history avoids multi-MB churn on every collection.
           file_pattern: |
-            public/iocs/**
+            public/iocs/latest.csv
+            public/iocs/latest.jsonl
             public/changelog/**
             public/diagnostics/**
             public/index.md

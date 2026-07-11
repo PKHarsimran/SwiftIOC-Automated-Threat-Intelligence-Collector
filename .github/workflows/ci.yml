@@ -5,8 +5,11 @@ on:
     branches: [main]
     paths:
       - "swiftioc.py"
+      - "scripts/**"
+      - "tests/**"
       - "sources*.yml"
-      - "requirements.txt"
+      - "requirements*.txt"
+      - "pyproject.toml"
       - ".github/workflows/ci.yml"
   pull_request:
     branches: [main]
@@ -52,11 +55,11 @@ jobs:
         with:
           inputs: requirements.txt
 
-      - name: Install lint and type-check tools
+      - name: Install lint, type-check, and test tools
         shell: bash
         run: |
           set -Eeuo pipefail
-          pip install ruff pyright
+          pip install ruff pyright pytest
 
       - name: Ruff lint
         run: ruff check .
@@ -66,6 +69,9 @@ jobs:
 
       - name: Self-test
         run: python swiftioc.py --self-test
+
+      - name: Unit tests
+        run: pytest -q
 
       - name: Dry run (skip RSS, short window)
         shell: bash

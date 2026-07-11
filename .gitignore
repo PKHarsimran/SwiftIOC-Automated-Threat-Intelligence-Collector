@@ -1,0 +1,27 @@
+# Bulky, regenerated IOC exports — published via GitHub Pages + workflow
+# artifacts instead of being committed (keeps the repo small). The compact
+# latest.csv and latest.jsonl remain tracked as the canonical git-hosted feeds.
+public/iocs/latest.json
+public/iocs/latest.tsv
+public/iocs/stix2.json
+
+# Raw feed captures (only created with --save-raw-dir)
+public/diagnostics/raw/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+
+# Local sources config (users copy sources.example.yml -> sources.yml)
+sources.yml
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store

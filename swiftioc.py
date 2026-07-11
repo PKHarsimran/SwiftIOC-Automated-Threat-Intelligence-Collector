@@ -2,7 +2,6 @@
 from __future__ import annotations
 import argparse
 import csv
-import hashlib
 import io
 import ipaddress
 import inspect
@@ -12,6 +11,8 @@ import os
 import random
 import re
 import time
+import uuid
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, asdict
 from datetime import datetime, timedelta, timezone
 from importlib import import_module
@@ -26,6 +27,9 @@ from dateutil import parser as dtparser
 import iocextract
 
 ISO_FMT = "%Y-%m-%dT%H:%M:%SZ"
+
+# Stable namespace for deterministic STIX 2.1 identifiers (uuid5).
+STIX_NAMESPACE = uuid.uuid5(uuid.NAMESPACE_DNS, "swiftioc.threatintel")
 
 # ---------------- UA pool ----------------
 DEFAULT_UAS = [
@@ -140,6 +144,15 @@ BTC_INLINE_RE = re.compile(r"\b(?:bc1|[13])[A-Za-z0-9]{25,39}\b")
 DATE_FIELD_RE = re.compile(r"(first|last)?_?(seen|time|date)|timestamp", re.I)
 TAGS_FIELD_RE = re.compile(r"tags?|labels?|famil(?:y|ies)|threats?|malware|campaign", re.I)
 
+# Precompiled once at import time; classify() is the hottest function in the
+# pipeline (called for every extracted token) so avoid recompiling per call.
+URL_SCHEME_RE = re.compile(r"^(?:https?|ftp)://", re.I)
+DOMAIN_RE = re.compile(r"^(?=.{1,253}$)(?!-)[A-Za-z0-9-]{1,63}(?:\.[A-Za-z0-9-]{1,63})+\.?$")
+MD5_RE = re.compile(r"[a-fA-F0-9]{32}")
+SHA1_RE = re.compile(r"[a-fA-F0-9]{40}")
+SHA256_RE = re.compile(r"[A-Fa-f0-9]{64}")
+CVE_RE = re.compile(r"CVE-\d{4}-\d{4,7}", re.I)
+
 
 def classify(v: str) -> Optional[str]:
     s = v.strip()
@@ -156,21 +169,21 @@ def classify(v: str) -> Optional[str]:
             return "ipv6_cidr"
     except Exception:
         pass
-    if re.match(r"^(?:https?|ftp)://", s, flags=re.I):
+    if URL_SCHEME_RE.match(s):
         return "url"
-    if re.match(r"^(?=.{1,253}$)(?!-)[A-Za-z0-9-]{1,63}(?:\.[A-Za-z0-9-]{1,63})+\.?$", s):
+    if DOMAIN_RE.match(s):
         return "domain"
-    if re.fullmatch(r"^[a-fA-F0-9]{32}$", s):
+    if MD5_RE.fullmatch(s):
         return "md5"
-    if re.fullmatch(r"^[a-fA-F0-9]{40}$", s):
+    if SHA1_RE.fullmatch(s):
         return "sha1"
-    if re.fullmatch(r"^[A-Fa-f0-9]{64}$", s):
+    if SHA256_RE.fullmatch(s):
         return "sha256"
     if SHA512_RE.fullmatch(s):
         return "sha512"
     if JA3_RE.fullmatch(s):
         return "ja3"
-    if re.fullmatch(r"CVE-\d{4}-\d{4,7}", s, re.IGNORECASE):
+    if CVE_RE.fullmatch(s):
         return "cve"
     if EMAIL_RE.fullmatch(s):
         return "email"
@@ -222,7 +235,7 @@ def extract_indicators_from_text(blob: str) -> List[Tuple[str, str]]:
         push(h, fallback="sha512")
     for mail in _safe_iocextract("extract_emails", blob):  # type: ignore[attr-defined]
         push(mail, fallback="email")
-    for cve in set(re.findall(r"CVE-\d{4}-\d{4,7}", blob, flags=re.I)):
+    for cve in set(CVE_RE.findall(blob)):
         push(cve.upper(), fallback="cve")
     for ja3 in set(JA3_RE.findall(blob)):
         push(ja3.lower(), fallback="ja3")
@@ -824,8 +837,11 @@ def fetch_rss(url: str, ref_url: str, source: str, ws: datetime, *, per_entry_ca
         raise
     try:
         feed = fp.parse(url, request_headers=choose_ua())
-    except Exception:
+    except Exception as exc:
+        logger.warning("RSS parse failed for %s: %s", source, exc)
         return []
+    if getattr(feed, "bozo", 0) and getattr(feed, "bozo_exception", None):
+        logger.debug("RSS %s reported a parse warning: %s", source, feed.bozo_exception)
     now = now_utc()
     out: List[Indicator] = []
     feed_updated = parse_dt(getattr(getattr(feed, "feed", object()), "updated", None)) or now
@@ -1102,6 +1118,7 @@ def collect_from_yaml(
     source_window: Dict[str, int],
     grace_on_404: Set[str],
     ci_safe_rss: bool,
+    max_workers: int = 8,
 ) -> Tuple[List[Indicator], Dict[str, int], Dict[str, Any]]:
     base_start = now_utc() - timedelta(hours=window_hours)
 
@@ -1113,24 +1130,20 @@ def collect_from_yaml(
     def cap(xs: List[Indicator]) -> List[Indicator]:
         return xs[:max_per_source] if (max_per_source and len(xs) > max_per_source) else xs
 
-    indicators: List[Indicator] = []
-    counts: Dict[str, int] = {}
-    failures: List[Dict[str, str]] = []
-    raw_total = 0
-
-        # APIs
-    for api in cfg.get("apis", []) or []:
+    # Each source is fetched by a worker returning a result dict so the network
+    # I/O can be run concurrently. Workers never raise: failures are captured in
+    # the result so one bad feed cannot abort the whole run.
+    def run_api(api: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         name = api.get("name", "api")
         parse = api.get("parse")
         if not parse:
-            continue
-
+            return None
         url = api.get("url", "")
         ref = api.get("reference", url) or ""
         ws = start_for(name)
         got: List[Indicator] = []
         options: Dict[str, Any] = {}
-
+        failure: Optional[Dict[str, str]] = None
         try:
             t0 = time.perf_counter()
             parser_fn = resolve_parser(parse)
@@ -1164,55 +1177,73 @@ def collect_from_yaml(
             dt = time.perf_counter() - t0
             logger.debug("collect %s %d in %.2fs", name, len(got), dt)
             logger.debug("summary %s types=%s tags_top=%s", name, type_counts(got), top_tags(got))
-
         except Exception as e:
             graceful_fail = bool(api.get("graceful_fail") or options.get("graceful_fail"))
             logger.warning("%s failed: %s", name, e)
             if not graceful_fail:
-                failures.append({"source": name, "error": str(e)})
+                failure = {"source": name, "error": str(e)}
             got = []
+        return {"name": name, "indicators": got, "failure": failure}
 
-        got = cap(got)
-        raw_total += len(got)
-        indicators.extend(got)
-        counts[name] = len(got)
+    def run_rss(rss: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        name = rss.get("name", "rss")
+        url = rss.get("url")
+        if not url:
+            return None
+        ref = rss.get("reference", url) or ""
+        got: List[Indicator] = []
+        failure: Optional[Dict[str, str]] = None
+        try:
+            t0 = time.perf_counter()
+            got = fetch_rss(url, ref, name, start_for(name), tolerate_missing=ci_safe_rss)
+            dt = time.perf_counter() - t0
+            logger.debug("collect RSS %s %d in %.2fs", name, len(got), dt)
+            logger.debug("summary %s types=%s tags_top=%s", name, type_counts(got), top_tags(got))
+        except Exception as e:
+            graceful_fail = bool(rss.get("graceful_fail"))
+            logger.warning("%s failed: %s", name, e)
+            if not graceful_fail:
+                failure = {"source": name, "error": str(e)}
+            got = []
+        return {"name": name, "indicators": got, "failure": failure}
 
-    # RSS
+    # Build the ordered task list (APIs first, then RSS) so results stay
+    # deterministic regardless of which worker finishes first.
+    tasks: List[Tuple[Callable[[Dict[str, Any]], Optional[Dict[str, Any]]], Dict[str, Any]]] = []
+    for api in cfg.get("apis", []) or []:
+        tasks.append((run_api, api))
     if not skip_rss:
         for rss in cfg.get("rss", []) or []:
-            name = rss.get("name", "rss")
-            url = rss.get("url")
-            if not url:
-                continue
-            ref = rss.get("reference", url) or ""
-            try:
-                t0 = time.perf_counter()
-                got = fetch_rss(
-                    url,
-                    ref,
-                    name,
-                    start_for(name),
-                    tolerate_missing=ci_safe_rss,
-                )
-                dt = time.perf_counter() - t0
-                logger.debug("collect RSS %s %d in %.2fs", name, len(got), dt)
-                logger.debug(
-                    "summary %s types=%s tags_top=%s",
-                    name,
-                    type_counts(got),
-                    top_tags(got),
-                )
-            except Exception as e:
-                graceful_fail = bool(rss.get("graceful_fail"))
-                logger.warning("%s failed: %s", name, e)
-                if not graceful_fail:
-                    failures.append({"source": name, "error": str(e)})
-                got = []
+            tasks.append((run_rss, rss))
 
-            got = cap(got)
-            raw_total += len(got)
-            indicators.extend(got)
-            counts[name] = len(got)
+    # Pre-initialise the shared HTTP session before fanning out so the workers
+    # don't race on lazy creation.
+    ensure_session()
+
+    results: List[Optional[Dict[str, Any]]] = [None] * len(tasks)
+    workers = max(1, min(max_workers, len(tasks))) if tasks else 1
+    if workers > 1:
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            futures = {executor.submit(fn, item): idx for idx, (fn, item) in enumerate(tasks)}
+            for future in as_completed(futures):
+                results[futures[future]] = future.result()
+    else:
+        for idx, (fn, item) in enumerate(tasks):
+            results[idx] = fn(item)
+
+    indicators: List[Indicator] = []
+    counts: Dict[str, int] = {}
+    failures: List[Dict[str, str]] = []
+    raw_total = 0
+    for result in results:
+        if result is None:
+            continue
+        if result["failure"]:
+            failures.append(result["failure"])
+        got = cap(result["indicators"])
+        raw_total += len(got)
+        indicators.extend(got)
+        counts[result["name"]] = len(got)
 
     # Dedup + merge
     uniq: Dict[Tuple[str, str], Indicator] = {}
@@ -1294,7 +1325,10 @@ def write_stix(path: Path, rows: List[Indicator]) -> None:
             pattern = f"[vulnerability:name = '{r.indicator}']"
         if not pattern:
             continue
-        sid = hashlib.sha256((r.type + r.indicator).encode()).hexdigest()[:32]
+        # STIX 2.1 requires the id suffix to be an RFC 4122 UUID. Derive it
+        # deterministically from type+indicator so the same IOC keeps a stable id
+        # across runs (idempotent for downstream platforms like OpenCTI/MISP).
+        sid = uuid.uuid5(STIX_NAMESPACE, f"{r.type}:{r.indicator}")
         objects.append(
             {
                 "type": "indicator", "spec_version": "2.1",
@@ -1305,19 +1339,30 @@ def write_stix(path: Path, rows: List[Indicator]) -> None:
                 "x_swiftioc_source": r.source, "x_swiftioc_tlp": r.tlp, "x_swiftioc_reference": r.reference,
             }
         )
-    bundle = {"type": "bundle", "id": "bundle--" + hashlib.sha1(now.encode()).hexdigest(), "objects": objects}
+    bundle = {"type": "bundle", "id": f"bundle--{uuid.uuid5(STIX_NAMESPACE, 'bundle:' + now)}", "objects": objects}
     with path.open("w", encoding="utf-8") as f:
         json.dump(bundle, f, ensure_ascii=False, indent=2)
 
 
-def write_changelog(path: Path, counts: Dict[str, int], total: int) -> None:
+def write_changelog(path: Path, counts: Dict[str, int], total: int, *, max_entries: int = 50) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     ts = iso(now_utc())
-    lines = ["# Changelog", "", f"## {ts}", "", f"Total indicators: **{total}**", "", "### By source"]
-    lines.extend(f"- {k}: {v}" for k, v in sorted(counts.items()))
-    lines.append("")
-    with path.open("a", encoding="utf-8") as f:
-        f.write("\n".join(lines))
+    entry_lines = [f"## {ts}", "", f"Total indicators: **{total}**", "", "### By source"]
+    entry_lines.extend(f"- {k}: {v}" for k, v in sorted(counts.items()))
+    entry = "\n".join(entry_lines).strip()
+
+    # Read existing run entries and keep only the most recent ``max_entries`` so
+    # the changelog can be committed every run without growing without bound.
+    existing: List[str] = []
+    if path.exists():
+        text = path.read_text(encoding="utf-8")
+        for chunk in re.split(r"(?m)^## ", text)[1:]:
+            existing.append("## " + chunk.strip())
+
+    entries = existing + [entry]  # chronological: newest last
+    entries = entries[-max_entries:]
+    body = "# Changelog\n\n" + "\n\n".join(entries) + "\n"
+    path.write_text(body, encoding="utf-8")
 
 
 # ---------------- logging ----------------
@@ -1402,6 +1447,7 @@ def main() -> int:
     ap.add_argument("--window-hours", type=int, default=48)
     ap.add_argument("--skip-rss", action="store_true")
     ap.add_argument("--max-per-source", type=int, default=None)
+    ap.add_argument("--max-workers", type=int, default=8, help="Concurrent source fetches (1 disables threading)")
     ap.add_argument("--urlhaus-status", choices=["any", "online", "offline"], default="any")
     ap.add_argument("--source-window", action="append", default=[], help="Override lookback per source: name=HOURS")
     ap.add_argument("--fail-on-empty", nargs="*", default=None, help="Fail if any listed sources return zero")
@@ -1434,7 +1480,7 @@ def main() -> int:
         args.log_format = "json"
         if not args.save_raw_dir:
             args.save_raw_dir = Path("public/diagnostics/raw")
-        args.skip_rss = args.skip_rss  # unchanged, but RSS will tolerate missing dep
+        # RSS still runs; fetch_rss tolerates a missing feedparser dependency.
     if on_ci and args.verbose == 0:
         # default to INFO on CI to get more signal in logs
         args.verbose = 1
@@ -1485,6 +1531,7 @@ def main() -> int:
         source_window=parse_name_int_pairs(args.source_window, "--source-window"),
         grace_on_404=set(args.grace_on_404 or []),
         ci_safe_rss=args.ci_safe,
+        max_workers=args.max_workers,
     )
 
     # outputs
