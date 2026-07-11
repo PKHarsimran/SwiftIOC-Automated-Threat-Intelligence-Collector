@@ -53,8 +53,14 @@ high-fidelity IOCs from authoritative sources. The project emphasises:
 - **Defanging & deduplication** – helper functions defang URLs/domains and
   remove duplicate indicators so that downstream tools receive safe, unique
   values. 
+- **Concurrent collection** – sources are fetched in parallel (configurable via
+  `--max-workers`), so a full run completes in a fraction of the time of a
+  sequential fetch without changing the deterministic output.
 - **Multiple export formats** – each run emits CSV, TSV, JSON, JSON Lines, a
-  STIX 2.1 bundle, and a Markdown changelog. 
+  STIX 2.1 bundle, and a Markdown changelog. STIX identifiers are deterministic
+  RFC 4122 UUIDs (STIX 2.1 compliant) so re-imports stay idempotent in MISP,
+  OpenCTI, and similar platforms. The changelog is capped to the most recent
+  runs to keep it committable indefinitely.
 - **Rich diagnostics** – a JSON run summary, Markdown report, and per-source
   counts are generated automatically for audits and dashboards. 
 - **Optional RSS collection** – RSS feeds are processed when `feedparser` is
@@ -120,13 +126,22 @@ threat feed workflow".
 │   └── changelog/          # Markdown changelog between runs
 ├── scripts/                # Utility helpers for post-processing
 │   └── summarize_iocs.py   # Generates Markdown summaries for Pages & artifacts
-├── requirements.txt        # Python dependencies
+├── tests/                  # Offline pytest suite (parsers, STIX, dedup)
+├── requirements.txt        # Python runtime dependencies
+├── requirements-dev.txt    # Runtime + lint/type/test tooling
+├── pyproject.toml          # Ruff, Pyright, and pytest configuration
 ├── sources.example.yml     # Sample feed configuration
 ├── swiftioc.py             # Main collector implementation & CLI
 ├── index.html              # Optional GitHub Pages entry point
 ├── README.md               # This document
 └── SECURITY.md             # Security reporting policy
 ```
+
+> **Note on outputs & git:** the compact `latest.csv` and `latest.jsonl` feeds
+> are committed to the repository, while the bulkier regenerated formats
+> (`latest.json`, `latest.tsv`, `stix2.json`) are ignored by git and instead
+> published through GitHub Pages and workflow artifacts. This keeps the
+> repository small while still exposing every format at the published site.
 
 ## 🧠 How it works
 1. **Load configuration** – `swiftioc.py` reads `sources.yml` (falling back to
@@ -214,6 +229,7 @@ Run `python -m swiftioc --help` for the full list of switches. Highlights:
 | `--window-hours N` | Global lookback window in hours. |
 | `--skip-rss` | Disable RSS processing entirely. |
 | `--max-per-source N` | Cap the number of indicators taken from each source. |
+| `--max-workers N` | Number of sources fetched concurrently (default `8`; use `1` to disable threading). |
 | `--urlhaus-status {any,online,offline}` | Filter URLhaus indicators by status. |
 | `--source-window name=N` | Override the lookback window for specific sources. |
 | `--grace-on-404 name…` | Treat HTTP 404 for listed sources as a non-fatal empty result. |
@@ -352,6 +368,23 @@ python scripts/summarize_iocs.py \
 Override `--out` or `--index` to control where the summary is written. When the
 repository is published with GitHub Pages, everything under `public/` becomes the
 site content.
+
+## 🧑‍💻 Development & testing
+Contributions are welcome. Set up a development environment and run the same
+checks CI runs:
+
+```bash
+pip install -r requirements-dev.txt
+
+ruff check .          # lint
+pyright               # static type check
+python swiftioc.py --self-test   # built-in sanity assertions
+pytest -q             # offline unit tests (parsers, STIX, dedup, changelog)
+```
+
+The `tests/` suite is fully offline—parsers that would hit the network have
+their HTTP layer monkeypatched—so it is safe to run anywhere and catches feed
+format drift before it reaches production.
 
 ---
 
