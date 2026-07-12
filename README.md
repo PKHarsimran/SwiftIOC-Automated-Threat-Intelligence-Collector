@@ -339,11 +339,14 @@ To publish on GitHub Pages:
 3. Enable GitHub Pages with the **GitHub Actions** source so deployments pick up
    the latest `public/` output automatically.
 
-The dashboard prioritises freshness by sorting preview rows by newest timestamp
-first, then confidence, ensuring visitors see the latest IOCs at the top of the
-feed. Mobile breakpoints convert the preview table into card-style rows for a
-phone-friendly experience, and all metadata is defanged to stay safe for casual
-browsing.
+The dashboard ranks preview rows by the collector's 0–100 relevance score
+(corroboration + freshness baked in), then by how many independent sources
+confirm each indicator, so the most dangerous and most corroborated IOCs sit at
+the top of the feed. A "Show" filter isolates high-score (≥80), corroborated
+(2+ sources), or new (last 48h) indicators, and multi-source rows carry a
+`×N confirmed` badge. Mobile breakpoints convert the preview table into
+card-style rows for a phone-friendly experience, and all metadata is defanged
+to stay safe for casual browsing.
 
 ## ⚙️ Running in GitHub Actions
 SwiftIOC runs cleanly inside GitHub Actions and emits artifacts that can be

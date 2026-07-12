@@ -196,6 +196,13 @@
         color: #fef9c3;
       }
 
+      .preview-meta-pill.meta-corroborated {
+        background: rgba(239, 68, 68, 0.14);
+        border-color: rgba(239, 68, 68, 0.4);
+        color: #fecaca;
+        font-weight: 600;
+      }
+
       .preview-indicator-tags {
         display: inline-flex;
         flex-wrap: wrap;
@@ -662,6 +669,20 @@
                   </select>
                 </label>
 
+                <label class="toolbar-group" for="preview-highlight">
+                  <span>Show</span>
+                  <select
+                    id="preview-highlight"
+                    data-preview-highlight
+                    disabled
+                  >
+                    <option value="all">Everything</option>
+                    <option value="high">High score (≥80)</option>
+                    <option value="corroborated">Corroborated (2+ sources)</option>
+                    <option value="new">New (last 48h)</option>
+                  </select>
+                </label>
+
                 <label class="toolbar-group" for="preview-limit">
                   <span>Rows</span>
                   <select id="preview-limit" data-preview-limit>
@@ -699,9 +720,9 @@
                   <tr>
                     <th scope="col">Indicator</th>
                     <th scope="col">Type</th>
-                    <th scope="col">Source</th>
+                    <th scope="col">Sources</th>
                     <th scope="col">First seen</th>
-                    <th scope="col">Confidence</th>
+                    <th scope="col">Score</th>
                   </tr>
                 </thead>
                 <tbody data-preview-body></tbody>
@@ -723,8 +744,11 @@
                   highlighted
                 </span>
                 <span class="preview-summary-pill">
-                  <span data-preview-high>0</span> high-confidence
+                  <span data-preview-high>0</span> high-score
                   (<span data-preview-high-percent>0%</span>)
+                </span>
+                <span class="preview-summary-pill">
+                  <span data-preview-corroborated>0</span> corroborated by 2+ sources
                 </span>
                 <span class="preview-summary-pill">
                   Top tag:

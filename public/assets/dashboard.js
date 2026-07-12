@@ -107,6 +107,15 @@
   const clamp = (value, min, max) =>
     Math.min(max, Math.max(min, value));
 
+  // Compact label for a possibly multi-source row: "feodo +2".
+  const primarySourceLabel = (row) => {
+    if (!row) return 'unknown';
+    const list = Array.isArray(row.sourceList) ? row.sourceList : [];
+    if (!list.length) return row.source || 'unknown';
+    if (list.length === 1) return list[0];
+    return `${list[0]} +${list.length - 1}`;
+  };
+
   const parseTimestamp = (value) => {
     if (value == null) return null;
 
@@ -323,6 +332,10 @@
   const createStatsAccumulator = () => {
     let total = 0;
     let duplicatesRemoved = 0;
+    let corroborated = 0;
+    let highScore = 0;
+    let scoreSum = 0;
+    let scoredCount = 0;
     const sources = new Set();
     const types = new Set();
     const tags = new Map();
@@ -365,8 +378,24 @@
       const type = normaliseString(row.type);
       const indicator = normaliseString(row.indicator);
 
-      if (source) {
-        sources.add(source);
+      // Multi-source rows carry comma-separated feeds; count each feed as a
+      // distinct source instead of treating "feodo,threatfox" as one.
+      const sourceParts = Array.isArray(row.sourceList)
+        ? row.sourceList
+        : uniqueStrings(source.split(','));
+      sourceParts.forEach((part) => {
+        const key = normaliseLower(part);
+        if (key) sources.add(key);
+      });
+
+      if (sourceParts.length >= 2) {
+        corroborated += 1;
+      }
+
+      if (typeof row.score === 'number') {
+        scoreSum += row.score;
+        scoredCount += 1;
+        if (row.score >= 80) highScore += 1;
       }
 
       if (type) {
@@ -433,6 +462,10 @@
       return {
         total,
         duplicatesRemoved,
+        corroborated,
+        highScore,
+        avgScore: scoredCount > 0 ? Math.round(scoreSum / scoredCount) : null,
+        hasScores: scoredCount > 0,
         activeSources: sources.size,
         indicatorTypes: types.size,
         tags,
@@ -465,9 +498,13 @@
       const source = normaliseString(row.source);
       const type = normaliseString(row.type);
 
-      if (source) {
-        bySource.set(source, (bySource.get(source) || 0) + 1);
-      }
+      // Credit each feed in a comma-separated multi-source value.
+      const sourceParts = Array.isArray(row.sourceList)
+        ? row.sourceList
+        : uniqueStrings(source.split(','));
+      sourceParts.forEach((part) => {
+        bySource.set(part, (bySource.get(part) || 0) + 1);
+      });
 
       if (type) {
         byType.set(type, (byType.get(type) || 0) + 1);
@@ -770,9 +807,28 @@
       row.confidence_score,
       row.confidenceScore,
       row.confidence_level,
-      row.confidenceLevel,
-      row.score
+      row.confidenceLevel
     );
+
+    // Numeric 0-100 relevance score emitted by the collector (confidence base
+    // + cross-source corroboration bonus, decayed by age). First-class: this
+    // is the primary ranking signal when present.
+    const parseScore = (value) => {
+      if (typeof value === 'number' && Number.isFinite(value)) {
+        return clamp(Math.round(value), 0, 100);
+      }
+      const numeric = Number(normaliseString(value));
+      if (Number.isFinite(numeric) && numeric > 0) {
+        return clamp(Math.round(numeric), 0, 100);
+      }
+      return null;
+    };
+    const score = parseScore(row.score);
+
+    // The source field accumulates comma-separated feeds as the living feed
+    // merges runs; each independent feed corroborates the indicator.
+    const sourceList = uniqueStrings((sourceRaw || '').split(','));
+    const sourceCount = sourceList.length;
 
     const tagValues = [
       ...extractTags(row.tags),
@@ -816,8 +872,14 @@
       indicator,
       type: typeRaw || 'unknown',
       source: sourceRaw || 'unknown',
+      sourceList,
+      sourceCount,
+      score,
       confidence,
-      confidenceRank: confidenceRankForValue(confidence),
+      confidenceRank:
+        score != null
+          ? confidenceRankForValue(score)
+          : confidenceRankForValue(confidence),
       tags,
       tagsLower,
       firstSeen,
@@ -889,6 +951,16 @@
     });
 
     const compareRows = (a, b) => {
+      // Primary signal: the collector's 0-100 score (confidence +
+      // cross-source corroboration, decayed by age). Falls back to the
+      // coarse confidence rank for feeds without scores.
+      const scoreA = typeof a.score === 'number' ? a.score : -1;
+      const scoreB = typeof b.score === 'number' ? b.score : -1;
+      if (scoreA !== scoreB) return scoreB - scoreA;
+
+      const corroborationDiff = (b.sourceCount || 0) - (a.sourceCount || 0);
+      if (corroborationDiff !== 0) return corroborationDiff;
+
       const confidenceDiff = confidenceRankForRow(b) - confidenceRankForRow(a);
       if (confidenceDiff !== 0) return confidenceDiff;
 
@@ -1347,6 +1419,7 @@
 
     const filterSelect = qs('[data-preview-filter]', container);
     const tagFilterSelect = qs('[data-preview-tag-filter]', container);
+    const highlightSelect = qs('[data-preview-highlight]', container);
     const limitSelect = qs('[data-preview-limit]', container);
     const searchInput = qs('[data-preview-search]', container);
     const refreshButton = qs('[data-preview-refresh]', container);
@@ -1357,6 +1430,10 @@
     const summaryHighEl = qs('[data-preview-high]', container);
     const summaryHighPercentEl = qs(
       '[data-preview-high-percent]',
+      container
+    );
+    const summaryCorroboratedEl = qs(
+      '[data-preview-corroborated]',
       container
     );
     const summaryTopTagEl = qs('[data-preview-top-tag]', container);
@@ -1375,6 +1452,7 @@
       rows: [],
       filter: 'all',
       tagFilter: 'all',
+      highlight: 'all',
       search: '',
       limit: DEFAULT_PREVIEW_LIMIT,
       origin: 'network',
@@ -1510,6 +1588,13 @@
       if (summaryHighEl)
         summaryHighEl.textContent = formatNumber(highCount);
 
+      if (summaryCorroboratedEl) {
+        const corroboratedCount = visibleRows.filter(
+          (row) => (row.sourceCount || 0) >= 2
+        ).length;
+        summaryCorroboratedEl.textContent = formatNumber(corroboratedCount);
+      }
+
       if (summaryHighPercentEl) {
         const percent =
           totalRows > 0 ? ((highCount / totalRows) * 100).toFixed(1) : '0.0';
@@ -1593,9 +1678,21 @@
       };
 
       indicatorMeta.appendChild(makeMetaPill('type', row.type || 'unknown'));
-      indicatorMeta.appendChild(makeMetaPill('source', row.source || 'unknown'));
       indicatorMeta.appendChild(
-        makeMetaPill('confidence', row.confidence || 'n/a')
+        makeMetaPill('source', primarySourceLabel(row))
+      );
+      if ((row.sourceCount || 0) >= 2) {
+        indicatorMeta.appendChild(
+          makeMetaPill('corroborated', `${row.sourceCount}× confirmed`)
+        );
+      }
+      indicatorMeta.appendChild(
+        makeMetaPill(
+          'confidence',
+          typeof row.score === 'number'
+            ? `score ${row.score}`
+            : row.confidence || 'n/a'
+        )
       );
 
       indicatorMain.appendChild(indicatorMeta);
@@ -1681,18 +1778,47 @@
       };
 
       tr.appendChild(makeCell('Type', row.type));
-      tr.appendChild(makeCell('Source', row.source));
+
+      const sourceCell = makeCell('Sources', primarySourceLabel(row));
+      if ((row.sourceCount || 0) >= 2 && Array.isArray(row.sourceList)) {
+        sourceCell.title = row.sourceList.join(', ');
+      }
+      tr.appendChild(sourceCell);
+
       tr.appendChild(
         makeCell('First seen', row.firstSeenDisplay ?? row.firstSeen)
       );
 
-      const confidenceClass = confidenceClassFor(row.confidence);
-      const confidenceLabel = row.confidence || '—';
-      tr.appendChild(
-        makeCell('Confidence', confidenceLabel, confidenceClass)
-      );
+      // Score column: the collector's 0-100 relevance score when present,
+      // otherwise the legacy confidence label.
+      const scoreValue =
+        typeof row.score === 'number' ? String(row.score) : row.confidence || '—';
+      const scoreClass =
+        typeof row.score === 'number'
+          ? confidenceClassFor(row.score)
+          : confidenceClassFor(row.confidence);
+      tr.appendChild(makeCell('Score', scoreValue, scoreClass));
 
       return tr;
+    };
+
+    const FRESH_WINDOW_SECONDS = 48 * 3600;
+
+    const matchesHighlight = (row, highlight) => {
+      if (highlight === 'all') return true;
+      if (highlight === 'high') {
+        if (typeof row.score === 'number') return row.score >= 80;
+        return confidenceRankForRow(row) >= 3;
+      }
+      if (highlight === 'corroborated') {
+        return (row.sourceCount || 0) >= 2;
+      }
+      if (highlight === 'new') {
+        const firstSeen = parseTimestamp(row.firstSeen);
+        if (!firstSeen) return false;
+        return Date.now() / 1000 - firstSeen.time <= FRESH_WINDOW_SECONDS;
+      }
+      return true;
     };
 
     const filterRows = () => {
@@ -1701,6 +1827,10 @@
       const searchTerm = state.search.toLowerCase().trim();
 
       return state.rows.filter((row) => {
+        if (!matchesHighlight(row, state.highlight)) {
+          return false;
+        }
+
         if (filter !== 'all' && row.type.toLowerCase() !== filter) {
           return false;
         }
@@ -1956,6 +2086,10 @@
             tagFilterSelect.options.length <= 1;
         }
 
+        if (highlightSelect) {
+          highlightSelect.disabled = state.rows.length === 0;
+        }
+
         if (searchInput) {
           searchInput.disabled = state.rows.length === 0;
           if (!searchInput.disabled) {
@@ -1976,6 +2110,7 @@
     const toggleControls = (disabled) => {
       if (filterSelect) filterSelect.disabled = disabled;
       if (tagFilterSelect) tagFilterSelect.disabled = disabled;
+      if (highlightSelect) highlightSelect.disabled = disabled;
       if (searchInput) searchInput.disabled = disabled;
       if (limitSelect) limitSelect.disabled = disabled;
       if (refreshButton) refreshButton.disabled = disabled;
@@ -1993,6 +2128,13 @@
     if (tagFilterSelect) {
       tagFilterSelect.addEventListener('change', () => {
         state.tagFilter = tagFilterSelect.value;
+        applyFilter();
+      });
+    }
+
+    if (highlightSelect) {
+      highlightSelect.addEventListener('change', () => {
+        state.highlight = highlightSelect.value;
         applyFilter();
       });
     }

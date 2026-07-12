@@ -388,6 +388,48 @@ def test_stix_bundle_validates_against_stix2_library(tmp_path):
     assert len(bundle.objects) == len(rows) + 2  # + identity + marking
 
 
+# ---------------- summarize_iocs helpers ----------------
+def _load_summarizer():
+    import importlib.util
+    from pathlib import Path
+
+    path = Path(__file__).resolve().parent.parent / "scripts" / "summarize_iocs.py"
+    spec = importlib.util.spec_from_file_location("summarize_iocs", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_summarizer_score_stats_and_top_table():
+    mod = _load_summarizer()
+    rows = [
+        {"indicator": "1.2.3.4", "type": "ipv4", "source": "a,b,c", "score": 96},
+        {"indicator": "5.6.7.8", "type": "ipv4", "source": "a", "score": 80},
+        {"indicator": "old.example", "type": "domain", "source": "a", "score": 21},
+        {"indicator": "unscored.example", "type": "domain", "source": "a"},
+    ]
+    stats = mod.summarize_scores(rows)
+    assert stats["scored"] == 3
+    assert stats["corroborated"] == 1
+    assert stats["min"] == 21 and stats["max"] == 96
+    assert stats["high"] == 2
+
+    top = mod.top_indicators_by_score(rows, limit=2)
+    assert len(top) == 2
+    assert "1.2.3.4" in top[0][0]  # highest score first
+    assert "score 96, 3 sources" == top[0][1]
+
+
+def test_summarizer_handles_scoreless_feed():
+    mod = _load_summarizer()
+    rows = [{"indicator": "x.example", "type": "domain", "source": "a"}]
+    stats = mod.summarize_scores(rows)
+    assert stats == {"scored": 0, "corroborated": 0}
+    # render_summary must not crash on legacy score-less data
+    summary_md, index_md, step_md = mod.render_summary({}, rows)
+    assert "Top indicators by score" in summary_md  # table still renders (score 0)
+
+
 # ---------------- scoring: corroboration + decay ("living feed") --------------
 def _iso_hours_ago(hours: float) -> str:
     from datetime import timedelta
@@ -486,6 +528,48 @@ def test_csv_includes_score_column(tmp_path):
     header = lines[0].split(",")
     row = lines[1].split(",")
     assert row[header.index("score")] == "88"
+
+
+def test_threatfox_export_endpoint_shape(monkeypatch):
+    # The real export endpoint returns {"<ioc_id>": [entry, ...]} with
+    # ioc_value/first_seen_utc/ip:port/md5_hash spellings and comma-string
+    # tags — all of which the parser previously dropped or crashed on.
+    payload = json.dumps(
+        {
+            "1848845": [
+                {
+                    "ioc_value": "nisosznd.jadoobet.club", "ioc_type": "domain",
+                    "threat_type": "payload_delivery", "malware_printable": "ClearFake",
+                    "first_seen_utc": "2026-07-12 02:20:08", "confidence_level": 100,
+                    "tags": "ClearFake,windows",
+                }
+            ],
+            "1848846": [
+                {
+                    "ioc_value": "203.0.113.9:4443", "ioc_type": "ip:port",
+                    "threat_type": "botnet_cc", "malware_printable": "Emotet",
+                    "first_seen_utc": "2026-07-12 01:00:00", "confidence_level": 50,
+                }
+            ],
+            "1848847": [
+                {
+                    "ioc_value": "d41d8cd98f00b204e9800998ecf8427e", "ioc_type": "md5_hash",
+                    "first_seen_utc": "2026-07-12 01:00:00", "confidence_level": 30,
+                }
+            ],
+        }
+    )
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
+    ws = si.now_utc().replace(year=2000)
+    out = si.fetch_threatfox_export_json("http://x", "ref", "tf", ws)
+    by_type = {i.type: i for i in out}
+    assert set(by_type) == {"domain", "ipv4", "md5"}
+    assert by_type["domain"].confidence == "high"  # confidence_level 100
+    assert "clearfake" in by_type["domain"].tags.lower()
+    # ip:port strips the port so corroboration can match other IP feeds.
+    assert si.refang(by_type["ipv4"].indicator) == "203.0.113.9"
+    assert by_type["ipv4"].confidence == "medium"
+    assert by_type["md5"].confidence == "low"
 
 
 def test_threatfox_and_feodo_parsers(monkeypatch):
