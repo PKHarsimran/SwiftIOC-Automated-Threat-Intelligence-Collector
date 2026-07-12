@@ -110,11 +110,15 @@ jobs:
         run: |
           set -Eeuo pipefail
 
+          # --persist-feed makes this a living feed: the latest.jsonl committed
+          # by the previous run (checked out above) is merged in, re-observed
+          # indicators refresh, and stale ones decay until they expire.
           python swiftioc.py -vv \
             --out-dir "$OUT_DIR" \
             --sources "$SOURCES_FILE" \
             --window-hours "$WINDOW_HOURS" \
             --urlhaus-status "$URLHAUS_STATUS" \
+            --persist-feed \
             --log-file "$DIAG_DIR/run.log" \
             --log-format json \
             --log-file-level DEBUG \

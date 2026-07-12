@@ -76,8 +76,10 @@ def test_extract_indicators_from_text():
 
 
 # ------------------------------- STIX -----------------------------------------
-def _sample_indicator(**overrides) -> si.Indicator:
-    base = dict(
+def _sample_indicator(**overrides: str) -> si.Indicator:
+    # Construct explicitly and apply overrides via setattr: spreading an
+    # untyped dict into the constructor loses per-field types under pyright.
+    ind = si.Indicator(
         indicator="8.8.8.8",
         type="ipv4",
         source="test",
@@ -89,8 +91,9 @@ def _sample_indicator(**overrides) -> si.Indicator:
         reference="https://example.com",
         context="unit test",
     )
-    base.update(overrides)
-    return si.Indicator(**base)
+    for key, value in overrides.items():
+        setattr(ind, key, value)
+    return ind
 
 
 def test_write_stix_uses_valid_uuid_ids(tmp_path):
@@ -383,6 +386,106 @@ def test_stix_bundle_validates_against_stix2_library(tmp_path):
     # spec violation (bad ids, marking, pattern syntax, ...).
     bundle = stix2.parse(out.read_text(encoding="utf-8"), allow_custom=True)
     assert len(bundle.objects) == len(rows) + 2  # + identity + marking
+
+
+# ---------------- scoring: corroboration + decay ("living feed") --------------
+def _iso_hours_ago(hours: float) -> str:
+    from datetime import timedelta
+
+    return si.iso(si.now_utc() - timedelta(hours=hours))
+
+
+def test_compute_score_fresh_multi_source():
+    ind = _sample_indicator(
+        confidence="high",
+        source="feodo,threatfox,blog",
+        last_seen=si.iso(si.now_utc()),
+    )
+    # base 80 + corroboration capped at +16 = 96, no decay when fresh.
+    assert si.compute_score(ind) == 96
+
+
+def test_compute_score_decays_with_age():
+    # ipv4 half-life is 7 days: a high-confidence single-source IP last seen
+    # 14 days ago has gone through two half-lives -> 80 * 0.25 = 20.
+    ind = _sample_indicator(confidence="high", last_seen=_iso_hours_ago(24 * 14))
+    assert si.compute_score(ind) == 20
+
+
+def test_compute_score_hashes_decay_slowly():
+    # sha256 half-life is 180 days; two weeks barely moves it.
+    ind = _sample_indicator(
+        indicator="a" * 64, type="sha256", confidence="high", last_seen=_iso_hours_ago(24 * 14)
+    )
+    assert si.compute_score(ind) >= 75
+
+
+def test_merge_with_previous_carries_and_refreshes():
+    now_iso = si.iso(si.now_utc())
+    current = [
+        _sample_indicator(indicator="8.8.8.8", source="feodo", first_seen=now_iso, last_seen=now_iso),
+    ]
+    previous = [
+        # Re-observed: same key, older first_seen, different source.
+        _sample_indicator(
+            indicator="8.8.8.8", source="threatfox",
+            first_seen="2025-01-01T00:00:00Z", last_seen="2025-06-01T00:00:00Z",
+        ),
+        # Previous-only: carried forward with its stale last_seen intact.
+        _sample_indicator(
+            indicator="9.9.9.9", source="cins",
+            first_seen="2025-06-01T00:00:00Z", last_seen="2025-06-01T00:00:00Z",
+        ),
+    ]
+    merged, carried = si.merge_with_previous(current, previous)
+    assert carried == 1
+    by_key = {m.indicator: m for m in merged}
+    refreshed = by_key["8.8.8.8"]
+    assert refreshed.first_seen == "2025-01-01T00:00:00Z"  # history preserved
+    assert refreshed.last_seen == now_iso  # fresh observation wins
+    assert set(refreshed.source.split(",")) == {"feodo", "threatfox"}
+    assert by_key["9.9.9.9"].last_seen == "2025-06-01T00:00:00Z"  # decays naturally
+
+
+def test_load_previous_feed_tolerates_garbage_and_filters_fps(tmp_path):
+    path = tmp_path / "latest.jsonl"
+    good = json.dumps(
+        {
+            "indicator": "8.8.8.8", "type": "ipv4", "source": "s",
+            "first_seen": "2025-01-01T00:00:00Z", "last_seen": "2025-01-01T00:00:00Z",
+            "confidence": "high", "tlp": "CLEAR", "tags": "t", "reference": "r",
+            "context": "c", "score": 80, "unknown_future_field": "ignored",
+        }
+    )
+    bogon = good.replace("8.8.8.8", "10.0.0.1")
+    path.write_text(good + "\n" + bogon + "\nnot json\n" + '{"indicator": "incomplete"}\n', encoding="utf-8")
+    loaded = si.load_previous_feed(path)
+    assert [i.indicator for i in loaded] == ["8.8.8.8"]
+    assert si.load_previous_feed(tmp_path / "missing.jsonl") == []
+
+
+def test_stix_confidence_uses_computed_score(tmp_path):
+    scored = _sample_indicator(indicator="192.0.2.1", type="ipv4")
+    scored.score = 96
+    unscored = _sample_indicator(indicator="192.0.2.2", type="ipv4", confidence="medium")
+    out = tmp_path / "stix.json"
+    si.write_stix(out, [scored, unscored])
+    bundle = json.loads(out.read_text(encoding="utf-8"))
+    confs = {o["name"]: o["confidence"] for o in bundle["objects"] if o["type"] == "indicator"}
+    assert confs["ipv4:192.0.2.1"] == 96  # computed score wins
+    assert confs["ipv4:192.0.2.2"] == 50  # legacy mapping for unscored rows
+
+
+def test_csv_includes_score_column(tmp_path):
+    ind = _sample_indicator()
+    ind.score = 88
+    out = tmp_path / "latest.csv"
+    si.write_csv(out, [ind])
+    lines = out.read_text(encoding="utf-8").strip().splitlines()
+    assert "score" in lines[0].split(",")
+    header = lines[0].split(",")
+    row = lines[1].split(",")
+    assert row[header.index("score")] == "88"
 
 
 def test_threatfox_and_feodo_parsers(monkeypatch):
