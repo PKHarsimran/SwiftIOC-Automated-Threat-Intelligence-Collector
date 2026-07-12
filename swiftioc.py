@@ -318,6 +318,39 @@ def high_confidence_rows(rows: List[Indicator], *, min_score: int = 80) -> List[
     return [r for r in rows if r.score >= min_score or source_count(r) >= 2]
 
 
+def apply_retention(
+    rows: List[Indicator],
+    *,
+    max_age_days: Optional[int] = None,
+    max_store: Optional[int] = None,
+    now: Optional[datetime] = None,
+) -> Tuple[List[Indicator], int, int]:
+    """Curate the stored feed to the most recent + top-scoring indicators.
+
+    This is the "top IOCs" retention (KEVIntel-style): first drop anything not
+    seen within ``max_age_days``, then keep only the ``max_store`` strongest by
+    (score, corroboration, recency). Returns ``(rows, aged_out, pruned)``.
+    Both bounds are optional and off by default.
+    """
+    now = now or now_utc()
+    aged_out = 0
+    if max_age_days is not None:
+        cutoff = now - timedelta(days=max_age_days)
+        before = len(rows)
+        rows = [r for r in rows if (parse_dt(r.last_seen) or now) >= cutoff]
+        aged_out = before - len(rows)
+    pruned = 0
+    if max_store is not None and len(rows) > max_store:
+        rows = sorted(
+            rows,
+            key=lambda r: (r.score, source_count(r), r.last_seen, r.indicator),
+            reverse=True,
+        )
+        pruned = len(rows) - max_store
+        rows = rows[:max_store]
+    return rows, aged_out, pruned
+
+
 def load_previous_feed(path: Path) -> List[Indicator]:
     """Load a previously published latest.jsonl so the feed can persist.
 
@@ -1822,6 +1855,10 @@ def main() -> int:
                     help="Living feed: merge the previously published latest.jsonl, decay scores by age, expire stale entries")
     ap.add_argument("--min-score", type=int, default=20,
                     help="Expire indicators whose decayed score falls below this (default 20)")
+    ap.add_argument("--max-age-days", type=int, default=None,
+                    help="Retention: drop indicators whose last_seen is older than N days")
+    ap.add_argument("--max-store", type=int, default=None,
+                    help="Retention: keep only the top N indicators by score/recency (KEVIntel-style curation)")
     ap.add_argument("--high-confidence-score", type=int, default=80,
                     help="Score at/above which an indicator enters the curated high_confidence feed (default 80)")
     ap.add_argument("--urlhaus-status", choices=["any", "online", "offline"], default="any")
@@ -1937,6 +1974,18 @@ def main() -> int:
     if expired:
         logger.info("Expired %d indicators below score threshold %d", expired, args.min_score)
 
+    # Retention — keep the stored feed to the most recent + highest-signal
+    # indicators ("top IOCs", KEVIntel-style). Applied here, before writing,
+    # so the persisted latest.jsonl stays bounded run over run instead of
+    # growing without limit.
+    rows, aged_out, pruned_over_cap = apply_retention(
+        rows, max_age_days=args.max_age_days, max_store=args.max_store, now=score_now
+    )
+    if aged_out:
+        logger.info("Aged out %d indicators last seen over %d days ago", aged_out, args.max_age_days)
+    if pruned_over_cap:
+        logger.info("Retained top %d indicators (pruned %d over --max-store)", args.max_store, pruned_over_cap)
+
     # outputs
     write_csv(out_dir / "iocs" / "latest.csv", rows)
     write_tsv(out_dir / "iocs" / "latest.tsv", rows)
@@ -1983,6 +2032,11 @@ def main() -> int:
         "persist_feed": bool(args.persist_feed),
         "carried_forward": carried_forward,
         "expired_low_score": expired,
+        "aged_out": aged_out,
+        "pruned_over_cap": pruned_over_cap,
+        "stored": len(rows),
+        "max_age_days": args.max_age_days,
+        "max_store": args.max_store,
         "score_min": min(scores) if scores else None,
         "score_avg": round(sum(scores) / len(scores), 1) if scores else None,
         "score_max": max(scores) if scores else None,
@@ -2016,6 +2070,11 @@ def main() -> int:
         if args.persist_feed:
             report_lines.append(f"| Carried forward | {carried_forward} |")
             report_lines.append(f"| Expired (score < {args.min_score}) | {expired} |")
+        if args.max_age_days is not None:
+            report_lines.append(f"| Aged out (> {args.max_age_days}d) | {aged_out} |")
+        if args.max_store is not None:
+            report_lines.append(f"| Pruned over cap ({args.max_store}) | {pruned_over_cap} |")
+            report_lines.append(f"| Stored | {len(rows)} |")
         if scores:
             report_lines.append(f"| Score (min / avg / max) | {min(scores)} / {round(sum(scores) / len(scores), 1)} / {max(scores)} |")
         report_lines.append(f"| High-confidence indicators | {len(high_conf)} |")

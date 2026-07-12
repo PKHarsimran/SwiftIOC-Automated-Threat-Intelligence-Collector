@@ -72,6 +72,11 @@ high-fidelity IOCs from authoritative sources. The project emphasises:
   are confirmed by 2+ independent sources, strongest-first. This is the
   block-ready subset for SIEM/firewall ingestion where false positives are
   costly.
+- **Retention / "top IOCs" curation** – `--max-age-days` drops indicators not
+  seen recently and `--max-store` keeps only the top N by score and recency, so
+  the published feed stays small, fresh, and high-signal (think *KEV catalogue,
+  but for indicators*) instead of an unbounded dump. The scheduled workflow
+  curates to the last 30 days and the top 10,000 indicators.
 - **Concurrent collection** – sources are fetched in parallel (configurable via
   `--max-workers`), so a full run completes in a fraction of the time of a
   sequential fetch without changing the deterministic output.
@@ -284,6 +289,8 @@ Run `python -m swiftioc --help` for the full list of switches. Highlights:
 | `--persist-feed` | Living feed: merge the previously published `latest.jsonl`, decay scores by age, expire stale entries. |
 | `--min-score N` | Expire indicators whose decayed score falls below `N` (default `20`). |
 | `--high-confidence-score N` | Score at/above which an indicator enters the curated `high_confidence` feed (default `80`; multi-source indicators always qualify). |
+| `--max-age-days N` | Retention: drop indicators whose `last_seen` is older than `N` days. |
+| `--max-store N` | Retention: keep only the top `N` indicators by score/recency (KEVIntel-style curation; keeps the stored feed small and high-signal). |
 | `--urlhaus-status {any,online,offline}` | Filter URLhaus indicators by status. |
 | `--source-window name=N` | Override the lookback window for specific sources. |
 | `--grace-on-404 name…` | Treat HTTP 404 for listed sources as a non-fatal empty result. |

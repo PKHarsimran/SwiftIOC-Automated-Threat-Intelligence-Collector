@@ -113,12 +113,17 @@ jobs:
           # --persist-feed makes this a living feed: the latest.jsonl committed
           # by the previous run (checked out above) is merged in, re-observed
           # indicators refresh, and stale ones decay until they expire.
+          # Retention keeps the published feed curated ("top IOCs", KEVIntel
+          # style): drop anything not seen in 30 days, then keep the top 10k by
+          # score/recency so the committed feed stays high-signal and small.
           python swiftioc.py -vv \
             --out-dir "$OUT_DIR" \
             --sources "$SOURCES_FILE" \
             --window-hours "$WINDOW_HOURS" \
             --urlhaus-status "$URLHAUS_STATUS" \
             --persist-feed \
+            --max-age-days 30 \
+            --max-store 10000 \
             --log-file "$DIAG_DIR/run.log" \
             --log-format json \
             --log-file-level DEBUG \

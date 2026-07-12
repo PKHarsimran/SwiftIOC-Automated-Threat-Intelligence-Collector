@@ -410,6 +410,44 @@ def test_high_confidence_rows_respects_threshold():
     assert si.high_confidence_rows([ind], min_score=70) == [ind]
 
 
+def test_apply_retention_age_and_cap():
+    from datetime import timedelta
+
+    now = si.now_utc()
+
+    def ind(name, score, sources, days_old):
+        r = _sample_indicator(indicator=name, type="ipv4", source=sources)
+        r.score = score
+        r.last_seen = si.iso(now - timedelta(days=days_old))
+        return r
+
+    rows = [
+        ind("1.1.1.1", 90, "a", 1),       # fresh, high
+        ind("2.2.2.2", 55, "a,b", 2),      # fresh, corroborated
+        ind("3.3.3.3", 80, "a", 40),       # stale -> aged out
+        ind("4.4.4.4", 30, "a", 3),        # fresh but weakest
+    ]
+
+    # Age filter drops the 40-day-old row.
+    kept, aged, pruned = si.apply_retention(rows, max_age_days=30, now=now)
+    assert aged == 1 and pruned == 0
+    assert "3.3.3.3" not in {r.indicator for r in kept}
+
+    # Cap keeps the top 2 by (score, corroboration, recency): 1.1.1.1 (90) and
+    # 2.2.2.2 (55, 2 sources) beat 4.4.4.4 (30).
+    kept2, aged2, pruned2 = si.apply_retention(rows, max_age_days=30, max_store=2, now=now)
+    assert aged2 == 1 and pruned2 == 1
+    assert {r.indicator for r in kept2} == {"1.1.1.1", "2.2.2.2"}
+    # Result is ranked strongest-first.
+    assert kept2[0].indicator == "1.1.1.1"
+
+
+def test_apply_retention_noop_by_default():
+    rows = [_sample_indicator(indicator=f"{i}.0.0.1", type="ipv4") for i in range(5)]
+    kept, aged, pruned = si.apply_retention(rows)
+    assert len(kept) == 5 and aged == 0 and pruned == 0
+
+
 def test_source_count():
     assert si.source_count(_sample_indicator(source="a")) == 1
     assert si.source_count(_sample_indicator(source="a,b,c")) == 3
