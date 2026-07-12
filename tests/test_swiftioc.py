@@ -388,6 +388,34 @@ def test_stix_bundle_validates_against_stix2_library(tmp_path):
     assert len(bundle.objects) == len(rows) + 2  # + identity + marking
 
 
+# ---------------- high-confidence curated feed ----------------
+def test_high_confidence_rows_selection():
+    high_score = _sample_indicator(indicator="1.1.1.1", type="ipv4", source="a")
+    high_score.score = 90
+    corroborated = _sample_indicator(indicator="2.2.2.2", type="ipv4", source="a,b")
+    corroborated.score = 55  # below threshold but multi-source
+    weak = _sample_indicator(indicator="3.3.3.3", type="ipv4", source="a")
+    weak.score = 40  # single source, low score -> excluded
+
+    selected = si.high_confidence_rows([high_score, corroborated, weak], min_score=80)
+    values = {r.indicator for r in selected}
+    assert values == {"1.1.1.1", "2.2.2.2"}
+    assert weak not in selected
+
+
+def test_high_confidence_rows_respects_threshold():
+    ind = _sample_indicator(indicator="4.4.4.4", type="ipv4", source="a")
+    ind.score = 70
+    assert si.high_confidence_rows([ind], min_score=80) == []
+    assert si.high_confidence_rows([ind], min_score=70) == [ind]
+
+
+def test_source_count():
+    assert si.source_count(_sample_indicator(source="a")) == 1
+    assert si.source_count(_sample_indicator(source="a,b,c")) == 3
+    assert si.source_count(_sample_indicator(source="")) == 0
+
+
 # ---------------- summarize_iocs helpers ----------------
 def _load_summarizer():
     import importlib.util
@@ -395,6 +423,7 @@ def _load_summarizer():
 
     path = Path(__file__).resolve().parent.parent / "scripts" / "summarize_iocs.py"
     spec = importlib.util.spec_from_file_location("summarize_iocs", path)
+    assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
