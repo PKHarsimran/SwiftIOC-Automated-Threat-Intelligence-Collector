@@ -67,6 +67,11 @@ high-fidelity IOCs from authoritative sources. The project emphasises:
   full score, unobserved ones fade out, and entries below `--min-score`
   expire. Most free aggregators publish stale snapshots — SwiftIOC publishes
   a self-maintaining feed.
+- **Curated high-confidence feed** – alongside the full exports, every run emits
+  `high_confidence.csv`/`.jsonl` containing only indicators that score ≥80 or
+  are confirmed by 2+ independent sources, strongest-first. This is the
+  block-ready subset for SIEM/firewall ingestion where false positives are
+  costly.
 - **Concurrent collection** – sources are fetched in parallel (configurable via
   `--max-workers`), so a full run completes in a fraction of the time of a
   sequential fetch without changing the deterministic output.
@@ -278,6 +283,7 @@ Run `python -m swiftioc --help` for the full list of switches. Highlights:
 | `--no-fp-filter` | Disable bogon / false-positive filtering (keep private IPs, `example.com`, etc.). |
 | `--persist-feed` | Living feed: merge the previously published `latest.jsonl`, decay scores by age, expire stale entries. |
 | `--min-score N` | Expire indicators whose decayed score falls below `N` (default `20`). |
+| `--high-confidence-score N` | Score at/above which an indicator enters the curated `high_confidence` feed (default `80`; multi-source indicators always qualify). |
 | `--urlhaus-status {any,online,offline}` | Filter URLhaus indicators by status. |
 | `--source-window name=N` | Override the lookback window for specific sources. |
 | `--grace-on-404 name…` | Treat HTTP 404 for listed sources as a non-fatal empty result. |
@@ -305,6 +311,8 @@ public/
 │   ├── latest.tsv
 │   ├── latest.json
 │   ├── latest.jsonl
+│   ├── high_confidence.csv    # curated: score ≥80 or 2+ sources
+│   ├── high_confidence.jsonl  # same, machine-readable
 │   └── stix2.json
 ├── changelog/
 │   └── CHANGELOG.md

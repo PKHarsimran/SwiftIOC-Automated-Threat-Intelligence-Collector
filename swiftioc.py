@@ -303,6 +303,21 @@ def compute_score(indicator: Indicator, now: Optional[datetime] = None) -> int:
     return max(0, min(100, round((base + bonus) * decay)))
 
 
+def source_count(indicator: Indicator) -> int:
+    """Number of independent feeds reporting this indicator."""
+    return len([s for s in indicator.source.split(",") if s.strip()])
+
+
+def high_confidence_rows(rows: List[Indicator], *, min_score: int = 80) -> List[Indicator]:
+    """Curated subset safe to action directly.
+
+    An indicator qualifies if it scores at or above ``min_score`` (fresh +
+    confident) OR is corroborated by two or more independent sources. This is
+    the "block-ready" feed: high-signal, low-false-positive.
+    """
+    return [r for r in rows if r.score >= min_score or source_count(r) >= 2]
+
+
 def load_previous_feed(path: Path) -> List[Indicator]:
     """Load a previously published latest.jsonl so the feed can persist.
 
@@ -1801,6 +1816,8 @@ def main() -> int:
                     help="Living feed: merge the previously published latest.jsonl, decay scores by age, expire stale entries")
     ap.add_argument("--min-score", type=int, default=20,
                     help="Expire indicators whose decayed score falls below this (default 20)")
+    ap.add_argument("--high-confidence-score", type=int, default=80,
+                    help="Score at/above which an indicator enters the curated high_confidence feed (default 80)")
     ap.add_argument("--urlhaus-status", choices=["any", "online", "offline"], default="any")
     ap.add_argument("--source-window", action="append", default=[], help="Override lookback per source: name=HOURS")
     ap.add_argument("--fail-on-empty", nargs="*", default=None, help="Fail if any listed sources return zero")
@@ -1920,6 +1937,21 @@ def main() -> int:
     write_json(out_dir / "iocs" / "latest.json", rows)
     write_jsonl(out_dir / "iocs" / "latest.jsonl", rows)
     write_stix(out_dir / "iocs" / "stix2.json", rows)
+
+    # Curated "block-ready" feed: only high-score or multi-source-confirmed
+    # indicators, sorted strongest-first so the top of the file is the most
+    # dangerous. Compact, so it is committed to git for direct raw-URL use.
+    high_conf = sorted(
+        high_confidence_rows(rows, min_score=args.high_confidence_score),
+        key=lambda r: (-r.score, -source_count(r), r.type, r.indicator),
+    )
+    write_csv(out_dir / "iocs" / "high_confidence.csv", high_conf)
+    write_jsonl(out_dir / "iocs" / "high_confidence.jsonl", high_conf)
+    logger.info(
+        "High-confidence feed: %d of %d indicators (score>=%d or 2+ sources)",
+        len(high_conf), len(rows), args.high_confidence_score,
+    )
+
     write_changelog(out_dir / "changelog" / "CHANGELOG.md", counts, total=len(rows))
 
     # diagnostics / summary
@@ -1948,6 +1980,8 @@ def main() -> int:
         "score_min": min(scores) if scores else None,
         "score_avg": round(sum(scores) / len(scores), 1) if scores else None,
         "score_max": max(scores) if scores else None,
+        "high_confidence_total": len(high_conf),
+        "high_confidence_score": args.high_confidence_score,
         "counts": counts,
         "type_counts": {k: v for k, v in type_totals},
         "earliest_first_seen": earliest,
@@ -1978,6 +2012,7 @@ def main() -> int:
             report_lines.append(f"| Expired (score < {args.min_score}) | {expired} |")
         if scores:
             report_lines.append(f"| Score (min / avg / max) | {min(scores)} / {round(sum(scores) / len(scores), 1)} / {max(scores)} |")
+        report_lines.append(f"| High-confidence indicators | {len(high_conf)} |")
         if earliest:
             report_lines.append(f"| Earliest first_seen | {earliest} |")
         if latest:
