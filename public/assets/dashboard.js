@@ -334,8 +334,11 @@
     let duplicatesRemoved = 0;
     let corroborated = 0;
     let highScore = 0;
+    let highConfidence = 0;
     let scoreSum = 0;
     let scoredCount = 0;
+    // Score bands for the distribution bar: critical / high / medium / low.
+    const scoreBands = { critical: 0, high: 0, medium: 0, low: 0 };
     const sources = new Set();
     const types = new Set();
     const tags = new Map();
@@ -388,7 +391,8 @@
         if (key) sources.add(key);
       });
 
-      if (sourceParts.length >= 2) {
+      const multiSource = sourceParts.length >= 2;
+      if (multiSource) {
         corroborated += 1;
       }
 
@@ -396,6 +400,15 @@
         scoreSum += row.score;
         scoredCount += 1;
         if (row.score >= 80) highScore += 1;
+        if (row.score >= 80) scoreBands.critical += 1;
+        else if (row.score >= 60) scoreBands.high += 1;
+        else if (row.score >= 40) scoreBands.medium += 1;
+        else scoreBands.low += 1;
+      }
+
+      // Block-ready: high score OR confirmed by multiple independent sources.
+      if ((typeof row.score === 'number' && row.score >= 80) || multiSource) {
+        highConfidence += 1;
       }
 
       if (type) {
@@ -464,6 +477,8 @@
         duplicatesRemoved,
         corroborated,
         highScore,
+        highConfidence,
+        scoreBands,
         avgScore: scoredCount > 0 ? Math.round(scoreSum / scoredCount) : null,
         hasScores: scoredCount > 0,
         activeSources: sources.size,
@@ -527,10 +542,11 @@
       const entries = Array.from(map.entries());
       const total = entries.reduce((sum, [, count]) => sum + count, 0) || 1;
 
+      const max = entries.reduce((m, [, count]) => Math.max(m, count), 0) || 1;
       return entries
         .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
         .map(([label, count]) => {
-          const share = `${((count / total) * 100).toFixed(1)}%`;
+          const pct = (count / total) * 100;
           return [
             {
               title: labelKey,
@@ -543,8 +559,11 @@
             },
             {
               title: 'Share',
-              value: share,
+              value: `${pct.toFixed(1)}%`,
               numeric: true,
+              // Bar width is relative to the largest row so small feeds stay
+              // visible; the label still shows the true share of total.
+              bar: (count / max) * 100,
             },
           ];
         });
@@ -591,7 +610,19 @@
           const td = document.createElement('td');
           td.dataset.title = cell.title;
           if (cell.numeric) td.classList.add('numeric');
-          td.textContent = cell.value;
+          if (typeof cell.bar === 'number') {
+            // Share cell: proportion bar behind a right-aligned value.
+            td.classList.add('has-bar');
+            const fill = document.createElement('span');
+            fill.className = 'cell-bar';
+            fill.style.width = `${Math.max(2, Math.min(100, cell.bar))}%`;
+            const val = document.createElement('span');
+            val.className = 'cell-bar-value';
+            val.textContent = cell.value;
+            td.append(fill, val);
+          } else {
+            td.textContent = cell.value;
+          }
           tr.appendChild(td);
         });
         tbody.appendChild(tr);
@@ -1233,6 +1264,60 @@
    *  GLOBAL STATS + TABLES
    * ========================================================================= */
 
+  const SCORE_BAND_META = [
+    { key: 'critical', label: 'Critical', hint: 'score 80–100' },
+    { key: 'high', label: 'High', hint: 'score 60–79' },
+    { key: 'medium', label: 'Medium', hint: 'score 40–59' },
+    { key: 'low', label: 'Low', hint: 'score < 40' },
+  ];
+
+  const renderScoreDistribution = (stats) => {
+    const root = qs('[data-score-distribution]');
+    if (!root) return;
+
+    const bands = stats.scoreBands;
+    const total = bands
+      ? SCORE_BAND_META.reduce((sum, b) => sum + (bands[b.key] || 0), 0)
+      : 0;
+
+    if (!bands || total === 0) {
+      root.hidden = true;
+      return;
+    }
+    root.hidden = false;
+
+    const bar = qs('[data-score-bar]', root);
+    const legend = qs('[data-score-legend]', root);
+    if (bar) bar.innerHTML = '';
+    if (legend) legend.innerHTML = '';
+
+    SCORE_BAND_META.forEach((meta) => {
+      const count = bands[meta.key] || 0;
+      if (!count) return;
+      const pct = (count / total) * 100;
+
+      if (bar) {
+        const seg = document.createElement('span');
+        seg.className = `score-seg score-seg-${meta.key}`;
+        seg.style.width = `${pct}%`;
+        seg.title = `${meta.label}: ${formatNumber(count)} (${pct.toFixed(1)}%)`;
+        bar.appendChild(seg);
+      }
+
+      if (legend) {
+        const item = document.createElement('span');
+        item.className = 'score-legend-item';
+        const swatch = document.createElement('span');
+        swatch.className = `score-swatch score-seg-${meta.key}`;
+        const text = document.createElement('span');
+        text.textContent = `${meta.label} ${formatNumber(count)}`;
+        item.append(swatch, text);
+        item.title = meta.hint;
+        legend.appendChild(item);
+      }
+    });
+  };
+
   const applyStats = (stats, dataset) => {
     if (!stats) return;
 
@@ -1253,6 +1338,19 @@
     setStatText('duplicates-removed', formatNumber(stats.duplicatesRemoved));
     setStatText('active-sources', formatNumber(stats.activeSources));
     setStatText('indicator-types', formatNumber(stats.indicatorTypes));
+
+    // Differentiator metrics: block-ready + cross-source-confirmed volume.
+    setStatText('high-confidence', formatNumber(stats.highConfidence ?? 0));
+    setStatText('corroborated', formatNumber(stats.corroborated ?? 0));
+    setStatText('avg-score', stats.avgScore != null ? String(stats.avgScore) : '—');
+    const hcPct =
+      stats.total > 0 ? ((stats.highConfidence ?? 0) / stats.total) * 100 : 0;
+    setStatText('high-confidence-caption', `${hcPct.toFixed(1)}% of the feed`);
+    const corrPct =
+      stats.total > 0 ? ((stats.corroborated ?? 0) / stats.total) * 100 : 0;
+    setStatText('corroborated-caption', `${corrPct.toFixed(1)}% multi-source`);
+
+    renderScoreDistribution(stats);
 
     const feedsText =
       stats.activeSources != null

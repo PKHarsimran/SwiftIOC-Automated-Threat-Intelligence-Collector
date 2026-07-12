@@ -26,7 +26,7 @@
       gtag('config', 'G-T7L8XCEG0S');
     </script>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/styles.css" />
+    <link rel="stylesheet" href="assets/styles.css?v=2" />
 
     <style>
       /* Page-specific layout refinements for the main dashboard */
@@ -569,8 +569,9 @@
           <div>
             <h1 class="section-title">SwiftIOC IOC Snapshot</h1>
             <p class="page-header-subtitle">
-              Live highlight of the latest SwiftIOC collection run: quick filters,
-              source breakdowns, and export options.
+              Scored, cross-source-corroborated, self-refreshing threat
+              indicators — ranked so the most dangerous, most-confirmed IOCs
+              surface first.
             </p>
           </div>
         </div>
@@ -603,30 +604,50 @@
 
       <section class="metrics-strip" aria-label="Top metrics">
         <article class="metric-card">
-          <p class="metric-label">Generated at</p>
-          <p class="metric-value" data-stat="generated-at">—</p>
-          <p class="metric-caption">Timestamp of this IOC bundle</p>
-        </article>
-
-        <article class="metric-card">
           <p class="metric-label">Total indicators</p>
           <p class="metric-value" data-stat="total-indicators">—</p>
-          <p class="metric-caption">After duplicate removal</p>
+          <p class="metric-caption" data-stat="feeds-online">
+            Across active sources
+          </p>
         </article>
 
-        <article class="metric-card">
-          <p class="metric-label">Active sources</p>
-          <p class="metric-value" data-stat="active-sources">—</p>
-          <p class="metric-caption" data-stat="feeds-online">
-            Sources active in this run
+        <article class="metric-card metric-card-accent">
+          <p class="metric-label">High-confidence</p>
+          <p class="metric-value" data-stat="high-confidence">—</p>
+          <p class="metric-caption" data-stat="high-confidence-caption">
+            Score ≥80 or 2+ sources
           </p>
         </article>
 
         <article class="metric-card">
-          <p class="metric-label">Types observed</p>
-          <p class="metric-value" data-stat="indicator-types">—</p>
-          <p class="metric-caption">IPs, domains, hashes, URLs, …</p>
+          <p class="metric-label">Corroborated</p>
+          <p class="metric-value" data-stat="corroborated">—</p>
+          <p class="metric-caption" data-stat="corroborated-caption">
+            Confirmed by 2+ sources
+          </p>
         </article>
+
+        <article class="metric-card">
+          <p class="metric-label">Avg score</p>
+          <p class="metric-value" data-stat="avg-score">—</p>
+          <p class="metric-caption">
+            <span data-stat="indicator-types">—</span> indicator types
+          </p>
+        </article>
+      </section>
+
+      <section
+        class="score-distribution"
+        data-score-distribution
+        hidden
+        aria-label="Score distribution"
+      >
+        <div class="score-distribution-head">
+          <span class="score-distribution-title">Threat score distribution</span>
+          <span class="score-legend" data-score-legend></span>
+        </div>
+        <div class="score-bar" data-score-bar role="img"
+          aria-label="Proportion of indicators by score band"></div>
       </section>
 
       <main class="dashboard-main">
@@ -997,6 +1018,6 @@
       </section>
     </div>
 
-    <script defer src="assets/dashboard.js"></script>
+    <script defer src="assets/dashboard.js?v=2"></script>
   </body>
 </html>
