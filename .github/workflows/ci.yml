@@ -73,21 +73,21 @@ jobs:
       - name: Unit tests
         run: pytest -q
 
-      - name: Dry run (skip RSS, short window)
+      - name: Dry run (end-to-end smoke test)
         shell: bash
-        # Hard backstop: this step hits every live feed in sources.example.yml
-        # (public threat-intel APIs, some of which rate-limit shared CI-runner
-        # IP ranges). The HTTP layer's own retry/timeout budget is now capped
-        # at ~85s per source, but this catches any pathological hang so the
-        # step fails fast with a clear timeout instead of silently consuming
-        # the whole job's 15-minute budget.
-        timeout-minutes: 6
+        # Exercises the full collect -> score -> write -> diagnostics pipeline
+        # against sources.ci.yml: a tiny, fast, reliable 2-feed config (not the
+        # full production feed set, which rate-limits CI-runner IPs and made
+        # this step slow and flaky). Those feeds use graceful_fail, so a
+        # transient outage degrades to an empty run instead of a red check.
+        # timeout-minutes stays as a hard backstop against any network hang.
+        timeout-minutes: 4
         run: |
           set -Eeuo pipefail
           mkdir -p public/diagnostics/raw
           python swiftioc.py -v \
             --out-dir public \
-            --sources sources.example.yml \
+            --sources sources.ci.yml \
             --window-hours 6 \
             --skip-rss \
             --log-file public/diagnostics/run.log \

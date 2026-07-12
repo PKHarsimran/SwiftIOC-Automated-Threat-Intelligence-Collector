@@ -601,7 +601,54 @@ def test_threatfox_export_endpoint_shape(monkeypatch):
     assert by_type["md5"].confidence == "low"
 
 
-def test_threatfox_and_feodo_parsers(monkeypatch):
+def test_blocklist_txt_plain_ip_feeds(monkeypatch):
+    # ET / BinaryDefense / IPsum are plain one-IP-per-line lists with comment
+    # headers. Verify they parse, defang, and get source-aware tags so the
+    # dashboard tag breakdown is meaningful.
+    payload = "# comment header\n100.23.75.120\n1.71.91.53\n\n; another comment\n185.65.202.199\n"
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
+    ws = si.now_utc().replace(year=2000)
+
+    et = si.fetch_blocklist_txt("http://x", "ref", "et_compromised", ws)
+    assert len(et) == 3
+    assert all(i.type == "ipv4" for i in et)
+    assert si.refang(et[0].indicator) == "100.23.75.120"
+    assert "compromised" in et[0].tags
+
+    ipsum = si.fetch_blocklist_txt("http://x", "ref", "ipsum_level5", ws)
+    assert "aggregated" in ipsum[0].tags and "ipsum" in ipsum[0].tags
+
+    bd = si.fetch_blocklist_txt("http://x", "ref", "binarydefense_banlist", ws)
+    assert "binarydefense" in bd[0].tags
+
+
+def test_overlapping_ip_feeds_corroborate(monkeypatch):
+    # The same IP from three different feeds must dedup to one row whose merged
+    # source field drives the corroboration bonus in compute_score.
+    ip_payload = "1.2.3.4\n"
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: ip_payload)
+    cfg = {
+        "apis": [
+            {"name": "et_compromised", "parse": "blocklist_txt", "url": "http://a"},
+            {"name": "binarydefense_banlist", "parse": "blocklist_txt", "url": "http://b"},
+            {"name": "ipsum_level5", "parse": "blocklist_txt", "url": "http://c"},
+        ]
+    }
+    rows, counts, _ = si.collect_from_yaml(
+        cfg,
+        window_hours=24 * 3650,
+        skip_rss=True,
+        max_per_source=None,
+        urlhaus_status="any",
+        source_window={},
+        grace_on_404=set(),
+        ci_safe_rss=False,
+        max_workers=3,
+    )
+    assert len(rows) == 1
+    assert len([s for s in rows[0].source.split(",") if s]) == 3
+    # medium base (60) + 2 extra sources * 8 = 76, fresh (no decay).
+    assert si.compute_score(rows[0]) == 76
     tf = json.dumps({"data": [{"ioc": "evil.tld", "ioc_type": "domain", "first_seen": "2025-01-01 00:00:00", "malware": "x"}]})
     monkeypatch.setattr(si, "http_get", lambda *a, **k: tf)
     out = si.fetch_threatfox_export_json("http://x", "ref", "tf", si.now_utc().replace(year=2000))

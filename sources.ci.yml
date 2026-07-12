@@ -1,0 +1,29 @@
+# Minimal, fast, reliable feed set for the CI end-to-end smoke test.
+#
+# Purpose: exercise the full collect -> score -> dedup -> filter -> write ->
+# diagnostics pipeline quickly and deterministically, WITHOUT depending on
+# every live production feed. Many public feeds rate-limit shared CI-runner IP
+# ranges, which makes a full run slow and flaky as a required check.
+#
+# The complete feed set lives in sources.example.yml and is exercised for real
+# by the scheduled `Collect` workflow. Both feeds below are hosted on
+# infrastructure that does not throttle CI runners (US-gov CDN and GitHub raw),
+# cover two indicator types (CVE + IPv4) and two parsers (json + text), and use
+# graceful_fail so a transient outage degrades to an empty result instead of
+# failing CI.
+window_hours: 48
+
+apis:
+  - name: cisa_kev
+    kind: json
+    parse: kev
+    url: https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json
+    reference: https://www.cisa.gov/known-exploited-vulnerabilities-catalog
+    graceful_fail: true
+
+  - name: ipsum_level8
+    kind: txt
+    parse: blocklist_txt
+    url: https://raw.githubusercontent.com/stamparm/ipsum/master/levels/8.txt
+    reference: https://github.com/stamparm/ipsum
+    graceful_fail: true
