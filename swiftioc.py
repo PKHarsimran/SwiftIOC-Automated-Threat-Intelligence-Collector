@@ -1064,6 +1064,12 @@ def fetch_blocklist_txt(url: str, ref_url: str, source: str, ws: datetime) -> Li
             tags.add("greensnow")
         if "ci" in src_lower and "army" in src_lower:
             tags.update({"scanner", "cins"})
+        if "compromised" in src_lower or "emergingthreats" in src_lower or src_lower.startswith("et_"):
+            tags.update({"compromised", "emerging-threats"})
+        if "binarydefense" in src_lower or "banlist" in src_lower:
+            tags.update({"scanner", "binarydefense"})
+        if "ipsum" in src_lower:
+            tags.update({"aggregated", "ipsum", "multi-list"})
         return tags
 
     tags = derive_tags()

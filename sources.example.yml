@@ -84,6 +84,29 @@ apis:
     url: https://check.torproject.org/exit-addresses
     reference: https://check.torproject.org/
 
+  # These IP feeds deliberately overlap with the scanner/C2 lists above and
+  # with each other, so IPs reported by several of them are cross-source
+  # "corroborated" and rise to the top of the score / high-confidence feed.
+  - name: et_compromised
+    kind: txt
+    parse: blocklist_txt
+    url: https://rules.emergingthreats.net/blockrules/compromised-ips.txt
+    reference: https://rules.emergingthreats.net/
+
+  - name: binarydefense_banlist
+    kind: txt
+    parse: blocklist_txt
+    url: https://www.binarydefense.com/banlist.txt
+    reference: https://www.binarydefense.com/
+
+  # IPsum aggregates 30+ public blocklists; level 5 = IPs present on >=5 of
+  # them, i.e. already externally corroborated bad actors.
+  - name: ipsum_level5
+    kind: txt
+    parse: blocklist_txt
+    url: https://raw.githubusercontent.com/stamparm/ipsum/master/levels/5.txt
+    reference: https://github.com/stamparm/ipsum
+
   # --- Vulnerability & Exploit Feeds ---
   - name: exploitdb_recent
     kind: rss
