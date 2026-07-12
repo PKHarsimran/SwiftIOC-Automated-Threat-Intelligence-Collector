@@ -395,6 +395,7 @@ def _load_summarizer():
 
     path = Path(__file__).resolve().parent.parent / "scripts" / "summarize_iocs.py"
     spec = importlib.util.spec_from_file_location("summarize_iocs", path)
+    assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
