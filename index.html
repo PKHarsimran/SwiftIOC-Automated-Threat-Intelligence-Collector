@@ -3,13 +3,16 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>SwiftIOC GitHub Pages</title>
+    <title>SwiftIOC — Free Scored Feed of the Latest Malicious IOCs (IPs, Domains, URLs, Hashes)</title>
     <meta
       name="description"
-      content="Compact SwiftIOC GitHub Pages launcher with quick actions, diagnostics, and a cancellable redirect."
+      content="SwiftIOC is a free, open-source threat-intelligence feed of the latest malicious IPs, domains, URLs, and file hashes — scored and cross-source corroborated. Open the live dashboard or download CSV / JSON / STIX."
     />
-    <link rel="canonical" href="public/" />
     <meta name="theme-color" content="#0f172a" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="SwiftIOC — Free Scored IOC Feed" />
+    <meta property="og:description" content="The latest malicious IPs, domains, URLs, and hashes — scored and corroborated across sources. Free CSV / JSON / STIX downloads." />
+    <link rel="icon" href="public/assets/favicon.svg" type="image/svg+xml" />
     <style>
       :root {
         color-scheme: dark light;
@@ -109,24 +112,6 @@
         border-radius: 999px;
         color: #c4d2ff;
         font-weight: 700;
-      }
-
-      .progress-shell {
-        position: relative;
-        width: 100%;
-        height: 8px;
-        border-radius: 999px;
-        background: rgba(148, 163, 184, 0.25);
-        overflow: hidden;
-      }
-
-      .progress-bar {
-        position: absolute;
-        inset: 0;
-        width: 0%;
-        background: linear-gradient(90deg, #38bdf8, #a78bfa);
-        border-radius: 999px;
-        transition: width 0.15s ease;
       }
 
       .actions {
@@ -262,28 +247,25 @@
   <body>
     <main class="card" id="top">
       <header class="card-header">
-        <span class="badge">GitHub Pages</span>
+        <span class="badge">Free · Open source · Auto-updated</span>
         <div class="title-row">
-          <h1>SwiftIOC is ready to launch</h1>
-          <span class="chip" id="redirect-chip" aria-live="polite">
-            <span id="redirect-label">Redirecting in</span> <strong id="countdown">3</strong>s
-          </span>
+          <h1>SwiftIOC — a free, scored feed of the latest malicious IOCs</h1>
         </div>
         <p>
-          Skip the scroll and jump straight into the SwiftIOC experience. Open the dashboard, head to diagnostics,
-          or dive into downloads without re-reading the same info.
+          The freshest indicators of compromise — malicious IPs, domains, URLs,
+          and file hashes — collected from many open sources, scored, and
+          <strong>cross-source corroborated</strong> so the most dangerous,
+          most-confirmed threats rise to the top. Like a KEV catalogue, but for
+          IOCs.
         </p>
-        <div class="highlights" aria-label="Instant context">
-          <span class="chip">One screen</span>
-          <p class="muted">The launcher locks to your viewport, resizing cards to stay full-screen without vertical scrolling.</p>
-        </div>
-        <div class="progress-shell" aria-hidden="true">
-          <span class="progress-bar" id="progress-bar"></span>
+        <div class="highlights" aria-label="Highlights">
+          <span class="chip">Scored &amp; corroborated</span>
+          <p class="muted">Every indicator carries a 0–100 relevance score; those confirmed by multiple independent sources are flagged as high-confidence.</p>
         </div>
         <div class="actions">
-          <a class="button-link primary" href="public/">Open dashboard</a>
-          <a class="button-link secondary" href="public/#exports">Skip to downloads</a>
-          <button class="button-link ghost" data-action="cancel-redirect" type="button">Stay here</button>
+          <a class="button-link primary" href="public/">Open the live dashboard</a>
+          <a class="button-link secondary" href="public/#exports">Download IOC feeds</a>
+          <a class="button-link ghost" href="public/diagnostics/summary.html">Run diagnostics</a>
         </div>
       </header>
 
@@ -293,7 +275,7 @@
           <p class="muted">Live metrics, preview highlights, and curated indicators in one glance.</p>
           <div class="link-row">
             <a class="button-link secondary" href="public/">Open</a>
-            <a class="button-link ghost" href="public/#sources">Recommendations</a>
+            <a class="button-link ghost" href="public/#sources">Sources &amp; feeds</a>
           </div>
         </article>
         <article class="cardlet">
@@ -332,71 +314,7 @@
             <a class="button-link ghost" href="public/#exports">Exports</a>
           </div>
         </article>
-        <article class="cardlet">
-          <h2>Redirect control</h2>
-          <p class="muted">Pause or restart the countdown without losing the full-screen launcher view.</p>
-          <div class="link-row">
-            <button class="button-link secondary" data-action="restart-redirect" type="button">Restart redirect</button>
-            <button class="button-link ghost" data-action="cancel-redirect" type="button">Stay here</button>
-          </div>
-        </article>
       </section>
     </main>
-
-    <script>
-      const countdownEl = document.getElementById("countdown");
-      const redirectLabel = document.getElementById("redirect-label");
-      const progressBar = document.getElementById("progress-bar");
-      const cancelButtons = document.querySelectorAll("[data-action='cancel-redirect']");
-      const restartButtons = document.querySelectorAll("[data-action='restart-redirect']");
-      const target = "public/";
-
-      let remaining = 3.0;
-      let progressTimer = null;
-
-      const updateCountdown = () => {
-        countdownEl.textContent = Math.max(0, remaining).toFixed(1).replace(/\.0$/, "");
-        const percent = ((3 - remaining) / 3) * 100;
-        progressBar.style.width = `${Math.min(100, Math.max(0, percent))}%`;
-      };
-
-      const startTimers = () => {
-        clearTimers();
-        remaining = 3.0;
-        updateCountdown();
-        progressTimer = setInterval(() => {
-          remaining = Math.max(0, remaining - 0.1);
-          updateCountdown();
-          if (remaining <= 0) {
-            clearTimers();
-            window.location.href = target;
-          }
-        }, 100);
-      };
-
-      const clearTimers = () => {
-        if (progressTimer) clearInterval(progressTimer);
-        progressTimer = null;
-      };
-
-      cancelButtons.forEach((button) =>
-        button.addEventListener("click", () => {
-          clearTimers();
-          redirectLabel.textContent = "Redirect paused";
-          progressBar.style.width = "0%";
-          countdownEl.textContent = "";
-        })
-      );
-
-      restartButtons.forEach((button) =>
-        button.addEventListener("click", () => {
-          redirectLabel.textContent = "Redirecting in";
-          countdownEl.textContent = "3";
-          startTimers();
-        })
-      );
-
-      startTimers();
-    </script>
   </body>
 </html>

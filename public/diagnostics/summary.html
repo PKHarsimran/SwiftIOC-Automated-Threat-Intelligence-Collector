@@ -6,394 +6,179 @@
     <title>SwiftIOC Run Diagnostics</title>
     <meta
       name="description"
-      content="SwiftIOC collection run diagnostics with per-source counts, type breakdowns, and tag distribution."
+      content="Live SwiftIOC collection-run diagnostics: totals, scoring, per-source counts, indicator types, and any source failures."
     />
     <meta name="theme-color" content="#0f172a" />
-    <meta property="og:title" content="SwiftIOC Run Diagnostics" />
-    <meta
-      property="og:description"
-      content="Inspect the health and composition of the latest SwiftIOC collection run."
-    />
     <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="../assets/styles.css" />
-
+    <link rel="stylesheet" href="../assets/styles.css?v=2" />
     <style>
-      /* Page-specific layout for diagnostics view */
-
-      .page-wrapper {
-        min-height: 100vh;
-        padding: 1.25rem 1.5rem 2.25rem;
-        max-width: 1200px;
+      .diag-wrapper {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 1.5rem 1.5rem 2.5rem;
       }
-
-      .page-header {
-        padding-inline: 0.1rem;
-        margin-bottom: 0.75rem;
-      }
-
-      .page-header-main {
-        gap: 0.75rem;
-      }
-
-      .page-header h1 {
-        margin-bottom: 0.2rem;
-      }
-
-      .page-header-subtitle {
-        max-width: 40rem;
-      }
-
-      .top-nav {
-        margin-bottom: 0.85rem;
-      }
-
-      .status-banner {
-        margin-bottom: 1rem;
-      }
-
-      .diagnostics-grid {
+      .diag-tables {
         display: grid;
-        grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.1fr);
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         gap: 1rem;
-        align-items: flex-start;
       }
-
-      .diagnostics-grid .panel {
-        height: 100%;
+      .diag-issue {
+        color: var(--warning-soft);
+        font-size: 0.82rem;
+        margin: 0.2rem 0;
       }
-
-      .timeline-list {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: grid;
-        gap: 0.55rem;
-      }
-
-      .timeline-item {
-        display: flex;
-        flex-direction: column;
-        gap: 0.1rem;
-      }
-
-      .timeline-label {
-        font-size: 0.72rem;
+      .diag-status {
+        font-size: 0.82rem;
         color: var(--text-soft);
       }
-
-      .timeline-value {
-        font-size: 0.86rem;
-        font-weight: 500;
-        color: var(--text-strong);
-      }
-
-      .timeline-relative {
-        font-size: 0.7rem;
-        color: var(--accent-soft);
-      }
-
-      .summary-section {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-      }
-
-      .summary-section .metrics-strip {
-        margin-bottom: 0;
-      }
-
-      .summary-section .metrics-strip .metric-card {
-        min-height: 0;
-      }
-
-      .panel-body .table-card {
-        max-height: 17.5rem;
-        overflow: auto;
-      }
-
-      .next-steps-list {
-        margin-top: 0.3rem;
-      }
-
-      @media (max-width: 960px) {
-        .diagnostics-grid {
-          grid-template-columns: minmax(0, 1fr);
-        }
-
-        .panel-body .table-card {
-          max-height: none;
-        }
-      }
-
-      @media (max-width: 640px) {
-        .page-wrapper {
-          padding-inline: 0.9rem;
-        }
-
-        .page-header {
-          padding-inline: 0;
-        }
-
-        .page-header-main {
-          flex-direction: column;
-          align-items: flex-start;
-        }
+      .diag-back {
+        display: inline-block;
+        margin-bottom: 0.8rem;
       }
     </style>
   </head>
-  <body data-ioc-root="..">
-    <div class="page-wrapper">
-      <nav class="top-nav" aria-label="SwiftIOC navigation">
-        <a class="brand" href="../index.html">
-          <span class="brand-mark">SwiftIOC</span>
-          <span class="brand-tagline">Diagnostics</span>
-        </a>
-        <div class="nav-links">
-          <a href="../index.html">Live snapshot</a>
-          <a href="#run-health">Run health</a>
-          <a href="#timeline">Timeline</a>
-          <a href="#sources">Sources</a>
-          <a href="#indicator-types">Types</a>
-          <a href="#tags">Tags</a>
-        </div>
-      </nav>
-
+  <body>
+    <div class="diag-wrapper">
+      <a class="button-link diag-back" href="../index.html">← Back to dashboard</a>
       <header class="page-header">
-        <div class="page-header-main">
-          <div>
-            <h1 class="section-title">SwiftIOC Run Diagnostics</h1>
-            <p class="page-header-subtitle">
-              Inspect the overall health, time window, and composition of the
-              latest SwiftIOC collection run.
-            </p>
-          </div>
-        </div>
+        <h1 class="section-title">SwiftIOC Run Diagnostics</h1>
+        <p class="page-header-subtitle">
+          Health and composition of the latest collection run, read live from
+          <code>run.json</code>.
+        </p>
+        <p class="diag-status" data-diag-status>Loading diagnostics…</p>
       </header>
 
-      <section
-        class="status-banner"
-        data-site-status-root
-        aria-label="Collection status"
-      >
-        <div class="status-badge" data-site-status-badge>
-          <span class="status-dot"></span>
-          <span class="status-label" data-site-status-label>Checking run…</span>
+      <section class="metrics-strip" data-diag-metrics hidden aria-label="Run metrics"></section>
+
+      <section class="diag-tables">
+        <div class="table-card">
+          <div class="table-card-header"><h3>Per-source counts</h3></div>
+          <table>
+            <thead><tr><th>Source</th><th class="numeric">Indicators</th></tr></thead>
+            <tbody data-diag-sources></tbody>
+          </table>
         </div>
-        <div class="status-meta">
-          <div>
-            <span class="status-meta-label">Generated:</span>
-            <span class="status-meta-value" data-site-generated>—</span>
-          </div>
-          <div>
-            <span class="status-meta-label">Updated:</span>
-            <span class="status-meta-value" data-site-updated>—</span>
-          </div>
-          <div>
-            <span class="status-meta-label">Window:</span>
-            <span class="status-meta-value" data-site-window>—</span>
-          </div>
+        <div class="table-card">
+          <div class="table-card-header"><h3>Indicator types</h3></div>
+          <table>
+            <thead><tr><th>Type</th><th class="numeric">Count</th></tr></thead>
+            <tbody data-diag-types></tbody>
+          </table>
         </div>
       </section>
 
-      <main class="diagnostics-grid">
-        <section
-          id="run-health"
-          class="panel"
-          aria-labelledby="run-health-heading"
-        >
-          <div class="panel-header">
-            <div>
-              <h2 id="run-health-heading" class="panel-title">Run health</h2>
-              <p class="panel-subtitle">
-                High-level metrics for the most recent SwiftIOC collection run.
-              </p>
-            </div>
-          </div>
-          <div class="panel-body summary-section">
-            <section class="metrics-strip" aria-label="Run metrics">
-              <article class="metric-card">
-                <p class="metric-label">Total indicators</p>
-                <p class="metric-value" data-stat="total-indicators">—</p>
-                <p class="metric-caption">After duplicate removal</p>
-              </article>
-
-              <article class="metric-card">
-                <p class="metric-label">Duplicates removed</p>
-                <p class="metric-value" data-stat="duplicates-removed">—</p>
-                <p class="metric-caption">
-                  Collapsed during collection &amp; normalisation
-                </p>
-              </article>
-
-              <article class="metric-card">
-                <p class="metric-label">Active sources</p>
-                <p class="metric-value" data-stat="active-sources">—</p>
-                <p class="metric-caption" data-stat="feeds-online">
-                  Sources contributing to this run
-                </p>
-              </article>
-
-              <article class="metric-card">
-                <p class="metric-label">Indicator types</p>
-                <p class="metric-value" data-stat="indicator-types">—</p>
-                <p class="metric-caption">IPs, domains, URLs, hashes, …</p>
-              </article>
-            </section>
-
-            <section
-              id="timeline"
-              aria-labelledby="timeline-heading"
-              class="panel-like"
-            >
-              <h3 id="timeline-heading" class="subsection-title">
-                Time window
-              </h3>
-              <ul class="timeline-list">
-                <li class="timeline-item">
-                  <span class="timeline-label">Earliest first seen</span>
-                  <span class="timeline-value" data-stat="earliest-first-seen">
-                    <span data-stat="earliest-first-seen-date">—</span>
-                    <span>·</span>
-                    <span data-stat="earliest-first-seen-time">—</span>
-                  </span>
-                  <span
-                    class="timeline-relative"
-                    data-stat="earliest-first-seen-relative"
-                    >—</span
-                  >
-                </li>
-                <li class="timeline-item">
-                  <span class="timeline-label">Newest first seen</span>
-                  <span class="timeline-value" data-stat="newest-first-seen">
-                    <span data-stat="newest-first-seen-date">—</span>
-                    <span>·</span>
-                    <span data-stat="newest-first-seen-time">—</span>
-                  </span>
-                  <span
-                    class="timeline-relative"
-                    data-stat="newest-first-seen-relative"
-                    >—</span
-                  >
-                </li>
-                <li class="timeline-item">
-                  <span class="timeline-label">Collection window</span>
-                  <span class="timeline-value" data-stat="collection-window"
-                    >—</span
-                  >
-                </li>
-              </ul>
-            </section>
-          </div>
-        </section>
-
-        <section
-          class="panel"
-          id="sources"
-          aria-labelledby="sources-heading"
-        >
-          <div class="panel-header">
-            <div>
-              <h2 id="sources-heading" class="panel-title">
-                Composition breakdown
-              </h2>
-              <p class="panel-subtitle">
-                Per-source counts, indicator types, and tags for this run.
-              </p>
-            </div>
-          </div>
-
-          <div class="panel-body">
-            <div class="table-card" aria-label="Sources table">
-              <div class="table-card-header">
-                <h3>Sources</h3>
-                <p>Active feeds and their indicator counts.</p>
-              </div>
-              <table>
-                <thead>
-                  <tr>
-                    <th scope="col">Source</th>
-                    <th scope="col">Indicators</th>
-                    <th scope="col">Share</th>
-                  </tr>
-                </thead>
-                <tbody data-table="sources"></tbody>
-              </table>
-            </div>
-
-            <div
-              class="table-card"
-              id="indicator-types"
-              aria-labelledby="indicator-types-heading"
-            >
-              <div class="table-card-header">
-                <h3 id="indicator-types-heading">Types</h3>
-                <p>Indicator types participating in this run.</p>
-              </div>
-              <table>
-                <thead>
-                  <tr>
-                    <th scope="col">Type</th>
-                    <th scope="col">Count</th>
-                    <th scope="col">Share</th>
-                  </tr>
-                </thead>
-                <tbody data-table="types"></tbody>
-              </table>
-            </div>
-
-            <div
-              class="table-card"
-              id="tags"
-              aria-labelledby="tags-heading"
-            >
-              <div class="table-card-header">
-                <h3 id="tags-heading">Tags</h3>
-                <p>Top tags across all indicators.</p>
-              </div>
-              <table>
-                <thead>
-                  <tr>
-                    <th scope="col">Tag</th>
-                    <th scope="col">Count</th>
-                    <th scope="col">Share</th>
-                  </tr>
-                </thead>
-                <tbody data-table="tags"></tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <section class="panel" aria-labelledby="next-steps-heading">
-        <div class="panel-header">
-          <div>
-            <h2 id="next-steps-heading" class="panel-title">Next steps</h2>
-            <p class="panel-subtitle">
-              Move from diagnostics into deeper investigation or SIEM import.
-            </p>
-          </div>
-        </div>
-        <div class="panel-body">
-          <ul class="next-steps-list">
-            <li>
-              Explore the raw IOC files in
-              <a href="../iocs/">the <code>/iocs</code> directory</a>.
-            </li>
-            <li>
-              Return to the
-              <a href="../index.html">live SwiftIOC dashboard</a> for quick
-              filtering and search.
-            </li>
-            <li>
-              Wire these feeds into your SIEM, TIP, or enrichment workflows
-              using CSV, JSONL, or STIX 2.1.
-            </li>
-          </ul>
-        </div>
+      <section class="table-card" data-diag-issues-card hidden style="margin-top:1rem">
+        <div class="table-card-header"><h3>Issues</h3></div>
+        <div data-diag-issues></div>
       </section>
     </div>
 
-    <script defer src="../assets/dashboard.js"></script>
+    <script>
+      (function () {
+        'use strict';
+        const nf = new Intl.NumberFormat('en-US');
+        const num = (v) => (v == null ? '—' : nf.format(v));
+        const qs = (s) => document.querySelector(s);
+
+        const metric = (label, value, caption) => {
+          const el = document.createElement('article');
+          el.className = 'metric-card';
+          el.innerHTML =
+            '<p class="metric-label"></p><p class="metric-value"></p><p class="metric-caption"></p>';
+          el.querySelector('.metric-label').textContent = label;
+          el.querySelector('.metric-value').textContent = value;
+          el.querySelector('.metric-caption').textContent = caption || '';
+          return el;
+        };
+
+        const fillTable = (tbody, entries) => {
+          tbody.innerHTML = '';
+          const rows = Object.entries(entries || {}).sort((a, b) => b[1] - a[1]);
+          if (!rows.length) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = '<td colspan="2">No data.</td>';
+            tbody.appendChild(tr);
+            return;
+          }
+          for (const [name, count] of rows) {
+            const tr = document.createElement('tr');
+            const td1 = document.createElement('td');
+            td1.textContent = name;
+            const td2 = document.createElement('td');
+            td2.className = 'numeric';
+            td2.textContent = num(count);
+            tr.append(td1, td2);
+            tbody.appendChild(tr);
+          }
+        };
+
+        const render = (d) => {
+          const stored = d.stored != null ? d.stored : d.total;
+          const metrics = qs('[data-diag-metrics]');
+          metrics.innerHTML = '';
+          metrics.append(
+            metric('Generated', d.ts || '—', 'Latest run timestamp'),
+            metric('Stored indicators', num(stored), 'After scoring + retention'),
+            metric(
+              'High-confidence',
+              num(d.high_confidence_total),
+              'Score ≥ ' + (d.high_confidence_score == null ? 80 : d.high_confidence_score) + ' or 2+ sources'
+            ),
+            metric(
+              'Score (min/avg/max)',
+              [d.score_min, d.score_avg, d.score_max]
+                .map((x) => (x == null ? '—' : x))
+                .join(' / '),
+              'Relevance scores'
+            ),
+            metric('Window (h)', num(d.window_hours), 'Lookback window'),
+            metric('Duplicates removed', num(d.duplicates_removed), 'Merged across sources'),
+            metric('False positives', num(d.false_positives_removed), 'Bogon / benign dropped'),
+            metric('Aged out / pruned', num((d.aged_out || 0) + (d.pruned_over_cap || 0)), 'Retention')
+          );
+          metrics.hidden = false;
+
+          fillTable(qs('[data-diag-sources]'), d.counts);
+          fillTable(qs('[data-diag-types]'), d.type_counts);
+
+          const failures = Array.isArray(d.failures) ? d.failures : [];
+          const empty = Array.isArray(d.empty_sources) ? d.empty_sources : [];
+          if (failures.length || empty.length) {
+            const box = qs('[data-diag-issues]');
+            box.innerHTML = '';
+            failures.forEach((f) => {
+              const p = document.createElement('p');
+              p.className = 'diag-issue';
+              p.textContent = '⚠️ ' + (f.source || 'unknown') + ': ' + (f.error || '');
+              box.appendChild(p);
+            });
+            empty.forEach((s) => {
+              const p = document.createElement('p');
+              p.className = 'diag-issue';
+              p.textContent = '⚠️ ' + s + ' returned zero indicators';
+              box.appendChild(p);
+            });
+            qs('[data-diag-issues-card]').hidden = false;
+          }
+
+          qs('[data-diag-status]').textContent =
+            'Loaded — generated ' + (d.ts || 'unknown') + '.';
+        };
+
+        fetch('run.json', { headers: { Accept: 'application/json' } })
+          .then((r) => {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+          })
+          .then(render)
+          .catch((err) => {
+            const s = qs('[data-diag-status]');
+            s.textContent =
+              'Could not load run.json (' + err.message + '). Diagnostics appear after the first collection run.';
+            s.style.color = 'var(--danger-soft)';
+          });
+      })();
+    </script>
   </body>
 </html>
