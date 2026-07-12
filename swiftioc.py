@@ -761,33 +761,78 @@ def fetch_malwarebazaar_csv(
 def fetch_threatfox_export_json(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
     text = ensure_text(http_get(url, name=source))
     raw = json.loads(text)
+    data: List[Dict[str, Any]]
     if isinstance(raw, dict):
-        data = raw.get("data") or []
+        if isinstance(raw.get("data"), list):
+            # API POST response shape: {"query_status": ..., "data": [...]}
+            data = [row for row in raw["data"] if isinstance(row, dict)]
+        else:
+            # Export endpoint shape: {"<ioc_id>": [entry, ...], ...}
+            data = [
+                entry
+                for value in raw.values()
+                if isinstance(value, list)
+                for entry in value
+                if isinstance(entry, dict)
+            ]
+    elif isinstance(raw, list):
+        data = [row for row in raw if isinstance(row, dict)]
     else:
-        data = raw
+        data = []
     now = now_utc()
     out: List[Indicator] = []
-    tmap = {"ipv4": "ipv4", "ipv6": "ipv6", "domain": "domain", "url": "url", "md5": "md5", "sha1": "sha1", "sha256": "sha256"}
+    tmap = {
+        "ipv4": "ipv4", "ipv6": "ipv6", "domain": "domain", "url": "url",
+        "md5": "md5", "sha1": "sha1", "sha256": "sha256",
+        # Export endpoint spellings.
+        "md5_hash": "md5", "sha1_hash": "sha1", "sha256_hash": "sha256",
+        "sha512_hash": "sha512",
+    }
 
-    for row in data or []:
-        ioc = row.get("ioc")
+    def normalise_tags(value: Any) -> List[str]:
+        if isinstance(value, str):
+            return [t.strip() for t in value.split(",") if t.strip()]
+        if isinstance(value, (list, tuple)):
+            return [str(t).strip() for t in value if str(t).strip()]
+        return []
+
+    for row in data:
+        ioc = row.get("ioc") or row.get("ioc_value")
+        if not isinstance(ioc, str) or not ioc.strip():
+            continue
+        ioc = ioc.strip()
         itype = (row.get("ioc_type") or "").lower()
-        seen = parse_dt(row.get("first_seen"))
-        if not ioc or (seen and seen < ws):
+        seen = parse_dt(row.get("first_seen") or row.get("first_seen_utc"))
+        if seen and seen < ws:
             continue
-        t = tmap.get(itype)
-        if not t:
-            continue
+        if itype == "ip:port":
+            # "1.2.3.4:443" -> classify the bare address; keeps the value
+            # comparable with other IP feeds so corroboration can match.
+            host = ioc.rsplit(":", 1)[0]
+            t = classify(host)
+            if t not in {"ipv4", "ipv6"}:
+                continue
+            ioc = host
+        else:
+            t = tmap.get(itype)
+            if not t:
+                continue
+        # ThreatFox reports 0-100 confidence_level; map onto our bands.
+        level = row.get("confidence_level")
+        if isinstance(level, (int, float)):
+            confidence = "high" if level >= 75 else "medium" if level >= 40 else "low"
+        else:
+            confidence = "medium"
         val = defang_min(ioc) if t in {"url", "domain", "ipv4", "ipv6"} else ioc
-        tags = row.get("tags") or []
+        tags = normalise_tags(row.get("tags"))
         out.append(
             Indicator(
                 indicator=val, type=t, source=source,
                 first_seen=iso(seen or now), last_seen=iso(now),
-                confidence="medium", tlp="CLEAR",
+                confidence=confidence, tlp="CLEAR",
                 tags=",".join(sorted(set(["threatfox"] + tags))),
                 reference=ref_url or "",
-                context=row.get("malware") or row.get("threat_type") or "ThreatFox recent",
+                context=row.get("malware_printable") or row.get("malware") or row.get("threat_type") or "ThreatFox recent",
             )
         )
     return out

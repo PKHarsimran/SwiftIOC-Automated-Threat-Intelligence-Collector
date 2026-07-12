@@ -73,6 +73,50 @@ def summarize_tags(rows: Iterable[Dict[str, Any]], limit: int = 10) -> List[Tupl
     return [(tag, f"{count}") for tag, count in ordered]
 
 
+def summarize_scores(rows: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
+    """Aggregate the collector's 0-100 relevance scores when present."""
+    scores: List[int] = []
+    corroborated = 0
+    for row in rows:
+        value = row.get("score")
+        if isinstance(value, (int, float)) and value > 0:
+            scores.append(int(value))
+        sources = [s.strip() for s in (row.get("source") or "").split(",") if s.strip()]
+        if len(sources) >= 2:
+            corroborated += 1
+    if not scores:
+        return {"scored": 0, "corroborated": corroborated}
+    return {
+        "scored": len(scores),
+        "corroborated": corroborated,
+        "min": min(scores),
+        "avg": round(sum(scores) / len(scores), 1),
+        "max": max(scores),
+        "high": sum(1 for s in scores if s >= 80),
+    }
+
+
+def top_indicators_by_score(rows: Sequence[Dict[str, Any]], limit: int = 10) -> List[Tuple[str, str]]:
+    """Highest-scored indicators, corroboration-first on ties."""
+
+    def sort_key(row: Dict[str, Any]) -> Tuple[int, int, str]:
+        score = row.get("score")
+        numeric = int(score) if isinstance(score, (int, float)) else 0
+        sources = [s.strip() for s in (row.get("source") or "").split(",") if s.strip()]
+        return (-numeric, -len(sources), str(row.get("indicator") or ""))
+
+    ranked = sorted((r for r in rows if r.get("indicator")), key=sort_key)[:limit]
+    out: List[Tuple[str, str]] = []
+    for row in ranked:
+        score = row.get("score")
+        numeric = int(score) if isinstance(score, (int, float)) else 0
+        sources = [s.strip() for s in (row.get("source") or "").split(",") if s.strip()]
+        label = f"{row.get('type', '?')}: `{row.get('indicator')}`"
+        detail = f"score {numeric}, {len(sources)} source{'s' if len(sources) != 1 else ''}"
+        out.append((label, detail))
+    return out
+
+
 def summarize_overlaps(rows: Iterable[Dict[str, Any]], limit: int = 10) -> List[Tuple[str, str]]:
     overlaps: List[Tuple[str, str]] = []
     for row in rows:
@@ -150,6 +194,7 @@ def build_highlights(diag: Dict[str, Any] | None, rows: List[Dict[str, Any]]) ->
         earliest = earliest or derived_first
         newest = newest or derived_latest
     overlaps = summarize_overlaps(rows, limit=9999)
+    score_stats = summarize_scores(rows)
     highlight_rows: List[Tuple[str, str]] = [("Generated", generated)]
     if window is not None:
         highlight_rows.append(("Window (hours)", str(window)))
@@ -158,6 +203,12 @@ def build_highlights(diag: Dict[str, Any] | None, rows: List[Dict[str, Any]]) ->
     highlight_rows.append(("Sources reporting", f"{active_sources}"))
     highlight_rows.append(("Indicator types", f"{types_seen}"))
     highlight_rows.append(("Multi-source overlaps", f"{len(overlaps)}"))
+    if score_stats.get("scored"):
+        highlight_rows.append(
+            ("Score (min / avg / max)", f"{score_stats['min']} / {score_stats['avg']} / {score_stats['max']}")
+        )
+        highlight_rows.append(("High-score indicators (≥80)", f"{score_stats['high']}"))
+        highlight_rows.append(("Corroborated (2+ sources)", f"{score_stats['corroborated']}"))
     if earliest:
         highlight_rows.append(("Earliest first_seen", earliest))
     if newest:
@@ -174,6 +225,12 @@ def render_summary(diag: Dict[str, Any] | None, rows: List[Dict[str, Any]]) -> T
 
     sections: List[str] = ["## Highlights", ""]
     sections.extend(to_table(highlight_rows, ("Metric", "Value")))
+
+    top_scored = top_indicators_by_score(rows)
+    if top_scored:
+        sections.append("## Top indicators by score")
+        sections.append("")
+        sections.extend(to_table(top_scored, ("Indicator", "Score / corroboration")))
 
     sections.append("## Per-source totals")
     sections.append("")
