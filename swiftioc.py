@@ -13,7 +13,7 @@ import re
 import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, fields as dataclass_fields
 from datetime import datetime, timedelta, timezone
 from importlib import import_module
 from pathlib import Path
@@ -117,6 +117,9 @@ class Indicator:
     tags: str
     reference: str
     context: str
+    # Computed 0-100 relevance score (confidence base + cross-source
+    # corroboration bonus, decayed by age). 0 means "not yet scored".
+    score: int = 0
 
     def key(self) -> Tuple[str, str]:
         return (self.type, self.indicator)
@@ -248,6 +251,119 @@ def classify(v: str) -> Optional[str]:
 
 def merge_conf(a: str, b: str) -> str:
     return a if CONF_RANK.get(a, 0) >= CONF_RANK.get(b, 0) else b
+
+
+# ---------------- scoring: corroboration + age decay ----------------
+# Base score by source-assigned confidence.
+SCORE_BASE = {"low": 40, "medium": 60, "high": 80}
+# Each independent source beyond the first adds a corroboration bonus: an IP
+# reported by Feodo *and* ThreatFox *and* a blog post is qualitatively
+# different from a single scanner hit.
+CORROBORATION_BONUS = 8
+CORROBORATION_CAP = 16
+# Exponential decay half-life per indicator type, in hours. Network
+# infrastructure churns fast (a C2 IP from a month ago is likely someone
+# else's VPS today); file hashes stay malicious essentially forever, so they
+# decay slowly and CVEs slower still.
+DECAY_HALF_LIFE_HOURS: Dict[str, float] = {
+    "url": 24 * 7.0,
+    "ipv4": 24 * 7.0,
+    "ipv6": 24 * 7.0,
+    "domain": 24 * 14.0,
+    "ipv4_cidr": 24 * 30.0,
+    "ipv6_cidr": 24 * 30.0,
+    "ja3": 24 * 30.0,
+    "ja3s": 24 * 30.0,
+    "email": 24 * 30.0,
+    "btc_address": 24 * 90.0,
+    "md5": 24 * 180.0,
+    "sha1": 24 * 180.0,
+    "sha256": 24 * 180.0,
+    "sha512": 24 * 180.0,
+    "cve": 24 * 365.0,
+}
+DEFAULT_HALF_LIFE_HOURS = 24 * 14.0
+
+
+def compute_score(indicator: Indicator, now: Optional[datetime] = None) -> int:
+    """Score an indicator 0-100: confidence base + corroboration, decayed by age.
+
+    Decay is exponential on hours since ``last_seen`` with a per-type
+    half-life, so a freshly observed indicator keeps its full score and a
+    stale one fades until it drops below the expiry threshold.
+    """
+    now = now or now_utc()
+    base = SCORE_BASE.get(indicator.confidence, 50)
+    n_sources = len([s for s in indicator.source.split(",") if s.strip()])
+    bonus = min(max(n_sources - 1, 0) * CORROBORATION_BONUS, CORROBORATION_CAP)
+    last = parse_dt(indicator.last_seen) or now
+    age_hours = max((now - last).total_seconds() / 3600.0, 0.0)
+    half_life = DECAY_HALF_LIFE_HOURS.get(indicator.type, DEFAULT_HALF_LIFE_HOURS)
+    decay = 0.5 ** (age_hours / half_life)
+    return max(0, min(100, round((base + bonus) * decay)))
+
+
+def load_previous_feed(path: Path) -> List[Indicator]:
+    """Load a previously published latest.jsonl so the feed can persist.
+
+    Tolerant of missing files, malformed lines, and schema drift (unknown
+    keys are ignored; rows missing required fields are skipped). Entries that
+    the current false-positive rules would reject are dropped on load, so an
+    improved FP list retroactively cleans the carried-forward feed.
+    """
+    if not path.exists():
+        return []
+    field_names = {f.name for f in dataclass_fields(Indicator)}
+    out: List[Indicator] = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            data = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(data, dict):
+            continue
+        try:
+            ind = Indicator(**{k: v for k, v in data.items() if k in field_names})
+        except TypeError:
+            continue
+        if is_false_positive(ind.type, ind.indicator):
+            continue
+        out.append(ind)
+    return out
+
+
+def merge_with_previous(current: List[Indicator], previous: List[Indicator]) -> Tuple[List[Indicator], int]:
+    """Merge the previous feed into this run's results ("living feed").
+
+    Indicators re-observed this run keep their fresh ``last_seen`` (so their
+    score resets to full) while inheriting the earliest ``first_seen`` and the
+    accumulated source/tag history. Indicators seen only previously are
+    carried forward untouched — their stale ``last_seen`` makes the decay
+    scoring fade them out until expiry. Returns (merged, carried_forward).
+    """
+    uniq: Dict[Tuple[str, str], Indicator] = {i.key(): i for i in current}
+    carried = 0
+    for prev in previous:
+        k = prev.key()
+        if k not in uniq:
+            uniq[k] = prev
+            carried += 1
+            continue
+        cur = uniq[k]
+        p_first = parse_dt(prev.first_seen)
+        c_first = parse_dt(cur.first_seen)
+        if p_first and (c_first is None or p_first < c_first):
+            cur.first_seen = prev.first_seen
+        merged_tags = set(filter(None, cur.tags.split(","))) | set(filter(None, prev.tags.split(",")))
+        cur.tags = ",".join(sorted(t for t in merged_tags if t))
+        merged_sources = set(filter(None, cur.source.split(","))) | set(filter(None, prev.source.split(",")))
+        cur.source = ",".join(sorted(merged_sources))
+        cur.confidence = merge_conf(cur.confidence, prev.confidence)
+    merged = sorted(uniq.values(), key=lambda r: (r.type, r.indicator, r.source))
+    return merged, carried
 
 
 # ---------------- false-positive / bogon filtering ----------------
@@ -1408,22 +1524,29 @@ def collect_from_yaml(
 
 
 # ---------------- writers ----------------
+CSV_HEADER = ["indicator", "type", "source", "first_seen", "last_seen", "confidence", "score", "tlp", "tags", "reference", "context"]
+
+
+def _csv_row(r: Indicator) -> List[Any]:
+    return [r.indicator, r.type, r.source, r.first_seen, r.last_seen, r.confidence, r.score, r.tlp, r.tags, r.reference, r.context]
+
+
 def write_csv(path: Path, rows: List[Indicator]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow(["indicator", "type", "source", "first_seen", "last_seen", "confidence", "tlp", "tags", "reference", "context"])
+        w.writerow(CSV_HEADER)
         for r in rows:
-            w.writerow([r.indicator, r.type, r.source, r.first_seen, r.last_seen, r.confidence, r.tlp, r.tags, r.reference, r.context])
+            w.writerow(_csv_row(r))
 
 
 def write_tsv(path: Path, rows: List[Indicator]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="", encoding="utf-8") as f:
         w = csv.writer(f, delimiter="\t")
-        w.writerow(["indicator", "type", "source", "first_seen", "last_seen", "confidence", "tlp", "tags", "reference", "context"])
+        w.writerow(CSV_HEADER)
         for r in rows:
-            w.writerow([r.indicator, r.type, r.source, r.first_seen, r.last_seen, r.confidence, r.tlp, r.tags, r.reference, r.context])
+            w.writerow(_csv_row(r))
 
 
 def write_json(path: Path, rows: List[Indicator]) -> None:
@@ -1512,7 +1635,9 @@ def write_stix(path: Path, rows: List[Indicator]) -> None:
             "id": f"indicator--{sid}", **common,
             "name": f"{r.type}:{r.indicator}", "pattern": pattern, "pattern_type": "stix",
             "valid_from": r.first_seen,
-            "confidence": 70 if r.confidence == "high" else 50 if r.confidence == "medium" else 30,
+            # Computed 0-100 score (corroboration + decay) when available;
+            # fall back to the coarse confidence mapping for unscored rows.
+            "confidence": r.score if r.score > 0 else (70 if r.confidence == "high" else 50 if r.confidence == "medium" else 30),
             "labels": [t for t in r.tags.split(",") if t],
             "x_swiftioc_source": r.source, "x_swiftioc_tlp": r.tlp, "x_swiftioc_reference": r.reference,
         })
@@ -1627,6 +1752,10 @@ def main() -> int:
     ap.add_argument("--max-workers", type=int, default=8, help="Concurrent source fetches (1 disables threading)")
     ap.add_argument("--no-fp-filter", dest="fp_filter", action="store_false", help="Disable bogon / false-positive filtering")
     ap.set_defaults(fp_filter=True)
+    ap.add_argument("--persist-feed", action="store_true",
+                    help="Living feed: merge the previously published latest.jsonl, decay scores by age, expire stale entries")
+    ap.add_argument("--min-score", type=int, default=20,
+                    help="Expire indicators whose decayed score falls below this (default 20)")
     ap.add_argument("--urlhaus-status", choices=["any", "online", "offline"], default="any")
     ap.add_argument("--source-window", action="append", default=[], help="Override lookback per source: name=HOURS")
     ap.add_argument("--fail-on-empty", nargs="*", default=None, help="Fail if any listed sources return zero")
@@ -1714,8 +1843,27 @@ def main() -> int:
         fp_filter=args.fp_filter,
     )
 
-    # outputs
     out_dir: Path = args.out_dir
+
+    # Living feed: merge the previously published feed so indicators persist
+    # across runs. Re-observed entries refresh (score resets to full); entries
+    # no longer being reported decay by age until they expire below --min-score.
+    carried_forward = 0
+    if args.persist_feed:
+        previous = load_previous_feed(out_dir / "iocs" / "latest.jsonl")
+        rows, carried_forward = merge_with_previous(rows, previous)
+        logger.info("Persisted feed: carried forward %d indicators from previous run", carried_forward)
+
+    score_now = now_utc()
+    for r in rows:
+        r.score = compute_score(r, score_now)
+    before_expiry = len(rows)
+    rows = [r for r in rows if r.score >= args.min_score]
+    expired = before_expiry - len(rows)
+    if expired:
+        logger.info("Expired %d indicators below score threshold %d", expired, args.min_score)
+
+    # outputs
     write_csv(out_dir / "iocs" / "latest.csv", rows)
     write_tsv(out_dir / "iocs" / "latest.tsv", rows)
     write_json(out_dir / "iocs" / "latest.json", rows)
@@ -1736,19 +1884,26 @@ def main() -> int:
     raw_total = stats.get("raw_total", len(rows))
     duplicates_removed = max(raw_total - len(rows), 0)
     empty_sources = sorted([name for name, count in counts.items() if count == 0])
+    scores = [r.score for r in rows]
     diag = {
         "window_hours": args.window_hours,
         "total": len(rows),
         "total_before_dedup": raw_total,
         "duplicates_removed": duplicates_removed,
         "false_positives_removed": stats.get("false_positives_removed", 0),
+        "persist_feed": bool(args.persist_feed),
+        "carried_forward": carried_forward,
+        "expired_low_score": expired,
+        "score_min": min(scores) if scores else None,
+        "score_avg": round(sum(scores) / len(scores), 1) if scores else None,
+        "score_max": max(scores) if scores else None,
         "counts": counts,
         "type_counts": {k: v for k, v in type_totals},
         "earliest_first_seen": earliest,
         "newest_first_seen": latest,
         "empty_sources": empty_sources,
         "failures": stats.get("failures", []),
-        "version": 2,
+        "version": 3,
         "ts": run_ts,
     }
     if args.diag_json:
@@ -1767,6 +1922,11 @@ def main() -> int:
             f"| Total indicators | {len(rows)} |",
             f"| Duplicates removed | {duplicates_removed} |",
         ]
+        if args.persist_feed:
+            report_lines.append(f"| Carried forward | {carried_forward} |")
+            report_lines.append(f"| Expired (score < {args.min_score}) | {expired} |")
+        if scores:
+            report_lines.append(f"| Score (min / avg / max) | {min(scores)} / {round(sum(scores) / len(scores), 1)} / {max(scores)} |")
         if earliest:
             report_lines.append(f"| Earliest first_seen | {earliest} |")
         if latest:

@@ -25,6 +25,7 @@ ready-to-use examples for rapid deployment in modern DevSecOps workflows.
 - [Use cases & SEO-friendly keywords](#-use-cases--seo-friendly-keywords)
 - [Repository layout](#-repository-layout)
 - [How it works](#-how-it-works)
+- [Indicator scoring & the living feed](#-indicator-scoring--the-living-feed)
 - [Quick start](#-quick-start)
 - [Configuring sources](#-configuring-sources)
 - [CLI reference](#-cli-reference)
@@ -58,6 +59,14 @@ high-fidelity IOCs from authoritative sources. The project emphasises:
   link-local, reserved, multicast) and well-known benign hosts (`example.com`,
   `localhost`, `*.test`, …) are dropped automatically; disable with
   `--no-fp-filter`. The count is reported in diagnostics.
+- **Indicator scoring, decay & a living feed** – every indicator gets a 0–100
+  relevance score combining source confidence, cross-source corroboration
+  (independent feeds agreeing boosts the score), and age-based exponential
+  decay with per-type half-lives. With `--persist-feed` the collector merges
+  the previously published feed each run: re-observed indicators refresh to
+  full score, unobserved ones fade out, and entries below `--min-score`
+  expire. Most free aggregators publish stale snapshots — SwiftIOC publishes
+  a self-maintaining feed.
 - **Concurrent collection** – sources are fetched in parallel (configurable via
   `--max-workers`), so a full run completes in a fraction of the time of a
   sequential fetch without changing the deterministic output.
@@ -156,11 +165,40 @@ threat feed workflow".
    output directories. 
 2. **Collect per source** – each API or RSS source is routed to a parser
    registered via `@register_parser`, which fetches and converts raw feed data
-   into `Indicator` objects. 
-3. **Deduplicate & filter** – indicators are merged, deduplicated, and filtered
-   by the configured lookback window. 
-4. **Publish outputs** – all formats, diagnostics, and changelog entries are
+   into `Indicator` objects. Sources are fetched concurrently.
+3. **Deduplicate & filter** – indicators are normalised, merged, deduplicated,
+   filtered for false positives, and bounded by the configured lookback window.
+4. **Score & age** – each indicator receives a 0–100 score; with
+   `--persist-feed` the previous feed is merged in and stale entries expire.
+5. **Publish outputs** – all formats, diagnostics, and changelog entries are
    written beneath the chosen output directory. 
+
+## 📈 Indicator scoring & the living feed
+Every published indicator carries a `score` (0–100) computed as:
+
+```
+score = (confidence base + corroboration bonus) × 0.5^(age / half-life)
+```
+
+- **Confidence base** – `high` = 80, `medium` = 60, `low` = 40 (assigned by the
+  source adapter).
+- **Corroboration bonus** – +8 per additional independent source reporting the
+  same indicator, capped at +16. An IP flagged by Feodo Tracker *and* ThreatFox
+  *and* a vendor blog outranks a single scanner hit.
+- **Age decay** – exponential on hours since `last_seen`, with per-type
+  half-lives that mirror how quickly each indicator class goes stale: URLs and
+  IPs decay in about a week (phishing pages die fast; C2 IPs get reassigned),
+  domains in two, curated CIDR blocks and JA3 fingerprints in a month, file
+  hashes over six months, and CVEs over a year.
+
+With `--persist-feed` (enabled in the scheduled collection workflow) the
+previous `latest.jsonl` is merged into each run, making the published feed
+**stateful**: re-observed indicators refresh to full score with their original
+`first_seen` and accumulated source history preserved, indicators that stop
+appearing decay run over run, and anything whose score falls below
+`--min-score` (default 20) is expired from the feed. The same score is emitted
+as the STIX 2.1 `confidence` property, so downstream platforms can prioritise
+on it directly.
 
 ## 🏁 Quick start
 Prerequisites:
@@ -238,6 +276,8 @@ Run `python -m swiftioc --help` for the full list of switches. Highlights:
 | `--max-per-source N` | Cap the number of indicators taken from each source. |
 | `--max-workers N` | Number of sources fetched concurrently (default `8`; use `1` to disable threading). |
 | `--no-fp-filter` | Disable bogon / false-positive filtering (keep private IPs, `example.com`, etc.). |
+| `--persist-feed` | Living feed: merge the previously published `latest.jsonl`, decay scores by age, expire stale entries. |
+| `--min-score N` | Expire indicators whose decayed score falls below `N` (default `20`). |
 | `--urlhaus-status {any,online,offline}` | Filter URLhaus indicators by status. |
 | `--source-window name=N` | Override the lookback window for specific sources. |
 | `--grace-on-404 name…` | Treat HTTP 404 for listed sources as a non-fatal empty result. |
