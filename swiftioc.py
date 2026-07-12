@@ -1768,8 +1768,11 @@ def main() -> int:
     ap.add_argument("--log-format", choices=["text", "json"], default="text")
     ap.add_argument("--log-file-level", choices=["ERROR", "WARNING", "INFO", "DEBUG"], default="DEBUG")
     ap.add_argument("--save-raw-dir", type=Path, default=None)
-    ap.add_argument("--diag-json", type=Path, default=Path("public/diagnostics/run.json"))
-    ap.add_argument("--report", type=Path, default=Path("public/diagnostics/REPORT.md"))
+    # Default to None so unset paths can follow --out-dir instead of always
+    # landing in ./public (which silently wrote into the repo when running
+    # with a custom --out-dir).
+    ap.add_argument("--diag-json", type=Path, default=None, help="Diagnostics JSON path (default: <out-dir>/diagnostics/run.json)")
+    ap.add_argument("--report", type=Path, default=None, help="Markdown run report path (default: <out-dir>/diagnostics/REPORT.md)")
     ap.add_argument("--ua-file", type=Path, default=None, help="Optional file with one UA per line")
 
     # CI helpers
@@ -1809,11 +1812,14 @@ def main() -> int:
     # UA file
     _load_ua_file(args.ua_file)
 
-    # Ensure diagnostics dirs (nice for GH Artifacts)
-    if args.diag_json:
-        args.diag_json.parent.mkdir(parents=True, exist_ok=True)
-    if args.report:
-        args.report.parent.mkdir(parents=True, exist_ok=True)
+    # Derive unset diagnostics paths from --out-dir, then ensure the dirs
+    # exist (nice for GH Artifacts).
+    if args.diag_json is None:
+        args.diag_json = args.out_dir / "diagnostics" / "run.json"
+    if args.report is None:
+        args.report = args.out_dir / "diagnostics" / "REPORT.md"
+    args.diag_json.parent.mkdir(parents=True, exist_ok=True)
+    args.report.parent.mkdir(parents=True, exist_ok=True)
     if _SAVE_RAW_DIR:
         _SAVE_RAW_DIR.mkdir(parents=True, exist_ok=True)
 

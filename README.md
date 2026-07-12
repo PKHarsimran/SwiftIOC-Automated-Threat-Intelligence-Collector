@@ -284,8 +284,8 @@ Run `python -m swiftioc --help` for the full list of switches. Highlights:
 | `--fail-on-empty name…` | Fail the run if any listed sources return zero indicators. |
 | `--fail-if-stale name=N` | Fail when the newest indicator from `name` is older than `N` hours. |
 | `--save-raw-dir PATH` | Persist raw feed responses for later inspection. |
-| `--diag-json PATH` | Write diagnostics JSON (defaults to `public/diagnostics/run.json`). |
-| `--report PATH` | Write Markdown run report (defaults to `public/diagnostics/REPORT.md`). |
+| `--diag-json PATH` | Write diagnostics JSON (defaults to `<out-dir>/diagnostics/run.json`). |
+| `--report PATH` | Write Markdown run report (defaults to `<out-dir>/diagnostics/REPORT.md`). |
 | `--ua-file PATH` | Provide a custom user-agent pool (one UA per line). |
 | `--ci-safe` | Convenience flag for CI runs (JSON logs, ensures diagnostics dirs, tolerates missing RSS dependency). |
 | `--self-test` | Execute built-in assertions without fetching feeds. |
