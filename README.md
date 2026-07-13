@@ -259,10 +259,13 @@ apis:
     reference: https://urlhaus.abuse.ch/
     # Optional filter supplied via --urlhaus-status
 
+# RSS is supported (parse: rss) for feeds whose entries embed IOCs. Most
+# security-blog feeds only summarise posts, so they rarely yield indicators
+# and are left out of the defaults.
 rss:
-  - name: google_tag
-    url: https://blog.google/threat-analysis-group/rss/
-    reference: https://blog.google/threat-analysis-group/
+  - name: my_ioc_blog
+    url: https://example.com/feed.xml
+    reference: https://example.com/
 ```
 
 Each parser can accept additional keyword arguments defined under `options:`.

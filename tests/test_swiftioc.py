@@ -597,6 +597,41 @@ def test_csv_includes_score_column(tmp_path):
     assert row[header.index("score")] == "88"
 
 
+def test_sslbl_ja3_column_order(monkeypatch):
+    # abuse.ch CSV columns are ja3_md5, firstseen, lastseen, listingreason.
+    # Regression: the parser previously read ja3/first_seen in swapped columns
+    # and returned nothing.
+    payload = (
+        "################ comment banner ################\n"
+        "# ja3_md5,firstseen,lastseen,listingreason\n"
+        "b386946a5a44d1ddcc843bc75336dfce,2017-07-14 18:08:15,2019-07-27 20:42:54,Dridex\n"
+    )
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
+    out = si.fetch_sslbl_ja3("http://x", "ref", "sslbl_ja3", si.now_utc().replace(year=2000))
+    assert len(out) == 1
+    assert out[0].type == "ja3"
+    assert out[0].indicator == "b386946a5a44d1ddcc843bc75336dfce"
+    assert "Dridex" in out[0].tags
+
+
+def test_nvd_parser_requests_recent_window(monkeypatch):
+    # Regression: an unfiltered NVD query returns the oldest CVEs, which the
+    # window then drops. The parser must inject lastModStartDate/EndDate.
+    captured = {}
+
+    def fake_get(url, *a, **k):
+        captured["url"] = url
+        return json.dumps({"vulnerabilities": []})
+
+    monkeypatch.setattr(si, "http_get", fake_get)
+    si.fetch_nvd_recent(
+        "https://services.nvd.nist.gov/rest/json/cves/2.0/?resultsPerPage=200",
+        "ref", "nvd", si.now_utc(),
+    )
+    assert "lastModStartDate" in captured["url"]
+    assert "lastModEndDate" in captured["url"]
+
+
 def test_threatfox_export_endpoint_shape(monkeypatch):
     # The real export endpoint returns {"<ioc_id>": [entry, ...]} with
     # ioc_value/first_seen_utc/ip:port/md5_hash spellings and comma-string

@@ -637,6 +637,22 @@ def fetch_cisa_kev(url: str, ref_url: str, source: str, ws: datetime) -> List[In
 
 @register_parser("nvd", "nist_nvd", "nist_nvd_recent")
 def fetch_nvd_recent(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
+    now = now_utc()
+    # The NVD 2.0 API returns the *oldest* CVEs first (startIndex 0), so an
+    # unfiltered query yields 1999-era CVEs that the lookback window then drops,
+    # leaving zero. Constrain it to CVEs modified within the window (the API
+    # requires both bounds and caps the range at 120 days; a lookback window is
+    # always well inside that).
+    if "nvd.nist.gov" in url:
+        from urllib.parse import parse_qs, urlencode, urlparse
+        parsed = urlparse(url)
+        query = parse_qs(parsed.query)
+        if not any(k in query for k in ("lastModStartDate", "pubStartDate")):
+            fmt = "%Y-%m-%dT%H:%M:%S.000"
+            start = max(ws, now - timedelta(days=119))
+            query["lastModStartDate"] = [start.strftime(fmt)]
+            query["lastModEndDate"] = [now.strftime(fmt)]
+            url = parsed._replace(query=urlencode(query, doseq=True)).geturl()
     text = ensure_text(http_get(url, name=source))
     try:
         data = json.loads(text)
@@ -646,7 +662,6 @@ def fetch_nvd_recent(url: str, ref_url: str, source: str, ws: datetime) -> List[
     records = data.get("vulnerabilities") if isinstance(data, dict) else None
     if not isinstance(records, list):
         return []
-    now = now_utc()
     out: List[Indicator] = []
 
     def extract_severity(entry: Dict[str, Any]) -> Optional[str]:
@@ -952,22 +967,17 @@ def _fetch_sslbl_ja3(
         if not row:
             continue
 
-        header_token = row[0].strip().lower()
-        if header_token.startswith("#") or header_token in {"first_seen", "timestamp"}:
+        # abuse.ch SSLBL CSV columns: ja3_md5, firstseen, lastseen, listingreason.
+        # A valid JA3 hash in column 0 also filters out comment/header lines.
+        ja = row[0].strip()
+        if not JA3_RE.fullmatch(ja):
             continue
 
-        ja = row[1].strip() if len(row) > 1 else None
-        if not ja:
-            continue
-
-        if not JA3_RE.fullmatch(ja.strip()):
-            continue
-
-        first_seen = parse_dt(row[0]) if row[0] else None
+        first_seen = parse_dt(row[1]) if len(row) > 1 else None
         if not disable_window and first_seen and first_seen < ws:
             continue
 
-        desc = row[2] if len(row) > 2 else ""
+        desc = (row[3].strip() if len(row) > 3 else "")
 
         out.append(
             Indicator(
