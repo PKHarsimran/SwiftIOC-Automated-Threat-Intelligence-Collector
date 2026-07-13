@@ -29,7 +29,7 @@
       gtag('config', 'G-T7L8XCEG0S');
     </script>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/styles.css?v=2" />
+    <link rel="stylesheet" href="assets/styles.css?v=3" />
 
     <style>
       /* Page-specific layout refinements for the main dashboard */
@@ -653,6 +653,21 @@
           aria-label="Proportion of indicators by score band"></div>
       </section>
 
+      <section
+        class="top-threats"
+        data-top-threats-section
+        hidden
+        aria-labelledby="top-threats-heading"
+      >
+        <div class="section-heading">
+          <h2 id="top-threats-heading" class="panel-title">🔥 Top threats right now</h2>
+          <p class="panel-subtitle">
+            The highest-scoring, most cross-source-confirmed indicators from the latest run.
+          </p>
+        </div>
+        <div class="top-threats-grid" data-top-threats></div>
+      </section>
+
       <main class="dashboard-main">
         <section
           id="live-preview"
@@ -1021,6 +1036,6 @@
       </section>
     </div>
 
-    <script defer src="assets/dashboard.js?v=2"></script>
+    <script defer src="assets/dashboard.js?v=3"></script>
   </body>
 </html>

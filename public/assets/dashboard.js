@@ -2289,11 +2289,125 @@
   };
 
   /* ==========================================================================
+   *  TOP THREATS SHOWCASE
+   * ========================================================================= */
+
+  const TOP_THREATS_LIMIT = 6;
+
+  const scoreBandClass = (score) => {
+    if (typeof score !== 'number') return 'threat-medium';
+    if (score >= 80) return 'threat-critical';
+    if (score >= 60) return 'threat-high';
+    if (score >= 40) return 'threat-medium';
+    return 'threat-low';
+  };
+
+  const makeThreatPill = (cls, text) => {
+    const span = document.createElement('span');
+    span.className = `threat-pill ${cls}`;
+    span.textContent = text;
+    return span;
+  };
+
+  const makeThreatCard = (row) => {
+    const card = document.createElement('article');
+    card.className = `threat-card ${scoreBandClass(row.score)}`;
+
+    const scoreBox = document.createElement('div');
+    scoreBox.className = 'threat-score';
+    const num = document.createElement('span');
+    num.className = 'threat-score-num';
+    num.textContent =
+      typeof row.score === 'number'
+        ? String(row.score)
+        : (row.confidence ? row.confidence[0].toUpperCase() : '—');
+    const lbl = document.createElement('span');
+    lbl.className = 'threat-score-label';
+    lbl.textContent = 'score';
+    scoreBox.append(num, lbl);
+
+    const body = document.createElement('div');
+    body.className = 'threat-body';
+
+    const ind = document.createElement('div');
+    ind.className = 'threat-indicator';
+    ind.textContent = row.indicator || '—';
+    if (row.indicator) ind.title = row.indicator;
+    body.appendChild(ind);
+
+    const pills = document.createElement('div');
+    pills.className = 'threat-pills';
+    pills.appendChild(makeThreatPill('type', row.type || 'unknown'));
+    if ((row.sourceCount || 0) >= 2) {
+      const p = makeThreatPill('confirmed', `${row.sourceCount}× confirmed`);
+      if (Array.isArray(row.sourceList)) p.title = row.sourceList.join(', ');
+      pills.appendChild(p);
+    }
+    const rel = formatRelativeTimeFromNow(row.bestTimestamp);
+    if (rel) pills.appendChild(makeThreatPill('time', rel));
+    body.appendChild(pills);
+
+    if (row.tags && row.tags.length) {
+      const tags = document.createElement('div');
+      tags.className = 'threat-tags';
+      row.tags.slice(0, 3).forEach((t) => {
+        const s = document.createElement('span');
+        s.textContent = t;
+        tags.appendChild(s);
+      });
+      body.appendChild(tags);
+    }
+
+    card.append(scoreBox, body);
+    return card;
+  };
+
+  const initialiseTopThreats = () => {
+    const section = qs('[data-top-threats-section]');
+    const grid = qs('[data-top-threats]');
+    if (!section || !grid) return;
+
+    const render = (dataset) => {
+      const entries = (dataset && dataset.entries) || [];
+      // Only a scored feed makes a meaningful "top threats" ranking; hide the
+      // showcase for legacy pre-scoring data instead of showing blank boxes.
+      if (!entries.length || !entries.some((e) => typeof e.score === 'number')) {
+        section.hidden = true;
+        return;
+      }
+      const ranked = entries
+        .slice()
+        .sort((a, b) => {
+          const sa = typeof a.score === 'number' ? a.score : -1;
+          const sb = typeof b.score === 'number' ? b.score : -1;
+          if (sa !== sb) return sb - sa;
+          const ca = a.sourceCount || 0;
+          const cb = b.sourceCount || 0;
+          if (ca !== cb) return cb - ca;
+          return (b.bestTimestamp || 0) - (a.bestTimestamp || 0);
+        })
+        .slice(0, TOP_THREATS_LIMIT);
+
+      grid.innerHTML = '';
+      ranked.forEach((row) => grid.appendChild(makeThreatCard(row)));
+      section.hidden = false;
+    };
+
+    subscribeToDataset((dataset) => {
+      if (dataset && !isCacheOrigin(dataset.origin)) render(dataset);
+    });
+    loadDataset({})
+      .then(({ dataset }) => render(dataset))
+      .catch((error) => console.warn('Top threats failed to load', error));
+  };
+
+  /* ==========================================================================
    *  BOOTSTRAP
    * ========================================================================= */
 
   initialiseTableToggles();
   initialiseStatusBanner();
+  initialiseTopThreats();
   loadStats();
   initialisePreview();
 })();
