@@ -646,7 +646,10 @@ def fetch_nvd_recent(url: str, ref_url: str, source: str, ws: datetime) -> List[
     from urllib.parse import parse_qs, urlencode, urlparse
     parsed = urlparse(url)
     host = (parsed.hostname or "").lower()
-    if host == "nvd.nist.gov":
+    # Match the NVD host by parsed hostname, not a substring of the whole URL,
+    # so a lookalike like nvd.nist.gov.evil.com or ?x=nvd.nist.gov can't trip it.
+    # Use endswith so the real config host (services.nvd.nist.gov) still matches.
+    if host == "nvd.nist.gov" or host.endswith(".nvd.nist.gov"):
         query = parse_qs(parsed.query)
         if not any(k in query for k in ("lastModStartDate", "pubStartDate")):
             fmt = "%Y-%m-%dT%H:%M:%S.000"
