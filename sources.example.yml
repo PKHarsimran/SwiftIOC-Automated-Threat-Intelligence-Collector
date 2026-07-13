@@ -53,12 +53,6 @@ apis:
     url: https://openphish.com/feed.txt
     reference: https://openphish.com/
 
-  - name: phishstats_api
-    kind: json
-    parse: phishstats
-    url: https://phishstats.info:2096/api/phishing?_limit=100
-    reference: https://phishstats.info/
-
   # --- Network / Malware IP Feeds ---
   - name: blocklist_de_ssh
     kind: txt
@@ -107,31 +101,12 @@ apis:
     url: https://raw.githubusercontent.com/stamparm/ipsum/master/levels/5.txt
     reference: https://github.com/stamparm/ipsum
 
-  # --- Vulnerability & Exploit Feeds ---
-  - name: exploitdb_recent
-    kind: rss
-    parse: rss
-    url: https://www.exploit-db.com/rss.xml
-    reference: https://www.exploit-db.com/
-
-rss:
-  - name: google_tag
-    url: https://blog.google/threat-analysis-group/rss/
-    reference: https://blog.google/threat-analysis-group/
-
-  - name: microsoft_msrc
-    url: https://msrc.microsoft.com/blog/feed
-    reference: https://msrc.microsoft.com/blog/
-
-  - name: cisco_talos
-    url: https://blog.talosintelligence.com/
-    reference: https://blog.talosintelligence.com/
-
-  - name: proofpoint_threatinsight
-    url: https://www.proofpoint.com/us/rss.xml
-    reference: https://www.proofpoint.com/us/blog/threat-insight
-
-  - name: bleepingcomputer_security
-    url: https://www.bleepingcomputer.com/feed/
-    reference: https://www.bleepingcomputer.com/
+# RSS support is built in (parse: rss). Security-blog feeds are intentionally
+# omitted from the defaults: their summaries rarely contain machine-readable
+# IOCs, so they mostly report zero. Add your own IOC-rich feeds here, e.g.:
+#
+# rss:
+#   - name: my_ioc_blog
+#     url: https://example.com/feed.xml
+#     reference: https://example.com/
 
