@@ -643,9 +643,10 @@ def fetch_nvd_recent(url: str, ref_url: str, source: str, ws: datetime) -> List[
     # leaving zero. Constrain it to CVEs modified within the window (the API
     # requires both bounds and caps the range at 120 days; a lookback window is
     # always well inside that).
-    if "nvd.nist.gov" in url:
-        from urllib.parse import parse_qs, urlencode, urlparse
-        parsed = urlparse(url)
+    from urllib.parse import parse_qs, urlencode, urlparse
+    parsed = urlparse(url)
+    host = (parsed.hostname or "").lower()
+    if host == "nvd.nist.gov":
         query = parse_qs(parsed.query)
         if not any(k in query for k in ("lastModStartDate", "pubStartDate")):
             fmt = "%Y-%m-%dT%H:%M:%S.000"
