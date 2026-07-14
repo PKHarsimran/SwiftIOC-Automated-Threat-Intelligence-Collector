@@ -17,11 +17,17 @@
     240
   );
 
+  // Compact, strongest-first feed produced specifically for the dashboard
+  // (~100 KB). The full latest.jsonl runs to many MB, so it is only a
+  // fallback for deployments that predate dashboard.jsonl.
+  const DASHBOARD_FEED_URL = resolveIocUrl('iocs/dashboard.jsonl');
   const INDICATORS_JSONL_URL = resolveIocUrl('iocs/latest.jsonl');
   const INDICATORS_JSON_FALLBACK_URL = resolveIocUrl('iocs/latest.json');
-  const PREVIEW_STREAM_URL = INDICATORS_JSONL_URL;
+  // Tiny JSON of full-feed aggregates (totals, score bands, per-source/type/
+  // tag counts) written by the collector each run.
+  const RUN_DIAG_URL = resolveIocUrl('diagnostics/run.json');
 
-  const DATASET_STORAGE_KEY = 'swiftioc-dashboard-cache-v1';
+  const DATASET_STORAGE_KEY = 'swiftioc-dashboard-cache-v2';
   const DATASET_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
   const numberFormatter = new Intl.NumberFormat('en-US');
@@ -580,6 +586,34 @@
     };
   };
 
+  // Convert a {name: count} object (from run.json) into the same row shape
+  // the table aggregators produce. Returns null when the object is unusable
+  // so callers can fall back to subset-derived rows.
+  const countsObjectToRows = (obj, labelKey) => {
+    if (!obj || typeof obj !== 'object') return null;
+    const entries = Object.entries(obj).filter(
+      ([, count]) => typeof count === 'number'
+    );
+    if (!entries.length) return null;
+    const total = entries.reduce((sum, [, count]) => sum + count, 0) || 1;
+    const max = entries.reduce((m, [, count]) => Math.max(m, count), 0) || 1;
+    return entries
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+      .map(([label, count]) => {
+        const pct = (count / total) * 100;
+        return [
+          { title: labelKey, value: label },
+          { title: 'Count', value: formatNumber(count), numeric: true },
+          {
+            title: 'Share',
+            value: `${pct.toFixed(1)}%`,
+            numeric: true,
+            bar: (count / max) * 100,
+          },
+        ];
+      });
+  };
+
   /* ==========================================================================
    *  TABLE POPULATION
    * ========================================================================= */
@@ -1040,7 +1074,7 @@
       if (!raw) return null;
       const parsed = JSON.parse(raw);
       if (!parsed || typeof parsed !== 'object') return null;
-      const { entries, fetchedAt, stats } = parsed;
+      const { entries, fetchedAt, stats, diag } = parsed;
       if (!Array.isArray(entries) || typeof fetchedAt !== 'number') {
         return null;
       }
@@ -1052,6 +1086,7 @@
         origin: age > DATASET_CACHE_TTL ? 'cache-stale' : 'cache',
         entries,
         stats,
+        diag: diag || null,
         fetchedAt,
       };
     } catch (error) {
@@ -1062,13 +1097,14 @@
 
   const saveToStorage = (dataset) => {
     try {
-      const { entries, stats, fetchedAt } = dataset;
+      const { entries, stats, diag, fetchedAt } = dataset;
       if (!Array.isArray(entries)) return;
       localStorage.setItem(
         DATASET_STORAGE_KEY,
         JSON.stringify({
           entries,
           stats,
+          diag: diag || null,
           fetchedAt: fetchedAt ?? Date.now(),
         })
       );
@@ -1105,10 +1141,33 @@
 
   const fetchDataset = async (previewLimit) => {
     try {
-      return await streamJsonLines(PREVIEW_STREAM_URL, previewLimit);
+      // The compact dashboard feed first: ~2% of the full feed's size.
+      return await streamJsonLines(DASHBOARD_FEED_URL, previewLimit);
+    } catch (error) {
+      console.warn('dashboard.jsonl unavailable, falling back to full feed', error);
+    }
+    try {
+      return await streamJsonLines(INDICATORS_JSONL_URL, previewLimit);
     } catch (error) {
       console.warn('JSONL request failed, falling back to JSON', error);
       return fetchJsonDataset(INDICATORS_JSON_FALLBACK_URL, previewLimit);
+    }
+  };
+
+  // Full-feed aggregates from the collector run: totals, score bands,
+  // per-source/type/tag counts. Lets the dashboard show accurate global
+  // numbers while only downloading the compact feed. Null when unavailable.
+  const fetchRunDiag = async () => {
+    try {
+      const response = await fetch(RUN_DIAG_URL, {
+        headers: { Accept: 'application/json' },
+      });
+      if (!response.ok) return null;
+      const data = await response.json();
+      return data && typeof data === 'object' ? data : null;
+    } catch (error) {
+      console.warn('run.json unavailable', error);
+      return null;
     }
   };
 
@@ -1125,7 +1184,10 @@
         });
 
     const fetchFreshDataset = async () => {
-      const { entries } = await fetchDataset(PREVIEW_CACHE_LIMIT);
+      const [{ entries }, diag] = await Promise.all([
+        fetchDataset(PREVIEW_CACHE_LIMIT),
+        fetchRunDiag(),
+      ]);
 
       const statsAccumulator = createStatsAccumulator();
       const tableAggregators = createTableAggregators();
@@ -1141,6 +1203,35 @@
 
       const stats = statsAccumulator.finalise();
 
+      // Prefer the collector's full-feed aggregates over numbers derived from
+      // the compact feed subset.
+      if (diag) {
+        if (typeof diag.total === 'number') stats.total = diag.total;
+        if (typeof diag.high_confidence_total === 'number') {
+          stats.highConfidence = diag.high_confidence_total;
+          stats.highScore = diag.high_confidence_total;
+        }
+        if (typeof diag.corroborated_total === 'number') {
+          stats.corroborated = diag.corroborated_total;
+        }
+        if (typeof diag.score_avg === 'number') {
+          stats.avgScore = Math.round(diag.score_avg);
+          stats.hasScores = true;
+        }
+        if (diag.score_bands && typeof diag.score_bands === 'object') {
+          stats.scoreBands = diag.score_bands;
+        }
+        if (typeof diag.duplicates_removed === 'number') {
+          stats.duplicatesRemoved = diag.duplicates_removed;
+        }
+        if (diag.counts && typeof diag.counts === 'object') {
+          stats.activeSources = Object.keys(diag.counts).length;
+        }
+        if (diag.type_counts && typeof diag.type_counts === 'object') {
+          stats.indicatorTypes = Object.keys(diag.type_counts).length;
+        }
+      }
+
       const previewEntriesNormalised = selectPreviewRows(
         normalisedEntries,
         PREVIEW_CACHE_LIMIT
@@ -1151,10 +1242,17 @@
         entries: normalisedEntries,
         previewEntries: previewEntriesNormalised,
         stats,
+        diag,
         fetchedAt: Date.now(),
-        sourcesTable: tableAggregators.toSourceRows(),
-        typesTable: tableAggregators.toTypeRows(),
-        tagsTable: tableAggregators.toTagRows(),
+        sourcesTable:
+          countsObjectToRows(diag?.counts, 'Source') ||
+          tableAggregators.toSourceRows(),
+        typesTable:
+          countsObjectToRows(diag?.type_counts, 'Type') ||
+          tableAggregators.toTypeRows(),
+        tagsTable:
+          countsObjectToRows(diag?.tag_counts, 'Tag') ||
+          tableAggregators.toTagRows(),
       };
 
       saveToStorage(dataset);
@@ -1178,6 +1276,7 @@
         }
 
         const stats = cached.stats || statsAccumulator.finalise();
+        const diag = cached.diag || null;
         const dataset = {
           origin: cached.origin,
           entries: normalisedEntries,
@@ -1186,10 +1285,17 @@
             PREVIEW_CACHE_LIMIT
           ),
           stats,
+          diag,
           fetchedAt: cached.fetchedAt,
-          sourcesTable: tableAggregators.toSourceRows(),
-          typesTable: tableAggregators.toTypeRows(),
-          tagsTable: tableAggregators.toTagRows(),
+          sourcesTable:
+            countsObjectToRows(diag?.counts, 'Source') ||
+            tableAggregators.toSourceRows(),
+          typesTable:
+            countsObjectToRows(diag?.type_counts, 'Type') ||
+            tableAggregators.toTypeRows(),
+          tagsTable:
+            countsObjectToRows(diag?.tag_counts, 'Tag') ||
+            tableAggregators.toTagRows(),
         };
 
         datasetCache.promise = Promise.resolve(dataset);

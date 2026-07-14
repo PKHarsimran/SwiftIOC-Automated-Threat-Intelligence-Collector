@@ -1675,6 +1675,40 @@ def write_jsonl(path: Path, rows: List[Indicator]) -> None:
             f.write(json.dumps(asdict(r), ensure_ascii=False) + "\n")
 
 
+def write_dashboard_feed(path: Path, rows: List[Indicator], *, limit: int = 1000) -> int:
+    """Write the compact feed the web dashboard downloads.
+
+    The full latest.jsonl can run to many megabytes, which every dashboard
+    visitor would otherwise download (and which overflows localStorage, so it
+    can't even be cached client-side). This trims to the top ``limit`` rows by
+    (score, corroboration, recency) and drops fields the dashboard never
+    renders, cutting the payload by ~98%. Global stats come from run.json.
+    """
+    ranked = sorted(
+        rows, key=lambda r: (r.score, source_count(r), r.last_seen, r.indicator), reverse=True
+    )[:limit]
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8") as f:
+        for r in ranked:
+            f.write(
+                json.dumps(
+                    {
+                        "indicator": r.indicator,
+                        "type": r.type,
+                        "source": r.source,
+                        "first_seen": r.first_seen,
+                        "last_seen": r.last_seen,
+                        "confidence": r.confidence,
+                        "score": r.score,
+                        "tags": r.tags,
+                    },
+                    ensure_ascii=False,
+                )
+                + "\n"
+            )
+    return len(ranked)
+
+
 def _stix_pattern(itype: str, indicator: str) -> Optional[str]:
     """Build a STIX 2.1 comparison expression for an indicator, or None.
 
@@ -1873,6 +1907,8 @@ def main() -> int:
                     help="Retention: drop indicators whose last_seen is older than N days")
     ap.add_argument("--max-store", type=int, default=None,
                     help="Retention: keep only the top N indicators by score/recency (KEVIntel-style curation)")
+    ap.add_argument("--dashboard-rows", type=int, default=1000,
+                    help="Rows in the compact dashboard.jsonl the web dashboard downloads (default 1000)")
     ap.add_argument("--high-confidence-score", type=int, default=80,
                     help="Score at/above which an indicator enters the curated high_confidence feed (default 80)")
     ap.add_argument("--urlhaus-status", choices=["any", "online", "offline"], default="any")
@@ -2021,6 +2057,11 @@ def main() -> int:
         len(high_conf), len(rows), args.high_confidence_score,
     )
 
+    dashboard_written = write_dashboard_feed(
+        out_dir / "iocs" / "dashboard.jsonl", rows, limit=args.dashboard_rows
+    )
+    logger.info("Dashboard feed: top %d rows written", dashboard_written)
+
     write_changelog(out_dir / "changelog" / "CHANGELOG.md", counts, total=len(rows))
 
     # diagnostics / summary
@@ -2037,6 +2078,15 @@ def main() -> int:
     duplicates_removed = max(raw_total - len(rows), 0)
     empty_sources = sorted([name for name, count in counts.items() if count == 0])
     scores = [r.score for r in rows]
+    # Full-feed aggregates the dashboard renders without downloading the whole
+    # feed: score bands, corroboration count, and top tags.
+    score_bands = {
+        "critical": sum(1 for s in scores if s >= 80),
+        "high": sum(1 for s in scores if 60 <= s < 80),
+        "medium": sum(1 for s in scores if 40 <= s < 60),
+        "low": sum(1 for s in scores if s < 40),
+    }
+    corroborated_total = sum(1 for r in rows if source_count(r) >= 2)
     diag = {
         "window_hours": args.window_hours,
         "total": len(rows),
@@ -2054,10 +2104,13 @@ def main() -> int:
         "score_min": min(scores) if scores else None,
         "score_avg": round(sum(scores) / len(scores), 1) if scores else None,
         "score_max": max(scores) if scores else None,
+        "score_bands": score_bands,
+        "corroborated_total": corroborated_total,
         "high_confidence_total": len(high_conf),
         "high_confidence_score": args.high_confidence_score,
         "counts": counts,
         "type_counts": {k: v for k, v in type_totals},
+        "tag_counts": {k: v for k, v in top_tags(rows, 25)},
         "earliest_first_seen": earliest,
         "newest_first_seen": latest,
         "empty_sources": empty_sources,

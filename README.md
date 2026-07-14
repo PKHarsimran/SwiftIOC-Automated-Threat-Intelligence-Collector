@@ -294,6 +294,7 @@ Run `python -m swiftioc --help` for the full list of switches. Highlights:
 | `--high-confidence-score N` | Score at/above which an indicator enters the curated `high_confidence` feed (default `80`; multi-source indicators always qualify). |
 | `--max-age-days N` | Retention: drop indicators whose `last_seen` is older than `N` days. |
 | `--max-store N` | Retention: keep only the top `N` indicators by score/recency (KEVIntel-style curation; keeps the stored feed small and high-signal). |
+| `--dashboard-rows N` | Rows in the compact `dashboard.jsonl` the web dashboard downloads (default `1000`, ~2–3% of the full feed's size). |
 | `--urlhaus-status {any,online,offline}` | Filter URLhaus indicators by status. |
 | `--source-window name=N` | Override the lookback window for specific sources. |
 | `--grace-on-404 name…` | Treat HTTP 404 for listed sources as a non-fatal empty result. |
@@ -323,6 +324,7 @@ public/
 │   ├── latest.jsonl
 │   ├── high_confidence.csv    # curated: score ≥80 or 2+ sources
 │   ├── high_confidence.jsonl  # same, machine-readable
+│   ├── dashboard.jsonl        # compact top-N feed the web dashboard loads
 │   └── stix2.json
 ├── changelog/
 │   └── CHANGELOG.md
