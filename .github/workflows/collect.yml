@@ -191,6 +191,7 @@ jobs:
           file_pattern: |
             public/iocs/latest.csv
             public/iocs/latest.jsonl
+            public/iocs/dashboard.jsonl
             public/iocs/high_confidence.csv
             public/iocs/high_confidence.jsonl
             public/changelog/**

@@ -63,10 +63,28 @@
   box-sizing: border-box;
 }
 
+html {
+  /* Smooth in-page navigation; anchors clear the sticky nav. */
+  scroll-behavior: smooth;
+}
+
 html,
 body {
   margin: 0;
   padding: 0;
+}
+
+[id] {
+  scroll-margin-top: 4.5rem;
+}
+
+/* Below-the-fold panels: let the browser skip layout/paint until they
+   approach the viewport. contain-intrinsic-size reserves space so the
+   scrollbar doesn't jump. */
+.summary-tables .table-card,
+#exports {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 320px;
 }
 
 body {

@@ -448,6 +448,26 @@ def test_apply_retention_noop_by_default():
     assert len(kept) == 5 and aged == 0 and pruned == 0
 
 
+def test_write_dashboard_feed_trims_and_ranks(tmp_path):
+    rows = []
+    for i, score in enumerate([50, 96, 70]):
+        r = _sample_indicator(indicator=f"10.0.0.{i}", type="ipv4")
+        r.score = score
+        rows.append(r)
+
+    out = tmp_path / "dashboard.jsonl"
+    written = si.write_dashboard_feed(out, rows, limit=2)
+    assert written == 2
+    lines = [json.loads(line) for line in out.read_text(encoding="utf-8").splitlines()]
+    # Strongest-first and capped at the limit.
+    assert [r["score"] for r in lines] == [96, 70]
+    # Trimmed schema: only the fields the dashboard renders.
+    assert set(lines[0]) == {
+        "indicator", "type", "source", "first_seen", "last_seen",
+        "confidence", "score", "tags",
+    }
+
+
 def test_source_count():
     assert si.source_count(_sample_indicator(source="a")) == 1
     assert si.source_count(_sample_indicator(source="a,b,c")) == 3

@@ -17,6 +17,11 @@
       content="The latest malicious IPs, domains, URLs, and hashes — scored, corroborated across sources, and updated automatically. Free CSV / JSON / STIX downloads."
     />
     <meta name="twitter:card" content="summary" />
+    <!-- Start the data fetch as early as possible: the dashboard feed and the
+         run aggregates are the page's real content. -->
+    <link rel="preload" href="iocs/dashboard.jsonl" as="fetch" crossorigin="anonymous" />
+    <link rel="preload" href="diagnostics/run.json" as="fetch" crossorigin="anonymous" />
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
     <!-- Google tag (gtag.js) for usage analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-T7L8XCEG0S"></script>
     <script>
@@ -29,7 +34,7 @@
       gtag('config', 'G-T7L8XCEG0S');
     </script>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/styles.css?v=3" />
+    <link rel="stylesheet" href="assets/styles.css?v=4" />
 
     <style>
       /* Page-specific layout refinements for the main dashboard */
@@ -1036,6 +1041,6 @@
       </section>
     </div>
 
-    <script defer src="assets/dashboard.js?v=3"></script>
+    <script defer src="assets/dashboard.js?v=4"></script>
   </body>
 </html>
