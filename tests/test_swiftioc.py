@@ -165,6 +165,97 @@ def test_urlhaus_parser(monkeypatch):
     assert out[0].indicator.startswith("hxxp://")  # defanged
 
 
+def test_spamhaus_drop_parser(monkeypatch):
+    payload = "; comment line\n1.2.3.0/24 ; SBL12345\n# hash comment\nnot-a-cidr\n5.6.7.0/16;SBL999\n"
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
+    out = si.fetch_spamhaus_drop("http://x", "ref", "spamhaus_drop", si.now_utc())
+    assert len(out) == 2
+    assert all(i.type == "ipv4_cidr" for i in out)
+    assert {i.indicator for i in out} == {"1.2.3.0/24", "5.6.7.0/16"}
+
+
+def test_openphish_parser(monkeypatch):
+    payload = "https://evil.example.com/phish\nnot-a-url\nhttp://also-evil.example.net/x\n\n"
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
+    out = si.fetch_openphish("http://x", "ref", "openphish_feed", si.now_utc())
+    assert len(out) == 2
+    assert all(i.type == "url" for i in out)
+    assert all(i.indicator.startswith("hxxp") for i in out)  # defanged
+
+
+def test_cins_army_parser(monkeypatch):
+    payload = "# header\n1.2.3.4\ngarbage-line\n5.6.7.8\n"
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
+    out = si.fetch_cins_army("http://x", "ref", "ci_army_list", si.now_utc())
+    assert len(out) == 2
+    assert all(i.type == "ipv4" and i.confidence == "low" for i in out)
+
+
+def test_tor_exit_parser(monkeypatch):
+    payload = "# header\n9.9.9.9\nnot-an-ip\n8.8.8.8\n"
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
+    out = si.fetch_tor_exit("http://x", "ref", "tor_exit_nodes", si.now_utc())
+    assert len(out) == 2
+    assert all("tor" in i.tags for i in out)
+
+
+def test_universal_parser_json(monkeypatch):
+    payload = json.dumps(
+        [
+            {"ip": "1.2.3.4", "first_seen": "2025-01-01T00:00:00Z", "tags": "malware,c2"},
+            {"ip": "not-an-indicator"},
+        ]
+    )
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
+    ws = si.now_utc().replace(year=2000)
+    out = si.fetch_universal("http://x", "ref", "universal_feed", ws)
+    values = {i.indicator for i in out}
+    assert "1[.]2[.]3[.]4" in values or "1.2.3.4" in values
+
+
+def test_universal_parser_plain_text_fallback(monkeypatch):
+    # Not valid JSON or CSV -> falls back to free-text indicator extraction.
+    payload = "Malicious activity seen from 203.0.113.9 and evil-example.org today."
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
+    ws = si.now_utc().replace(year=2000)
+    out = si.fetch_universal("http://x", "ref", "universal_feed", ws)
+    types = {i.type for i in out}
+    assert "ipv4" in types
+
+
+def test_rss_parser_extracts_iocs_from_entries(monkeypatch):
+    class FakeEntry:
+        title = "New malware campaign"
+        summary = "C2 server at 198.51.100.7 delivers payloads via evil-payload.example"
+        link = "https://blog.example.com/post"
+        published = "2025-06-01T00:00:00Z"
+        content = []
+
+    class FakeFeed:
+        bozo = 0
+        bozo_exception = None
+        entries = [FakeEntry()]
+        feed = type("F", (), {"updated": None})()
+
+    monkeypatch.setattr(si, "load_feedparser", lambda: type("M", (), {"parse": staticmethod(lambda *a, **k: FakeFeed())}))
+    ws = si.now_utc().replace(year=2000)
+    out = si.fetch_rss("http://blog.example.com/feed", "ref", "test_blog", ws)
+    assert out
+    types = {i.type for i in out}
+    assert "ipv4" in types
+    assert all(i.source == "test_blog" for i in out)
+
+
+def test_rss_parser_handles_parse_failure(monkeypatch):
+    def boom(*a, **k):
+        raise RuntimeError("network down")
+
+    monkeypatch.setattr(si, "load_feedparser", lambda: type("M", (), {"parse": staticmethod(boom)}))
+    ws = si.now_utc().replace(year=2000)
+    out = si.fetch_rss("http://x", "ref", "test_blog", ws)
+    assert out == []
+
+
 def test_kev_parser(monkeypatch):
     payload = json.dumps(
         {
@@ -466,6 +557,93 @@ def test_write_dashboard_feed_trims_and_ranks(tmp_path):
         "indicator", "type", "source", "first_seen", "last_seen",
         "confidence", "score", "tags",
     }
+
+
+def test_write_misp_feed_manifest_and_event(tmp_path):
+    ind = _sample_indicator(indicator="1.2.3.4", type="ipv4", source="a,b")
+    ind.score = 90
+    cve = _sample_indicator(indicator="CVE-2025-0001", type="cve")
+    cve.score = 80
+    ja3 = _sample_indicator(indicator="a" * 32, type="ja3")
+    ja3.score = 60
+
+    out_dir = tmp_path / "misp"
+    count = si.write_misp_feed(out_dir, [ind, cve, ja3], run_ts="2025-01-01T00:00:00Z")
+    assert count == 3
+
+    manifest = json.loads((out_dir / "manifest.json").read_text(encoding="utf-8"))
+    assert len(manifest) == 1
+    event_uuid = next(iter(manifest))
+    event = json.loads((out_dir / f"{event_uuid}.json").read_text(encoding="utf-8"))["Event"]
+    assert event["uuid"] == event_uuid
+    by_value = {a["value"]: a for a in event["Attribute"]}
+    assert by_value["1.2.3.4"]["type"] == "ip-dst"
+    assert by_value["1.2.3.4"]["to_ids"] is True
+    assert by_value["CVE-2025-0001"]["type"] == "vulnerability"
+    assert by_value["CVE-2025-0001"]["to_ids"] is False  # not an observable
+    assert by_value["a" * 32]["type"] == "ja3-fingerprint-md5"
+
+
+def test_write_misp_feed_event_uuid_stable_across_runs(tmp_path):
+    # Regression: a per-run-timestamp UUID would create a brand-new event
+    # file every collection and never clean up, growing the repo forever.
+    # The event UUID must stay fixed regardless of run_ts so each run
+    # overwrites the same event (matching "top IOCs only" retention).
+    ind = _sample_indicator(indicator="1.2.3.4", type="ipv4")
+    si.write_misp_feed(tmp_path / "a", [ind], run_ts="2025-01-01T00:00:00Z")
+    si.write_misp_feed(tmp_path / "b", [ind], run_ts="2026-06-15T12:30:00Z")
+    ma = json.loads((tmp_path / "a" / "manifest.json").read_text())
+    mb = json.loads((tmp_path / "b" / "manifest.json").read_text())
+    assert list(ma.keys()) == list(mb.keys())
+    event_files_a = {p.name for p in (tmp_path / "a").glob("*.json") if p.name != "manifest.json"}
+    event_files_b = {p.name for p in (tmp_path / "b").glob("*.json") if p.name != "manifest.json"}
+    assert event_files_a == event_files_b == {f"{next(iter(ma))}.json"}
+
+
+def test_write_rss_feed_valid_xml_and_ordering(tmp_path):
+    import xml.etree.ElementTree as ET
+
+    old = _sample_indicator(indicator="1.1.1.1", type="ipv4", first_seen="2020-01-01T00:00:00Z", last_seen="2020-01-01T00:00:00Z")
+    old.score = 50
+    new = _sample_indicator(indicator="2.2.2.2", type="ipv4", first_seen="2025-06-01T00:00:00Z", last_seen="2025-06-01T00:00:00Z")
+    new.score = 90
+
+    out = tmp_path / "feed.xml"
+    written = si.write_rss_feed(out, [old, new], site_url="https://example.com", limit=10)
+    assert written == 2
+
+    root = ET.fromstring(out.read_text(encoding="utf-8"))
+    items = root.findall("./channel/item")
+    assert len(items) == 2
+    # Newest last_seen first.
+    title_el = items[0].find("title")
+    assert title_el is not None and title_el.text is not None
+    assert "2.2.2.2" in title_el.text
+    assert "<" not in title_el.text.replace("&lt;", "")  # escaped, not raw
+
+
+def test_write_badge_json_shields_schema(tmp_path):
+    out = tmp_path / "badge.json"
+    si.write_badge_json(out, total=12345, generated="2025-01-01T00:00:00Z")
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert data["schemaVersion"] == 1
+    assert "12,345" in data["message"]
+
+
+def test_write_history_appends_and_caps(tmp_path):
+    path = tmp_path / "history.json"
+    for i in range(5):
+        si.write_history(path, {"ts": f"run-{i}", "total": i}, max_entries=3)
+    history = json.loads(path.read_text(encoding="utf-8"))
+    assert len(history) == 3
+    assert [h["total"] for h in history] == [2, 3, 4]  # oldest 2 dropped, order preserved
+
+
+def test_write_history_tolerates_corrupt_file(tmp_path):
+    path = tmp_path / "history.json"
+    path.write_text("not json", encoding="utf-8")
+    history = si.write_history(path, {"ts": "run-0", "total": 1})
+    assert history == [{"ts": "run-0", "total": 1}]
 
 
 def test_source_count():

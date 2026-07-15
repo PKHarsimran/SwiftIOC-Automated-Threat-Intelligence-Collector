@@ -26,6 +26,8 @@
   // Tiny JSON of full-feed aggregates (totals, score bands, per-source/type/
   // tag counts) written by the collector each run.
   const RUN_DIAG_URL = resolveIocUrl('diagnostics/run.json');
+  // Rolling per-run history (capped) for the trend sparkline.
+  const HISTORY_URL = resolveIocUrl('diagnostics/history.json');
 
   const DATASET_STORAGE_KEY = 'swiftioc-dashboard-cache-v2';
   const DATASET_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
@@ -87,6 +89,14 @@
   };
 
   const normaliseLower = (value) => normaliseString(value).toLowerCase();
+
+  // Undo defang_min() from the collector (hxxp[s]:// -> http[s]://, [.] -> .)
+  // so a user can paste either a defanged or a raw indicator into search.
+  const refang = (value) =>
+    normaliseString(value)
+      .replace(/hxxps:\/\//gi, 'https://')
+      .replace(/hxxp:\/\//gi, 'http://')
+      .replace(/\[\.\]/g, '.');
 
   const coalesceString = (...values) => {
     for (const v of values) {
@@ -2508,12 +2518,240 @@
   };
 
   /* ==========================================================================
+   *  IOC LOOKUP
+   * ========================================================================= */
+
+  // Two-stage search: first check the already-loaded compact dataset
+  // (instant), then — only if the user asks and it's not found — stream the
+  // full feed looking for an exact match, aborting the reader as soon as it
+  // hits. Keeps the common case free and the full download opt-in.
+  const initialiseIocLookup = () => {
+    const form = qs('[data-lookup-form]');
+    if (!form) return;
+
+    const input = qs('[data-lookup-input]', form);
+    const button = qs('[data-lookup-submit]', form);
+    const resultBox = qs('[data-lookup-result]');
+
+    const normaliseQuery = (value) => refang(normaliseString(value)).toLowerCase();
+
+    const renderResult = (state, row, checkedFull) => {
+      if (!resultBox) return;
+      resultBox.hidden = false;
+      resultBox.dataset.state = state;
+
+      if (state === 'found' && row) {
+        const sourceLabel = primarySourceLabel(row);
+        resultBox.innerHTML = '';
+        const scoreClass = confidenceClassFor(row.score ?? row.confidence);
+        const head = document.createElement('div');
+        head.className = 'lookup-hit';
+        head.innerHTML =
+          '<span class="lookup-hit-badge">⚠ In the feed</span>';
+        const score = document.createElement('span');
+        score.className = `lookup-hit-score ${scoreClass || ''}`;
+        score.textContent =
+          typeof row.score === 'number' ? `score ${row.score}` : row.confidence || '';
+        head.appendChild(score);
+        resultBox.appendChild(head);
+
+        const details = document.createElement('p');
+        details.className = 'lookup-details';
+        const parts = [
+          `type: ${row.type || 'unknown'}`,
+          `sources: ${sourceLabel}`,
+        ];
+        if (row.firstSeenDisplay) parts.push(`first seen: ${row.firstSeenDisplay}`);
+        details.textContent = parts.join(' · ');
+        resultBox.appendChild(details);
+        return;
+      }
+
+      if (state === 'loading') {
+        resultBox.textContent = 'Checking the top feed…';
+        return;
+      }
+      if (state === 'loading-full') {
+        resultBox.textContent =
+          'Not in the top feed — checking the full archive (this downloads the full feed once)…';
+        return;
+      }
+      if (state === 'not-found') {
+        resultBox.textContent = checkedFull
+          ? '✅ Not found in the full feed — no known reports.'
+          : '✅ Not in the current top feed.';
+        return;
+      }
+      if (state === 'error') {
+        resultBox.textContent = 'Could not complete the lookup. Try again shortly.';
+      }
+    };
+
+    const searchFullFeed = async (needle) => {
+      const response = await fetch(INDICATORS_JSONL_URL, {
+        headers: { Accept: 'application/jsonl, text/plain' },
+      });
+      if (!response.ok || !response.body || typeof response.body.getReader !== 'function') {
+        const text = await response.text();
+        for (const line of text.split(/\r?\n/)) {
+          const parsed = parseJsonSafely(line);
+          const normalised = parsed && normaliseRow(parsed);
+          if (normalised && normaliseQuery(normalised.indicator) === needle) return normalised;
+        }
+        return null;
+      }
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder('utf-8');
+      let buffer = '';
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          let idx;
+          while ((idx = buffer.indexOf('\n')) >= 0) {
+            const line = buffer.slice(0, idx).trim();
+            buffer = buffer.slice(idx + 1);
+            if (!line) continue;
+            const parsed = parseJsonSafely(line);
+            const normalised = parsed && normaliseRow(parsed);
+            if (normalised && normaliseQuery(normalised.indicator) === needle) {
+              reader.cancel().catch(() => {});
+              return normalised;
+            }
+          }
+        }
+      } finally {
+        try {
+          reader.releaseLock();
+        } catch (e) {
+          // already released via cancel()
+        }
+      }
+      return null;
+    };
+
+    const runLookup = async () => {
+      const needle = normaliseQuery(input?.value);
+      if (!needle) return;
+
+      if (button) button.disabled = true;
+      renderResult('loading');
+
+      try {
+        const { dataset } = await loadDataset({});
+        const hit = (dataset.entries || []).find(
+          (row) => normaliseQuery(row.indicator) === needle
+        );
+        if (hit) {
+          renderResult('found', hit, false);
+          return;
+        }
+
+        renderResult('loading-full');
+        const fullHit = await searchFullFeed(needle);
+        if (fullHit) {
+          renderResult('found', fullHit, true);
+        } else {
+          renderResult('not-found', null, true);
+        }
+      } catch (error) {
+        console.error('IOC lookup failed', error);
+        renderResult('error');
+      } finally {
+        if (button) button.disabled = false;
+      }
+    };
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      runLookup();
+    });
+  };
+
+  /* ==========================================================================
+   *  TREND SPARKLINE
+   * ========================================================================= */
+
+  const initialiseTrendSparkline = () => {
+    const container = qs('[data-trend-sparkline]');
+    if (!container) return;
+
+    fetch(HISTORY_URL, { headers: { Accept: 'application/json' } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((history) => {
+        if (!Array.isArray(history) || history.length < 2) {
+          container.hidden = true;
+          return;
+        }
+
+        const totals = history.map((h) => (typeof h.total === 'number' ? h.total : 0));
+        const min = Math.min(...totals);
+        const max = Math.max(...totals);
+        const range = max - min || 1;
+        const w = 280;
+        const h = 48;
+        const pad = 3;
+
+        const points = totals.map((value, i) => {
+          const x = totals.length > 1 ? (i / (totals.length - 1)) * (w - pad * 2) + pad : pad;
+          const y = h - pad - ((value - min) / range) * (h - pad * 2);
+          return `${x.toFixed(1)},${y.toFixed(1)}`;
+        });
+
+        const latest = history[history.length - 1];
+        const first = history[0];
+        const delta = (latest.total || 0) - (first.total || 0);
+        const trendLabel =
+          delta > 0 ? `▲ +${formatNumber(delta)}` : delta < 0 ? `▼ ${formatNumber(delta)}` : '— flat';
+
+        container.innerHTML = '';
+        container.hidden = false;
+
+        const svgNs = 'http://www.w3.org/2000/svg';
+        const svg = document.createElementNS(svgNs, 'svg');
+        svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+        svg.setAttribute('class', 'trend-svg');
+        svg.setAttribute('role', 'img');
+        svg.setAttribute('aria-label', `Total indicators trend over ${history.length} runs`);
+
+        const polyline = document.createElementNS(svgNs, 'polyline');
+        polyline.setAttribute('points', points.join(' '));
+        polyline.setAttribute('class', 'trend-line');
+        svg.appendChild(polyline);
+
+        if (points.length) {
+          const [lastX, lastY] = points[points.length - 1].split(',');
+          const dot = document.createElementNS(svgNs, 'circle');
+          dot.setAttribute('cx', lastX);
+          dot.setAttribute('cy', lastY);
+          dot.setAttribute('r', '2.5');
+          dot.setAttribute('class', 'trend-dot');
+          svg.appendChild(dot);
+        }
+
+        const label = document.createElement('span');
+        label.className = 'trend-label';
+        label.textContent = `${trendLabel} over ${history.length} runs`;
+
+        container.appendChild(svg);
+        container.appendChild(label);
+      })
+      .catch((error) => {
+        console.warn('Trend sparkline unavailable', error);
+        container.hidden = true;
+      });
+  };
+
+  /* ==========================================================================
    *  BOOTSTRAP
    * ========================================================================= */
 
   initialiseTableToggles();
   initialiseStatusBanner();
   initialiseTopThreats();
+  initialiseIocLookup();
+  initialiseTrendSparkline();
   loadStats();
   initialisePreview();
 })();
