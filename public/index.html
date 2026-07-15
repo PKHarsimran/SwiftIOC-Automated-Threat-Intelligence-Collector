@@ -34,7 +34,7 @@
       gtag('config', 'G-T7L8XCEG0S');
     </script>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/styles.css?v=4" />
+    <link rel="stylesheet" href="assets/styles.css?v=5" />
 
     <style>
       /* Page-specific layout refinements for the main dashboard */
@@ -608,6 +608,26 @@
             <span class="status-meta-value" data-site-window>—</span>
           </div>
         </div>
+        <div class="trend-sparkline" data-trend-sparkline hidden aria-label="Indicator count trend"></div>
+      </section>
+
+      <section class="ioc-lookup" aria-labelledby="ioc-lookup-heading">
+        <h2 id="ioc-lookup-heading" class="sr-only">Check an indicator</h2>
+        <form class="lookup-form" data-lookup-form role="search">
+          <input
+            type="text"
+            data-lookup-input
+            class="lookup-input"
+            placeholder="Check an IP, domain, URL, or hash against this feed…"
+            autocomplete="off"
+            spellcheck="false"
+            aria-label="Indicator to check"
+          />
+          <button type="submit" class="button-link primary" data-lookup-submit>
+            Check IOC
+          </button>
+        </form>
+        <p class="lookup-result" data-lookup-result hidden></p>
       </section>
 
       <section class="metrics-strip" aria-label="Top metrics">
@@ -1041,6 +1061,6 @@
       </section>
     </div>
 
-    <script defer src="assets/dashboard.js?v=4"></script>
+    <script defer src="assets/dashboard.js?v=5"></script>
   </body>
 </html>

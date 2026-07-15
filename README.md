@@ -3,6 +3,7 @@
 [![CI – SwiftIOC](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/ci.yml/badge.svg)](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/codeql.yml/badge.svg)](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/codeql.yml)
 [![Security Policy](https://img.shields.io/badge/security-SECURITY.md-informational)](./SECURITY.md)
+[![IOCs](https://img.shields.io/endpoint?url=https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/badge.json)](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/)
 
 SwiftIOC is an open-source Python threat intelligence automation toolkit that
 keeps recent Indicators of Compromise (IOCs) in machine-readable formats. The
@@ -77,6 +78,20 @@ high-fidelity IOCs from authoritative sources. The project emphasises:
   the published feed stays small, fresh, and high-signal (think *KEV catalogue,
   but for indicators*) instead of an unbounded dump. The scheduled workflow
   curates to the last 30 days and the top 10,000 indicators.
+- **MISP feed** – every run writes a MISP-compatible feed (`public/misp/` —
+  `manifest.json` + one event) that any MISP instance can subscribe to
+  directly (Sync Actions → Feeds → add by URL), no API key needed on either
+  side. The event UUID is stable across runs, so it updates in place instead
+  of accumulating a new event forever.
+- **RSS feed & status badge** – `public/feed.xml` lets people subscribe to the
+  newest high-confidence indicators instead of polling the dashboard.
+  `public/badge.json` is a shields.io endpoint badge showing live indicator
+  count — see the `IOCs` badge at the top of this README.
+- **Trend history & IOC lookup** – the dashboard renders a sparkline of feed
+  size over the last ~90 runs (`diagnostics/history.json`) and a search box to
+  check whether a specific IP/domain/URL/hash is currently in the feed
+  (instant against the top feed, falls back to a one-time full-feed scan if
+  not found there).
 - **Concurrent collection** – sources are fetched in parallel (configurable via
   `--max-workers`), so a full run completes in a fraction of the time of a
   sequential fetch without changing the deterministic output.
@@ -295,6 +310,9 @@ Run `python -m swiftioc --help` for the full list of switches. Highlights:
 | `--max-age-days N` | Retention: drop indicators whose `last_seen` is older than `N` days. |
 | `--max-store N` | Retention: keep only the top `N` indicators by score/recency (KEVIntel-style curation; keeps the stored feed small and high-signal). |
 | `--dashboard-rows N` | Rows in the compact `dashboard.jsonl` the web dashboard downloads (default `1000`, ~2–3% of the full feed's size). |
+| `--site-url URL` | Public site URL used as the RSS `<link>` (override for forks/custom domains). |
+| `--rss-limit N` | Number of items in `feed.xml` (default `50`). |
+| `--no-misp-feed` | Disable writing the MISP feed directory. |
 | `--urlhaus-status {any,online,offline}` | Filter URLhaus indicators by status. |
 | `--source-window name=N` | Override the lookback window for specific sources. |
 | `--grace-on-404 name…` | Treat HTTP 404 for listed sources as a non-fatal empty result. |
@@ -317,6 +335,8 @@ The collector populates the following structure (paths relative to `--out-dir`):
 ```
 public/
 ├── index.md
+├── feed.xml                   # RSS: newest high-confidence indicators
+├── badge.json                 # shields.io endpoint badge (live IOC count)
 ├── iocs/
 │   ├── latest.csv
 │   ├── latest.tsv
@@ -326,12 +346,16 @@ public/
 │   ├── high_confidence.jsonl  # same, machine-readable
 │   ├── dashboard.jsonl        # compact top-N feed the web dashboard loads
 │   └── stix2.json
+├── misp/
+│   ├── manifest.json          # MISP feed manifest (add by URL in MISP)
+│   └── <event-uuid>.json      # single stable event, updated in place
 ├── changelog/
 │   └── CHANGELOG.md
 └── diagnostics/
     ├── REPORT.md
     ├── run.json
     ├── summary.md
+    ├── history.json           # rolling per-run stats (dashboard sparkline)
     └── raw/                 # present when --save-raw-dir is used
 ```
 

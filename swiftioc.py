@@ -1793,6 +1793,174 @@ def write_stix(path: Path, rows: List[Indicator]) -> None:
         json.dump(bundle, f, ensure_ascii=False, indent=2)
 
 
+# ---------------- MISP feed ----------------
+# MISP attribute type per our indicator type. See
+# https://www.misp-project.org/datamodels/#attribute-types. CIDRs use the
+# same ip-src/ip-dst types (MISP accepts CIDR notation in the value).
+MISP_ATTRIBUTE_TYPES = {
+    "ipv4": "ip-dst",
+    "ipv4_cidr": "ip-dst",
+    "ipv6": "ip-dst",
+    "ipv6_cidr": "ip-dst",
+    "domain": "domain",
+    "url": "url",
+    "md5": "md5",
+    "sha1": "sha1",
+    "sha256": "sha256",
+    "sha512": "sha512",
+    "email": "email-src",
+    "cve": "vulnerability",
+    "btc_address": "btc",
+    "ja3": "ja3-fingerprint-md5",
+    "ja3s": "ja3-fingerprint-md5",
+}
+
+
+def write_misp_feed(out_dir: Path, rows: List[Indicator], *, run_ts: str) -> int:
+    """Write a MISP-compatible feed: manifest.json + one event JSON.
+
+    This is the "MISP feed" format (Sync > Feeds > add a feed with this URL),
+    not the full MISP API — no server or API key needed on either side. A
+    single, stable event (fixed UUID, overwritten every run) represents the
+    feed's *current* state — matching the "top IOCs only" retention model.
+    A per-run UUID would create a new event file on every collection and
+    never clean up, growing the repo unboundedly.
+    """
+    out_dir.mkdir(parents=True, exist_ok=True)
+    event_uuid = str(uuid.uuid5(STIX_NAMESPACE, "misp-event:swiftioc-current"))
+    attributes = []
+    for r in rows:
+        misp_type = MISP_ATTRIBUTE_TYPES.get(r.type)
+        if not misp_type:
+            continue
+        value = refang(r.indicator) if r.type in {"ipv4", "ipv6", "ipv4_cidr", "ipv6_cidr", "domain", "url"} else r.indicator
+        attributes.append(
+            {
+                "uuid": str(uuid.uuid5(STIX_NAMESPACE, f"misp-attr:{r.type}:{r.indicator}")),
+                "type": misp_type,
+                "category": "External analysis" if r.type == "cve" else "Network activity" if misp_type in {"ip-dst", "domain", "url"} else "Payload delivery",
+                "value": value,
+                "to_ids": misp_type != "vulnerability",
+                "timestamp": str(int((parse_dt(r.last_seen) or now_utc()).timestamp())),
+                "comment": f"score={r.score} source={r.source}",
+                "Tag": [{"name": t} for t in r.tags.split(",") if t][:10],
+            }
+        )
+    event = {
+        "Event": {
+            "uuid": event_uuid,
+            "info": f"SwiftIOC feed — {run_ts}",
+            "date": run_ts[:10],
+            "threat_level_id": "2",
+            "analysis": "2",
+            "distribution": "3",
+            "publish_timestamp": str(int(now_utc().timestamp())),
+            "Orgc": {"name": "SwiftIOC"},
+            "Attribute": attributes,
+        }
+    }
+    (out_dir / f"{event_uuid}.json").write_text(
+        json.dumps(event, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+    manifest = {
+        event_uuid: {
+            "Orgc": {"name": "SwiftIOC"},
+            "Tag": [],
+            "info": event["Event"]["info"],
+            "date": event["Event"]["date"],
+            "analysis": "2",
+            "threat_level_id": "2",
+            "publish_timestamp": event["Event"]["publish_timestamp"],
+        }
+    }
+    (out_dir / "manifest.json").write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+    return len(attributes)
+
+
+# ---------------- RSS / badge / trend outputs ----------------
+def _xml_escape(text: str) -> str:
+    return (
+        text.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+    )
+
+
+def write_rss_feed(path: Path, rows: List[Indicator], *, site_url: str, limit: int = 50) -> int:
+    """Write an RSS 2.0 feed of the newest high-confidence indicators.
+
+    Lets people subscribe to "what's new" instead of polling the dashboard,
+    and gives feed aggregators (threatfeeds.io-style directories) something
+    to index.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    ranked = sorted(rows, key=lambda r: (r.last_seen, r.score), reverse=True)[:limit]
+    now_rfc822 = now_utc().strftime("%a, %d %b %Y %H:%M:%S +0000")
+    items = []
+    for r in ranked:
+        pub = parse_dt(r.first_seen) or now_utc()
+        title = _xml_escape(f"[{r.score}] {r.type}: {r.indicator}")
+        sources = ", ".join(sorted(set(s for s in r.source.split(",") if s)))
+        desc = _xml_escape(f"Score {r.score}, confidence {r.confidence}, sources: {sources}, tags: {r.tags}")
+        guid = uuid.uuid5(STIX_NAMESPACE, f"rss:{r.type}:{r.indicator}")
+        items.append(
+            "    <item>\n"
+            f"      <title>{title}</title>\n"
+            f"      <description>{desc}</description>\n"
+            f"      <guid isPermaLink=\"false\">{guid}</guid>\n"
+            f"      <pubDate>{pub.strftime('%a, %d %b %Y %H:%M:%S +0000')}</pubDate>\n"
+            "    </item>"
+        )
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<rss version="2.0"><channel>\n'
+        "  <title>SwiftIOC — Newest High-Confidence IOCs</title>\n"
+        f"  <link>{_xml_escape(site_url)}</link>\n"
+        "  <description>Freshest scored, cross-source-corroborated indicators of compromise.</description>\n"
+        f"  <lastBuildDate>{now_rfc822}</lastBuildDate>\n"
+        + "\n".join(items)
+        + "\n</channel></rss>\n"
+    )
+    path.write_text(xml, encoding="utf-8")
+    return len(ranked)
+
+
+def write_badge_json(path: Path, *, total: int, generated: str) -> None:
+    """Write a shields.io endpoint-badge JSON: ![IOCs](.../badge.json)."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "schemaVersion": 1,
+        "label": "IOCs",
+        "message": f"{total:,} · updated {generated}",
+        "color": "blue",
+    }
+    path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+
+
+def write_history(path: Path, entry: Dict[str, Any], *, max_entries: int = 90) -> List[Dict[str, Any]]:
+    """Append one run's summary stats to a capped rolling history.
+
+    Powers the dashboard trend sparkline. Tolerant of a missing/corrupt file
+    (starts fresh) so it never blocks a run.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    history: List[Dict[str, Any]] = []
+    if path.exists():
+        try:
+            loaded = json.loads(path.read_text(encoding="utf-8"))
+            if isinstance(loaded, list):
+                history = [e for e in loaded if isinstance(e, dict)]
+        except json.JSONDecodeError:
+            history = []
+    history.append(entry)
+    history = history[-max_entries:]
+    path.write_text(json.dumps(history, ensure_ascii=False), encoding="utf-8")
+    return history
+
+
 def write_changelog(path: Path, counts: Dict[str, int], total: int, *, max_entries: int = 50) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     ts = iso(now_utc())
@@ -1909,6 +2077,12 @@ def main() -> int:
                     help="Retention: keep only the top N indicators by score/recency (KEVIntel-style curation)")
     ap.add_argument("--dashboard-rows", type=int, default=1000,
                     help="Rows in the compact dashboard.jsonl the web dashboard downloads (default 1000)")
+    ap.add_argument("--site-url", type=str,
+                    default="https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector",
+                    help="Public site URL used as the <link> in the RSS feed (override for forks/custom domains)")
+    ap.add_argument("--rss-limit", type=int, default=50, help="Number of items in feed.xml (default 50)")
+    ap.add_argument("--no-misp-feed", dest="misp_feed", action="store_false", help="Disable writing the MISP feed directory")
+    ap.set_defaults(misp_feed=True)
     ap.add_argument("--high-confidence-score", type=int, default=80,
                     help="Score at/above which an indicator enters the curated high_confidence feed (default 80)")
     ap.add_argument("--urlhaus-status", choices=["any", "online", "offline"], default="any")
@@ -2062,10 +2236,32 @@ def main() -> int:
     )
     logger.info("Dashboard feed: top %d rows written", dashboard_written)
 
+    run_ts = iso(now_utc())
+
+    if args.misp_feed:
+        misp_count = write_misp_feed(out_dir / "misp", high_conf, run_ts=run_ts)
+        logger.info("MISP feed: %d attributes in %s/misp", misp_count, out_dir)
+
+    rss_written = write_rss_feed(
+        out_dir / "feed.xml", rows, site_url=args.site_url, limit=args.rss_limit
+    )
+    logger.info("RSS feed: %d items written", rss_written)
+
+    write_badge_json(out_dir / "badge.json", total=len(rows), generated=run_ts)
+
+    write_history(
+        out_dir / "diagnostics" / "history.json",
+        {
+            "ts": run_ts,
+            "total": len(rows),
+            "high_confidence": len(high_conf),
+            "score_avg": round(sum(r.score for r in rows) / len(rows), 1) if rows else None,
+        },
+    )
+
     write_changelog(out_dir / "changelog" / "CHANGELOG.md", counts, total=len(rows))
 
     # diagnostics / summary
-    run_ts = iso(now_utc())
     type_totals = type_breakdown(rows)
     first_seen_dates: List[datetime] = []
     for r in rows:
