@@ -31,532 +31,17 @@
       }
       gtag('js', new Date());
 
-      gtag('config', 'G-T7L8XCEG0S');
+      // Shared IOC/search state lives in the fragment so it is not sent to the
+      // server. Strip that fragment from analytics as well.
+      gtag('config', 'G-T7L8XCEG0S', {
+        page_location: `${window.location.origin}${window.location.pathname}${window.location.search}`,
+      });
     </script>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/styles.css?v=5" />
-
-    <style>
-      /* Page-specific layout refinements for the main dashboard */
-
-      .page-wrapper {
-        min-height: 100vh;
-        padding: 1.25rem 1.5rem 2.25rem;
-        max-width: 1320px;
-      }
-
-      .page-header {
-        padding-inline: 0.1rem;
-        margin-bottom: 0.75rem;
-      }
-
-      .page-header-main {
-        gap: 0.75rem;
-      }
-
-      .page-header h1 {
-        margin-bottom: 0.2rem;
-      }
-
-      .page-header-subtitle {
-        max-width: 36rem;
-      }
-
-      .status-banner {
-        margin-bottom: 0.9rem;
-      }
-
-      .metrics-strip {
-        margin-bottom: 1rem;
-      }
-
-      .dashboard-main {
-        display: grid;
-        grid-template-columns: minmax(0, 1.75fr) minmax(0, 1.1fr);
-        gap: 0.9rem;
-        align-items: stretch;
-      }
-
-      .dashboard-main .panel {
-        height: 100%;
-      }
-
-      .panel-body.preview-panel {
-        display: flex;
-        flex-direction: column;
-        gap: 0.65rem;
-      }
-
-      .preview-toolbar {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.55rem;
-        align-items: center;
-        justify-content: space-between;
-      }
-
-      .preview-toolbar .toolbar-controls {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.55rem;
-        align-items: center;
-      }
-
-      .preview-toolbar .toolbar-group {
-        min-width: 8.5rem;
-      }
-
-      .preview-toolbar .toolbar-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.45rem;
-        align-items: center;
-      }
-
-      .preview-toolbar input[type='search'] {
-        min-width: 11.5rem;
-      }
-
-      .preview-table-wrapper {
-        flex: 1;
-        min-height: 0;
-        border-radius: 0.7rem;
-        border: 1px solid var(--border-soft);
-        background: rgba(15, 23, 42, 0.96);
-        overflow: auto;
-        max-height: 60vh; /* scales with viewport height */
-      }
-
-      .preview-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 0.72rem;
-        transition: background 0.15s ease;
-      }
-
-      .preview-table th,
-      .preview-table td {
-        padding: 0.35rem 0.55rem;
-      }
-
-      .preview-table thead th {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-      }
-
-      .preview-indicator {
-        display: flex;
-        align-items: center;
-        gap: 0.4rem;
-      }
-
-      .preview-indicator-main {
-        flex: 1;
-        min-width: 0;
-      }
-
-      .preview-indicator-main code {
-        font-size: 0.7rem;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        display: block;
-        max-width: 100%;
-      }
-
-      .preview-indicator-meta {
-        display: none;
-        align-items: center;
-        gap: 0.35rem;
-        flex-wrap: wrap;
-        margin-top: 0.1rem;
-      }
-
-      .preview-meta-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.28rem;
-        font-size: 0.62rem;
-        letter-spacing: 0.01em;
-        padding: 0.12rem 0.38rem;
-        border-radius: 999px;
-        border: 1px solid rgba(148, 163, 184, 0.28);
-        background: rgba(148, 163, 184, 0.12);
-        color: var(--text-soft);
-      }
-
-      .preview-meta-pill.meta-type {
-        background: rgba(59, 130, 246, 0.14);
-        border-color: rgba(59, 130, 246, 0.35);
-        color: #dbeafe;
-      }
-
-      .preview-meta-pill.meta-source {
-        background: rgba(34, 197, 94, 0.12);
-        border-color: rgba(34, 197, 94, 0.3);
-        color: #dcfce7;
-      }
-
-      .preview-meta-pill.meta-confidence {
-        background: rgba(234, 179, 8, 0.12);
-        border-color: rgba(234, 179, 8, 0.3);
-        color: #fef9c3;
-      }
-
-      .preview-meta-pill.meta-corroborated {
-        background: rgba(239, 68, 68, 0.14);
-        border-color: rgba(239, 68, 68, 0.4);
-        color: #fecaca;
-        font-weight: 600;
-      }
-
-      .preview-indicator-tags {
-        display: inline-flex;
-        flex-wrap: wrap;
-        gap: 0.2rem;
-        margin-top: 0.1rem;
-      }
-
-      .preview-indicator-tags span {
-        font-size: 0.6rem;
-        padding: 0.04rem 0.3rem;
-        border-radius: 999px;
-        background: rgba(37, 99, 235, 0.12);
-        color: var(--accent-soft);
-      }
-
-      .preview-indicator-copy {
-        flex-shrink: 0;
-      }
-
-      .preview-indicator-copy button {
-        font-size: 0.65rem;
-        padding: 0.2rem 0.55rem;
-      }
-
-      .preview-summary {
-        font-size: 0.7rem;
-        color: var(--text-soft);
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.35rem 0.75rem;
-        align-items: center;
-        justify-content: space-between;
-      }
-
-      .preview-summary-main {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.35rem 0.75rem;
-        align-items: baseline;
-      }
-
-      .preview-summary-figure {
-        font-weight: 600;
-        color: var(--text-strong);
-      }
-
-      .preview-summary-pill {
-        padding: 0.1rem 0.38rem;
-        border-radius: 999px;
-        background: rgba(148, 163, 184, 0.14);
-        border: 1px solid rgba(148, 163, 184, 0.24);
-      }
-
-      .preview-summary-high {
-        color: var(--accent-soft);
-      }
-
-      .preview-summary-tag {
-        color: var(--accent-soft);
-      }
-
-      .preview-status {
-        font-size: 0.7rem;
-        color: var(--text-soft);
-        margin-top: 0.25rem;
-      }
-
-      .preview-status[data-status='error'] {
-        color: var(--danger-soft);
-      }
-
-      .preview-status[data-status='empty'] {
-        color: var(--warning-soft);
-      }
-
-      .preview-status[data-status='loading'] {
-        color: var(--accent-soft);
-      }
-
-      .summary-tables {
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-      }
-
-      .summary-tables .panel-body {
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-      }
-
-      .summary-tables .table-card {
-        max-height: 18.5rem;
-        overflow: auto;
-      }
-
-      .table-card-actions {
-        margin-top: 0.35rem;
-        display: none;
-        flex-direction: column;
-        gap: 0.35rem;
-      }
-
-      .table-card-actions .button {
-        width: 100%;
-        justify-content: center;
-      }
-
-      .table-card-hint {
-        margin: 0;
-        font-size: 0.68rem;
-        color: var(--text-soft);
-      }
-
-      .exports-grid {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-      }
-
-      .exports-grid a.button-link {
-        flex: 1 1 8rem;
-        justify-content: center;
-      }
-
-      .exports-grid a.button-link.exports-highlight {
-        flex-basis: 12rem;
-        background: rgba(239, 68, 68, 0.14);
-        border-color: rgba(239, 68, 68, 0.4);
-        color: #fecaca;
-        font-weight: 600;
-      }
-
-      .exports-grid a.button-link.exports-highlight:hover {
-        background: rgba(239, 68, 68, 0.22);
-      }
-
-      @media (max-width: 1100px) {
-        .dashboard-main {
-          grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.1fr);
-        }
-      }
-
-      @media (max-width: 820px) {
-        .top-nav {
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 0.6rem;
-          position: sticky;
-          top: 0.6rem;
-        }
-
-        .nav-links {
-          width: 100%;
-          justify-content: flex-start;
-          gap: 0.35rem;
-          overflow-x: auto;
-          padding-bottom: 0.2rem;
-        }
-
-        .nav-links a {
-          padding: 0.3rem 0.6rem;
-          border-radius: 999px;
-          border: 1px solid rgba(148, 163, 184, 0.3);
-        }
-      }
-
-      @media (max-width: 900px) {
-        .dashboard-main {
-          grid-template-columns: minmax(0, 1fr);
-        }
-
-        .summary-tables .table-card {
-          max-height: none;
-        }
-      }
-
-      @media (max-width: 760px) {
-        .dashboard-main {
-          gap: 0.75rem;
-        }
-
-        .preview-summary {
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 0.4rem;
-        }
-
-        .preview-summary-meta {
-          display: grid;
-          width: 100%;
-          gap: 0.35rem;
-        }
-
-        .preview-table-wrapper {
-          max-height: none;
-        }
-
-        .preview-table {
-          display: block;
-        }
-
-        .preview-table thead {
-          display: none;
-        }
-
-        .preview-table tbody {
-          display: grid;
-          gap: 0.65rem;
-        }
-
-        .preview-table tr {
-          display: grid;
-          gap: 0.4rem;
-          padding: 0.65rem 0.7rem;
-          border-radius: 0.9rem;
-          border: 1px solid var(--border-soft);
-          box-shadow: 0 14px 30px rgba(15, 23, 42, 0.65);
-          background: rgba(15, 23, 42, 0.98);
-        }
-
-        .preview-table tr:nth-child(2n) td,
-        .preview-table tr:hover td {
-          background: transparent;
-        }
-
-        .preview-indicator {
-          align-items: flex-start;
-          gap: 0.55rem;
-        }
-
-        .preview-indicator-meta {
-          display: flex;
-          width: 100%;
-        }
-
-        .preview-indicator-main code {
-          white-space: normal;
-          word-break: break-word;
-        }
-
-        .preview-indicator-copy button {
-          width: 100%;
-          justify-content: center;
-        }
-
-        .preview-table td {
-          display: grid;
-          grid-template-columns: minmax(5rem, 6rem) minmax(0, 1fr);
-          align-items: baseline;
-          gap: 0.35rem;
-          padding: 0;
-          border: none;
-        }
-
-        .preview-table td[data-title]::before {
-          display: block;
-          font-weight: 600;
-          color: var(--text-soft);
-          letter-spacing: 0.01em;
-        }
-
-        td.numeric {
-          text-align: left;
-        }
-      }
-
-      @media (max-width: 640px) {
-        .page-wrapper {
-          padding-inline: 0.9rem;
-        }
-
-        .page-header {
-          padding-inline: 0;
-        }
-
-        .page-header-main {
-          flex-direction: column;
-          align-items: flex-start;
-        }
-
-        .preview-toolbar {
-          flex-direction: column;
-          align-items: stretch;
-          gap: 0.4rem;
-        }
-
-        .preview-toolbar .toolbar-controls {
-          width: 100%;
-        }
-
-        .preview-toolbar .toolbar-group {
-          flex: 1;
-        }
-
-        .preview-toolbar .toolbar-actions {
-          width: 100%;
-        }
-
-        .preview-toolbar input[type='search'] {
-          flex: 1;
-          min-width: 0;
-        }
-
-        .preview-table-wrapper {
-          max-height: 65vh;
-        }
-      }
-
-      @media (max-width: 540px) {
-        .metrics-strip {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-
-        .metrics-strip .metric-card:nth-child(3),
-        .metrics-strip .metric-card:nth-child(4) {
-          grid-column: span 1;
-        }
-
-        .summary-tables .table-card {
-          max-height: none;
-        }
-      }
-
-      @media (max-width: 480px) {
-        .page-wrapper {
-          padding-inline: 0.75rem;
-        }
-
-        .metrics-strip {
-          grid-template-columns: 1fr;
-        }
-
-        .panel-header {
-          align-items: flex-start;
-          gap: 0.6rem;
-        }
-
-        .panel-header-link {
-          width: 100%;
-          justify-content: center;
-        }
-      }
-    </style>
+    <link rel="stylesheet" href="assets/styles.css?v=6" />
   </head>
   <body data-ioc-root=".">
+    <a class="skip-link" href="#live-preview">Skip to IOC results</a>
     <div class="page-wrapper">
       <nav class="top-nav" aria-label="SwiftIOC navigation">
         <a class="brand" href="index.html">
@@ -564,7 +49,8 @@
           <span class="brand-tagline">Threat Intelligence</span>
         </a>
         <div class="nav-links">
-          <a href="#live-preview">Live snapshot</a>
+          <a href="#ioc-lookup">Check an IOC</a>
+          <a href="#live-preview">Browse feed</a>
           <a href="#sources">Sources</a>
           <a href="#indicator-types">Types</a>
           <a href="#tags">Tags</a>
@@ -572,62 +58,108 @@
         </div>
       </nav>
 
+      <main id="main-content">
       <header class="page-header">
         <div class="page-header-main">
           <div>
-            <h1 class="section-title">SwiftIOC IOC Snapshot</h1>
+            <p class="eyebrow">Open-source · refreshed every four hours</p>
+            <h1 class="section-title">Threat intelligence you can act on</h1>
             <p class="page-header-subtitle">
-              Scored, cross-source-corroborated, self-refreshing threat
-              indicators — ranked so the most dangerous, most-confirmed IOCs
-              surface first.
+              Search, investigate, and export scored indicators from independent
+              threat feeds. Freshness and corroboration are built into every score.
             </p>
           </div>
+          <a
+            class="hero-download"
+            href="iocs/high_confidence.csv"
+            data-download-fallback="iocs/latest.csv"
+            data-fallback-title="Download complete feed"
+            data-fallback-caption="CSV · current snapshot"
+            download
+          >
+            <span>Download block-ready feed</span>
+            <small>High-confidence CSV</small>
+          </a>
         </div>
       </header>
+
+      <section id="ioc-lookup" class="ioc-lookup" aria-labelledby="ioc-lookup-heading">
+        <div class="lookup-heading">
+          <div>
+            <p class="eyebrow">Instant IOC lookup</p>
+            <h2 id="ioc-lookup-heading">Check an indicator</h2>
+          </div>
+          <p id="ioc-lookup-help">Raw and defanged IPs, domains, URLs, hashes, and CVEs are supported.</p>
+        </div>
+        <form class="lookup-form" data-lookup-form role="search">
+          <label class="sr-only" for="ioc-lookup-input">Indicator to check</label>
+          <input
+            id="ioc-lookup-input"
+            type="search"
+            data-lookup-input
+            class="lookup-input"
+            placeholder="Paste an IP, domain, URL, hash, or CVE…"
+            autocomplete="off"
+            autocapitalize="none"
+            spellcheck="false"
+            aria-describedby="ioc-lookup-help"
+          />
+          <button type="submit" class="button-link primary" data-lookup-submit>
+            Search feed
+          </button>
+        </form>
+        <div
+          class="lookup-result"
+          data-lookup-result
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          hidden
+        ></div>
+      </section>
 
       <section
         class="status-banner"
         data-site-status-root
+        data-state="loading"
         aria-label="Collection status"
       >
         <div class="status-badge" data-site-status-badge>
-          <span class="status-dot"></span>
-          <span class="status-label" data-site-status-label>Checking feed…</span>
+          <span class="status-dot" aria-hidden="true"></span>
+          <span
+            class="status-label"
+            data-site-status-label
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+          >Checking feed…</span>
         </div>
-        <div class="status-meta">
+        <dl class="status-meta">
           <div>
-            <span class="status-meta-label">Generated:</span>
-            <span class="status-meta-value" data-site-generated>—</span>
+            <dt>Last collected</dt>
+            <dd data-site-generated>—</dd>
           </div>
           <div>
-            <span class="status-meta-label">Updated:</span>
-            <span class="status-meta-value" data-site-updated>—</span>
+            <dt>Newest sighting</dt>
+            <dd data-site-updated>—</dd>
           </div>
           <div>
-            <span class="status-meta-label">Window:</span>
-            <span class="status-meta-value" data-site-window>—</span>
+            <dt>Source health</dt>
+            <dd data-site-sources>—</dd>
           </div>
-        </div>
-        <div class="trend-sparkline" data-trend-sparkline hidden aria-label="Indicator count trend"></div>
-      </section>
-
-      <section class="ioc-lookup" aria-labelledby="ioc-lookup-heading">
-        <h2 id="ioc-lookup-heading" class="sr-only">Check an indicator</h2>
-        <form class="lookup-form" data-lookup-form role="search">
-          <input
-            type="text"
-            data-lookup-input
-            class="lookup-input"
-            placeholder="Check an IP, domain, URL, or hash against this feed…"
-            autocomplete="off"
-            spellcheck="false"
-            aria-label="Indicator to check"
-          />
-          <button type="submit" class="button-link primary" data-lookup-submit>
-            Check IOC
-          </button>
-        </form>
-        <p class="lookup-result" data-lookup-result hidden></p>
+          <div>
+            <dt>Collection window</dt>
+            <dd data-site-window>—</dd>
+          </div>
+        </dl>
+        <div
+          class="trend-sparkline"
+          data-trend-sparkline
+          hidden
+          role="img"
+          aria-label="Indicator count trend"
+        ></div>
+        <a class="status-details" href="diagnostics/summary.html">View diagnostics</a>
       </section>
 
       <section class="metrics-strip" aria-label="Top metrics">
@@ -678,22 +210,7 @@
           aria-label="Proportion of indicators by score band"></div>
       </section>
 
-      <section
-        class="top-threats"
-        data-top-threats-section
-        hidden
-        aria-labelledby="top-threats-heading"
-      >
-        <div class="section-heading">
-          <h2 id="top-threats-heading" class="panel-title">🔥 Top threats right now</h2>
-          <p class="panel-subtitle">
-            The highest-scoring, most cross-source-confirmed indicators from the latest run.
-          </p>
-        </div>
-        <div class="top-threats-grid" data-top-threats></div>
-      </section>
-
-      <main class="dashboard-main">
+      <div class="dashboard-main">
         <section
           id="live-preview"
           class="panel"
@@ -722,31 +239,54 @@
             class="panel-body preview-panel"
             data-preview-container
             role="region"
-            aria-live="polite"
+            aria-labelledby="live-preview-heading"
             aria-busy="false"
           >
             <div class="preview-toolbar">
+              <div class="toolbar-search">
+                <label for="preview-search">Search this feed</label>
+                <input
+                  id="preview-search"
+                  type="search"
+                  inputmode="search"
+                  placeholder="Indicator, source, or tag…"
+                  data-preview-search
+                  autocomplete="off"
+                />
+              </div>
               <div class="toolbar-controls">
-                <label class="toolbar-group" for="preview-filter">
-                  <span>Type</span>
-                  <select id="preview-filter" data-preview-filter disabled>
-                    <option value="all">All types</option>
-                  </select>
-                </label>
+                <details class="facet-menu" data-facet-menu="types">
+                  <summary>
+                    <span>Type</span>
+                    <strong data-facet-summary="types">All types</strong>
+                  </summary>
+                  <fieldset data-facet-options="types" disabled>
+                    <legend class="sr-only">Filter by one or more IOC types</legend>
+                  </fieldset>
+                </details>
 
-                <label class="toolbar-group" for="preview-tag-filter">
-                  <span>Tag</span>
-                  <select
-                    id="preview-tag-filter"
-                    data-preview-tag-filter
-                    disabled
-                  >
-                    <option value="all">All tags</option>
-                  </select>
-                </label>
+                <details class="facet-menu" data-facet-menu="sources">
+                  <summary>
+                    <span>Source</span>
+                    <strong data-facet-summary="sources">All sources</strong>
+                  </summary>
+                  <fieldset data-facet-options="sources" disabled>
+                    <legend class="sr-only">Filter by one or more sources</legend>
+                  </fieldset>
+                </details>
+
+                <details class="facet-menu" data-facet-menu="tags">
+                  <summary>
+                    <span>Tag</span>
+                    <strong data-facet-summary="tags">All tags</strong>
+                  </summary>
+                  <fieldset data-facet-options="tags" disabled>
+                    <legend class="sr-only">Filter by one or more tags</legend>
+                  </fieldset>
+                </details>
 
                 <label class="toolbar-group" for="preview-highlight">
-                  <span>Show</span>
+                  <span>Signal</span>
                   <select
                     id="preview-highlight"
                     data-preview-highlight
@@ -755,9 +295,38 @@
                     <option value="all">Everything</option>
                     <option value="high">High score (≥80)</option>
                     <option value="corroborated">Corroborated (2+ sources)</option>
-                    <option value="new">New (last 48h)</option>
+                    <option value="new">New (first seen in 48h)</option>
                   </select>
                 </label>
+
+                <details class="facet-menu" data-facet-menu="scoreBands">
+                  <summary>
+                    <span>Score band</span>
+                    <strong data-facet-summary="scoreBands">Any score</strong>
+                  </summary>
+                  <fieldset data-facet-options="scoreBands" disabled>
+                    <legend class="sr-only">Filter by one or more score bands</legend>
+                    <label><input type="checkbox" value="high" /> High · 80–100</label>
+                    <label><input type="checkbox" value="elevated" /> Elevated · 60–79</label>
+                    <label><input type="checkbox" value="moderate" /> Moderate · 40–59</label>
+                    <label><input type="checkbox" value="aging" /> Aging · below 40</label>
+                  </fieldset>
+                </details>
+
+                <details class="facet-menu" data-facet-menu="ageBands">
+                  <summary>
+                    <span>Last seen</span>
+                    <strong data-facet-summary="ageBands">Any time</strong>
+                  </summary>
+                  <fieldset data-facet-options="ageBands" disabled>
+                    <legend class="sr-only">Filter by one or more age ranges</legend>
+                    <label><input type="checkbox" value="day" /> Last 24 hours</label>
+                    <label><input type="checkbox" value="week" /> 1–7 days ago</label>
+                    <label><input type="checkbox" value="month" /> 8–30 days ago</label>
+                    <label><input type="checkbox" value="older" /> More than 30 days</label>
+                    <label><input type="checkbox" value="unknown" /> Unknown age</label>
+                  </fieldset>
+                </details>
 
                 <label class="toolbar-group" for="preview-limit">
                   <span>Rows</span>
@@ -768,37 +337,62 @@
                     <option value="100">100</option>
                   </select>
                 </label>
-              </div>
-
-              <div class="toolbar-actions">
-                <label class="toolbar-group" for="preview-search">
-                  <span class="sr-only">Search indicators</span>
-                  <input
-                    id="preview-search"
-                    type="search"
-                    inputmode="search"
-                    placeholder="Search indicator, source, or tag…"
-                    data-preview-search
-                    autocomplete="off"
-                  />
+                <label class="toolbar-group mobile-sort" for="preview-sort-select">
+                  <span>Sort</span>
+                  <select id="preview-sort-select" data-preview-sort-select disabled>
+                    <option value="score:desc">Highest score</option>
+                    <option value="lastSeen:desc">Newest sighting</option>
+                    <option value="sources:desc">Most sources</option>
+                    <option value="indicator:asc">Indicator A–Z</option>
+                  </select>
                 </label>
+                <button
+                  type="button"
+                  class="button ghost clear-filters"
+                  data-preview-clear
+                  disabled
+                >
+                  Clear filters <span data-preview-filter-count hidden></span>
+                </button>
+                <button
+                  type="button"
+                  class="button ghost"
+                  data-preview-share
+                  disabled
+                >
+                  Share view
+                </button>
               </div>
             </div>
 
             <div class="preview-table-wrapper">
+              <div class="preview-state" data-preview-state data-state="loading">
+                <div class="preview-skeleton" aria-hidden="true">
+                  <span></span><span></span><span></span><span></span>
+                </div>
+                <p data-preview-state-message>Loading the latest indicators…</p>
+                <div class="preview-state-actions" data-preview-state-actions hidden>
+                  <button type="button" class="button primary" data-preview-retry>Retry</button>
+                  <a class="button ghost" href="iocs/latest.csv" download>Download CSV instead</a>
+                </div>
+              </div>
               <table
                 class="preview-table"
                 data-preview-table
                 hidden
                 aria-label="Live indicators table"
               >
+                <caption class="sr-only">
+                  Current SwiftIOC indicators. Activate a column heading to sort.
+                </caption>
                 <thead>
                   <tr>
-                    <th scope="col">Indicator</th>
-                    <th scope="col">Type</th>
-                    <th scope="col">Sources</th>
-                    <th scope="col">First seen</th>
-                    <th scope="col">Score</th>
+                    <th scope="col" aria-sort="none"><button class="sort-button" data-preview-sort="indicator">Indicator <span aria-hidden="true">↕</span></button></th>
+                    <th scope="col" aria-sort="none"><button class="sort-button" data-preview-sort="type">Type <span aria-hidden="true">↕</span></button></th>
+                    <th scope="col" aria-sort="descending"><button class="sort-button" data-preview-sort="score">Score <span aria-hidden="true">↓</span></button></th>
+                    <th scope="col" aria-sort="none"><button class="sort-button" data-preview-sort="sources">Sources <span aria-hidden="true">↕</span></button></th>
+                    <th scope="col" aria-sort="none"><button class="sort-button" data-preview-sort="lastSeen">Last seen <span aria-hidden="true">↕</span></button></th>
+                    <th scope="col"><span class="sr-only">Row actions</span></th>
                   </tr>
                 </thead>
                 <tbody data-preview-body></tbody>
@@ -809,7 +403,6 @@
               class="preview-summary"
               data-preview-summary
               hidden
-              aria-live="polite"
             >
               <div class="preview-summary-main">
                 <span class="preview-summary-figure">
@@ -857,7 +450,14 @@
               </div>
             </div>
 
-            <p class="preview-status" data-preview-status data-status="idle">
+            <p
+              class="preview-status"
+              data-preview-status
+              data-status="idle"
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+            >
               Preparing live preview…
             </p>
           </div>
@@ -885,6 +485,7 @@
                 <p>Top sources by indicator contribution.</p>
               </div>
               <table>
+                <caption class="sr-only">Indicator contribution by source</caption>
                 <thead>
                   <tr>
                     <th scope="col">Source</th>
@@ -920,6 +521,7 @@
                 <p>Indicator types observed in this IOC bundle.</p>
               </div>
               <table>
+                <caption class="sr-only">Indicator totals by type</caption>
                 <thead>
                   <tr>
                     <th scope="col">Type</th>
@@ -954,6 +556,7 @@
                 <p>Top tags across the full indicator set.</p>
               </div>
               <table>
+                <caption class="sr-only">Most frequent indicator tags</caption>
                 <thead>
                   <tr>
                     <th scope="col">Tag</th>
@@ -980,7 +583,22 @@
             </div>
           </div>
         </section>
-      </main>
+      </div>
+
+      <section
+        class="top-threats"
+        data-top-threats-section
+        hidden
+        aria-labelledby="top-threats-heading"
+      >
+        <div class="section-heading">
+          <h2 id="top-threats-heading" class="panel-title">Top threats right now</h2>
+          <p class="panel-subtitle">
+            The highest-scoring, most cross-source-confirmed indicators from the latest run.
+          </p>
+        </div>
+        <div class="top-threats-grid" data-top-threats></div>
+      </section>
 
       <section
         id="exports"
@@ -1002,6 +620,8 @@
             <a
               class="button-link exports-highlight"
               href="iocs/high_confidence.csv"
+              data-download-fallback="iocs/latest.csv"
+              data-fallback-label="Complete CSV"
               rel="nofollow"
               download
               title="Only score ≥80 or indicators confirmed by 2+ sources — block-ready"
@@ -1010,6 +630,8 @@
             <a
               class="button-link exports-highlight"
               href="iocs/high_confidence.jsonl"
+              data-download-fallback="iocs/latest.jsonl"
+              data-fallback-label="Complete JSONL"
               rel="nofollow"
               download
               title="Only score ≥80 or indicators confirmed by 2+ sources — block-ready"
@@ -1059,8 +681,11 @@
           </p>
         </div>
       </section>
+      </main>
     </div>
 
-    <script defer src="assets/dashboard.js?v=5"></script>
+    <div class="toast" data-toast role="status" aria-live="polite" aria-atomic="true" hidden></div>
+    <script defer src="assets/dashboard-core.js?v=6"></script>
+    <script defer src="assets/dashboard.js?v=6"></script>
   </body>
 </html>
