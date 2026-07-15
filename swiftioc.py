@@ -1815,6 +1815,29 @@ MISP_ATTRIBUTE_TYPES = {
     "ja3s": "ja3-fingerprint-md5",
 }
 
+# MISP validates category/type combinations on feed import, so each type
+# needs its own valid category rather than a generic fallback — a TLS
+# fingerprint tagged "Payload delivery" (a hash/file category) can be
+# rejected or silently dropped. Per the MISP attribute vocabulary
+# (https://www.misp-project.org/datamodels/#attribute-types):
+MISP_CATEGORY_BY_TYPE = {
+    "ipv4": "Network activity",
+    "ipv4_cidr": "Network activity",
+    "ipv6": "Network activity",
+    "ipv6_cidr": "Network activity",
+    "domain": "Network activity",
+    "url": "Network activity",
+    "md5": "Payload delivery",
+    "sha1": "Payload delivery",
+    "sha256": "Payload delivery",
+    "sha512": "Payload delivery",
+    "email": "Network activity",
+    "cve": "External analysis",
+    "btc_address": "Financial fraud",
+    "ja3": "Network activity",
+    "ja3s": "Network activity",
+}
+
 
 def write_misp_feed(out_dir: Path, rows: List[Indicator], *, run_ts: str) -> int:
     """Write a MISP-compatible feed: manifest.json + one event JSON.
@@ -1838,7 +1861,7 @@ def write_misp_feed(out_dir: Path, rows: List[Indicator], *, run_ts: str) -> int
             {
                 "uuid": str(uuid.uuid5(STIX_NAMESPACE, f"misp-attr:{r.type}:{r.indicator}")),
                 "type": misp_type,
-                "category": "External analysis" if r.type == "cve" else "Network activity" if misp_type in {"ip-dst", "domain", "url"} else "Payload delivery",
+                "category": MISP_CATEGORY_BY_TYPE.get(r.type, "Payload delivery"),
                 "value": value,
                 "to_ids": misp_type != "vulnerability",
                 "timestamp": str(int((parse_dt(r.last_seen) or now_utc()).timestamp())),
@@ -2243,7 +2266,7 @@ def main() -> int:
         logger.info("MISP feed: %d attributes in %s/misp", misp_count, out_dir)
 
     rss_written = write_rss_feed(
-        out_dir / "feed.xml", rows, site_url=args.site_url, limit=args.rss_limit
+        out_dir / "feed.xml", high_conf, site_url=args.site_url, limit=args.rss_limit
     )
     logger.info("RSS feed: %d items written", rss_written)
 
