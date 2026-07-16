@@ -566,10 +566,12 @@ def test_write_misp_feed_manifest_and_event(tmp_path):
     cve.score = 80
     ja3 = _sample_indicator(indicator="a" * 32, type="ja3")
     ja3.score = 60
+    btc = _sample_indicator(indicator="bc1qtest00000000000000000000000000", type="btc_address")
+    btc.score = 50
 
     out_dir = tmp_path / "misp"
-    count = si.write_misp_feed(out_dir, [ind, cve, ja3], run_ts="2025-01-01T00:00:00Z")
-    assert count == 3
+    count = si.write_misp_feed(out_dir, [ind, cve, ja3, btc], run_ts="2025-01-01T00:00:00Z")
+    assert count == 4
 
     manifest = json.loads((out_dir / "manifest.json").read_text(encoding="utf-8"))
     assert len(manifest) == 1
@@ -578,10 +580,18 @@ def test_write_misp_feed_manifest_and_event(tmp_path):
     assert event["uuid"] == event_uuid
     by_value = {a["value"]: a for a in event["Attribute"]}
     assert by_value["1.2.3.4"]["type"] == "ip-dst"
+    assert by_value["1.2.3.4"]["category"] == "Network activity"
     assert by_value["1.2.3.4"]["to_ids"] is True
     assert by_value["CVE-2025-0001"]["type"] == "vulnerability"
+    assert by_value["CVE-2025-0001"]["category"] == "External analysis"
     assert by_value["CVE-2025-0001"]["to_ids"] is False  # not an observable
+    # Regression: TLS fingerprints and BTC addresses previously fell through
+    # to the generic "Payload delivery" category, which MISP can reject as
+    # an invalid category/type combination on feed import.
     assert by_value["a" * 32]["type"] == "ja3-fingerprint-md5"
+    assert by_value["a" * 32]["category"] == "Network activity"
+    assert by_value["bc1qtest00000000000000000000000000"]["type"] == "btc"
+    assert by_value["bc1qtest00000000000000000000000000"]["category"] == "Financial fraud"
 
 
 def test_write_misp_feed_event_uuid_stable_across_runs(tmp_path):
