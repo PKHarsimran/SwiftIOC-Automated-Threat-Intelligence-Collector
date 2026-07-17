@@ -1,0 +1,55 @@
+name: History index - SwiftIOC
+
+# Builds the "time machine" summary from the git history of the published feed
+# and commits the compact history_summary.json (the dashboard's IOC-lookup
+# dossier reads it). The large SQLite index is git-ignored — rebuilt on demand
+# from git by scripts/build_history_index.py. Runs daily, well off the 4-hourly
+# collect cadence.
+
+on:
+  schedule:
+    - cron: "45 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: history-swiftioc
+  cancel-in-progress: false
+
+jobs:
+  build-history:
+    name: Build IOC history summary
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout (full history)
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Build history summary
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          # Walk up to the last ~180 days of feed commits (bounded so the job
+          # stays fast); writes public/history_summary.json + the gitignored
+          # public/history/index.sqlite.
+          python scripts/build_history_index.py --out-dir public --since-days 180
+
+      - name: Auto-commit history summary
+        if: success()
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_message: "chore(history): update IOC history summary [skip ci]"
+          file_pattern: "public/history_summary.json"
+          commit_user_name: SwiftIOC Bot
+          commit_user_email: actions@github.com

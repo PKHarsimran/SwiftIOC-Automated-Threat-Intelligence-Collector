@@ -7,7 +7,7 @@
 
 SwiftIOC is an open-source Python threat intelligence automation toolkit that
 keeps recent Indicators of Compromise (IOCs) in machine-readable formats. The
-lightweight collector (`swiftioc.py`) ingests threat feeds via YAML
+lightweight collector (`swiftioc/`) ingests threat feeds via YAML
 configuration, normalises and deduplicates the indicators, and exports them to
 CSV, TSV, JSON, JSON Lines, and STIX 2.1 alongside searchable run diagnostics.
 
@@ -92,6 +92,24 @@ high-fidelity IOCs from authoritative sources. The project emphasises:
   check whether a specific IP/domain/URL/hash is currently in the feed
   (instant against the top feed, falls back to a one-time full-feed scan if
   not found there).
+- **IOC time machine** – because every run commits `latest.jsonl`, the git
+  history is an append-only archive of *what was publicly known-bad at time T,
+  at what score, confirmed by which sources*.
+  [`scripts/build_history_index.py`](scripts/build_history_index.py) turns that
+  history into a SQLite index + a compact `history_summary.json`, and
+  [`scripts/ioc_timeline.py`](scripts/ioc_timeline.py) answers the forensic
+  question commercial platforms charge for — *"was this indicator known-bad on
+  the day we saw it, and how confidently?"* — from free, auditable public data:
+
+  ```bash
+  python scripts/build_history_index.py --out-dir public --since-days 180
+  python scripts/ioc_timeline.py 45.137.21.9
+  python scripts/ioc_timeline.py --at 2026-03-01 evil.example.com
+  ```
+- **Sightings** – each indicator tracks how many collection runs have
+  re-observed it (`sightings`), so a one-off scanner hit is distinguishable
+  from an IP flagged across dozens of runs. Surfaced in the exports and the
+  dashboard lookup dossier.
 - **Concurrent collection** – sources are fetched in parallel (configurable via
   `--max-workers`), so a full run completes in a fraction of the time of a
   sequential fetch without changing the deterministic output.
@@ -172,7 +190,7 @@ threat feed workflow".
 ├── requirements-dev.txt    # Runtime + lint/type/test tooling
 ├── pyproject.toml          # Ruff, Pyright, and pytest configuration
 ├── sources.example.yml     # Sample feed configuration
-├── swiftioc.py             # Main collector implementation & CLI
+├── swiftioc/               # Main collector implementation & CLI (package)
 ├── index.html              # Optional GitHub Pages entry point
 ├── README.md               # This document
 └── SECURITY.md             # Security reporting policy
@@ -185,7 +203,7 @@ threat feed workflow".
 > repository small while still exposing every format at the published site.
 
 ## 🧠 How it works
-1. **Load configuration** – `swiftioc.py` reads `sources.yml` (falling back to
+1. **Load configuration** – `swiftioc` reads `sources.yml` (falling back to
    `sources.example.yml` when needed) and sets up logging, user agents, and
    output directories. 
 2. **Collect per source** – each API or RSS source is routed to a parser
@@ -369,7 +387,7 @@ browsed without additional tooling. The project uses `public/` as both the
 artifact directory and the published site root:
 
 - `public/index.html` renders the live preview, source breakdowns, tag counts,
-  and export links using the JSON/JSONL outputs produced by `swiftioc.py`.
+  and export links using the JSON/JSONL outputs produced by `swiftioc`.
 - `index.html` at the repository root provides a branded landing page that
   redirects to `public/` after a short delay while offering quick links for
   manual navigation.
@@ -473,7 +491,7 @@ pip install -r requirements-dev.txt
 
 ruff check .          # lint
 pyright               # static type check
-python swiftioc.py --self-test   # built-in sanity assertions
+python -m swiftioc --self-test   # built-in sanity assertions
 pytest -q             # offline unit tests (parsers, STIX, dedup, changelog)
 ```
 

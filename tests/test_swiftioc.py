@@ -555,7 +555,7 @@ def test_write_dashboard_feed_trims_and_ranks(tmp_path):
     # Trimmed schema: only the fields the dashboard renders.
     assert set(lines[0]) == {
         "indicator", "type", "source", "first_seen", "last_seen",
-        "confidence", "score", "tags",
+        "confidence", "score", "sightings", "tags",
     }
 
 
@@ -762,6 +762,43 @@ def test_merge_with_previous_carries_and_refreshes():
     assert refreshed.last_seen == now_iso  # fresh observation wins
     assert set(refreshed.source.split(",")) == {"feodo", "threatfox"}
     assert by_key["9.9.9.9"].last_seen == "2025-06-01T00:00:00Z"  # decays naturally
+
+
+def test_merge_with_previous_counts_sightings():
+    now_iso = si.iso(si.now_utc())
+    # Re-observed indicator with 12 prior sightings -> 13 this run.
+    current = [_sample_indicator(indicator="8.8.8.8", first_seen=now_iso, last_seen=now_iso)]
+    prev = _sample_indicator(indicator="8.8.8.8", first_seen="2025-01-01T00:00:00Z")
+    prev.sightings = 12
+    # Brand-new (previous-only) indicator keeps its own count when carried.
+    carried_prev = _sample_indicator(indicator="9.9.9.9")
+    carried_prev.sightings = 5
+
+    merged, _ = si.merge_with_previous(current, [prev, carried_prev])
+    by_key = {m.indicator: m for m in merged}
+    assert by_key["8.8.8.8"].sightings == 13
+    assert by_key["9.9.9.9"].sightings == 5  # carried untouched
+    # A first-ever indicator defaults to 1 sighting.
+    fresh, _ = si.merge_with_previous([_sample_indicator(indicator="1.1.1.1")], [])
+    assert fresh[0].sightings == 1
+
+
+def test_sightings_in_csv_and_dashboard_output(tmp_path):
+    ind = _sample_indicator(indicator="1.2.3.4", type="ipv4")
+    ind.score = 90
+    ind.sightings = 42
+
+    csv_out = tmp_path / "latest.csv"
+    si.write_csv(csv_out, [ind])
+    header = csv_out.read_text(encoding="utf-8").splitlines()[0].split(",")
+    row = csv_out.read_text(encoding="utf-8").splitlines()[1].split(",")
+    assert "sightings" in header
+    assert row[header.index("sightings")] == "42"
+
+    dash_out = tmp_path / "dashboard.jsonl"
+    si.write_dashboard_feed(dash_out, [ind])
+    rec = json.loads(dash_out.read_text(encoding="utf-8").splitlines()[0])
+    assert rec["sightings"] == 42
 
 
 def test_load_previous_feed_tolerates_garbage_and_filters_fps(tmp_path):
