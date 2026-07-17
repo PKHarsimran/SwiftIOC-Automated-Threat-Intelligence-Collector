@@ -8,6 +8,10 @@ public/iocs/stix2.json
 # Raw feed captures (only created with --save-raw-dir)
 public/diagnostics/raw/
 
+# Time-machine SQLite index (large; rebuilt from git history on demand).
+# The compact history_summary.json it also produces IS committed.
+public/history/
+
 # Python
 __pycache__/
 *.py[cod]

@@ -30,6 +30,9 @@
   const RUN_DIAG_URL = resolveIocUrl('diagnostics/run.json');
   // Rolling per-run history (capped) for the trend sparkline.
   const HISTORY_URL = resolveIocUrl('diagnostics/history.json');
+  // Per-indicator historical summary (first-publicly-seen, peak score, run
+  // count) built from git history by scripts/build_history_index.py. Optional.
+  const HISTORY_SUMMARY_URL = resolveIocUrl('history_summary.json');
 
   const DATASET_STORAGE_KEY = 'swiftioc-dashboard-cache-v2';
   const DATASET_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
@@ -1067,6 +1070,10 @@
       firstSeenDisplay,
       lastSeenDisplay,
       bestTimestamp,
+      sightings:
+        typeof row.sightings === 'number' && row.sightings > 0
+          ? row.sightings
+          : null,
       reference,
       context,
       tlp,
@@ -2713,6 +2720,46 @@
    *  IOC LOOKUP
    * ========================================================================= */
 
+  // "Time machine" summary keyed by indicator ({first_seen_run, last_seen_run,
+  // run_count, max_score}), built from git history by build_history_index.py.
+  // Fetched at most once; resolves to {} when the index hasn't been published.
+  let historySummaryPromise = null;
+  const loadHistorySummary = () => {
+    if (!historySummaryPromise) {
+      historySummaryPromise = fetch(HISTORY_SUMMARY_URL, {
+        headers: { Accept: 'application/json' },
+      })
+        .then((r) => (r.ok ? r.json() : {}))
+        .then((data) => (data && typeof data === 'object' ? data : {}))
+        .catch(() => ({}));
+    }
+    return historySummaryPromise;
+  };
+
+  const enrichWithHistory = (row, details, appendDetail) => {
+    loadHistorySummary()
+      .then((summary) => {
+        const entry =
+          summary[row.indicator] ||
+          summary[refang(row.indicator)] ||
+          summary[normaliseString(row.indicator)];
+        if (!entry) return;
+        if (typeof entry.first_seen_run === 'number') {
+          appendDetail(
+            'First seen in feed',
+            formatTimestampForDisplay(entry.first_seen_run)
+          );
+        }
+        if (typeof entry.run_count === 'number') {
+          appendDetail('Known across', `${formatNumber(entry.run_count)} feed snapshots`);
+        }
+        if (typeof entry.max_score === 'number' && entry.max_score > 0) {
+          appendDetail('Peak score', String(entry.max_score));
+        }
+      })
+      .catch(() => {});
+  };
+
   // Two-stage search: first check the already-loaded compact dataset
   // (instant), then — only if the user asks and it's not found — stream the
   // full feed looking for an exact match, aborting the reader as soon as it
@@ -2772,7 +2819,18 @@
         );
         appendDetail('First seen', row.firstSeenDisplay);
         appendDetail('Last seen', row.lastSeenDisplay);
+        if (typeof row.sightings === 'number' && row.sightings > 0) {
+          appendDetail(
+            'Sightings',
+            `${formatNumber(row.sightings)} collection run${row.sightings === 1 ? '' : 's'}`
+          );
+        }
         resultBox.appendChild(details);
+
+        // Optional "time machine" enrichment: how long this indicator has been
+        // in the published feed's git history. Appended async so it never
+        // blocks the main result; silently absent if the index isn't built.
+        enrichWithHistory(row, details, appendDetail);
 
         const rationale = document.createElement('p');
         rationale.className = 'score-explanation';
