@@ -81,6 +81,28 @@ def test_render_point_in_time(tmp_path):
     assert "present, score 70" in out_during
 
 
+def test_render_at_treats_first_seen_day_as_present(tmp_path):
+    """Regression: --at is a whole calendar day, not the 00:00 instant.
+
+    If an indicator's very first sighting lands later the same day as the
+    requested --at date (e.g. first observed 14:00 UTC), querying --at for
+    that date must not report it as "not yet reported".
+    """
+    mod = _load_timeline()
+    first_seen_ts = _ts(2026, 3, 1) + 14 * 3600  # 2026-03-01 14:00 UTC
+    series = [[first_seen_ts, 70]]
+    row = {
+        "indicator": "1.2.3.4", "type": "ipv4",
+        "first_run_ts": first_seen_ts, "last_run_ts": first_seen_ts,
+        "run_count": 1, "max_score": 70, "last_score": 70,
+        "last_sources": "feodo", "last_tags": "c2",
+        "score_series": json.dumps(series),
+    }
+    out = mod.render(row, datetime(2026, 3, 1))
+    assert "present, score 70" in out
+    assert "not yet reported" not in out
+
+
 def test_sparkline_bounds():
     mod = _load_timeline()
     assert mod._sparkline([]) == ""

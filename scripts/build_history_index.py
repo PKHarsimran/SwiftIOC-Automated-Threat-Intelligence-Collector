@@ -30,7 +30,7 @@ from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
 
 FEED_PATH = "public/iocs/latest.jsonl"
-SCORE_SERIES_CAP = 200  # keep the most recent N (ts, score) points per indicator
+SCORE_SERIES_CAP = 200  # fallback cap when walking unbounded history (no --since-days)
 
 
 def _run_git(args: List[str]) -> str:
@@ -91,6 +91,12 @@ def build(
     if not commits:
         raise SystemExit(f"No commits found touching {FEED_PATH}. Run from the repo root.")
 
+    # A --since-days walk is already bounded, so cap the series at that many
+    # points to keep the full configured window queryable via --at; without
+    # --since-days the walk is unbounded (full repo history), so fall back to
+    # SCORE_SERIES_CAP to keep the per-indicator blob from growing forever.
+    series_cap = len(commits) if since_days else SCORE_SERIES_CAP
+
     hist_dir = out_dir / "history"
     hist_dir.mkdir(parents=True, exist_ok=True)
     db_path = hist_dir / "index.sqlite"
@@ -144,8 +150,8 @@ def build(
                 entry["last_sources"] = row.get("source", "")
                 entry["last_tags"] = row.get("tags", "")
                 entry["series"].append((ts, score))
-                if len(entry["series"]) > SCORE_SERIES_CAP:
-                    entry["series"] = entry["series"][-SCORE_SERIES_CAP:]
+                if len(entry["series"]) > series_cap:
+                    entry["series"] = entry["series"][-series_cap:]
         con.execute("INSERT OR REPLACE INTO runs VALUES (?, ?)", (ts, run_total))
 
     con.executemany(

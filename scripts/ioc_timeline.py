@@ -82,13 +82,15 @@ def render(row: dict, at: Optional[datetime]) -> str:
         f"Tags      : {row['last_tags'] or '—'}",
     ]
     if at is not None:
-        at_ts = int(at.replace(tzinfo=timezone.utc).timestamp())
-        # Was it in the feed on/around that date? Find the score at the nearest
-        # run at or before the requested time.
-        prior = [(ts, sc) for ts, sc in series if ts <= at_ts]
-        if row["first_run_ts"] <= at_ts <= row["last_run_ts"] and prior:
+        # --at is a whole calendar day, not an instant: compare against the
+        # end of that day so an indicator first seen later on the requested
+        # date (e.g. first_run_ts at 14:00 UTC) still counts as present.
+        at_start_ts = int(at.replace(tzinfo=timezone.utc).timestamp())
+        at_end_ts = at_start_ts + 86399
+        prior = [(ts, sc) for ts, sc in series if ts <= at_end_ts]
+        if row["first_run_ts"] <= at_end_ts and at_start_ts <= row["last_run_ts"] and prior:
             lines.append(f"On {at.date()}: ✔ present, score {prior[-1][1]}")
-        elif at_ts < row["first_run_ts"]:
+        elif at_end_ts < row["first_run_ts"]:
             lines.append(f"On {at.date()}: ✘ not yet reported (first appeared {_fmt_ts(row['first_run_ts'])[:10]})")
         else:
             lines.append(f"On {at.date()}: ✘ not present in the feed at that time")
