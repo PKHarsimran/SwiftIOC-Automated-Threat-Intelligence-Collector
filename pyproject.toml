@@ -1,10 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "swiftioc"
-version = "0.2.0"
+version = "0.3.0"
 description = "Open-source automated threat intelligence collector"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
+dynamic = ["dependencies"]
+
+[project.scripts]
+swiftioc = "swiftioc.cli:main"
+
+[project.urls]
+Repository = "https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector"
+
+[tool.setuptools.dynamic]
+# requirements.txt stays the single source of truth for runtime deps (CI
+# installs via `pip install -r requirements.txt`); this just lets
+# `pip install .` read the same file instead of duplicating versions here.
+dependencies = { file = ["requirements.txt"] }
+
+[tool.setuptools.packages.find]
+include = ["swiftioc*"]
 
 [tool.ruff]
 line-length = 140
@@ -16,7 +36,7 @@ target-version = "py310"
 select = ["E4", "E7", "E9", "F"]
 
 [tool.pyright]
-include = ["swiftioc.py", "scripts", "tests"]
+include = ["swiftioc", "scripts", "tests"]
 pythonVersion = "3.10"
 typeCheckingMode = "basic"
 reportMissingImports = false

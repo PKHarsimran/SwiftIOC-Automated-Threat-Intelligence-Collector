@@ -23,7 +23,7 @@ Run the same checks CI runs — all four should pass:
 ```bash
 ruff check .                     # lint
 pyright                          # static type check
-python swiftioc.py --self-test   # built-in sanity assertions
+python -m swiftioc --self-test   # built-in sanity assertions
 pytest -q                        # offline unit tests
 ```
 
@@ -34,7 +34,7 @@ especially when adding a new feed parser.
 ## Adding a new feed parser
 
 1. Write a function decorated with `@register_parser("name")` in
-   [`swiftioc.py`](swiftioc.py). It receives `(url, ref_url, source, ws)` plus
+   [`swiftioc/parsers.py`](swiftioc/parsers.py). It receives `(url, ref_url, source, ws)` plus
    any keyword options and returns a `list[Indicator]`.
 2. Defang network indicators with `defang_min(...)` and classify values with
    `classify(...)`.

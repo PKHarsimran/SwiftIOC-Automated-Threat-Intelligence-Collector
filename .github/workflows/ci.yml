@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - "swiftioc.py"
+      - "swiftioc/**"
       - "scripts/**"
       - "tests/**"
       - "sources*.yml"
@@ -68,7 +68,7 @@ jobs:
         run: pyright
 
       - name: Self-test
-        run: python swiftioc.py --self-test
+        run: python -m swiftioc --self-test
 
       - name: Unit tests
         run: pytest -q
@@ -85,7 +85,7 @@ jobs:
         run: |
           set -Eeuo pipefail
           mkdir -p public/diagnostics/raw
-          python swiftioc.py -v \
+          python -m swiftioc -v \
             --out-dir public \
             --sources sources.ci.yml \
             --window-hours 6 \

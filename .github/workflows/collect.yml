@@ -73,7 +73,8 @@ jobs:
       - name: Validate required files
         shell: bash
         run: |
-          test -f swiftioc.py || { echo "swiftioc.py not found"; exit 1; }
+          test -f pyproject.toml || { echo "pyproject.toml not found"; exit 1; }
+          test -d swiftioc || { echo "swiftioc package not found"; exit 1; }
           test -f requirements.txt || { echo "requirements.txt not found"; exit 1; }
           test -f "$SOURCES_FILE" || { echo "$SOURCES_FILE not found"; exit 1; }
 
@@ -86,7 +87,7 @@ jobs:
       - name: Run self-test
         shell: bash
         run: |
-          python swiftioc.py --self-test
+          python -m swiftioc --self-test
 
       - name: Show collector settings
         shell: bash
@@ -116,7 +117,7 @@ jobs:
           # Retention keeps the published feed curated ("top IOCs", KEVIntel
           # style): drop anything not seen in 30 days, then keep the top 10k by
           # score/recency so the committed feed stays high-signal and small.
-          python swiftioc.py -vv \
+          python -m swiftioc -vv \
             --out-dir "$OUT_DIR" \
             --sources "$SOURCES_FILE" \
             --window-hours "$WINDOW_HOURS" \

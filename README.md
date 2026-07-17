@@ -7,7 +7,7 @@
 
 SwiftIOC is an open-source Python threat intelligence automation toolkit that
 keeps recent Indicators of Compromise (IOCs) in machine-readable formats. The
-lightweight collector (`swiftioc.py`) ingests threat feeds via YAML
+lightweight collector (`swiftioc/`) ingests threat feeds via YAML
 configuration, normalises and deduplicates the indicators, and exports them to
 CSV, TSV, JSON, JSON Lines, and STIX 2.1 alongside searchable run diagnostics.
 
@@ -190,7 +190,7 @@ threat feed workflow".
 ├── requirements-dev.txt    # Runtime + lint/type/test tooling
 ├── pyproject.toml          # Ruff, Pyright, and pytest configuration
 ├── sources.example.yml     # Sample feed configuration
-├── swiftioc.py             # Main collector implementation & CLI
+├── swiftioc/               # Main collector implementation & CLI (package)
 ├── index.html              # Optional GitHub Pages entry point
 ├── README.md               # This document
 └── SECURITY.md             # Security reporting policy
@@ -203,7 +203,7 @@ threat feed workflow".
 > repository small while still exposing every format at the published site.
 
 ## 🧠 How it works
-1. **Load configuration** – `swiftioc.py` reads `sources.yml` (falling back to
+1. **Load configuration** – `swiftioc` reads `sources.yml` (falling back to
    `sources.example.yml` when needed) and sets up logging, user agents, and
    output directories. 
 2. **Collect per source** – each API or RSS source is routed to a parser
@@ -387,7 +387,7 @@ browsed without additional tooling. The project uses `public/` as both the
 artifact directory and the published site root:
 
 - `public/index.html` renders the live preview, source breakdowns, tag counts,
-  and export links using the JSON/JSONL outputs produced by `swiftioc.py`.
+  and export links using the JSON/JSONL outputs produced by `swiftioc`.
 - `index.html` at the repository root provides a branded landing page that
   redirects to `public/` after a short delay while offering quick links for
   manual navigation.
@@ -491,7 +491,7 @@ pip install -r requirements-dev.txt
 
 ruff check .          # lint
 pyright               # static type check
-python swiftioc.py --self-test   # built-in sanity assertions
+python -m swiftioc --self-test   # built-in sanity assertions
 pytest -q             # offline unit tests (parsers, STIX, dedup, changelog)
 ```
 
