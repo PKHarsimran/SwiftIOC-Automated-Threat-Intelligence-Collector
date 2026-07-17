@@ -55,6 +55,9 @@ _SESSION: Optional[requests.Session] = None
 _FEEDPARSER = None
 _SAVE_RAW_DIR: Optional[Path] = None
 HTTP_DEBUG = False
+# Per-fetch telemetry ({name: {ms, bytes, status}}) filled by http_get, drained
+# into diagnostics so the dashboard can show a feed-health / latency panel.
+_FETCH_METRICS: Dict[str, Dict[str, Any]] = {}
 
 CONF_RANK = {"low": 10, "medium": 50, "high": 90}
 
@@ -120,6 +123,9 @@ class Indicator:
     # Computed 0-100 relevance score (confidence base + cross-source
     # corroboration bonus, decayed by age). 0 means "not yet scored".
     score: int = 0
+    # How many collection runs have re-observed this indicator (persisted
+    # across runs via the living feed). 1 = seen in this run only.
+    sightings: int = 1
 
     def key(self) -> Tuple[str, str]:
         return (self.type, self.indicator)
@@ -387,10 +393,11 @@ def merge_with_previous(current: List[Indicator], previous: List[Indicator]) -> 
     """Merge the previous feed into this run's results ("living feed").
 
     Indicators re-observed this run keep their fresh ``last_seen`` (so their
-    score resets to full) while inheriting the earliest ``first_seen`` and the
-    accumulated source/tag history. Indicators seen only previously are
-    carried forward untouched — their stale ``last_seen`` makes the decay
-    scoring fade them out until expiry. Returns (merged, carried_forward).
+    score resets to full) while inheriting the earliest ``first_seen``, the
+    accumulated source/tag history, and an incremented ``sightings`` count.
+    Indicators seen only previously are carried forward untouched — their
+    stale ``last_seen`` makes the decay scoring fade them out until expiry.
+    Returns (merged, carried_forward).
     """
     uniq: Dict[Tuple[str, str], Indicator] = {i.key(): i for i in current}
     carried = 0
@@ -410,6 +417,9 @@ def merge_with_previous(current: List[Indicator], previous: List[Indicator]) -> 
         merged_sources = set(filter(None, cur.source.split(","))) | set(filter(None, prev.source.split(",")))
         cur.source = ",".join(sorted(merged_sources))
         cur.confidence = merge_conf(cur.confidence, prev.confidence)
+        # Re-observed this run: one more sighting on top of the accumulated
+        # history. max() guards against a malformed/reset previous count.
+        cur.sightings = max(prev.sightings, 1) + 1
     merged = sorted(uniq.values(), key=lambda r: (r.type, r.indicator, r.source))
     return merged, carried
 
@@ -585,12 +595,26 @@ def http_get(url: str, *, name: str, kind: str = "text", timeout: int = 20) -> s
     t0 = time.perf_counter()
     r = s.get(url, headers=headers, timeout=timeout)
     dt = time.perf_counter() - t0
+    # Record telemetry before raise_for_status so failed statuses are captured.
+    _FETCH_METRICS[name] = {
+        "ms": round(dt * 1000),
+        "bytes": len(r.content),
+        "status": r.status_code,
+    }
     if HTTP_DEBUG:
         logger.debug("HTTP %s %.2fs %s [%s]", r.status_code, dt, url, name)
     r.raise_for_status()
     body = r.text if kind == "text" else r.content
     save_raw(name, body, kind)
     return body
+
+
+def reset_fetch_metrics() -> None:
+    _FETCH_METRICS.clear()
+
+
+def get_fetch_metrics() -> Dict[str, Dict[str, Any]]:
+    return dict(_FETCH_METRICS)
 
 
 def ensure_text(content: str | bytes) -> str:
@@ -1567,8 +1591,9 @@ def collect_from_yaml(
             tasks.append((run_rss, rss))
 
     # Pre-initialise the shared HTTP session before fanning out so the workers
-    # don't race on lazy creation.
+    # don't race on lazy creation. Reset telemetry so it reflects this run.
     ensure_session()
+    reset_fetch_metrics()
 
     results: List[Optional[Dict[str, Any]]] = [None] * len(tasks)
     workers = max(1, min(max_workers, len(tasks))) if tasks else 1
@@ -1637,11 +1662,11 @@ def collect_from_yaml(
 
 
 # ---------------- writers ----------------
-CSV_HEADER = ["indicator", "type", "source", "first_seen", "last_seen", "confidence", "score", "tlp", "tags", "reference", "context"]
+CSV_HEADER = ["indicator", "type", "source", "first_seen", "last_seen", "confidence", "score", "sightings", "tlp", "tags", "reference", "context"]
 
 
 def _csv_row(r: Indicator) -> List[Any]:
-    return [r.indicator, r.type, r.source, r.first_seen, r.last_seen, r.confidence, r.score, r.tlp, r.tags, r.reference, r.context]
+    return [r.indicator, r.type, r.source, r.first_seen, r.last_seen, r.confidence, r.score, r.sightings, r.tlp, r.tags, r.reference, r.context]
 
 
 def write_csv(path: Path, rows: List[Indicator]) -> None:
@@ -1700,6 +1725,7 @@ def write_dashboard_feed(path: Path, rows: List[Indicator], *, limit: int = 1000
                         "last_seen": r.last_seen,
                         "confidence": r.confidence,
                         "score": r.score,
+                        "sightings": r.sightings,
                         "tags": r.tags,
                     },
                     ensure_ascii=False,
@@ -2330,6 +2356,7 @@ def main() -> int:
         "counts": counts,
         "type_counts": {k: v for k, v in type_totals},
         "tag_counts": {k: v for k, v in top_tags(rows, 25)},
+        "fetch_metrics": get_fetch_metrics(),
         "earliest_first_seen": earliest,
         "newest_first_seen": latest,
         "empty_sources": empty_sources,
