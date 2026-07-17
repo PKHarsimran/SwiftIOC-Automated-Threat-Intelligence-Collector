@@ -92,6 +92,24 @@ high-fidelity IOCs from authoritative sources. The project emphasises:
   check whether a specific IP/domain/URL/hash is currently in the feed
   (instant against the top feed, falls back to a one-time full-feed scan if
   not found there).
+- **IOC time machine** – because every run commits `latest.jsonl`, the git
+  history is an append-only archive of *what was publicly known-bad at time T,
+  at what score, confirmed by which sources*.
+  [`scripts/build_history_index.py`](scripts/build_history_index.py) turns that
+  history into a SQLite index + a compact `history_summary.json`, and
+  [`scripts/ioc_timeline.py`](scripts/ioc_timeline.py) answers the forensic
+  question commercial platforms charge for — *"was this indicator known-bad on
+  the day we saw it, and how confidently?"* — from free, auditable public data:
+
+  ```bash
+  python scripts/build_history_index.py --out-dir public --since-days 180
+  python scripts/ioc_timeline.py 45.137.21.9
+  python scripts/ioc_timeline.py --at 2026-03-01 evil.example.com
+  ```
+- **Sightings** – each indicator tracks how many collection runs have
+  re-observed it (`sightings`), so a one-off scanner hit is distinguishable
+  from an IP flagged across dozens of runs. Surfaced in the exports and the
+  dashboard lookup dossier.
 - **Concurrent collection** – sources are fetched in parallel (configurable via
   `--max-workers`), so a full run completes in a fraction of the time of a
   sequential fetch without changing the deterministic output.
