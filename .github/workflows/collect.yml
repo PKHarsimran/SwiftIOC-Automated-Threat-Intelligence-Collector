@@ -187,22 +187,16 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "chore(ioc): update feeds [skip ci]"
-          # Commit only the compact, human-facing artefacts. The bulky derived
-          # formats (latest.json, latest.tsv, stix2.json) are regenerated every
-          # run and published via GitHub Pages + workflow artifacts, so keeping
-          # them out of git history avoids multi-MB churn on every collection.
-          file_pattern: |
-            public/iocs/latest.csv
-            public/iocs/latest.jsonl
-            public/iocs/dashboard.jsonl
-            public/iocs/high_confidence.csv
-            public/iocs/high_confidence.jsonl
-            public/changelog/**
-            public/diagnostics/**
-            public/index.md
-            public/misp/**
-            public/feed.xml
-            public/badge.json
+          # Single `public` add — NOT a multi-line file_pattern. The previous
+          # explicit list was silently committing only latest.csv: with several
+          # patterns (some globs, some new/untracked files) git-auto-commit
+          # staged/committed just the first, so latest.jsonl and every newer
+          # output (dashboard.jsonl, high_confidence.*, misp/, feed.xml,
+          # badge.json) never reached the site — the published feed was frozen
+          # at pre-scoring data. Adding the whole `public` dir and letting
+          # .gitignore exclude the bulky formats (latest.json/tsv, stix2.json,
+          # diagnostics/raw) is robust and commits exactly the intended set.
+          file_pattern: "public"
           commit_user_name: SwiftIOC Bot
           commit_user_email: actions@github.com
           skip_dirty_check: false
