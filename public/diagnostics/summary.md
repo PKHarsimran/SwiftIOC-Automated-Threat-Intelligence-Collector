@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-07-18T06:04:10Z_
+_Generated 2026-07-18T09:21:46Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-07-18T06:04:10Z |
+| Generated | 2026-07-18T09:21:46Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 25729 |
+| Duplicates removed | 24587 |
 | Sources reporting | 14 |
 | Indicator types | 7 |
-| Multi-source overlaps | 4694 |
+| Multi-source overlaps | 4748 |
 | Score (min / avg / max) | 60 / 71.9 / 88 |
-| High-score indicators (≥80) | 3398 |
-| Corroborated (2+ sources) | 4694 |
+| High-score indicators (≥80) | 2373 |
+| Corroborated (2+ sources) | 4748 |
 | Earliest first_seen | 2021-11-03T00:00:00Z |
-| Newest first_seen | 2026-07-18T06:03:34Z |
+| Newest first_seen | 2026-07-18T09:21:32Z |
 
 ## Top indicators by score
 
@@ -39,24 +39,24 @@ _Generated 2026-07-18T06:04:10Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5354 |
-| greensnow_blocklist | 3967 |
+| blocklist_de_ssh | 5356 |
+| greensnow_blocklist | 3927 |
 | binarydefense_banlist | 2601 |
-| threatfox_export_json | 1831 |
 | ipsum_level5 | 1692 |
 | cisa_kev | 1647 |
-| tor_exit_nodes | 1422 |
-| malwarebazaar_recent | 875 |
+| tor_exit_nodes | 1423 |
+| threatfox_export_json | 809 |
+| malwarebazaar_recent | 792 |
 | et_compromised | 578 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| ipv4 | 6573 |
+| ipv4 | 5905 |
 | cve | 1647 |
-| domain | 1388 |
-| url | 330 |
+| domain | 1403 |
+| url | 983 |
 | sha256 | 24 |
 | md5 | 19 |
 | sha1 | 19 |
@@ -65,16 +65,16 @@ _Generated 2026-07-18T06:04:10Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| blocklist | 6376 |
-| greensnow | 3503 |
-| scanner | 2896 |
-| ssh | 2627 |
-| bruteforce | 2625 |
-| aggregated | 2216 |
-| ipsum | 2216 |
-| multi-list | 2216 |
-| binarydefense | 2115 |
-| threatfox | 1972 |
+| blocklist | 5702 |
+| scanner | 3406 |
+| ssh | 2660 |
+| bruteforce | 2658 |
+| binarydefense | 2601 |
+| greensnow | 2323 |
+| aggregated | 2224 |
+| ipsum | 2224 |
+| multi-list | 2224 |
+| cins | 2012 |
 
 ## Multi-source overlaps
 
