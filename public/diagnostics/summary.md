@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-07-18T02:04:42Z_
+_Generated 2026-07-18T06:04:10Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-07-18T02:04:42Z |
+| Generated | 2026-07-18T06:04:10Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 25806 |
+| Duplicates removed | 25729 |
 | Sources reporting | 14 |
 | Indicator types | 7 |
-| Multi-source overlaps | 4607 |
-| Score (min / avg / max) | 60 / 71.8 / 88 |
-| High-score indicators (≥80) | 3424 |
-| Corroborated (2+ sources) | 4607 |
+| Multi-source overlaps | 4694 |
+| Score (min / avg / max) | 60 / 71.9 / 88 |
+| High-score indicators (≥80) | 3398 |
+| Corroborated (2+ sources) | 4694 |
 | Earliest first_seen | 2021-11-03T00:00:00Z |
-| Newest first_seen | 2026-07-18T02:03:06Z |
+| Newest first_seen | 2026-07-18T06:03:34Z |
 
 ## Top indicators by score
 
@@ -39,24 +39,24 @@ _Generated 2026-07-18T02:04:42Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5363 |
-| greensnow_blocklist | 4007 |
+| blocklist_de_ssh | 5354 |
+| greensnow_blocklist | 3967 |
 | binarydefense_banlist | 2601 |
-| threatfox_export_json | 1862 |
+| threatfox_export_json | 1831 |
 | ipsum_level5 | 1692 |
 | cisa_kev | 1647 |
-| tor_exit_nodes | 1421 |
-| malwarebazaar_recent | 886 |
+| tor_exit_nodes | 1422 |
+| malwarebazaar_recent | 875 |
 | et_compromised | 578 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| ipv4 | 6592 |
+| ipv4 | 6573 |
 | cve | 1647 |
-| domain | 1370 |
-| url | 329 |
+| domain | 1388 |
+| url | 330 |
 | sha256 | 24 |
 | md5 | 19 |
 | sha1 | 19 |
@@ -65,16 +65,16 @@ _Generated 2026-07-18T02:04:42Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| blocklist | 6401 |
-| scanner | 3347 |
-| greensnow | 2987 |
-| binarydefense | 2601 |
-| ssh | 2590 |
-| bruteforce | 2588 |
-| aggregated | 2248 |
-| ipsum | 2248 |
-| multi-list | 2248 |
-| threatfox | 1947 |
+| blocklist | 6376 |
+| greensnow | 3503 |
+| scanner | 2896 |
+| ssh | 2627 |
+| bruteforce | 2625 |
+| aggregated | 2216 |
+| ipsum | 2216 |
+| multi-list | 2216 |
+| binarydefense | 2115 |
+| threatfox | 1972 |
 
 ## Multi-source overlaps
 
