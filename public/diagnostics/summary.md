@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-07-18T13:06:10Z_
+_Generated 2026-07-18T16:54:39Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-07-18T13:06:10Z |
+| Generated | 2026-07-18T16:54:39Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 23863 |
+| Duplicates removed | 23856 |
 | Sources reporting | 14 |
 | Indicator types | 7 |
-| Multi-source overlaps | 4788 |
-| Score (min / avg / max) | 60 / 72.0 / 88 |
-| High-score indicators (≥80) | 2363 |
-| Corroborated (2+ sources) | 4788 |
+| Multi-source overlaps | 4818 |
+| Score (min / avg / max) | 60 / 71.9 / 88 |
+| High-score indicators (≥80) | 2364 |
+| Corroborated (2+ sources) | 4818 |
 | Earliest first_seen | 2021-11-03T00:00:00Z |
-| Newest first_seen | 2026-07-18T13:06:05Z |
+| Newest first_seen | 2026-07-18T16:54:32Z |
 
 ## Top indicators by score
 
@@ -30,34 +30,34 @@ _Generated 2026-07-18T13:06:10Z_
 | sha256: `06ba715b44892af143c4336c189c28b5d95f446d3d07ca7ce7a6ab2a0601168b` | score 80, 1 source |
 | md5: `0a9a59c9e53e6d9f218fc6c307016b44` | score 80, 1 source |
 | sha256: `0e8553970999b60c3a0a2637e0c282ca52b33d3e3ae88c99b6fa426bddc0075d` | score 80, 1 source |
+| ipv4: `101[.]133[.]225[.]51` | score 80, 1 source |
 | ipv4: `101[.]34[.]222[.]38` | score 80, 1 source |
 | ipv4: `102[.]117[.]170[.]0` | score 80, 1 source |
-| ipv4: `102[.]220[.]160[.]105` | score 80, 1 source |
 
 ## Per-source totals
 
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5331 |
-| greensnow_blocklist | 3244 |
+| blocklist_de_ssh | 5402 |
+| greensnow_blocklist | 3183 |
 | binarydefense_banlist | 2601 |
 | ipsum_level5 | 1692 |
 | cisa_kev | 1647 |
-| tor_exit_nodes | 1423 |
-| threatfox_export_json | 795 |
-| malwarebazaar_recent | 782 |
+| tor_exit_nodes | 1424 |
+| threatfox_export_json | 793 |
+| malwarebazaar_recent | 759 |
 | et_compromised | 578 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| ipv4 | 6529 |
+| ipv4 | 5977 |
 | cve | 1647 |
-| domain | 1431 |
-| url | 331 |
-| sha256 | 24 |
+| domain | 1460 |
+| url | 853 |
+| sha256 | 25 |
 | md5 | 19 |
 | sha1 | 19 |
 
@@ -65,16 +65,16 @@ _Generated 2026-07-18T13:06:10Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| blocklist | 6316 |
-| greensnow | 3331 |
-| scanner | 2935 |
-| ssh | 2688 |
-| bruteforce | 2686 |
-| aggregated | 2307 |
-| ipsum | 2307 |
-| multi-list | 2307 |
-| binarydefense | 2120 |
-| cins | 2037 |
+| blocklist | 5757 |
+| scanner | 3429 |
+| ssh | 2714 |
+| bruteforce | 2712 |
+| binarydefense | 2601 |
+| greensnow | 2375 |
+| aggregated | 2226 |
+| ipsum | 2226 |
+| multi-list | 2226 |
+| threatfox | 2068 |
 
 ## Multi-source overlaps
 
