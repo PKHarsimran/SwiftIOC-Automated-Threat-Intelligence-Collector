@@ -4,7 +4,7 @@ from __future__ import annotations
 import ipaddress
 from typing import Set, Tuple
 
-from .models import _URL_HEAD_RE, refang
+from .models import _URL_HEAD_RE, _split_authority, refang
 
 
 # ---------------- false-positive / bogon filtering ----------------
@@ -63,7 +63,7 @@ def is_false_positive(itype: str, value: str) -> bool:
     if itype == "url":
         m = _URL_HEAD_RE.match(raw)
         if m:
-            host = m.group(3).split("@")[-1].split(":")[0]
+            _userinfo_at, host, _port = _split_authority(m.group(3))
             return host in FP_IPS or _ip_is_bogon(host) or _domain_is_fp(host)
     return False
 

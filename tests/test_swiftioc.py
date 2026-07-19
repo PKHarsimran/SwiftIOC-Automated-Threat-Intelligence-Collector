@@ -6,8 +6,10 @@ CI and catches feed-format drift without depending on live feeds.
 """
 from __future__ import annotations
 
+import csv
 import json
 import uuid
+from datetime import timedelta
 
 import pytest
 
@@ -35,6 +37,27 @@ import swiftioc as si
 )
 def test_classify(value, expected):
     assert si.classify(value) == expected
+
+
+def test_parse_dt_treats_naive_timestamp_as_utc():
+    # abuse.ch-style feeds (URLhaus/MalwareBazaar/Feodo/SSLBL) emit naive
+    # "YYYY-MM-DD HH:MM:SS" timestamps with no offset despite "_utc"-suffixed
+    # field names. dtparser.parse() on that leaves tzinfo=None, and Python's
+    # .astimezone() on a naive datetime silently assumes the HOST machine's
+    # local timezone — parse_dt must treat naive input as already UTC.
+    dt = si.parse_dt("2024-01-15 10:23:45")
+    assert dt is not None
+    offset = dt.utcoffset()
+    assert offset is not None and offset.total_seconds() == 0
+    assert dt.hour == 10 and dt.minute == 23
+
+
+def test_parse_dt_preserves_explicit_offset():
+    dt = si.parse_dt("2024-01-15T10:23:45+05:00")
+    assert dt is not None
+    offset = dt.utcoffset()
+    assert offset is not None and offset.total_seconds() == 0
+    assert dt.hour == 5
 
 
 def test_defang_min():
@@ -66,6 +89,26 @@ def test_normalize_value_no_userinfo():
     assert si.normalize_value("url", "HTTPS://Evil.COM/Path") == "https://evil.com/Path"
 
 
+# ------------------------- false-positive filtering ---------------------------
+def test_is_false_positive_blocks_ipv4_loopback_url():
+    assert si.is_false_positive("url", "http://127.0.0.1:8080/x") is True
+
+
+def test_is_false_positive_blocks_bracketed_ipv6_loopback_url():
+    # Regression: splitting a bracketed IPv6 authority on the first colon
+    # yielded "[" instead of the address, so these silently passed as
+    # legitimate before is_false_positive was fixed to use _split_authority.
+    assert si.is_false_positive("url", "http://[::1]:8080/x") is True
+
+
+def test_is_false_positive_blocks_bracketed_ipv6_link_local_url_no_port():
+    assert si.is_false_positive("url", "http://[fe80::1]/x") is True
+
+
+def test_is_false_positive_allows_real_url():
+    assert si.is_false_positive("url", "http://bad-c2.attacker-controlled.net/x") is False
+
+
 def test_extract_indicators_from_text():
     blob = "See https://evil.example.com and 8.8.8.8 plus CVE-2024-0001"
     found = dict((t, v) for t, v in si.extract_indicators_from_text(blob))
@@ -73,6 +116,22 @@ def test_extract_indicators_from_text():
     assert found["cve"] == "CVE-2024-0001"
     types = {t for t, _ in si.extract_indicators_from_text(blob)}
     assert "ipv4" in types
+
+
+def test_extract_indicators_from_text_finds_bare_domains():
+    # iocextract has no extract_domains function, so bare-domain mentions
+    # (no http(s):// prefix — common phrasing in threat write-ups) must be
+    # recovered by our own fallback, not silently dropped.
+    blob = "Beware of bare-domain-example-xyz123.tk hosting malware."
+    found = dict((t, v) for t, v in si.extract_indicators_from_text(blob))
+    assert found.get("domain") == "bare-domain-example-xyz123.tk"
+
+
+def test_extract_indicators_from_text_ignores_filenames():
+    blob = "The dropper saved itself as readme.md and payload.exe on disk."
+    values = {v for _, v in si.extract_indicators_from_text(blob)}
+    assert "readme.md" not in values
+    assert "payload.exe" not in values
 
 
 # ------------------------------- STIX -----------------------------------------
@@ -174,6 +233,15 @@ def test_spamhaus_drop_parser(monkeypatch):
     assert {i.indicator for i in out} == {"1.2.3.0/24", "5.6.7.0/16"}
 
 
+def test_spamhaus_drop_parser_rejects_out_of_range_octets(monkeypatch):
+    # Regression: a digit-only regex admitted 999.999.999.999/24 as a valid
+    # CIDR; classify() correctly rejects it via ipaddress.
+    payload = "1.2.3.0/24 ; SBL12345\n999.999.999.999/24 ; garbage\n"
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
+    out = si.fetch_spamhaus_drop("http://x", "ref", "spamhaus_drop", si.now_utc())
+    assert {i.indicator for i in out} == {"1.2.3.0/24"}
+
+
 def test_openphish_parser(monkeypatch):
     payload = "https://evil.example.com/phish\nnot-a-url\nhttp://also-evil.example.net/x\n\n"
     monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
@@ -191,12 +259,28 @@ def test_cins_army_parser(monkeypatch):
     assert all(i.type == "ipv4" and i.confidence == "low" for i in out)
 
 
+def test_cins_army_parser_rejects_out_of_range_octets(monkeypatch):
+    # Regression: a digit-only regex admitted 999.999.999.999 as a valid
+    # ipv4 indicator; classify() correctly rejects it via ipaddress.
+    payload = "1.2.3.4\n999.999.999.999\n"
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
+    out = si.fetch_cins_army("http://x", "ref", "ci_army_list", si.now_utc())
+    assert len(out) == 1
+
+
 def test_tor_exit_parser(monkeypatch):
     payload = "# header\n9.9.9.9\nnot-an-ip\n8.8.8.8\n"
     monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
     out = si.fetch_tor_exit("http://x", "ref", "tor_exit_nodes", si.now_utc())
     assert len(out) == 2
     assert all("tor" in i.tags for i in out)
+
+
+def test_tor_exit_parser_rejects_out_of_range_octets(monkeypatch):
+    payload = "9.9.9.9\n999.999.999.999\n"
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
+    out = si.fetch_tor_exit("http://x", "ref", "tor_exit_nodes", si.now_utc())
+    assert len(out) == 1
 
 
 def test_universal_parser_json(monkeypatch):
@@ -214,13 +298,40 @@ def test_universal_parser_json(monkeypatch):
 
 
 def test_universal_parser_plain_text_fallback(monkeypatch):
-    # Not valid JSON or CSV -> falls back to free-text indicator extraction.
+    # Not valid JSON, and CSV-sniffing genuinely fails -> the true
+    # handle_text() last-resort fallback runs (context == source exactly).
+    # Regression: this payload alone doesn't prove the intended branch ran —
+    # csv.Sniffer().sniff() succeeds on plain prose surprisingly often
+    # (finds a space/comma "delimiter"), so parse_as_csv() silently consumes
+    # it first and this test previously passed for the wrong reason.
+    import csv
+
+    def raising_sniff(self, sample, delimiters=None):
+        raise csv.Error("Could not determine delimiter")
+
+    monkeypatch.setattr(csv.Sniffer, "sniff", raising_sniff)
     payload = "Malicious activity seen from 203.0.113.9 and evil-example.org today."
     monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
     ws = si.now_utc().replace(year=2000)
     out = si.fetch_universal("http://x", "ref", "universal_feed", ws)
     types = {i.type for i in out}
     assert "ipv4" in types
+    # Proves handle_text(text, context=source, ...) ran, not parse_as_csv().
+    assert all(i.context == "universal_feed" for i in out)
+
+
+def test_universal_parser_csv_with_header(monkeypatch):
+    # The legitimate parse_as_csv() success path (a real multi-column feed
+    # like a PhishStats-style export) had zero dedicated coverage — every
+    # existing "CSV" case was either JSON or, per the regression above,
+    # accidentally routed through CSV-sniffing rather than testing it on
+    # purpose.
+    payload = "ip,first_seen,tags\n1.2.3.4,2025-01-01T00:00:00Z,malware c2\n"
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
+    ws = si.now_utc().replace(year=2000)
+    out = si.fetch_universal("http://x", "ref", "universal_feed", ws)
+    assert any(i.type == "ipv4" and "1[.]2[.]3[.]4" == i.indicator for i in out)
+    assert any(i.context.startswith("universal_feed[1]/") for i in out)
 
 
 def test_rss_parser_extracts_iocs_from_entries(monkeypatch):
@@ -502,8 +613,6 @@ def test_high_confidence_rows_respects_threshold():
 
 
 def test_apply_retention_age_and_cap():
-    from datetime import timedelta
-
     now = si.now_utc()
 
     def ind(name, score, sources, days_old):
@@ -531,6 +640,27 @@ def test_apply_retention_age_and_cap():
     assert {r.indicator for r in kept2} == {"1.1.1.1", "2.2.2.2"}
     # Result is ranked strongest-first.
     assert kept2[0].indicator == "1.1.1.1"
+
+
+def test_apply_retention_tie_break_uses_first_seen_not_last_seen():
+    # Regression: last_seen is refreshed to this run's fetch-completion
+    # wall-clock time for every re-observed indicator, so it's a fetch-order
+    # artifact, not a real recency signal. The tie-break must use first_seen
+    # (stable, genuine discovery recency) instead.
+    now = si.now_utc()
+    older_discovery = _sample_indicator(indicator="1.1.1.1", type="ipv4")
+    older_discovery.score = 50
+    older_discovery.first_seen = si.iso(now - timedelta(days=10))
+    older_discovery.last_seen = si.iso(now)  # refreshed just now by this run
+
+    newer_discovery = _sample_indicator(indicator="2.2.2.2", type="ipv4")
+    newer_discovery.score = 50
+    newer_discovery.first_seen = si.iso(now - timedelta(hours=1))
+    newer_discovery.last_seen = si.iso(now - timedelta(minutes=1))
+
+    kept, _aged, pruned = si.apply_retention([older_discovery, newer_discovery], max_store=1)
+    assert pruned == 1
+    assert kept[0].indicator == "2.2.2.2"  # genuinely newer discovery wins
 
 
 def test_apply_retention_noop_by_default():
@@ -630,6 +760,19 @@ def test_write_rss_feed_valid_xml_and_ordering(tmp_path):
     assert title_el is not None and title_el.text is not None
     assert "2.2.2.2" in title_el.text
     assert "<" not in title_el.text.replace("&lt;", "")  # escaped, not raw
+
+
+def test_write_rss_feed_strips_illegal_xml_control_chars(tmp_path):
+    import xml.etree.ElementTree as ET
+
+    ind = _sample_indicator(indicator="3.3.3.3", type="ipv4")
+    ind.context = "malware\x01name"  # raw C0 control char — invalid in XML 1.0
+    ind.tags = "c2,\x02bad"
+
+    out = tmp_path / "feed.xml"
+    si.write_rss_feed(out, [ind], site_url="https://example.com", limit=10)
+    # Must not raise "not well-formed (invalid token)".
+    ET.fromstring(out.read_text(encoding="utf-8"))
 
 
 def test_write_badge_json_shields_schema(tmp_path):
@@ -840,6 +983,30 @@ def test_csv_includes_score_column(tmp_path):
     header = lines[0].split(",")
     row = lines[1].split(",")
     assert row[header.index("score")] == "88"
+
+
+def test_csv_neutralizes_formula_injection(tmp_path):
+    # ThreatFox/MalwareBazaar are public-submission feeds; a submitter could
+    # set a malware/tag string starting with =/+/-/@ to trigger formula/DDE
+    # execution when an analyst opens the exported CSV in Excel (CWE-1236).
+    ind = _sample_indicator()
+    ind.context = "=cmd|' /C calc'!A0"
+    ind.tags = "@SUM(1+1)*cmd"
+    out = tmp_path / "latest.csv"
+    si.write_csv(out, [ind])
+    lines = out.read_text(encoding="utf-8").strip().splitlines()
+    header = lines[0].split(",")
+    row = next(csv.reader([lines[1]]))
+    assert row[header.index("context")].startswith("'=")
+    assert row[header.index("tags")].startswith("'@")
+
+
+def test_csv_leaves_normal_values_untouched(tmp_path):
+    ind = _sample_indicator()
+    out = tmp_path / "latest.csv"
+    si.write_csv(out, [ind])
+    lines = out.read_text(encoding="utf-8").strip().splitlines()
+    assert not lines[1].startswith("'")
 
 
 def test_sslbl_ja3_column_order(monkeypatch):

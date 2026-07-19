@@ -179,8 +179,13 @@ def build(
     current_entries.sort(key=lambda t: (t[2]["run_count"], t[2]["max_score"]), reverse=True)
     if summary_max is not None:
         current_entries = current_entries[:summary_max]
+    # Keyed by "type:indicator" (matching Indicator.key()'s (type, indicator)
+    # convention used everywhere else in this codebase), not the bare
+    # indicator string — two indicators of different types can share the
+    # same string value, which would otherwise silently overwrite one
+    # entry with the other's history.
     summary = {
-        ind: {
+        f"{typ}:{ind}": {
             "type": typ,
             "first_seen_run": e["first_run_ts"],
             "last_seen_run": e["last_run_ts"],

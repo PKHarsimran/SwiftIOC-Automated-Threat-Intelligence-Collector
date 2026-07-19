@@ -53,9 +53,19 @@ def parse_dt(s: Optional[str]) -> Optional[datetime]:
     if not s:
         return None
     try:
-        return dtparser.parse(s).astimezone(timezone.utc)
+        dt: datetime = dtparser.parse(s)  # explicit annotation: dateutil's stub return type is unreliable here
     except Exception:
         return None
+    # A naive result (no tzinfo) means the source string had no offset/Z
+    # marker — several feeds (URLhaus, MalwareBazaar, Feodo, SSLBL) emit
+    # exactly this despite "_utc"-suffixed field names. .astimezone() on a
+    # naive datetime assumes the HOST machine's local timezone, silently
+    # corrupting first_seen/last_seen (and everything downstream: scoring
+    # decay, retention windows) on any non-UTC machine. Treat naive input as
+    # already UTC instead.
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
 
 
 def defang_min(text: str) -> str:
@@ -75,21 +85,41 @@ def refang(text: str) -> str:
 _URL_HEAD_RE = re.compile(r"^(hxxps?|https?|ftp)(://)([^/]+)(.*)$", re.I)
 
 
-def _lower_authority_host(authority: str) -> str:
-    """Lowercase only the host portion of a URL authority component.
+def _split_authority(authority: str) -> Tuple[str, str, str]:
+    """Split a URL authority into (userinfo_with_at, host, port).
 
-    ``authority`` is ``[userinfo@]host[:port]``. Userinfo (which may carry a
-    case-sensitive username/password/token) is preserved verbatim; only the
-    host — and an IPv6 literal's brackets — are lowercased.
+    ``authority`` is ``[userinfo@]host[:port]``. An IPv6 literal host is
+    RFC 3986 ``[...]``-bracketed so its own colons aren't mistaken for the
+    port separator (a naive ``split(":")[0]`` yields garbage like ``"["`` for
+    ``"[::1]:8080"``). ``host`` is returned WITHOUT brackets, so callers can
+    hand it straight to ``ipaddress.ip_address()`` or domain matching;
+    ``userinfo_with_at`` includes the trailing ``@`` (or is ``""``).
     """
     userinfo, at, hostport = authority.rpartition("@") if "@" in authority else ("", "", authority)
     if hostport.startswith("["):
         end = hostport.find("]")
         if end != -1:
-            return userinfo + at + hostport[: end + 1].lower() + hostport[end + 1 :]
-        return userinfo + at + hostport.lower()
-    host, sep, port = hostport.partition(":")
-    return userinfo + at + host.lower() + sep + port
+            host = hostport[1:end]
+            rest = hostport[end + 1 :]
+            port = rest[1:] if rest.startswith(":") else ""
+            return userinfo + at, host, port
+        return userinfo + at, hostport, ""
+    host, _sep, port = hostport.partition(":")
+    return userinfo + at, host, port
+
+
+def _lower_authority_host(authority: str) -> str:
+    """Lowercase only the host portion of a URL authority component.
+
+    Userinfo (which may carry a case-sensitive username/password/token) is
+    preserved verbatim; only the host — re-bracketed if it's IPv6 — and its
+    brackets are lowercased.
+    """
+    userinfo_at, host, port = _split_authority(authority)
+    lowered = host.lower()
+    if ":" in lowered:  # IPv6 literal — re-wrap in brackets
+        lowered = f"[{lowered}]"
+    return userinfo_at + lowered + (f":{port}" if port else "")
 
 
 def normalize_value(itype: str, value: str) -> str:

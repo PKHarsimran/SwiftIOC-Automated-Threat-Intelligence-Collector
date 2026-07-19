@@ -31,9 +31,10 @@ ready-to-use examples for rapid deployment in modern DevSecOps workflows.
 - [Configuring sources](#-configuring-sources)
 - [CLI reference](#-cli-reference)
 - [Outputs & diagnostics](#-outputs--diagnostics)
-- [Running in GitHub Actions](#-running-in-github-actions)
 - [GitHub Pages preview & publishing](#-github-pages-preview--publishing)
+- [Running in GitHub Actions](#-running-in-github-actions)
 - [Auto-generated IOC summary](#auto-generated-ioc-summary)
+- [Development & testing](#-development--testing)
 
 ## 🔍 SwiftIOC at a glance
 SwiftIOC helps cybersecurity teams automate the collection and publication of
@@ -106,6 +107,13 @@ high-fidelity IOCs from authoritative sources. The project emphasises:
   python scripts/ioc_timeline.py 45.137.21.9
   python scripts/ioc_timeline.py --at 2026-03-01 evil.example.com
   ```
+
+  Both scripts take a few more flags than shown above — run either with
+  `--help`, or see: `build_history_index.py` also accepts `--max-commits`
+  (cap the number of feed commits walked) and `--summary-max` (cap
+  `history_summary.json` to the N most-attested indicators); `ioc_timeline.py`
+  also accepts `--db` (point at a different index file) and `--json` (emit
+  the raw record instead of the human-readable summary).
 - **Sightings** – each indicator tracks how many collection runs have
   re-observed it (`sightings`), so a one-off scanner hit is distinguishable
   from an IP flagged across dozens of runs. Surfaced in the exports and the
@@ -184,7 +192,9 @@ threat feed workflow".
 │   ├── diagnostics/        # Run report, JSON diagnostics, and auto summary
 │   └── changelog/          # Markdown changelog between runs
 ├── scripts/                # Utility helpers for post-processing
-│   └── summarize_iocs.py   # Generates Markdown summaries for Pages & artifacts
+│   ├── summarize_iocs.py       # Generates Markdown summaries for Pages & artifacts
+│   ├── build_history_index.py  # Builds the IOC time-machine SQLite index from git history
+│   └── ioc_timeline.py         # Queries the time-machine index for an indicator's history
 ├── tests/                  # Offline pytest suite (parsers, STIX, dedup)
 ├── requirements.txt        # Python runtime dependencies
 ├── requirements-dev.txt    # Runtime + lint/type/test tooling
@@ -267,6 +277,11 @@ python -m swiftioc --sources sources.example.yml --out-dir public
 
 Artifacts appear under `public/`. Add `--verbose` for progress logging or
 `--self-test` to run the built-in sanity checks without touching the network.
+
+> **Installing as a package:** `pip install .` (or `pip install -e .` for
+> development) also registers a `swiftioc` console script, so `swiftioc
+> --sources sources.example.yml --out-dir public` works identically to
+> `python -m swiftioc ...` without the `-m` invocation.
 
 
 ## 🧾 Configuring sources
@@ -412,16 +427,21 @@ to stay safe for casual browsing.
 
 ## ⚙️ Running in GitHub Actions
 SwiftIOC runs cleanly inside GitHub Actions and emits artifacts that can be
-published via GitHub Pages. The workflow below collects IOCs hourly and deploys
-`public/`:
+published via GitHub Pages. The minimal workflow below collects IOCs every 4
+hours and deploys `public/` — it's a stripped-down starting point; it does
+**not** persist the feed across runs (see the callout below the code block).
+For the full production setup — including the living feed, retention, MISP
+feed, RSS, and auto-committing outputs back to the repo — see the actual
+[`.github/workflows/collect.yml`](.github/workflows/collect.yml) this project
+runs on itself.
 
 ```yaml
 name: SwiftIOC – Threat Intel Collector
 
 on:
   schedule:
-    - cron: "0 * * * *"   # Run every hour
-  workflow_dispatch:       # Allow manual runs from the Actions tab
+    - cron: "0 */4 * * *"   # Run every 4 hours
+  workflow_dispatch:         # Allow manual runs from the Actions tab
 
 permissions:
   contents: read
@@ -464,6 +484,15 @@ jobs:
 
 `--ci-safe` enables JSON logging, ensures diagnostic directories exist, and
 suppresses hard failures when the optional RSS dependency is missing.
+
+> **This example is stateless.** Each run starts from an empty feed and
+> publishes only what it collects in `--window-hours 48` — it does not get
+> the self-maintaining "living feed" or "top IOCs" curation described in
+> [Indicator scoring & the living feed](#-indicator-scoring--the-living-feed).
+> To get that, checkout with `fetch-depth: 0`, add `--persist-feed
+> --max-age-days 30 --max-store 10000` to the collector invocation, and
+> auto-commit `public/` back to the repo before deploying — exactly what
+> `.github/workflows/collect.yml` does.
 
 
 ## 🧪 Auto-generated IOC summary

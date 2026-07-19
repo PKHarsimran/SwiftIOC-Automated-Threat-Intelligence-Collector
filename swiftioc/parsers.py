@@ -493,7 +493,7 @@ def fetch_spamhaus_drop(url: str, ref_url: str, source: str, ws: datetime) -> Li
         if not line or line.startswith(";") or line.startswith("#"):
             continue
         cidr = line.split(";")[0].strip()
-        if not re.fullmatch(r"(?:\d{1,3}\.){3}\d{1,3}/\d{1,2}", cidr):
+        if classify(cidr) != "ipv4_cidr":
             continue
         out.append(
             Indicator(
@@ -541,7 +541,7 @@ def fetch_cins_army(url: str, ref_url: str, source: str, ws: datetime) -> List[I
         line = line.strip()
         if not line or line.startswith("#"):
             continue
-        if re.match(r"^(?:\d{1,3}\.){3}\d{1,3}$", line):
+        if classify(line) == "ipv4":
             out.append(
                 Indicator(
                     indicator=defang_min(line), type="ipv4", source=source,
@@ -565,7 +565,7 @@ def fetch_tor_exit(url: str, ref_url: str, source: str, ws: datetime) -> List[In
         if not line or line.startswith("#"):
             continue
 
-        if re.match(r"^(?:\d{1,3}\.){3}\d{1,3}$", line):
+        if classify(line) == "ipv4":
             out.append(
                 Indicator(
                     indicator=defang_min(line),

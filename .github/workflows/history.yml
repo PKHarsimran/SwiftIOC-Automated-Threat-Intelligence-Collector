@@ -15,7 +15,11 @@ permissions:
   contents: write
 
 concurrency:
-  group: history-swiftioc
+  # Shared with collect.yml's group (GitHub Actions concurrency groups are
+  # global across workflow files when the name matches) — both auto-commit
+  # + push to main, so this queues them instead of letting them race a
+  # non-fast-forward push.
+  group: collect-swiftioc-refs/heads/main
   cancel-in-progress: false
 
 jobs:
@@ -47,7 +51,7 @@ jobs:
 
       - name: Auto-commit history summary
         if: success()
-        uses: stefanzweifel/git-auto-commit-action@v7
+        uses: stefanzweifel/git-auto-commit-action@4a55954c782fc1ea30b9056cd3e7a2b40ca8887d # v7
         with:
           commit_message: "chore(history): update IOC history summary [skip ci]"
           file_pattern: "public/history_summary.json"

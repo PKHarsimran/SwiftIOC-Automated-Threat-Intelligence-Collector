@@ -13,7 +13,7 @@
 ## Checklist
 - [ ] `ruff check .` passes
 - [ ] `pyright` passes
-- [ ] `python swiftioc.py --self-test` passes
+- [ ] `python -m swiftioc --self-test` passes
 - [ ] `pytest -q` passes
 - [ ] Added/updated tests for the change (offline; network monkeypatched)
 - [ ] Updated docs (`README.md` / `sources.example.yml`) if behavior or config changed

@@ -29,8 +29,27 @@ STIX_HASH_NAMES = {"md5": "MD5", "sha1": "SHA-1", "sha256": "SHA-256", "sha512":
 CSV_HEADER = ["indicator", "type", "source", "first_seen", "last_seen", "confidence", "score", "sightings", "tlp", "tags", "reference", "context"]
 
 
+_CSV_FORMULA_TRIGGERS = ("=", "+", "-", "@", "\t", "\r")
+
+
+def _csv_safe(value: Any) -> Any:
+    """Neutralize CSV/formula injection (CWE-1236).
+
+    tags/context/reference/indicator are attacker-influenced on
+    public-submission sources (ThreatFox, MalwareBazaar) or free-text
+    RSS/OSINT extraction. Excel/LibreOffice/Sheets treat a leading
+    =/+/-/@ (or a raw tab/CR, which can smuggle one past a naive check) as a
+    formula/DDE trigger when the CSV/TSV is opened — these files are direct
+    analyst downloads (public/index.html), not an internal artifact.
+    Prefixing with an apostrophe is the standard OWASP mitigation.
+    """
+    if isinstance(value, str) and value.startswith(_CSV_FORMULA_TRIGGERS):
+        return "'" + value
+    return value
+
+
 def _csv_row(r: Indicator) -> List[Any]:
-    return [r.indicator, r.type, r.source, r.first_seen, r.last_seen, r.confidence, r.score, r.sightings, r.tlp, r.tags, r.reference, r.context]
+    return [_csv_safe(v) for v in (r.indicator, r.type, r.source, r.first_seen, r.last_seen, r.confidence, r.score, r.sightings, r.tlp, r.tags, r.reference, r.context)]
 
 
 def write_csv(path: Path, rows: List[Indicator]) -> None:
@@ -293,7 +312,14 @@ def write_misp_feed(out_dir: Path, rows: List[Indicator], *, run_ts: str) -> int
 
 
 # ---------------- RSS / badge / trend outputs ----------------
+_XML_ILLEGAL_CONTROL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f]")
+
+
 def _xml_escape(text: str) -> str:
+    # XML 1.0 forbids most C0 control characters outside tab/CR/LF; a raw one
+    # in attacker-influenced context/tags (e.g. universal-parser free text)
+    # would otherwise produce a structurally invalid rss.xml.
+    text = _XML_ILLEGAL_CONTROL_RE.sub("", text)
     return (
         text.replace("&", "&amp;")
         .replace("<", "&lt;")
@@ -310,7 +336,13 @@ def write_rss_feed(path: Path, rows: List[Indicator], *, site_url: str, limit: i
     to index.
     """
     path.parent.mkdir(parents=True, exist_ok=True)
-    ranked = sorted(rows, key=lambda r: (r.last_seen, r.score), reverse=True)[:limit]
+    # first_seen, not last_seen: last_seen is refreshed to this run's
+    # fetch-completion time for every re-observed indicator, so within one
+    # run it barely varies and effectively defers to score — biasing
+    # "newest" toward whatever scores highest rather than what was actually
+    # newly discovered. first_seen is stable across runs and matches the
+    # pubDate already used below and the dashboard's own "New" definition.
+    ranked = sorted(rows, key=lambda r: (r.first_seen, r.score), reverse=True)[:limit]
     now_rfc822 = now_utc().strftime("%a, %d %b %Y %H:%M:%S +0000")
     items = []
     for r in ranked:
