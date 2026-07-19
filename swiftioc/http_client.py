@@ -7,16 +7,26 @@ namespace, not the globals ``http_get``/``save_raw`` actually read here.
 """
 from __future__ import annotations
 
+import ipaddress
 import logging
 import random
+import socket
 import time
 from importlib import import_module
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+from urllib.parse import urljoin, urlparse
 
 import requests
 
 logger = logging.getLogger("swiftioc")
+
+# Generous cap for any legitimate feed export; guards against a
+# decompression-bomb / memory-exhaustion response from a single feed.
+MAX_RESPONSE_BYTES = 100 * 1024 * 1024
+# Redirect targets are validated hop-by-hop (see _validate_redirect_target);
+# this bounds the chain length regardless.
+MAX_REDIRECTS = 5
 
 # ---------------- UA pool ----------------
 DEFAULT_UAS = [
@@ -94,22 +104,102 @@ def save_raw(name: str, content: str | bytes, kind: str) -> None:
         logger.debug("raw-save-failed %s: %s", name, e)
 
 
+def _resolves_to_public_address(host: str) -> bool:
+    """True only if every address `host` resolves to is a public IP.
+
+    Rejects loopback/link-local (incl. 169.254.0.0/16 cloud metadata)/
+    RFC1918-private/reserved/multicast targets, and fails closed (returns
+    False) if the host can't be resolved at all.
+    """
+    try:
+        addrs = [ipaddress.ip_address(host)]
+    except ValueError:
+        try:
+            addrs = [ipaddress.ip_address(info[4][0]) for info in socket.getaddrinfo(host, None)]
+        except (socket.gaierror, OSError):
+            return False
+    return bool(addrs) and all(
+        not (a.is_private or a.is_loopback or a.is_link_local or a.is_reserved or a.is_multicast or a.is_unspecified)
+        for a in addrs
+    )
+
+
+def _validate_redirect_target(url: str) -> None:
+    """Block a redirect hop from pivoting to internal/link-local infrastructure.
+
+    Top-level feed URLs come from sources.yml (maintainer-configured, trusted)
+    and are not checked here; only *redirect targets* are, since a compromised
+    upstream host or an open redirect on any configured feed could otherwise
+    30x the request to e.g. a cloud metadata service.
+    """
+    parsed = urlparse(url)
+    if parsed.scheme not in ("http", "https"):
+        raise requests.exceptions.RequestException(f"Refusing redirect to non-http(s) scheme: {url!r}")
+    host = parsed.hostname
+    if not host or not _resolves_to_public_address(host):
+        raise requests.exceptions.RequestException(f"Refusing redirect to a non-public host: {url!r}")
+
+
+def _read_capped(r: requests.Response, max_bytes: int) -> bytes:
+    """Read a streamed response body, aborting before it exceeds max_bytes.
+
+    Guards against a decompression-bomb response (requests/urllib3
+    transparently inflate gzip/deflate): a small compressed body can
+    otherwise expand to gigabytes in memory before any check runs.
+    """
+    content_length = r.headers.get("Content-Length")
+    if content_length is not None:
+        try:
+            if int(content_length) > max_bytes:
+                r.close()
+                raise requests.exceptions.RequestException(
+                    f"Refusing to read response: Content-Length {content_length} exceeds {max_bytes}-byte cap"
+                )
+        except ValueError:
+            pass
+    chunks: List[bytes] = []
+    total = 0
+    for chunk in r.iter_content(chunk_size=65536):
+        total += len(chunk)
+        if total > max_bytes:
+            r.close()
+            raise requests.exceptions.RequestException(
+                f"Response exceeded {max_bytes}-byte cap while streaming (aborted after {total} bytes)"
+            )
+        chunks.append(chunk)
+    return b"".join(chunks)
+
+
 def http_get(url: str, *, name: str, kind: str = "text", timeout: int = 20) -> str | bytes:
     s = ensure_session()
     headers = choose_ua()
     t0 = time.perf_counter()
-    r = s.get(url, headers=headers, timeout=timeout)
+
+    current_url = url
+    r = s.get(current_url, headers=headers, timeout=timeout, stream=True, allow_redirects=False)
+    hops = 0
+    while r.is_redirect or r.is_permanent_redirect:
+        location = r.headers.get("Location")
+        r.close()
+        hops += 1
+        if not location or hops > MAX_REDIRECTS:
+            raise requests.exceptions.TooManyRedirects(f"Exceeded {MAX_REDIRECTS} redirects fetching {url!r}")
+        current_url = urljoin(current_url, location)
+        _validate_redirect_target(current_url)
+        r = s.get(current_url, headers=headers, timeout=timeout, stream=True, allow_redirects=False)
+
     dt = time.perf_counter() - t0
+    raw = _read_capped(r, MAX_RESPONSE_BYTES)
     # Record telemetry before raise_for_status so failed statuses are captured.
     _FETCH_METRICS[name] = {
         "ms": round(dt * 1000),
-        "bytes": len(r.content),
+        "bytes": len(raw),
         "status": r.status_code,
     }
     if HTTP_DEBUG:
-        logger.debug("HTTP %s %.2fs %s [%s]", r.status_code, dt, url, name)
+        logger.debug("HTTP %s %.2fs %s [%s]", r.status_code, dt, current_url, name)
     r.raise_for_status()
-    body = r.text if kind == "text" else r.content
+    body: str | bytes = raw.decode(r.encoding or "utf-8", errors="replace") if kind == "text" else raw
     save_raw(name, body, kind)
     return body
 

@@ -3,7 +3,7 @@ name: CI – SwiftIOC
 on:
   push:
     branches: [main]
-    paths:
+    paths: &ci-paths
       - "swiftioc/**"
       - "scripts/**"
       - "tests/**"
@@ -13,6 +13,7 @@ on:
       - ".github/workflows/ci.yml"
   pull_request:
     branches: [main]
+    paths: *ci-paths
   workflow_dispatch:
 
 env:
@@ -51,7 +52,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Dependency audit
-        uses: pypa/gh-action-pip-audit@v1.1.0
+        uses: pypa/gh-action-pip-audit@1220774d901786e6f652ae159f7b6bc8fea6d266 # v1.1.0
         with:
           inputs: requirements.txt
 
@@ -59,7 +60,7 @@ jobs:
         shell: bash
         run: |
           set -Eeuo pipefail
-          pip install ruff pyright pytest
+          pip install -r requirements-dev.txt
 
       - name: Ruff lint
         run: ruff check .

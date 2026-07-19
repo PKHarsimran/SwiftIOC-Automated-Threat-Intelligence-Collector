@@ -53,6 +53,12 @@ apis:
     url: https://openphish.com/feed.txt
     reference: https://openphish.com/
 
+  - name: spamhaus_drop
+    kind: txt
+    parse: spamhaus_drop
+    url: https://www.spamhaus.org/drop/drop.txt
+    reference: https://www.spamhaus.org/blocklists/do-not-route-or-peer/
+
   # --- Network / Malware IP Feeds ---
   - name: blocklist_de_ssh
     kind: txt

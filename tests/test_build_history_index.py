@@ -44,6 +44,34 @@ def test_series_not_truncated_within_since_days_window(tmp_path, monkeypatch):
     assert len(series) == n_commits
 
 
+def test_history_summary_keyed_by_type_and_indicator(tmp_path, monkeypatch):
+    # Regression: history_summary.json used to be keyed by the bare
+    # indicator string, so two indicators of different types sharing the
+    # same string value would silently overwrite one another. Keying by
+    # "type:indicator" (matching Indicator.key()'s convention) prevents that.
+    mod = _load_builder()
+    commits = [("sha0", 1_700_000_000)]
+    monkeypatch.setattr(mod, "feed_commits", lambda max_commits, since_days: commits)
+    monkeypatch.setattr(
+        mod,
+        "feed_at_commit",
+        lambda sha: iter(
+            [
+                {"indicator": "COLLIDE", "type": "cve", "score": 80, "source": "s", "tags": "t"},
+                {"indicator": "COLLIDE", "type": "domain", "score": 40, "source": "s", "tags": "t"},
+            ]
+        ),
+    )
+
+    mod.build(tmp_path, max_commits=None, since_days=180, summary_max=None)
+
+    summary = json.loads((tmp_path / "history_summary.json").read_text(encoding="utf-8"))
+    assert "cve:COLLIDE" in summary
+    assert "domain:COLLIDE" in summary
+    assert summary["cve:COLLIDE"]["max_score"] == 80
+    assert summary["domain:COLLIDE"]["max_score"] == 40
+
+
 def test_series_falls_back_to_fixed_cap_without_since_days(tmp_path, monkeypatch):
     """Without --since-days the walk is unbounded, so the series still needs
     a fixed ceiling to keep the per-indicator blob from growing forever.

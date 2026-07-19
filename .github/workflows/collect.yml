@@ -22,12 +22,11 @@ on:
 # the diff (e.g. a feed transiently returning zero indicators). ci.yml already
 # exercises the collector end-to-end via a scoped dry run for PR validation.
 
-permissions:
-  contents: write
-  pages: write
-  id-token: write
-
 concurrency:
+  # Shared with history.yml's group (not just this workflow's own runs) —
+  # both jobs auto-commit+push to main, and GitHub Actions concurrency
+  # groups are global across workflow files when the name matches, so this
+  # queues the two rather than letting them race a non-fast-forward push.
   group: collect-swiftioc-${{ github.ref }}
   cancel-in-progress: false
 
@@ -46,12 +45,18 @@ jobs:
     name: Collect IOC feeds
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    # Only the auto-commit step needs write access; this job never touches
+    # Pages or requests an OIDC token — least-privilege vs. the third-party
+    # actions and external feed URLs it runs against.
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout
         uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
+        # Shallow: this job only needs to push one new commit on top of the
+        # current tip (git-auto-commit-action doesn't read history), unlike
+        # history.yml's git-log walk which genuinely needs fetch-depth: 0.
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -185,7 +190,7 @@ jobs:
 
       - name: Auto-commit updated outputs
         if: success() && github.ref == 'refs/heads/main'
-        uses: stefanzweifel/git-auto-commit-action@v7
+        uses: stefanzweifel/git-auto-commit-action@4a55954c782fc1ea30b9056cd3e7a2b40ca8887d # v7
         with:
           commit_message: "chore(ioc): update feeds [skip ci]"
           # Single `public` add — NOT a multi-line file_pattern. The previous
@@ -208,6 +213,9 @@ jobs:
     needs: collect
     if: github.ref == 'refs/heads/main' && vars.ENABLE_PAGES != 'false'
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
 

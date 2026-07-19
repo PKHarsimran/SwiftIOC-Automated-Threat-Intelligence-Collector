@@ -211,6 +211,11 @@ def main() -> int:
         max_workers=args.max_workers,
         fp_filter=args.fp_filter,
     )
+    # Snapshot the post-dedup, pre-persist/expiry/retention count: rows is
+    # about to be grown (carried-forward indicators) and shrunk (expiry,
+    # retention) below, and duplicates_removed must reflect cross-source
+    # dedup alone, not get conflated with those later mutations.
+    deduped_count = len(rows)
 
     out_dir: Path = args.out_dir
 
@@ -304,8 +309,8 @@ def main() -> int:
             first_seen_dates.append(dt)
     earliest = iso(min(first_seen_dates)) if first_seen_dates else None
     latest = iso(max(first_seen_dates)) if first_seen_dates else None
-    raw_total = stats.get("raw_total", len(rows))
-    duplicates_removed = max(raw_total - len(rows), 0)
+    raw_total = stats.get("raw_total", deduped_count)
+    duplicates_removed = max(raw_total - deduped_count, 0)
     empty_sources = sorted([name for name, count in counts.items() if count == 0])
     scores = [r.score for r in rows]
     # Full-feed aggregates the dashboard renders without downloading the whole

@@ -2720,9 +2720,10 @@
    *  IOC LOOKUP
    * ========================================================================= */
 
-  // "Time machine" summary keyed by indicator ({first_seen_run, last_seen_run,
-  // run_count, max_score}), built from git history by build_history_index.py.
-  // Fetched at most once; resolves to {} when the index hasn't been published.
+  // "Time machine" summary keyed by "type:indicator" ({first_seen_run,
+  // last_seen_run, run_count, max_score}), built from git history by
+  // build_history_index.py. Fetched at most once; resolves to {} when the
+  // index hasn't been published.
   let historySummaryPromise = null;
   const loadHistorySummary = () => {
     if (!historySummaryPromise) {
@@ -2739,10 +2740,11 @@
   const enrichWithHistory = (row, details, appendDetail) => {
     loadHistorySummary()
       .then((summary) => {
+        const type = row.type || '';
         const entry =
-          summary[row.indicator] ||
-          summary[refang(row.indicator)] ||
-          summary[normaliseString(row.indicator)];
+          summary[`${type}:${row.indicator}`] ||
+          summary[`${type}:${refang(row.indicator)}`] ||
+          summary[`${type}:${normaliseString(row.indicator)}`];
         if (!entry) return;
         if (typeof entry.first_seen_run === 'number') {
           appendDetail(

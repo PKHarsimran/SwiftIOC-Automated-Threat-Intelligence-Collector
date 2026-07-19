@@ -99,9 +99,16 @@ def apply_retention(
         aged_out = before - len(rows)
     pruned = 0
     if max_store is not None and len(rows) > max_store:
+        # Tie-break on first_seen, not last_seen: last_seen is refreshed to
+        # this run's fetch-completion wall-clock time for every re-observed
+        # indicator regardless of how long it's actually been known, so
+        # within one run it's nearly identical across huge swaths of rows
+        # (a fetch-order artifact) rather than a real recency signal.
+        # first_seen is stable across runs and reflects genuine discovery
+        # recency.
         rows = sorted(
             rows,
-            key=lambda r: (r.score, source_count(r), r.last_seen, r.indicator),
+            key=lambda r: (r.score, source_count(r), r.first_seen, r.indicator),
             reverse=True,
         )
         pruned = len(rows) - max_store
