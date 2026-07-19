@@ -59,6 +59,15 @@ apis:
     url: https://www.spamhaus.org/drop/drop.txt
     reference: https://www.spamhaus.org/blocklists/do-not-route-or-peer/
 
+  # SANS ISC / DShield's top-attacking netblocks, aggregated from their own
+  # distributed sensor network — independent of every abuse.ch/CINS/IPsum
+  # source above, so overlap with them is genuine cross-vendor corroboration.
+  - name: dshield_block
+    kind: txt
+    parse: dshield_block
+    url: https://feeds.dshield.org/block.txt
+    reference: https://isc.sans.edu/block.html
+
   # --- Network / Malware IP Feeds ---
   - name: blocklist_de_ssh
     kind: txt

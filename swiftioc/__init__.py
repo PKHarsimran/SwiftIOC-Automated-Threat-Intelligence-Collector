@@ -82,6 +82,7 @@ from .parsers import (
     fetch_blocklist_txt,
     fetch_cins_army,
     fetch_cisa_kev,
+    fetch_dshield_block,
     fetch_feodo_ipblocklist,
     fetch_malwarebazaar_csv,
     fetch_nvd_recent,
@@ -152,7 +153,7 @@ __all__ = [
     "DECAY_HALF_LIFE_HOURS", "DEFAULT_HALF_LIFE_HOURS",
     # parsers
     "PARSERS", "ParserRegistry", "register_parser", "resolve_parser",
-    "fetch_cisa_kev", "fetch_nvd_recent", "fetch_urlhaus_csv",
+    "fetch_cisa_kev", "fetch_nvd_recent", "fetch_urlhaus_csv", "fetch_dshield_block",
     "fetch_malwarebazaar_csv", "fetch_threatfox_export_json",
     "fetch_feodo_ipblocklist", "fetch_sslbl_ja3", "fetch_sslbl_ja3s",
     "fetch_spamhaus_drop", "fetch_openphish", "fetch_cins_army",
