@@ -48,8 +48,8 @@ high-fidelity IOCs from authoritative sources. The project emphasises:
 ## 🚀 Features
 - **YAML-driven feeds** – feed metadata lives in `sources.yml` so collections can
   be changed without touching Python code. The example file includes adapters for
-  CISA KEV, URLhaus, MalwareBazaar, ThreatFox, Feodo Tracker, SSLBL JA3, Spamhaus
-  DROP, OpenPhish, CINS Army, and Tor exit lists.
+  CISA KEV, NVD, URLhaus, MalwareBazaar, ThreatFox, Feodo Tracker, SSLBL JA3,
+  Spamhaus DROP, DShield/SANS ISC, OpenPhish, CINS Army, Tor exit lists, and more.
 - **Indicator normalisation** – every indicator is represented by the
   `Indicator` dataclass and classified (IPv4/IPv6, URL, domain, hash, CVE, etc.)
   before being written to disk. 
@@ -151,6 +151,8 @@ intelligence feeds used by SOC teams and managed security providers:
 
 - **CISA Known Exploited Vulnerabilities (KEV)** – prioritise patching by
   monitoring the official CISA KEV catalogue.
+- **NVD (NIST National Vulnerability Database)** – recently published/updated
+  CVEs with CVSS severity, corroborating and enriching the KEV catalogue.
 - **URLhaus** – ingest malicious URL indicators to protect web gateways and
   proxies.
 - **MalwareBazaar** – track malicious file hashes for EDR, AV, and sandbox
@@ -159,8 +161,12 @@ intelligence feeds used by SOC teams and managed security providers:
 - **Feodo Tracker & SSLBL JA3 fingerprints** – detect C2 traffic associated
   with banking trojans and malicious TLS fingerprints.
 - **Spamhaus DROP/EDROP** – block known botnet controllers at the network edge.
-- **OpenPhish, CINS Army, Tor exit lists, and more** – extend coverage with
-  phishing, scanning, and anonymiser indicators.
+- **DShield / SANS Internet Storm Center** – the top attacking netblocks from
+  DShield's independent, distributed sensor network — a genuinely different
+  detection methodology from the abuse.ch/CINS/IPsum feeds above, so overlap
+  with them is real cross-vendor corroboration, not double-counting.
+- **OpenPhish, CINS Army, Tor exit lists, blocklist.de, IPsum, and more** –
+  extend coverage with phishing, scanning, and anonymiser indicators.
 
 Each feed is configurable through `sources.yml`, allowing teams to fine-tune the
 collection cadence, lookback windows, and authentication as required.

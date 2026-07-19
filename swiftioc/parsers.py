@@ -179,7 +179,16 @@ def fetch_nvd_recent(url: str, ref_url: str, source: str, ws: datetime) -> List[
         published = parse_dt(cve.get("published"))
         last_modified = parse_dt(cve.get("lastModified"))
         first_seen = published or last_modified or now
-        if first_seen and first_seen < ws:
+        # The request above is windowed on lastModStartDate/lastModEndDate
+        # (or pubStartDate for a differently-configured URL), so the
+        # recency gate must check the SAME dimension. Most CVEs the API
+        # returns for a "recently modified" window are old CVEs that were
+        # merely re-analyzed/re-scored today — checking `first_seen`
+        # (which prefers the original publish date) here discarded most or
+        # all of what the API just returned, intermittently zeroing this
+        # source out entirely.
+        recency_anchor = last_modified or first_seen
+        if recency_anchor and recency_anchor < ws:
             continue
         description = ""
         for desc in cve.get("descriptions", []) or []:
@@ -502,6 +511,44 @@ def fetch_spamhaus_drop(url: str, ref_url: str, source: str, ws: datetime) -> Li
                 confidence="high", tlp="CLEAR",
                 tags="spamhaus,drop", reference=ref_url or "",
                 context="Spamhaus DROP/EDROP network",
+            )
+        )
+    return out
+
+
+@register_parser("dshield_block")
+def fetch_dshield_block(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
+    """SANS ISC / DShield "Recommended Block List": the top ~20 attacking
+    /24 netblocks over the last 3 days, aggregated from DShield's
+    distributed sensor network. Tab-delimited: start_ip, end_ip,
+    prefix_len, target_count, org, country, contact — independent of every
+    other source here (honeypot/firewall-log aggregation, not a single
+    vendor's malware feed), so overlap with them is genuine corroboration.
+    """
+    text = ensure_text(_pkg.http_get(url, name=source))
+    out: List[Indicator] = []
+    now = now_utc()
+    for line in text.splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        cols = line.split("\t")
+        if len(cols) < 4:
+            continue
+        start_ip, prefix_len, target_count = cols[0].strip(), cols[2].strip(), cols[3].strip()
+        cidr = f"{start_ip}/{prefix_len}"
+        if classify(cidr) != "ipv4_cidr":
+            continue
+        org = cols[4].strip() if len(cols) > 4 else ""
+        country = cols[5].strip() if len(cols) > 5 else ""
+        origin = f" ({org}, {country})" if org and org not in {"-", ""} else ""
+        out.append(
+            Indicator(
+                indicator=cidr, type="ipv4_cidr", source=source,
+                first_seen=iso(now), last_seen=iso(now),
+                confidence="medium", tlp="CLEAR",
+                tags="dshield,scanning,sans-isc", reference=ref_url or "",
+                context=f"DShield top-attacking netblock: {target_count} targets reporting scans{origin}",
             )
         )
     return out

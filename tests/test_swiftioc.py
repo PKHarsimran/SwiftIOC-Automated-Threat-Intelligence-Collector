@@ -233,6 +233,30 @@ def test_spamhaus_drop_parser(monkeypatch):
     assert {i.indicator for i in out} == {"1.2.3.0/24", "5.6.7.0/16"}
 
 
+def test_dshield_block_parser(monkeypatch):
+    payload = (
+        "#\n#   DShield.org Recommended Block List\n#\n"
+        "162.217.100.0\t162.217.100.255\t24\t344\tSINGLEHOP-LLC\tUS\tnetops@singlehop.com\n"
+        "66.132.172.0\t66.132.172.255\t24\t340\t-\t-\t-\n"
+    )
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
+    out = si.fetch_dshield_block("http://x", "ref", "dshield_block", si.now_utc())
+    assert len(out) == 2
+    assert all(i.type == "ipv4_cidr" and i.confidence == "medium" for i in out)
+    assert {i.indicator for i in out} == {"162.217.100.0/24", "66.132.172.0/24"}
+    with_org = next(i for i in out if i.indicator == "162.217.100.0/24")
+    assert "SINGLEHOP-LLC" in with_org.context and "344 targets" in with_org.context
+    no_org = next(i for i in out if i.indicator == "66.132.172.0/24")
+    assert "(-" not in no_org.context  # placeholder "-" org/country omitted, not leaked into context
+
+
+def test_dshield_block_parser_skips_malformed_rows(monkeypatch):
+    payload = "# header\ntoo\tfew\tcols\n999.999.999.0\t999.999.999.255\t24\t10\n"
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
+    out = si.fetch_dshield_block("http://x", "ref", "dshield_block", si.now_utc())
+    assert out == []
+
+
 def test_spamhaus_drop_parser_rejects_out_of_range_octets(monkeypatch):
     # Regression: a digit-only regex admitted 999.999.999.999/24 as a valid
     # CIDR; classify() correctly rejects it via ipaddress.
@@ -1042,6 +1066,38 @@ def test_nvd_parser_requests_recent_window(monkeypatch):
     )
     assert "lastModStartDate" in captured["url"]
     assert "lastModEndDate" in captured["url"]
+
+
+def test_nvd_parser_keeps_old_cve_recently_modified(monkeypatch):
+    # Regression: the query is windowed on lastModified (see test above),
+    # but the recency gate used to check `published` instead — dropping an
+    # old CVE that was merely re-analyzed/re-scored today, which in
+    # practice is the majority of what "recently modified" returns. This
+    # intermittently zeroed the whole source out in production.
+    now = si.now_utc()
+    payload = json.dumps(
+        {
+            "vulnerabilities": [
+                {
+                    "cve": {
+                        "id": "CVE-2023-0567",
+                        "published": "2023-03-01T08:15:11.530",
+                        "lastModified": si.iso(now),
+                        "descriptions": [{"lang": "en", "value": "Old CVE, freshly re-scored"}],
+                        "metrics": {"cvssMetricV31": [{"cvssData": {"baseSeverity": "HIGH"}}]},
+                    }
+                }
+            ]
+        }
+    )
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
+    ws = now - timedelta(hours=48)
+    out = si.fetch_nvd_recent(
+        "https://services.nvd.nist.gov/rest/json/cves/2.0/?resultsPerPage=200", "ref", "nvd", ws,
+    )
+    assert len(out) == 1
+    assert out[0].indicator == "CVE-2023-0567"
+    assert out[0].first_seen.startswith("2023-03-01")  # true original publish date preserved
 
 
 def test_threatfox_export_endpoint_shape(monkeypatch):
