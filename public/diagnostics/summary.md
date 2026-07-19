@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-07-19T02:12:20Z_
+_Generated 2026-07-19T06:26:17Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-07-19T02:12:20Z |
+| Generated | 2026-07-19T06:26:17Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 4216 |
+| Duplicates removed | 3972 |
 | Sources reporting | 15 |
 | Indicator types | 8 |
-| Multi-source overlaps | 4430 |
-| Score (min / avg / max) | 68 / 75.5 / 88 |
-| High-score indicators (≥80) | 4150 |
-| Corroborated (2+ sources) | 4430 |
+| Multi-source overlaps | 4444 |
+| Score (min / avg / max) | 68 / 75.4 / 88 |
+| High-score indicators (≥80) | 4153 |
+| Corroborated (2+ sources) | 4444 |
 | Earliest first_seen | 2021-11-03T00:00:00Z |
-| Newest first_seen | 2026-07-19T02:11:47Z |
+| Newest first_seen | 2026-07-19T06:26:01Z |
 
 ## Top indicators by score
 
@@ -39,25 +39,25 @@ _Generated 2026-07-19T02:12:20Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5534 |
-| greensnow_blocklist | 3775 |
+| blocklist_de_ssh | 5648 |
+| greensnow_blocklist | 3698 |
 | binarydefense_banlist | 2819 |
 | ipsum_level5 | 2279 |
 | spamhaus_drop | 1678 |
 | cisa_kev | 1647 |
 | tor_exit_nodes | 1422 |
-| threatfox_export_json | 888 |
-| malwarebazaar_recent | 692 |
+| threatfox_export_json | 890 |
+| malwarebazaar_recent | 667 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| ipv4 | 4681 |
+| ipv4 | 4690 |
 | ipv4_cidr | 1677 |
 | cve | 1647 |
-| domain | 1527 |
-| url | 340 |
+| domain | 1542 |
+| url | 316 |
 | sha256 | 46 |
 | md5 | 41 |
 | sha1 | 41 |
@@ -66,16 +66,16 @@ _Generated 2026-07-19T02:12:20Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| blocklist | 4429 |
-| aggregated | 2990 |
-| ipsum | 2990 |
-| multi-list | 2990 |
-| scanner | 2856 |
-| cins | 2358 |
-| threatfox | 2242 |
-| ssh | 1932 |
-| bruteforce | 1930 |
-| binarydefense | 1815 |
+| blocklist | 4443 |
+| aggregated | 2970 |
+| ipsum | 2970 |
+| multi-list | 2970 |
+| scanner | 2857 |
+| cins | 2356 |
+| threatfox | 2228 |
+| ssh | 1962 |
+| bruteforce | 1960 |
+| binarydefense | 1830 |
 
 ## Multi-source overlaps
 
