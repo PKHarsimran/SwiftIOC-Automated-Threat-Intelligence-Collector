@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-07-20T02:32:17Z_
+_Generated 2026-07-20T06:41:54Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-07-20T02:32:17Z |
+| Generated | 2026-07-20T06:41:54Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3952 |
+| Duplicates removed | 3792 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-source overlaps | 4034 |
-| Score (min / avg / max) | 68 / 75.8 / 88 |
-| High-score indicators (≥80) | 4268 |
-| Corroborated (2+ sources) | 4034 |
+| Multi-source overlaps | 3964 |
+| Score (min / avg / max) | 68 / 75.7 / 88 |
+| High-score indicators (≥80) | 4343 |
+| Corroborated (2+ sources) | 3964 |
 | Earliest first_seen | 2021-11-03T00:00:00Z |
-| Newest first_seen | 2026-07-20T02:32:10Z |
+| Newest first_seen | 2026-07-20T06:41:21Z |
 
 ## Top indicators by score
 
@@ -31,7 +31,7 @@ _Generated 2026-07-20T02:32:17Z_
 | url: `hxxp://193[.]148[.]56[.]98/WQUKDbdzO8yY5asDU6` | score 88, 2 sources |
 | url: `hxxps://gerenland[.]click/api/stale[.]msi` | score 88, 2 sources |
 | url: `hxxps://gerenland[.]click/flask/whales[.]msi` | score 88, 2 sources |
-| url: `hxxp://41[.]216[.]189[.]236/nz[.]sh` | score 81, 2 sources |
+| url: `hxxp://41[.]216[.]189[.]236/nz[.]sh` | score 80, 2 sources |
 | sha1: `0301c109feb04625b760b29cc34fceadd8c62e6f` | score 80, 1 source |
 
 ## Per-source totals
@@ -39,25 +39,25 @@ _Generated 2026-07-20T02:32:17Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4965 |
-| greensnow_blocklist | 3384 |
+| blocklist_de_ssh | 4984 |
+| greensnow_blocklist | 3404 |
 | binarydefense_banlist | 3029 |
 | ipsum_level5 | 2071 |
 | spamhaus_drop | 1678 |
 | cisa_kev | 1647 |
 | tor_exit_nodes | 1423 |
-| threatfox_export_json | 776 |
-| malwarebazaar_recent | 660 |
+| threatfox_export_json | 808 |
+| malwarebazaar_recent | 656 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| ipv4 | 4248 |
-| cve | 1881 |
-| domain | 1719 |
+| ipv4 | 4163 |
+| cve | 1933 |
+| domain | 1748 |
 | ipv4_cidr | 1677 |
-| url | 308 |
+| url | 312 |
 | sha256 | 69 |
 | md5 | 49 |
 | sha1 | 49 |
@@ -66,16 +66,16 @@ _Generated 2026-07-20T02:32:17Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| blocklist | 4025 |
-| aggregated | 3173 |
-| ipsum | 3173 |
-| multi-list | 3173 |
-| scanner | 2768 |
-| threatfox | 2412 |
-| cins | 2213 |
-| cve | 1881 |
-| ssh | 1856 |
-| bruteforce | 1855 |
+| blocklist | 3955 |
+| aggregated | 3036 |
+| ipsum | 3036 |
+| multi-list | 3036 |
+| scanner | 2677 |
+| threatfox | 2430 |
+| cins | 2225 |
+| cve | 1933 |
+| ssh | 1863 |
+| bruteforce | 1862 |
 
 ## Multi-source overlaps
 
