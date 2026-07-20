@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-07-20T10:47:04Z_
+_Generated 2026-07-20T13:57:41Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-07-20T10:47:04Z |
+| Generated | 2026-07-20T13:57:41Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3262 |
+| Duplicates removed | 3467 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-source overlaps | 3818 |
-| Score (min / avg / max) | 68 / 75.8 / 88 |
-| High-score indicators (≥80) | 4444 |
-| Corroborated (2+ sources) | 3818 |
+| Multi-source overlaps | 3504 |
+| Score (min / avg / max) | 68 / 76.0 / 88 |
+| High-score indicators (≥80) | 4720 |
+| Corroborated (2+ sources) | 3504 |
 | Earliest first_seen | 2021-11-03T00:00:00Z |
-| Newest first_seen | 2026-07-20T10:46:30Z |
+| Newest first_seen | 2026-07-20T13:55:35Z |
 
 ## Top indicators by score
 
@@ -39,43 +39,43 @@ _Generated 2026-07-20T10:47:04Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5224 |
+| blocklist_de_ssh | 5430 |
 | binarydefense_banlist | 3029 |
-| greensnow_blocklist | 2301 |
+| greensnow_blocklist | 2928 |
 | ipsum_level5 | 2071 |
 | spamhaus_drop | 1667 |
 | cisa_kev | 1647 |
-| tor_exit_nodes | 1421 |
-| threatfox_export_json | 904 |
-| malwarebazaar_recent | 726 |
+| tor_exit_nodes | 1419 |
+| threatfox_export_json | 1035 |
+| malwarebazaar_recent | 747 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| ipv4 | 4045 |
-| cve | 1962 |
-| domain | 1800 |
+| ipv4 | 3745 |
+| cve | 2119 |
+| domain | 1856 |
 | ipv4_cidr | 1677 |
-| url | 349 |
-| sha256 | 69 |
-| md5 | 49 |
-| sha1 | 49 |
+| url | 355 |
+| sha256 | 96 |
+| md5 | 76 |
+| sha1 | 76 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| blocklist | 3809 |
-| aggregated | 2913 |
-| ipsum | 2913 |
-| multi-list | 2913 |
-| scanner | 2573 |
-| threatfox | 2547 |
-| cins | 2124 |
-| cve | 1962 |
-| ssh | 1840 |
-| bruteforce | 1839 |
+| blocklist | 3495 |
+| threatfox | 2704 |
+| aggregated | 2664 |
+| ipsum | 2664 |
+| multi-list | 2664 |
+| scanner | 2457 |
+| cve | 2119 |
+| cins | 1993 |
+| drop | 1677 |
+| spamhaus | 1677 |
 
 ## Multi-source overlaps
 
@@ -86,10 +86,10 @@ _Generated 2026-07-20T10:47:04Z_
 | ipv4: 107[.]189[.]10[.]124 | blocklist_de_ssh, ci_army_list, et_compromised, greensnow_blocklist, ipsum_level5 |
 | ipv4: 118[.]216[.]88[.]229 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, et_compromised, ipsum_level5 |
 | ipv4: 118[.]26[.]111[.]107 | blocklist_de_ssh, ci_army_list, et_compromised, greensnow_blocklist, ipsum_level5 |
+| ipv4: 138[.]197[.]39[.]208 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, greensnow_blocklist, ipsum_level5 |
 | ipv4: 144[.]31[.]156[.]249 | blocklist_de_ssh, ci_army_list, et_compromised, greensnow_blocklist, ipsum_level5 |
 | ipv4: 148[.]66[.]142[.]9 | blocklist_de_ssh, ci_army_list, et_compromised, greensnow_blocklist, ipsum_level5 |
 | ipv4: 151[.]217[.]4[.]34 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, greensnow_blocklist, ipsum_level5 |
 | ipv4: 159[.]65[.]143[.]47 | blocklist_de_ssh, ci_army_list, et_compromised, greensnow_blocklist, ipsum_level5 |
-| ipv4: 167[.]94[.]146[.]49 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, greensnow_blocklist, ipsum_level5 |
 
 For more detail see [diagnostics/REPORT.md](diagnostics/REPORT.md) and the machine-readable feeds in [iocs/](iocs/).
