@@ -158,6 +158,25 @@
     return success;
   };
 
+  // Clipboard access can fail silently in real browsers, not just this test
+  // harness — a background/unfocused tab, a corporate permission policy, or
+  // older Firefox without the async Clipboard API all reject or no-op the
+  // copy. Falling back to window.prompt() (pre-filled + auto-selected) means
+  // "Share view"/"Copy" never dead-ends the user with nothing to act on.
+  const copyOrPrompt = async (text, successMessage, promptLabel) => {
+    let copied = false;
+    try {
+      copied = await copyToClipboard(text);
+    } catch (error) {
+      copied = false;
+    }
+    if (copied) {
+      showToast(successMessage);
+    } else {
+      window.prompt(promptLabel, text);
+    }
+  };
+
   const safeHttpUrl = (value) => {
     const text = normaliseString(value);
     if (!text) return null;
@@ -2095,14 +2114,8 @@
       copy.setAttribute('aria-label', 'Copy indicator ' + (row.indicator || ''));
       copy.addEventListener('click', async () => {
         copy.disabled = true;
-        try {
-          await copyToClipboard(row.indicator);
-          showToast('Indicator copied to clipboard.');
-        } catch (error) {
-          showToast('Could not copy the indicator.');
-        } finally {
-          copy.disabled = false;
-        }
+        await copyOrPrompt(row.indicator, 'Indicator copied to clipboard.', 'Copy this indicator:');
+        copy.disabled = false;
       });
       const toggle = document.createElement('button');
       toggle.type = 'button';
@@ -2580,12 +2593,7 @@
     });
     shareButton?.addEventListener('click', async () => {
       const url = writeUrl({ includeSearch: true });
-      try {
-        await copyToClipboard(url.toString());
-        showToast('Shareable dashboard view copied.');
-      } catch (error) {
-        showToast('Could not copy the dashboard URL.');
-      }
+      await copyOrPrompt(url.toString(), 'Shareable dashboard view copied.', 'Copy this shareable link:');
     });
     refreshButton?.addEventListener('click', () => load({ forceRefresh: true }));
     retryButton?.addEventListener('click', () => load({ forceRefresh: true }));
@@ -2851,12 +2859,7 @@
         };
         actions.appendChild(
           makeAction('Copy indicator', async () => {
-            try {
-              await copyToClipboard(row.indicator);
-              showToast('Indicator copied to clipboard.');
-            } catch (error) {
-              showToast('Could not copy the indicator.');
-            }
+            await copyOrPrompt(row.indicator, 'Indicator copied to clipboard.', 'Copy this indicator:');
           })
         );
         actions.appendChild(
@@ -2867,12 +2870,7 @@
             const url = new URL(window.location.href);
             url.hash = `ioc=${encodeURIComponent(row.indicator)}`;
             window.history.replaceState(null, '', url);
-            try {
-              await copyToClipboard(url.toString());
-              showToast('Shareable IOC lookup copied.');
-            } catch (error) {
-              showToast('Could not copy the lookup URL.');
-            }
+            await copyOrPrompt(url.toString(), 'Shareable IOC lookup copied.', 'Copy this shareable link:');
           })
         );
         if (row.reference) {

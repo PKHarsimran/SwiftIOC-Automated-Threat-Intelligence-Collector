@@ -10,13 +10,21 @@
     />
     <meta name="keywords" content="threat intelligence feed, malicious IP list, IOC feed, indicators of compromise, C2 IP blocklist, open source threat intel, STIX feed, free IOC download" />
     <meta name="theme-color" content="#0f172a" />
+    <link rel="canonical" href="https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="SwiftIOC — Free Live IOC Feed" />
     <meta
       property="og:description"
       content="The latest malicious IPs, domains, URLs, and hashes — scored, corroborated across sources, and updated automatically. Free CSV / JSON / STIX downloads."
     />
+    <meta property="og:url" content="https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/" />
     <meta name="twitter:card" content="summary" />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="SwiftIOC — Newest High-Confidence IOCs"
+      href="feed.xml"
+    />
     <!-- Start the data fetch as early as possible: the dashboard feed and the
          run aggregates are the page's real content. -->
     <link rel="preload" href="iocs/dashboard.jsonl" as="fetch" crossorigin="anonymous" />
@@ -38,7 +46,40 @@
       });
     </script>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/styles.css?v=6" />
+    <link rel="stylesheet" href="assets/styles.css?v=7" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Dataset",
+        "name": "SwiftIOC Threat Intelligence Feed",
+        "description": "Free, open-source, continuously updated feed of scored, cross-source-corroborated indicators of compromise (malicious IPs, domains, URLs, and file hashes) aggregated from CISA KEV, NVD, abuse.ch, Spamhaus, DShield/SANS ISC, and other public threat intelligence sources.",
+        "url": "https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/",
+        "license": "https://opensource.org/licenses/MIT",
+        "isAccessibleForFree": true,
+        "creator": {
+          "@type": "Organization",
+          "name": "SwiftIOC",
+          "url": "https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector"
+        },
+        "distribution": [
+          {
+            "@type": "DataDownload",
+            "encodingFormat": "text/csv",
+            "contentUrl": "https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/iocs/high_confidence.csv"
+          },
+          {
+            "@type": "DataDownload",
+            "encodingFormat": "application/json",
+            "contentUrl": "https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/iocs/latest.json"
+          },
+          {
+            "@type": "DataDownload",
+            "encodingFormat": "application/stix+json",
+            "contentUrl": "https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/iocs/stix2.json"
+          }
+        ]
+      }
+    </script>
   </head>
   <body data-ioc-root=".">
     <a class="skip-link" href="#live-preview">Skip to IOC results</a>
@@ -685,7 +726,7 @@
     </div>
 
     <div class="toast" data-toast role="status" aria-live="polite" aria-atomic="true" hidden></div>
-    <script defer src="assets/dashboard-core.js?v=6"></script>
-    <script defer src="assets/dashboard.js?v=6"></script>
+    <script defer src="assets/dashboard-core.js?v=7"></script>
+    <script defer src="assets/dashboard.js?v=7"></script>
   </body>
 </html>
