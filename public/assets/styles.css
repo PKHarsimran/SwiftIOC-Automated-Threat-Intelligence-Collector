@@ -880,7 +880,13 @@ td.has-bar .cell-bar-value {
   align-items: stretch;
 }
 
-.lookup-input {
+/* input.lookup-input (not just .lookup-input): the base `input[type='search']`
+   rule above is an attribute selector, which outranks a bare class selector
+   on specificity regardless of source order — a class-only selector here
+   silently lost every declaration to it, so the hero lookup box rendered as
+   a cramped 12.48px toolbar-style pill instead of its intended prominent
+   sizing. */
+input.lookup-input {
   flex: 1;
   min-width: 0;
   font-size: 0.85rem;
@@ -894,7 +900,7 @@ td.has-bar .cell-bar-value {
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-.lookup-input:focus-visible {
+input.lookup-input:focus-visible {
   border-color: rgba(96, 165, 250, 0.95);
   box-shadow: var(--focus-ring);
 }
@@ -1941,12 +1947,12 @@ h1.section-title {
   gap: 0.65rem;
 }
 
-.lookup-input,
+input.lookup-input,
 .lookup-form .button-link {
   min-height: 3.35rem;
 }
 
-.lookup-input {
+input.lookup-input {
   padding-inline: 1rem;
   border-color: var(--border-control);
   border-radius: 0.75rem;
