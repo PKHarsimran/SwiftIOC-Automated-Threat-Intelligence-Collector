@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-07-20T13:57:41Z_
+_Generated 2026-07-20T17:57:37Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-07-20T13:57:41Z |
+| Generated | 2026-07-20T17:57:37Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3467 |
+| Duplicates removed | 3407 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-source overlaps | 3504 |
-| Score (min / avg / max) | 68 / 76.0 / 88 |
-| High-score indicators (≥80) | 4720 |
-| Corroborated (2+ sources) | 3504 |
-| Earliest first_seen | 2021-11-03T00:00:00Z |
-| Newest first_seen | 2026-07-20T13:55:35Z |
+| Multi-source overlaps | 3455 |
+| Score (min / avg / max) | 68 / 76.1 / 88 |
+| High-score indicators (≥80) | 4757 |
+| Corroborated (2+ sources) | 3455 |
+| Earliest first_seen | 2009-11-03T16:30:12Z |
+| Newest first_seen | 2026-07-20T17:56:15Z |
 
 ## Top indicators by score
 
@@ -27,37 +27,37 @@ _Generated 2026-07-20T13:57:41Z_
 | ipv4_cidr: `43.228.157.0/24` | score 88, 2 sources |
 | ipv4_cidr: `45.148.10.0/24` | score 88, 2 sources |
 | ipv4_cidr: `77.90.185.0/24` | score 88, 2 sources |
+| cve: `CVE-2024-30088` | score 88, 2 sources |
+| cve: `CVE-2024-35250` | score 88, 2 sources |
 | url: `hxxp://103[.]83[.]87[.]122/telnet[.]sh` | score 88, 2 sources |
 | url: `hxxp://193[.]148[.]56[.]98/WQUKDbdzO8yY5asDU6` | score 88, 2 sources |
 | url: `hxxps://gerenland[.]click/api/stale[.]msi` | score 88, 2 sources |
 | url: `hxxps://gerenland[.]click/flask/whales[.]msi` | score 88, 2 sources |
-| domain: `01ejjpa2[.]behtarin-site-shartbandi[.]com` | score 80, 1 source |
-| sha1: `0301c109feb04625b760b29cc34fceadd8c62e6f` | score 80, 1 source |
 
 ## Per-source totals
 
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5430 |
+| blocklist_de_ssh | 5492 |
 | binarydefense_banlist | 3029 |
-| greensnow_blocklist | 2928 |
+| greensnow_blocklist | 3005 |
 | ipsum_level5 | 2071 |
 | spamhaus_drop | 1667 |
 | cisa_kev | 1647 |
-| tor_exit_nodes | 1419 |
-| threatfox_export_json | 1035 |
-| malwarebazaar_recent | 747 |
+| tor_exit_nodes | 1420 |
+| threatfox_export_json | 1023 |
+| malwarebazaar_recent | 735 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| ipv4 | 3745 |
-| cve | 2119 |
-| domain | 1856 |
+| ipv4 | 3700 |
+| cve | 2172 |
+| domain | 1840 |
 | ipv4_cidr | 1677 |
-| url | 355 |
+| url | 363 |
 | sha256 | 96 |
 | md5 | 76 |
 | sha1 | 76 |
@@ -66,13 +66,13 @@ _Generated 2026-07-20T13:57:41Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| blocklist | 3495 |
-| threatfox | 2704 |
-| aggregated | 2664 |
-| ipsum | 2664 |
-| multi-list | 2664 |
-| scanner | 2457 |
-| cve | 2119 |
+| blocklist | 3444 |
+| threatfox | 2702 |
+| aggregated | 2605 |
+| ipsum | 2605 |
+| multi-list | 2605 |
+| scanner | 2412 |
+| cve | 2172 |
 | cins | 1993 |
 | drop | 1677 |
 | spamhaus | 1677 |
