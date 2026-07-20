@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-07-20T06:41:54Z_
+_Generated 2026-07-20T10:47:04Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-07-20T06:41:54Z |
+| Generated | 2026-07-20T10:47:04Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3792 |
+| Duplicates removed | 3262 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-source overlaps | 3964 |
-| Score (min / avg / max) | 68 / 75.7 / 88 |
-| High-score indicators (≥80) | 4343 |
-| Corroborated (2+ sources) | 3964 |
+| Multi-source overlaps | 3818 |
+| Score (min / avg / max) | 68 / 75.8 / 88 |
+| High-score indicators (≥80) | 4444 |
+| Corroborated (2+ sources) | 3818 |
 | Earliest first_seen | 2021-11-03T00:00:00Z |
-| Newest first_seen | 2026-07-20T06:41:21Z |
+| Newest first_seen | 2026-07-20T10:46:30Z |
 
 ## Top indicators by score
 
@@ -33,7 +33,7 @@ _Generated 2026-07-20T06:41:54Z_
 | url: `hxxp://193[.]148[.]56[.]98/WQUKDbdzO8yY5asDU6` | score 88, 2 sources |
 | url: `hxxps://gerenland[.]click/api/stale[.]msi` | score 88, 2 sources |
 | url: `hxxps://gerenland[.]click/flask/whales[.]msi` | score 88, 2 sources |
-| url: `hxxp://41[.]216[.]189[.]236/nz[.]sh` | score 80, 2 sources |
+| domain: `01ejjpa2[.]behtarin-site-shartbandi[.]com` | score 80, 1 source |
 | sha1: `0301c109feb04625b760b29cc34fceadd8c62e6f` | score 80, 1 source |
 
 ## Per-source totals
@@ -41,25 +41,25 @@ _Generated 2026-07-20T06:41:54Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4984 |
-| greensnow_blocklist | 3404 |
+| blocklist_de_ssh | 5224 |
 | binarydefense_banlist | 3029 |
+| greensnow_blocklist | 2301 |
 | ipsum_level5 | 2071 |
-| spamhaus_drop | 1678 |
+| spamhaus_drop | 1667 |
 | cisa_kev | 1647 |
-| tor_exit_nodes | 1423 |
-| threatfox_export_json | 808 |
-| malwarebazaar_recent | 656 |
+| tor_exit_nodes | 1421 |
+| threatfox_export_json | 904 |
+| malwarebazaar_recent | 726 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| ipv4 | 4163 |
-| cve | 1933 |
-| domain | 1748 |
+| ipv4 | 4045 |
+| cve | 1962 |
+| domain | 1800 |
 | ipv4_cidr | 1677 |
-| url | 312 |
+| url | 349 |
 | sha256 | 69 |
 | md5 | 49 |
 | sha1 | 49 |
@@ -68,16 +68,16 @@ _Generated 2026-07-20T06:41:54Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| blocklist | 3955 |
-| aggregated | 3036 |
-| ipsum | 3036 |
-| multi-list | 3036 |
-| scanner | 2677 |
-| threatfox | 2430 |
-| cins | 2225 |
-| cve | 1933 |
-| ssh | 1863 |
-| bruteforce | 1862 |
+| blocklist | 3809 |
+| aggregated | 2913 |
+| ipsum | 2913 |
+| multi-list | 2913 |
+| scanner | 2573 |
+| threatfox | 2547 |
+| cins | 2124 |
+| cve | 1962 |
+| ssh | 1840 |
+| bruteforce | 1839 |
 
 ## Multi-source overlaps
 
