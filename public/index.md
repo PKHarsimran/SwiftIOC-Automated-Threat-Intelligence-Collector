@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-07-21T02:12:53Z_
+_Generated 2026-07-21T06:25:11Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-07-21T02:12:53Z |
+| Generated | 2026-07-21T06:25:11Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 4266 |
+| Duplicates removed | 4121 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-source overlaps | 3435 |
+| Multi-source overlaps | 3395 |
 | Score (min / avg / max) | 68 / 76.2 / 96 |
-| High-score indicators (≥80) | 4806 |
-| Corroborated (2+ sources) | 3435 |
+| High-score indicators (≥80) | 4823 |
+| Corroborated (2+ sources) | 3395 |
 | Earliest first_seen | 2009-11-03T16:30:12Z |
-| Newest first_seen | 2026-07-21T02:10:41Z |
+| Newest first_seen | 2026-07-21T06:24:06Z |
 
 ## Top indicators by score
 
@@ -41,26 +41,26 @@ _Generated 2026-07-21T02:12:53Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5388 |
-| greensnow_blocklist | 3647 |
+| blocklist_de_ssh | 5341 |
+| greensnow_blocklist | 3676 |
 | binarydefense_banlist | 3281 |
 | ipsum_level5 | 2328 |
 | spamhaus_drop | 1667 |
 | cisa_kev | 1647 |
-| tor_exit_nodes | 1426 |
-| threatfox_export_json | 957 |
-| malwarebazaar_recent | 771 |
+| tor_exit_nodes | 1425 |
+| threatfox_export_json | 1093 |
+| malwarebazaar_recent | 767 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| ipv4 | 3672 |
-| cve | 2217 |
-| domain | 1843 |
+| ipv4 | 3650 |
+| cve | 2220 |
+| domain | 1861 |
 | ipv4_cidr | 1677 |
 | url | 343 |
-| sha256 | 96 |
+| sha256 | 97 |
 | md5 | 76 |
 | sha1 | 76 |
 
@@ -68,16 +68,16 @@ _Generated 2026-07-21T02:12:53Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| blocklist | 3423 |
-| aggregated | 2927 |
-| ipsum | 2927 |
-| multi-list | 2927 |
-| threatfox | 2679 |
-| scanner | 2334 |
-| cve | 2217 |
-| cins | 1850 |
-| ssh | 1755 |
-| bruteforce | 1754 |
+| blocklist | 3383 |
+| aggregated | 2850 |
+| ipsum | 2850 |
+| multi-list | 2850 |
+| threatfox | 2716 |
+| scanner | 2343 |
+| cve | 2220 |
+| cins | 1941 |
+| ssh | 1702 |
+| bruteforce | 1701 |
 
 ## Multi-source overlaps
 
