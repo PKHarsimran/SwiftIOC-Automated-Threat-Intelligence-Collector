@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-07-21T10:21:27Z_
+_Generated 2026-07-21T13:27:52Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-07-21T10:21:27Z |
+| Generated | 2026-07-21T13:27:52Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3661 |
+| Duplicates removed | 3910 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-source overlaps | 3741 |
+| Multi-source overlaps | 3865 |
 | Score (min / avg / max) | 68 / 76.1 / 96 |
-| High-score indicators (≥80) | 4836 |
-| Corroborated (2+ sources) | 3741 |
+| High-score indicators (≥80) | 4763 |
+| Corroborated (2+ sources) | 3865 |
 | Earliest first_seen | 2009-11-03T16:30:12Z |
-| Newest first_seen | 2026-07-21T10:21:10Z |
+| Newest first_seen | 2026-07-21T13:27:39Z |
 
 ## Top indicators by score
 
@@ -34,32 +34,32 @@ _Generated 2026-07-21T10:21:27Z_
 | cve: `CVE-2024-30088` | score 88, 2 sources |
 | cve: `CVE-2024-35250` | score 88, 2 sources |
 | url: `hxxp://193[.]148[.]56[.]98/WQUKDbdzO8yY5asDU6` | score 88, 2 sources |
-| url: `hxxp://103[.]83[.]87[.]122/telnet[.]sh` | score 87, 2 sources |
+| url: `hxxp://103[.]83[.]87[.]122/telnet[.]sh` | score 85, 2 sources |
 
 ## Per-source totals
 
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5312 |
+| blocklist_de_ssh | 5918 |
+| greensnow_blocklist | 3359 |
 | binarydefense_banlist | 3281 |
-| greensnow_blocklist | 2611 |
 | ipsum_level5 | 2328 |
 | spamhaus_drop | 1669 |
 | cisa_kev | 1647 |
 | tor_exit_nodes | 1423 |
-| threatfox_export_json | 1044 |
-| malwarebazaar_recent | 905 |
+| threatfox_export_json | 1046 |
+| malwarebazaar_recent | 873 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| ipv4 | 3991 |
-| cve | 2250 |
+| ipv4 | 4120 |
+| cve | 2270 |
 | ipv4_cidr | 1682 |
-| domain | 1482 |
-| url | 346 |
+| domain | 1329 |
+| url | 350 |
 | sha256 | 97 |
 | md5 | 76 |
 | sha1 | 76 |
@@ -68,16 +68,16 @@ _Generated 2026-07-21T10:21:27Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| blocklist | 3729 |
-| aggregated | 2973 |
-| ipsum | 2973 |
-| multi-list | 2973 |
-| scanner | 2547 |
-| threatfox | 2335 |
-| cve | 2250 |
-| cins | 2083 |
-| ssh | 1853 |
-| bruteforce | 1852 |
+| blocklist | 3853 |
+| aggregated | 2985 |
+| ipsum | 2985 |
+| multi-list | 2985 |
+| scanner | 2623 |
+| cve | 2270 |
+| threatfox | 2191 |
+| cins | 2155 |
+| ssh | 1908 |
+| bruteforce | 1907 |
 
 ## Multi-source overlaps
 
