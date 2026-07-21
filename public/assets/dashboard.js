@@ -1368,8 +1368,15 @@
         if (typeof diag.duplicates_removed === 'number') {
           stats.duplicatesRemoved = diag.duplicates_removed;
         }
-        if (diag.counts && typeof diag.counts === 'object') {
-          stats.activeSources = Object.keys(diag.counts).length;
+        // Prefer stored_counts (post-dedup/retention contribution to the
+        // shipped feed) over counts (raw pre-dedup fetch totals, which can
+        // exceed the feed size). Fall back to counts for older run.json.
+        const sourceCounts =
+          diag.stored_counts && typeof diag.stored_counts === 'object'
+            ? diag.stored_counts
+            : diag.counts;
+        if (sourceCounts && typeof sourceCounts === 'object') {
+          stats.activeSources = Object.keys(sourceCounts).length;
         }
         if (diag.type_counts && typeof diag.type_counts === 'object') {
           stats.indicatorTypes = Object.keys(diag.type_counts).length;
@@ -1389,7 +1396,7 @@
         diag,
         fetchedAt: Date.now(),
         sourcesTable:
-          countsObjectToRows(diag?.counts, 'Source') ||
+          countsObjectToRows(diag?.stored_counts || diag?.counts, 'Source') ||
           tableAggregators.toSourceRows(),
         typesTable:
           countsObjectToRows(diag?.type_counts, 'Type') ||

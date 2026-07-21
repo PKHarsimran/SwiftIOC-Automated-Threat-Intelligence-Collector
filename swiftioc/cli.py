@@ -322,6 +322,17 @@ def main() -> int:
         "low": sum(1 for s in scores if s < 40),
     }
     corroborated_total = sum(1 for r in rows if source_count(r) >= 2)
+    # Per-source contribution to the STORED feed (post-dedup/expiry/retention),
+    # so the dashboard's "Sources" table reflects what actually shipped rather
+    # than raw pre-dedup fetch counts (which could show a single source at
+    # 15,000 inside a 10,000-row feed). A merged multi-source row counts once
+    # per contributing source.
+    stored_counts: Dict[str, int] = {}
+    for r in rows:
+        for s in (p.strip() for p in r.source.split(",")):
+            if s:
+                stored_counts[s] = stored_counts.get(s, 0) + 1
+    stored_counts = dict(sorted(stored_counts.items(), key=lambda kv: kv[1], reverse=True))
     diag = {
         "window_hours": args.window_hours,
         "total": len(rows),
@@ -344,6 +355,7 @@ def main() -> int:
         "high_confidence_total": len(high_conf),
         "high_confidence_score": args.high_confidence_score,
         "counts": counts,
+        "stored_counts": stored_counts,
         "type_counts": {k: v for k, v in type_totals},
         "tag_counts": {k: v for k, v in top_tags(rows, 25)},
         "fetch_metrics": get_fetch_metrics(),

@@ -228,10 +228,14 @@ def fetch_urlhaus_csv(url: str, ref_url: str, source: str, ws: datetime, *, stat
         if not row or row[0].startswith("#"):
             continue
         try:
+            # URLhaus CSV columns: id,dateadded,url,url_status,last_online,
+            # threat,tags,urlhaus_link,reporter. row[4] is a *timestamp*
+            # (last_online), NOT the threat — threat is row[5], tags row[6].
             dateadded = parse_dt(row[1])
             url_val = row[2]
             url_status = (row[3] if len(row) > 3 else "").lower()
-            threat = row[4] if len(row) > 4 else ""
+            threat = row[5] if len(row) > 5 else ""
+            feed_tags = row[6] if len(row) > 6 else ""
         except Exception:
             continue
         if status_filter != "any" and url_status != status_filter:
@@ -239,13 +243,14 @@ def fetch_urlhaus_csv(url: str, ref_url: str, source: str, ws: datetime, *, stat
         if dateadded and dateadded < ws:
             continue
         t = classify(url_val) or "url"
+        tag_list = ["malware", threat] + [s.strip() for s in feed_tags.split(",")]
         out.append(
             Indicator(
                 indicator=defang_min(url_val), type=t, source=source,
                 first_seen=iso(dateadded or now), last_seen=iso(now),
-                confidence="medium", tlp="CLEAR",
-                tags=",".join(filter(None, ["malware", threat])),
-                reference=ref_url or "", context=f"URLhaus: {threat}",
+                confidence="high", tlp="CLEAR",
+                tags=",".join(dict.fromkeys(filter(None, tag_list))),
+                reference=ref_url or "", context=f"URLhaus: {threat or 'malware URL'}",
             )
         )
     return out
@@ -302,7 +307,11 @@ def fetch_malwarebazaar_csv(
             Indicator(
                 indicator=sha256.lower(), type="sha256", source=source,
                 first_seen=iso(first_seen or now), last_seen=iso(now),
-                confidence="medium", tlp="CLEAR",
+                # A confirmed malware-sample hash from MalwareBazaar is a
+                # high-confidence, directly block-ready artifact — not a
+                # medium-confidence heuristic. Keeping it "medium" floored it
+                # below retention's cut and evicted scarce hash IOCs.
+                confidence="high", tlp="CLEAR",
                 tags=",".join(filter(None, ["malware", sig])),
                 reference=ref_url or "", context=f"MalwareBazaar: {sig}",
             )
@@ -476,7 +485,10 @@ def _fetch_sslbl_ja3(
                 source=source,
                 first_seen=iso(first_seen or now),
                 last_seen=iso(now),
-                confidence="medium",
+                # SSLBL only lists fingerprints tied to confirmed malware C2 —
+                # a high-confidence artifact, promoted so scarce JA3 IOCs
+                # aren't pruned below retention's cut.
+                confidence="high",
                 tlp="CLEAR",
                 tags=",".join(filter(None, ["sslbl", "tls", "fingerprint", desc])),
                 reference=ref_url or "",

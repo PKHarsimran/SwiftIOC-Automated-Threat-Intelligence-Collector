@@ -212,9 +212,14 @@ def test_changelog_is_capped(tmp_path):
 
 # ------------------------- parsers (offline) ----------------------------------
 def test_urlhaus_parser(monkeypatch):
+    # Real URLhaus CSV columns: id,dateadded,url,url_status,last_online,
+    # threat,tags,urlhaus_link,reporter. Regression: the parser used to read
+    # row[4] (last_online — a timestamp) as the threat, polluting threat/tags
+    # with dates. threat is row[5], tags row[6].
     csv_payload = (
-        "# id,dateadded,url,url_status,threat\n"
-        '"1","2025-01-01 00:00:00","http://bad.example.com/x","online","malware_download"\n'
+        "# id,dateadded,url,url_status,last_online,threat,tags,urlhaus_link,reporter\n"
+        '"1","2025-01-01 00:00:00","http://bad.example.com/x","online",'
+        '"2025-01-02 03:04:05","malware_download","elf,mips,Mozi","https://urlhaus.abuse.ch/url/1/","rep"\n'
     )
     monkeypatch.setattr(si, "http_get", lambda *a, **k: csv_payload)
     ws = si.now_utc().replace(year=2000)
@@ -222,6 +227,12 @@ def test_urlhaus_parser(monkeypatch):
     assert len(out) == 1
     assert out[0].type == "url"
     assert out[0].indicator.startswith("hxxp://")  # defanged
+    tags = out[0].tags.split(",")
+    assert "malware_download" in tags
+    assert "Mozi" in tags  # feed tags carried through
+    assert "2025-01-02 03:04:05" not in out[0].tags  # timestamp not leaked
+    assert out[0].context == "URLhaus: malware_download"  # threat, not a date
+    assert out[0].confidence == "high"
 
 
 def test_spamhaus_drop_parser(monkeypatch):
@@ -713,6 +724,30 @@ def test_write_dashboard_feed_trims_and_ranks(tmp_path):
     }
 
 
+def test_write_dashboard_feed_stratifies_by_type(tmp_path):
+    # Regression: a pure global top-N-by-score dropped whole categories from
+    # the browse preview (e.g. all IPs, which score below the fixed-80
+    # CVE/hash band). Every present type must get at least one slot so the
+    # flagship table isn't missing a category entirely.
+    rows = []
+    for i in range(50):  # 50 high-scoring CVEs dominate the global top-N
+        r = _sample_indicator(indicator=f"CVE-2025-{1000 + i}", type="cve")
+        r.score = 80
+        rows.append(r)
+    for i in range(50):  # 50 lower-scoring IPs that a global cut would drop
+        r = _sample_indicator(indicator=f"10.0.{i}.1", type="ipv4")
+        r.score = 30
+        rows.append(r)
+
+    out = tmp_path / "dashboard.jsonl"
+    written = si.write_dashboard_feed(out, rows, limit=20)
+    lines = [json.loads(line) for line in out.read_text(encoding="utf-8").splitlines()]
+    types = {r["type"] for r in lines}
+    assert written == 20
+    assert "ipv4" in types  # would be absent under a pure global top-N
+    assert "cve" in types
+
+
 def test_write_misp_feed_manifest_and_event(tmp_path):
     ind = _sample_indicator(indicator="1.2.3.4", type="ipv4", source="a,b")
     ind.score = 90
@@ -1048,6 +1083,25 @@ def test_sslbl_ja3_column_order(monkeypatch):
     assert out[0].type == "ja3"
     assert out[0].indicator == "b386946a5a44d1ddcc843bc75336dfce"
     assert "Dridex" in out[0].tags
+    # SSLBL only lists confirmed-malware C2 fingerprints — high confidence so
+    # these scarce IOCs aren't pruned below retention's cut.
+    assert out[0].confidence == "high"
+
+
+def test_malwarebazaar_hash_is_high_confidence(monkeypatch):
+    # Parser reads sha256 from row[3] and signature from row[8].
+    sha = "a" * 64
+    payload = (
+        "# comment banner\n"
+        '"2025-01-01 00:00:00","md5x","sha1x","' + sha + '","reporter",'
+        '"sample.exe","exe","application/x-dosexec","AgentTesla"\n'
+    )
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
+    out = si.fetch_malwarebazaar_csv("http://x", "ref", "mb", si.now_utc().replace(year=2000))
+    assert len(out) == 1
+    assert out[0].type == "sha256" and out[0].indicator == sha
+    # A confirmed malware-sample hash is directly block-ready — high confidence.
+    assert out[0].confidence == "high"
 
 
 def test_nvd_parser_requests_recent_window(monkeypatch):
