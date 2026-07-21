@@ -88,13 +88,40 @@ def write_dashboard_feed(path: Path, rows: List[Indicator], *, limit: int = 1000
 
     The full latest.jsonl can run to many megabytes, which every dashboard
     visitor would otherwise download (and which overflows localStorage, so it
-    can't even be cached client-side). This trims to the top ``limit`` rows by
-    (score, corroboration, recency) and drops fields the dashboard never
-    renders, cutting the payload by ~98%. Global stats come from run.json.
+    can't even be cached client-side). This trims to ``limit`` rows and drops
+    fields the dashboard never renders, cutting the payload by ~98%. Global
+    stats come from run.json.
+
+    The sample is *stratified by type* before the global fill: a naive global
+    top-N-by-score excluded whole categories (e.g. IPs, which decay below the
+    fixed-80 CVE/hash band) so the flagship "browse" table showed zero IPs
+    despite IPs being the largest slice of the feed. Each present type gets a
+    guaranteed floor of slots (highest-scoring first), then any remaining
+    budget is filled globally by score.
     """
-    ranked = sorted(
-        rows, key=lambda r: (r.score, source_count(r), r.last_seen, r.indicator), reverse=True
-    )[:limit]
+    def key(r: Indicator) -> tuple:
+        return (r.score, source_count(r), r.first_seen, r.indicator)
+
+    by_type: Dict[str, List[Indicator]] = {}
+    for r in rows:
+        by_type.setdefault(r.type, []).append(r)
+    for group in by_type.values():
+        group.sort(key=key, reverse=True)
+
+    chosen: Dict[tuple, Indicator] = {}
+    if by_type:
+        # Guaranteed per-type floor so no category is invisible, capped at
+        # each type's actual size.
+        floor = max(1, limit // (len(by_type) * 3))
+        for group in by_type.values():
+            for r in group[:floor]:
+                chosen[r.key()] = r
+    # Fill the rest globally by score.
+    for r in sorted(rows, key=key, reverse=True):
+        if len(chosen) >= limit:
+            break
+        chosen.setdefault(r.key(), r)
+    ranked = sorted(chosen.values(), key=key, reverse=True)[:limit]
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as f:
         for r in ranked:
