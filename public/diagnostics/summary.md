@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-07-21T21:02:19Z_
+_Generated 2026-07-22T02:05:55Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-07-21T21:02:19Z |
+| Generated | 2026-07-22T02:05:55Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3933 |
+| Duplicates removed | 4575 |
 | Sources reporting | 17 |
-| Indicator types | 8 |
-| Multi-source overlaps | 4109 |
-| Score (min / avg / max) | 66 / 76.1 / 96 |
-| High-score indicators (≥80) | 4730 |
-| Corroborated (2+ sources) | 4109 |
+| Indicator types | 9 |
+| Multi-source overlaps | 3261 |
+| Score (min / avg / max) | 68 / 77.8 / 96 |
+| High-score indicators (≥80) | 5869 |
+| Corroborated (2+ sources) | 3261 |
 | Earliest first_seen | 2009-11-03T16:30:12Z |
-| Newest first_seen | 2026-07-21T21:01:56Z |
+| Newest first_seen | 2026-07-22T02:05:38Z |
 
 ## Top indicators by score
 
@@ -39,26 +39,27 @@ _Generated 2026-07-21T21:02:19Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5912 |
-| greensnow_blocklist | 3578 |
-| binarydefense_banlist | 3281 |
-| ipsum_level5 | 2328 |
+| blocklist_de_ssh | 5866 |
+| greensnow_blocklist | 4072 |
+| binarydefense_banlist | 3507 |
+| ipsum_level5 | 2325 |
 | spamhaus_drop | 1669 |
 | cisa_kev | 1651 |
 | tor_exit_nodes | 1421 |
-| threatfox_export_json | 1016 |
-| malwarebazaar_recent | 785 |
+| threatfox_export_json | 997 |
+| malwarebazaar_recent | 743 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| ipv4 | 4381 |
-| cve | 2294 |
+| ipv4 | 3530 |
+| cve | 2295 |
 | ipv4_cidr | 1682 |
-| domain | 1191 |
-| url | 203 |
-| sha256 | 97 |
+| domain | 905 |
+| sha256 | 840 |
+| url | 499 |
+| ja3 | 97 |
 | md5 | 76 |
 | sha1 | 76 |
 
@@ -66,16 +67,16 @@ _Generated 2026-07-21T21:02:19Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| blocklist | 4094 |
-| aggregated | 2990 |
-| ipsum | 2990 |
-| multi-list | 2990 |
-| scanner | 2755 |
-| cve | 2294 |
-| cins | 2284 |
-| ssh | 2048 |
-| bruteforce | 2047 |
-| threatfox | 1926 |
+| blocklist | 3247 |
+| aggregated | 3055 |
+| ipsum | 3055 |
+| multi-list | 3055 |
+| cve | 2295 |
+| scanner | 2196 |
+| ssh | 1807 |
+| bruteforce | 1806 |
+| cins | 1798 |
+| drop | 1682 |
 
 ## Multi-source overlaps
 
