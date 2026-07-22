@@ -665,3 +665,26 @@ Total indicators: **10000**
 - threatfox_export_json: 993
 - tor_exit_nodes: 1422
 - urlhaus_recent_urls: 333
+
+## 2026-07-22T10:21:17Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 3507
+- blocklist_de_ssh: 9896
+- ci_army_list: 15000
+- cisa_kev: 1651
+- dshield_block: 20
+- et_compromised: 590
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 2732
+- ipsum_level5: 2325
+- malwarebazaar_recent: 759
+- nist_nvd_recent: 200
+- openphish_feed: 300
+- spamhaus_drop: 1669
+- sslbl_ja3: 97
+- threatfox_export_json: 919
+- tor_exit_nodes: 1421
+- urlhaus_recent_urls: 308
