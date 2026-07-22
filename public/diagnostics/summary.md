@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-07-22T17:11:49Z_
+_Generated 2026-07-22T21:00:20Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-07-22T17:11:49Z |
+| Generated | 2026-07-22T21:00:20Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 4093 |
+| Duplicates removed | 4020 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 2651 |
-| Score (min / avg / max) | 68 / 78.3 / 96 |
-| High-score indicators (≥80) | 5935 |
-| Corroborated (2+ sources) | 2651 |
+| Multi-source overlaps | 2599 |
+| Score (min / avg / max) | 69 / 78.4 / 96 |
+| High-score indicators (≥80) | 5970 |
+| Corroborated (2+ sources) | 2599 |
 | Earliest first_seen | 2009-11-03T16:30:12Z |
-| Newest first_seen | 2026-07-22T17:11:25Z |
+| Newest first_seen | 2026-07-22T20:59:58Z |
 
 ## Top indicators by score
 
@@ -39,26 +39,26 @@ _Generated 2026-07-22T17:11:49Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 9749 |
+| blocklist_de_ssh | 9713 |
 | binarydefense_banlist | 3507 |
-| greensnow_blocklist | 3494 |
+| greensnow_blocklist | 3446 |
 | ipsum_level5 | 2325 |
 | spamhaus_drop | 1669 |
-| cisa_kev | 1651 |
-| tor_exit_nodes | 1418 |
-| threatfox_export_json | 787 |
-| malwarebazaar_recent | 777 |
+| cisa_kev | 1653 |
+| tor_exit_nodes | 1417 |
+| threatfox_export_json | 797 |
+| malwarebazaar_recent | 729 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| ipv4 | 2929 |
-| cve | 2317 |
+| ipv4 | 2879 |
+| cve | 2343 |
 | ipv4_cidr | 1682 |
-| sha256 | 1123 |
-| domain | 957 |
-| url | 743 |
+| sha256 | 1173 |
+| domain | 920 |
+| url | 754 |
 | ja3 | 97 |
 | md5 | 76 |
 | sha1 | 76 |
@@ -67,16 +67,16 @@ _Generated 2026-07-22T17:11:49Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| blocklist | 2637 |
-| aggregated | 2573 |
-| ipsum | 2573 |
-| multi-list | 2573 |
-| cve | 2317 |
-| scanner | 1791 |
-| threatfox | 1690 |
+| blocklist | 2585 |
+| aggregated | 2552 |
+| ipsum | 2552 |
+| multi-list | 2552 |
+| cve | 2343 |
+| scanner | 1740 |
 | drop | 1682 |
 | spamhaus | 1682 |
-| exploited-in-the-wild | 1651 |
+| malware | 1662 |
+| exploited-in-the-wild | 1653 |
 
 ## Multi-source overlaps
 
