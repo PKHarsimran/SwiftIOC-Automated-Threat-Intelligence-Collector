@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-07-22T02:05:55Z_
+_Generated 2026-07-22T02:08:59Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-07-22T02:05:55Z |
+| Generated | 2026-07-22T02:08:59Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 4575 |
-| Sources reporting | 17 |
+| Duplicates removed | 4573 |
+| Sources reporting | 16 |
 | Indicator types | 9 |
-| Multi-source overlaps | 3261 |
+| Multi-source overlaps | 3258 |
 | Score (min / avg / max) | 68 / 77.8 / 96 |
-| High-score indicators (≥80) | 5869 |
-| Corroborated (2+ sources) | 3261 |
+| High-score indicators (≥80) | 5872 |
+| Corroborated (2+ sources) | 3258 |
 | Earliest first_seen | 2009-11-03T16:30:12Z |
-| Newest first_seen | 2026-07-22T02:05:38Z |
+| Newest first_seen | 2026-07-22T02:08:35Z |
 
 ## Top indicators by score
 
@@ -40,7 +40,7 @@ _Generated 2026-07-22T02:05:55Z_
 | --- | ---: |
 | ci_army_list | 15000 |
 | blocklist_de_ssh | 5866 |
-| greensnow_blocklist | 4072 |
+| greensnow_blocklist | 4067 |
 | binarydefense_banlist | 3507 |
 | ipsum_level5 | 2325 |
 | spamhaus_drop | 1669 |
@@ -53,12 +53,12 @@ _Generated 2026-07-22T02:05:55Z_
 
 | Type | Indicators |
 | --- | ---: |
-| ipv4 | 3530 |
+| ipv4 | 3527 |
 | cve | 2295 |
 | ipv4_cidr | 1682 |
 | domain | 905 |
 | sha256 | 840 |
-| url | 499 |
+| url | 502 |
 | ja3 | 97 |
 | md5 | 76 |
 | sha1 | 76 |
@@ -67,16 +67,16 @@ _Generated 2026-07-22T02:05:55Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| blocklist | 3247 |
-| aggregated | 3055 |
-| ipsum | 3055 |
-| multi-list | 3055 |
+| blocklist | 3244 |
+| aggregated | 2688 |
+| ipsum | 2688 |
+| multi-list | 2688 |
 | cve | 2295 |
-| scanner | 2196 |
-| ssh | 1807 |
-| bruteforce | 1806 |
-| cins | 1798 |
-| drop | 1682 |
+| scanner | 2163 |
+| ssh | 1825 |
+| bruteforce | 1824 |
+| cins | 1784 |
+| binarydefense | 1711 |
 
 ## Multi-source overlaps
 
