@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-07-23T02:21:32Z_
+_Generated 2026-07-23T06:26:33Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-07-23T02:21:32Z |
+| Generated | 2026-07-23T06:26:33Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 4726 |
+| Duplicates removed | 4425 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 2752 |
-| Score (min / avg / max) | 74 / 78.7 / 96 |
-| High-score indicators (≥80) | 6278 |
-| Corroborated (2+ sources) | 2752 |
+| Multi-source overlaps | 2715 |
+| Score (min / avg / max) | 75 / 78.8 / 96 |
+| High-score indicators (≥80) | 6449 |
+| Corroborated (2+ sources) | 2715 |
 | Earliest first_seen | 2009-11-03T16:30:12Z |
-| Newest first_seen | 2026-07-23T02:20:34Z |
+| Newest first_seen | 2026-07-23T06:26:21Z |
 
 ## Top indicators by score
 
@@ -41,26 +41,26 @@ _Generated 2026-07-23T02:21:32Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 9673 |
-| greensnow_blocklist | 3993 |
+| blocklist_de_ssh | 9639 |
+| greensnow_blocklist | 4009 |
 | binarydefense_banlist | 3713 |
 | ipsum_level5 | 2412 |
 | spamhaus_drop | 1669 |
 | cisa_kev | 1653 |
 | tor_exit_nodes | 1416 |
-| threatfox_export_json | 1006 |
-| malwarebazaar_recent | 772 |
+| threatfox_export_json | 1042 |
+| malwarebazaar_recent | 687 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| ipv4 | 2970 |
-| cve | 2344 |
-| ipv4_cidr | 1682 |
-| sha256 | 1327 |
-| domain | 669 |
-| url | 627 |
+| ipv4 | 2921 |
+| cve | 2348 |
+| ipv4_cidr | 1671 |
+| sha256 | 1357 |
+| url | 695 |
+| domain | 627 |
 | md5 | 142 |
 | sha1 | 142 |
 | ja3 | 97 |
@@ -69,16 +69,16 @@ _Generated 2026-07-23T02:21:32Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| blocklist | 2741 |
-| aggregated | 2711 |
-| ipsum | 2711 |
-| multi-list | 2711 |
-| cve | 2344 |
-| scanner | 1827 |
-| bruteforce | 1708 |
-| ssh | 1708 |
-| malware | 1694 |
-| drop | 1682 |
+| blocklist | 2705 |
+| aggregated | 2675 |
+| ipsum | 2675 |
+| multi-list | 2675 |
+| cve | 2348 |
+| scanner | 1796 |
+| malware | 1719 |
+| ssh | 1673 |
+| bruteforce | 1672 |
+| drop | 1671 |
 
 ## Multi-source overlaps
 
