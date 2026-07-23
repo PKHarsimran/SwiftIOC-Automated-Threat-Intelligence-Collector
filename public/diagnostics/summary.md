@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-07-22T21:00:20Z_
+_Generated 2026-07-23T02:21:32Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-07-22T21:00:20Z |
+| Generated | 2026-07-23T02:21:32Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 4020 |
+| Duplicates removed | 4726 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 2599 |
-| Score (min / avg / max) | 69 / 78.4 / 96 |
-| High-score indicators (≥80) | 5970 |
-| Corroborated (2+ sources) | 2599 |
+| Multi-source overlaps | 2752 |
+| Score (min / avg / max) | 74 / 78.7 / 96 |
+| High-score indicators (≥80) | 6278 |
+| Corroborated (2+ sources) | 2752 |
 | Earliest first_seen | 2009-11-03T16:30:12Z |
-| Newest first_seen | 2026-07-22T20:59:58Z |
+| Newest first_seen | 2026-07-23T02:20:34Z |
 
 ## Top indicators by score
 
@@ -39,44 +39,44 @@ _Generated 2026-07-22T21:00:20Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 9713 |
-| binarydefense_banlist | 3507 |
-| greensnow_blocklist | 3446 |
-| ipsum_level5 | 2325 |
+| blocklist_de_ssh | 9673 |
+| greensnow_blocklist | 3993 |
+| binarydefense_banlist | 3713 |
+| ipsum_level5 | 2412 |
 | spamhaus_drop | 1669 |
 | cisa_kev | 1653 |
-| tor_exit_nodes | 1417 |
-| threatfox_export_json | 797 |
-| malwarebazaar_recent | 729 |
+| tor_exit_nodes | 1416 |
+| threatfox_export_json | 1006 |
+| malwarebazaar_recent | 772 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| ipv4 | 2879 |
-| cve | 2343 |
+| ipv4 | 2970 |
+| cve | 2344 |
 | ipv4_cidr | 1682 |
-| sha256 | 1173 |
-| domain | 920 |
-| url | 754 |
+| sha256 | 1327 |
+| domain | 669 |
+| url | 627 |
+| md5 | 142 |
+| sha1 | 142 |
 | ja3 | 97 |
-| md5 | 76 |
-| sha1 | 76 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| blocklist | 2585 |
-| aggregated | 2552 |
-| ipsum | 2552 |
-| multi-list | 2552 |
-| cve | 2343 |
-| scanner | 1740 |
+| blocklist | 2741 |
+| aggregated | 2711 |
+| ipsum | 2711 |
+| multi-list | 2711 |
+| cve | 2344 |
+| scanner | 1827 |
+| bruteforce | 1708 |
+| ssh | 1708 |
+| malware | 1694 |
 | drop | 1682 |
-| spamhaus | 1682 |
-| malware | 1662 |
-| exploited-in-the-wild | 1653 |
 
 ## Multi-source overlaps
 
