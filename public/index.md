@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-07-23T10:15:21Z_
+_Generated 2026-07-23T13:46:42Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-07-23T10:15:21Z |
+| Generated | 2026-07-23T13:46:42Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3754 |
+| Duplicates removed | 3907 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 2656 |
-| Score (min / avg / max) | 76 / 78.8 / 96 |
-| High-score indicators (≥80) | 6597 |
-| Corroborated (2+ sources) | 2656 |
+| Multi-source overlaps | 2569 |
+| Score (min / avg / max) | 76 / 78.9 / 96 |
+| High-score indicators (≥80) | 6709 |
+| Corroborated (2+ sources) | 2569 |
 | Earliest first_seen | 2009-11-03T16:30:12Z |
-| Newest first_seen | 2026-07-23T10:15:03Z |
+| Newest first_seen | 2026-07-23T13:45:28Z |
 
 ## Top indicators by score
 
@@ -41,26 +41,26 @@ _Generated 2026-07-23T10:15:21Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 9602 |
+| blocklist_de_ssh | 9592 |
 | binarydefense_banlist | 3713 |
-| greensnow_blocklist | 2519 |
+| greensnow_blocklist | 3238 |
 | ipsum_level5 | 2412 |
 | spamhaus_drop | 1670 |
 | cisa_kev | 1653 |
-| tor_exit_nodes | 1413 |
-| threatfox_export_json | 1075 |
-| malwarebazaar_recent | 710 |
+| tor_exit_nodes | 1410 |
+| threatfox_export_json | 1087 |
+| malwarebazaar_recent | 736 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| ipv4 | 2865 |
-| cve | 2370 |
+| ipv4 | 2762 |
+| cve | 2452 |
 | ipv4_cidr | 1669 |
-| sha256 | 1469 |
-| url | 684 |
-| domain | 562 |
+| sha256 | 1524 |
+| url | 643 |
+| domain | 569 |
 | md5 | 142 |
 | sha1 | 142 |
 | ja3 | 97 |
@@ -69,13 +69,13 @@ _Generated 2026-07-23T10:15:21Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| blocklist | 2646 |
-| aggregated | 2615 |
-| ipsum | 2615 |
-| multi-list | 2615 |
-| cve | 2370 |
-| malware | 1814 |
-| scanner | 1748 |
+| blocklist | 2558 |
+| aggregated | 2527 |
+| ipsum | 2527 |
+| multi-list | 2527 |
+| cve | 2452 |
+| malware | 1825 |
+| scanner | 1724 |
 | drop | 1669 |
 | spamhaus | 1669 |
 | exploited-in-the-wild | 1653 |
