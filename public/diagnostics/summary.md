@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-07-24T10:12:02Z_
+_Generated 2026-07-24T13:26:52Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-07-24T10:12:02Z |
+| Generated | 2026-07-24T13:26:52Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3140 |
+| Duplicates removed | 3313 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 1640 |
+| Multi-source overlaps | 1545 |
 | Score (min / avg / max) | 76 / 79.2 / 96 |
-| High-score indicators (≥80) | 6976 |
-| Corroborated (2+ sources) | 1640 |
+| High-score indicators (≥80) | 7022 |
+| Corroborated (2+ sources) | 1545 |
 | Earliest first_seen | 2000-12-19T05:00:00Z |
-| Newest first_seen | 2026-07-24T10:11:40Z |
+| Newest first_seen | 2026-07-24T13:26:01Z |
 
 ## Top indicators by score
 
@@ -39,26 +39,26 @@ _Generated 2026-07-24T10:12:02Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4618 |
+| blocklist_de_ssh | 4615 |
 | binarydefense_banlist | 3902 |
-| greensnow_blocklist | 2462 |
+| greensnow_blocklist | 3237 |
 | ipsum_level5 | 1705 |
 | spamhaus_drop | 1670 |
 | cisa_kev | 1653 |
-| threatfox_export_json | 1459 |
-| tor_exit_nodes | 1385 |
-| malwarebazaar_recent | 664 |
+| threatfox_export_json | 1463 |
+| tor_exit_nodes | 1384 |
+| malwarebazaar_recent | 655 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 2700 |
-| sha256 | 1861 |
-| ipv4 | 1825 |
+| cve | 2706 |
+| sha256 | 1896 |
+| ipv4 | 1734 |
 | ipv4_cidr | 1669 |
-| url | 823 |
-| domain | 581 |
+| url | 866 |
+| domain | 588 |
 | md5 | 222 |
 | sha1 | 222 |
 | ja3 | 97 |
@@ -67,16 +67,16 @@ _Generated 2026-07-24T10:12:02Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| cve | 2700 |
-| malware | 2104 |
-| threatfox | 1799 |
+| cve | 2706 |
+| malware | 2167 |
+| threatfox | 1825 |
 | drop | 1669 |
 | spamhaus | 1669 |
 | exploited-in-the-wild | 1653 |
-| blocklist | 1628 |
-| aggregated | 1618 |
-| ipsum | 1618 |
-| multi-list | 1618 |
+| blocklist | 1533 |
+| aggregated | 1524 |
+| ipsum | 1524 |
+| multi-list | 1524 |
 
 ## Multi-source overlaps
 
