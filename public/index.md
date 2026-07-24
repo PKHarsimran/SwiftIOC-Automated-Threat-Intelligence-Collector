@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-07-23T20:57:33Z_
+_Generated 2026-07-24T02:12:20Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-07-23T20:57:33Z |
+| Generated | 2026-07-24T02:12:20Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3786 |
+| Duplicates removed | 3901 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 2134 |
-| Score (min / avg / max) | 76 / 79.0 / 96 |
-| High-score indicators (≥80) | 6937 |
-| Corroborated (2+ sources) | 2134 |
+| Multi-source overlaps | 1888 |
+| Score (min / avg / max) | 76 / 79.1 / 96 |
+| High-score indicators (≥80) | 6913 |
+| Corroborated (2+ sources) | 1888 |
 | Earliest first_seen | 2000-12-19T05:00:00Z |
-| Newest first_seen | 2026-07-23T20:57:26Z |
+| Newest first_seen | 2026-07-24T02:11:43Z |
 
 ## Top indicators by score
 
@@ -41,44 +41,44 @@ _Generated 2026-07-23T20:57:33Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 9570 |
-| binarydefense_banlist | 3713 |
-| greensnow_blocklist | 3221 |
-| ipsum_level5 | 2412 |
+| blocklist_de_ssh | 9556 |
+| binarydefense_banlist | 3902 |
+| greensnow_blocklist | 3744 |
+| ipsum_level5 | 1705 |
 | spamhaus_drop | 1670 |
 | cisa_kev | 1653 |
-| tor_exit_nodes | 1397 |
-| threatfox_export_json | 1237 |
-| malwarebazaar_recent | 770 |
+| threatfox_export_json | 1485 |
+| tor_exit_nodes | 1396 |
+| malwarebazaar_recent | 758 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 2556 |
-| ipv4 | 2338 |
+| cve | 2558 |
+| ipv4 | 2082 |
+| sha256 | 1789 |
 | ipv4_cidr | 1669 |
-| sha256 | 1659 |
-| url | 817 |
-| domain | 580 |
-| md5 | 142 |
-| sha1 | 142 |
+| url | 778 |
+| domain | 583 |
+| md5 | 222 |
+| sha1 | 222 |
 | ja3 | 97 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| cve | 2556 |
-| blocklist | 2122 |
-| aggregated | 2105 |
-| ipsum | 2105 |
-| multi-list | 2105 |
-| malware | 1974 |
+| cve | 2558 |
+| malware | 1988 |
+| blocklist | 1876 |
+| aggregated | 1868 |
+| ipsum | 1868 |
+| multi-list | 1868 |
+| threatfox | 1809 |
 | drop | 1669 |
 | spamhaus | 1669 |
 | exploited-in-the-wild | 1653 |
-| threatfox | 1579 |
 
 ## Multi-source overlaps
 
