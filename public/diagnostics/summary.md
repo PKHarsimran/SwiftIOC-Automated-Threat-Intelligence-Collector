@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-07-24T02:12:20Z_
+_Generated 2026-07-24T06:21:55Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-07-24T02:12:20Z |
+| Generated | 2026-07-24T06:21:55Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3901 |
+| Duplicates removed | 3649 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 1888 |
+| Multi-source overlaps | 1909 |
 | Score (min / avg / max) | 76 / 79.1 / 96 |
-| High-score indicators (≥80) | 6913 |
-| Corroborated (2+ sources) | 1888 |
+| High-score indicators (≥80) | 6895 |
+| Corroborated (2+ sources) | 1909 |
 | Earliest first_seen | 2000-12-19T05:00:00Z |
-| Newest first_seen | 2026-07-24T02:11:43Z |
+| Newest first_seen | 2026-07-24T06:21:20Z |
 
 ## Top indicators by score
 
@@ -39,26 +39,26 @@ _Generated 2026-07-24T02:12:20Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 9556 |
+| blocklist_de_ssh | 9599 |
 | binarydefense_banlist | 3902 |
-| greensnow_blocklist | 3744 |
+| greensnow_blocklist | 3769 |
 | ipsum_level5 | 1705 |
 | spamhaus_drop | 1670 |
 | cisa_kev | 1653 |
-| threatfox_export_json | 1485 |
-| tor_exit_nodes | 1396 |
-| malwarebazaar_recent | 758 |
+| threatfox_export_json | 1484 |
+| tor_exit_nodes | 1388 |
+| malwarebazaar_recent | 739 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 2558 |
-| ipv4 | 2082 |
-| sha256 | 1789 |
+| cve | 2561 |
+| ipv4 | 2097 |
+| sha256 | 1814 |
 | ipv4_cidr | 1669 |
-| url | 778 |
-| domain | 583 |
+| url | 741 |
+| domain | 577 |
 | md5 | 222 |
 | sha1 | 222 |
 | ja3 | 97 |
@@ -67,13 +67,13 @@ _Generated 2026-07-24T02:12:20Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| cve | 2558 |
-| malware | 1988 |
-| blocklist | 1876 |
-| aggregated | 1868 |
-| ipsum | 1868 |
-| multi-list | 1868 |
-| threatfox | 1809 |
+| cve | 2561 |
+| malware | 1983 |
+| blocklist | 1897 |
+| aggregated | 1888 |
+| ipsum | 1888 |
+| multi-list | 1888 |
+| threatfox | 1790 |
 | drop | 1669 |
 | spamhaus | 1669 |
 | exploited-in-the-wild | 1653 |
