@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-07-25T06:12:40Z_
+_Generated 2026-07-25T09:41:24Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-07-25T06:12:40Z |
+| Generated | 2026-07-25T09:41:24Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3615 |
+| Duplicates removed | 3526 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 1066 |
-| Score (min / avg / max) | 76 / 79.4 / 96 |
-| High-score indicators (≥80) | 7021 |
-| Corroborated (2+ sources) | 1066 |
+| Multi-source overlaps | 1081 |
+| Score (min / avg / max) | 76 / 79.3 / 96 |
+| High-score indicators (≥80) | 6832 |
+| Corroborated (2+ sources) | 1081 |
 | Earliest first_seen | 2000-12-19T05:00:00Z |
-| Newest first_seen | 2026-07-25T06:12:06Z |
+| Newest first_seen | 2026-07-25T09:41:19Z |
 
 ## Top indicators by score
 
@@ -39,26 +39,26 @@ _Generated 2026-07-25T06:12:40Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4595 |
+| blocklist_de_ssh | 4629 |
 | binarydefense_banlist | 4119 |
-| greensnow_blocklist | 3777 |
+| greensnow_blocklist | 3742 |
 | spamhaus_drop | 1670 |
 | cisa_kev | 1653 |
 | ipsum_level5 | 1640 |
-| tor_exit_nodes | 1386 |
-| threatfox_export_json | 1285 |
-| malwarebazaar_recent | 685 |
+| tor_exit_nodes | 1387 |
+| threatfox_export_json | 1252 |
+| malwarebazaar_recent | 646 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
 | cve | 2891 |
-| sha256 | 2250 |
+| sha256 | 2283 |
 | ipv4_cidr | 1669 |
-| ipv4 | 1249 |
-| url | 751 |
-| domain | 527 |
+| ipv4 | 1266 |
+| url | 702 |
+| domain | 526 |
 | md5 | 283 |
 | sha1 | 283 |
 | ja3 | 97 |
@@ -68,15 +68,15 @@ _Generated 2026-07-25T06:12:40Z_
 | Tag | Indicators |
 | --- | ---: |
 | cve | 2891 |
-| malware | 2328 |
+| malware | 2313 |
 | threatfox | 1959 |
 | drop | 1669 |
 | spamhaus | 1669 |
 | exploited-in-the-wild | 1653 |
 | nvd | 1245 |
-| blocklist | 1053 |
-| aggregated | 1046 |
-| ipsum | 1046 |
+| blocklist | 1068 |
+| aggregated | 1060 |
+| ipsum | 1060 |
 
 ## Multi-source overlaps
 
