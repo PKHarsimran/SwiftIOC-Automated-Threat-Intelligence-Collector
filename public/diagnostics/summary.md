@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-07-25T16:51:57Z_
+_Generated 2026-07-25T20:43:31Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-07-25T16:51:57Z |
+| Generated | 2026-07-25T20:43:31Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3342 |
+| Duplicates removed | 3365 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 480 |
-| Score (min / avg / max) | 76 / 79.6 / 96 |
-| High-score indicators (≥80) | 7366 |
-| Corroborated (2+ sources) | 480 |
+| Multi-source overlaps | 512 |
+| Score (min / avg / max) | 76 / 79.5 / 96 |
+| High-score indicators (≥80) | 7256 |
+| Corroborated (2+ sources) | 512 |
 | Earliest first_seen | 2000-12-19T05:00:00Z |
-| Newest first_seen | 2026-07-25T16:51:49Z |
+| Newest first_seen | 2026-07-25T20:43:24Z |
 
 ## Top indicators by score
 
@@ -39,26 +39,26 @@ _Generated 2026-07-25T16:51:57Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4619 |
+| blocklist_de_ssh | 4592 |
 | binarydefense_banlist | 4119 |
-| greensnow_blocklist | 3172 |
+| greensnow_blocklist | 3111 |
 | spamhaus_drop | 1670 |
 | cisa_kev | 1653 |
 | ipsum_level5 | 1640 |
-| threatfox_export_json | 1387 |
-| tor_exit_nodes | 1387 |
-| malwarebazaar_recent | 856 |
+| tor_exit_nodes | 1393 |
+| threatfox_export_json | 1351 |
+| malwarebazaar_recent | 867 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
 | cve | 2925 |
-| sha256 | 2608 |
+| sha256 | 2677 |
 | ipv4_cidr | 1669 |
-| domain | 754 |
-| ipv4 | 691 |
-| url | 689 |
+| domain | 742 |
+| ipv4 | 704 |
+| url | 619 |
 | md5 | 284 |
 | sha1 | 283 |
 | ja3 | 97 |
@@ -68,15 +68,15 @@ _Generated 2026-07-25T16:51:57Z_
 | Tag | Indicators |
 | --- | ---: |
 | cve | 2925 |
-| malware | 2686 |
-| threatfox | 2155 |
+| malware | 2698 |
+| threatfox | 2111 |
 | drop | 1669 |
 | spamhaus | 1669 |
 | exploited-in-the-wild | 1653 |
 | nvd | 1279 |
-| Mirai | 636 |
+| Mirai | 666 |
 | high | 555 |
-| blocklist | 466 |
+| blocklist | 498 |
 
 ## Multi-source overlaps
 
