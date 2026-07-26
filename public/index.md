@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-07-26T09:54:37Z_
+_Generated 2026-07-26T13:09:21Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-07-26T09:54:37Z |
+| Generated | 2026-07-26T13:09:21Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 1815 |
+| Duplicates removed | 1656 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 571 |
-| Score (min / avg / max) | 76 / 79.5 / 96 |
-| High-score indicators (≥80) | 7172 |
-| Corroborated (2+ sources) | 571 |
+| Multi-source overlaps | 17 |
+| Score (min / avg / max) | 77 / 79.7 / 96 |
+| High-score indicators (≥80) | 7360 |
+| Corroborated (2+ sources) | 17 |
 | Earliest first_seen | 2000-12-19T05:00:00Z |
-| Newest first_seen | 2026-07-26T09:54:31Z |
+| Newest first_seen | 2026-07-26T13:05:06Z |
 
 ## Top indicators by score
 
@@ -41,58 +41,58 @@ _Generated 2026-07-26T09:54:37Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4611 |
-| greensnow_blocklist | 3541 |
+| blocklist_de_ssh | 4577 |
+| greensnow_blocklist | 2890 |
 | spamhaus_drop | 1670 |
 | cisa_kev | 1653 |
-| tor_exit_nodes | 1390 |
-| threatfox_export_json | 1254 |
+| threatfox_export_json | 1465 |
+| tor_exit_nodes | 1389 |
 | ipsum_level5 | 1039 |
-| malwarebazaar_recent | 839 |
+| malwarebazaar_recent | 811 |
 | et_compromised | 583 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
+| sha256 | 3020 |
 | cve | 2925 |
-| sha256 | 2840 |
 | ipv4_cidr | 1669 |
-| ipv4 | 756 |
-| domain | 613 |
-| url | 385 |
-| md5 | 358 |
+| url | 659 |
+| domain | 619 |
+| md5 | 435 |
 | sha1 | 357 |
+| ipv4 | 219 |
 | ja3 | 97 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
+| malware | 3076 |
 | cve | 2925 |
-| malware | 2703 |
-| threatfox | 2047 |
+| threatfox | 2230 |
 | drop | 1669 |
 | spamhaus | 1669 |
 | exploited-in-the-wild | 1653 |
 | nvd | 1279 |
-| Mirai | 679 |
-| blocklist | 557 |
+| Mirai | 732 |
 | high | 555 |
+| malware_download | 530 |
 
 ## Multi-source overlaps
 
 | Indicator | Sources |
 | --- | --- |
-| ipv4: 154[.]90[.]70[.]254 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, et_compromised, greensnow_blocklist, ipsum_level5 |
-| ipv4: 185[.]65[.]202[.]199 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, et_compromised, greensnow_blocklist, ipsum_level5 |
-| ipv4: 192[.]142[.]28[.]77 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, et_compromised, greensnow_blocklist, ipsum_level5 |
-| ipv4: 195[.]178[.]110[.]137 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, et_compromised, greensnow_blocklist, ipsum_level5 |
-| ipv4: 94[.]154[.]43[.]50 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, et_compromised, greensnow_blocklist, ipsum_level5 |
-| ipv4: 101[.]47[.]15[.]119 | blocklist_de_ssh, ci_army_list, et_compromised, greensnow_blocklist, ipsum_level5 |
-| ipv4: 103[.]167[.]88[.]166 | blocklist_de_ssh, ci_army_list, et_compromised, greensnow_blocklist, ipsum_level5 |
-| ipv4: 107[.]189[.]10[.]124 | blocklist_de_ssh, ci_army_list, et_compromised, greensnow_blocklist, ipsum_level5 |
-| ipv4: 117[.]175[.]140[.]121 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, greensnow_blocklist, ipsum_level5 |
-| ipv4: 118[.]216[.]88[.]229 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, et_compromised, ipsum_level5 |
+| ipv4: 94[.]154[.]43[.]77 | binarydefense_banlist, blocklist_de_ssh, et_compromised, ipsum_level5, threatfox_export_json |
+| ipv4: 94[.]154[.]43[.]102 | binarydefense_banlist, ci_army_list, ipsum_level5, threatfox_export_json |
+| cve: CVE-2024-30088 | cisa_kev, nist_nvd_recent |
+| cve: CVE-2024-35250 | cisa_kev, nist_nvd_recent |
+| cve: CVE-2026-0770 | cisa_kev, nist_nvd_recent |
+| cve: CVE-2026-45498 | cisa_kev, nist_nvd_recent |
+| cve: CVE-2026-60137 | cisa_kev, nist_nvd_recent |
+| cve: CVE-2026-63030 | cisa_kev, nist_nvd_recent |
+| cve: CVE-2026-9082 | cisa_kev, nist_nvd_recent |
+| ipv4_cidr: 195.178.110.0/24 | dshield_block, spamhaus_drop |
 
 For more detail see [diagnostics/REPORT.md](diagnostics/REPORT.md) and the machine-readable feeds in [iocs/](iocs/).
