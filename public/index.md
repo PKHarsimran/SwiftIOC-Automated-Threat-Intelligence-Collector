@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-07-27T17:39:30Z_
+_Generated 2026-07-27T21:06:28Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-07-27T17:39:30Z |
+| Generated | 2026-07-27T21:06:28Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 1851 |
+| Duplicates removed | 1894 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 21 |
+| Multi-source overlaps | 23 |
 | Score (min / avg / max) | 79 / 79.9 / 96 |
-| High-score indicators (≥80) | 8984 |
-| Corroborated (2+ sources) | 21 |
+| High-score indicators (≥80) | 9070 |
+| Corroborated (2+ sources) | 23 |
 | Earliest first_seen | 2015-04-16T16:59:45Z |
-| Newest first_seen | 2026-07-27T17:32:14Z |
+| Newest first_seen | 2026-07-27T20:45:03Z |
 
 ## Top indicators by score
 
@@ -41,44 +41,44 @@ _Generated 2026-07-27T17:39:30Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4715 |
-| greensnow_blocklist | 3149 |
-| threatfox_export_json | 3058 |
+| blocklist_de_ssh | 4775 |
+| greensnow_blocklist | 3206 |
+| threatfox_export_json | 2862 |
 | spamhaus_drop | 1664 |
-| cisa_kev | 1654 |
-| tor_exit_nodes | 1386 |
+| cisa_kev | 1655 |
+| tor_exit_nodes | 1383 |
+| malwarebazaar_recent | 999 |
 | ipsum_level5 | 990 |
-| malwarebazaar_recent | 968 |
 | binarydefense_banlist | 771 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 2614 |
-| cve | 2573 |
+| cve | 2625 |
+| sha256 | 2552 |
 | ipv4_cidr | 1663 |
-| url | 745 |
-| md5 | 705 |
+| url | 812 |
+| md5 | 675 |
 | domain | 651 |
-| ipv4 | 554 |
-| sha1 | 398 |
+| ipv4 | 558 |
+| sha1 | 367 |
 | ja3 | 97 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 2919 |
-| malware | 2748 |
-| cve | 2573 |
+| threatfox | 2840 |
+| malware | 2776 |
+| cve | 2625 |
 | drop | 1663 |
 | spamhaus | 1663 |
-| exploited-in-the-wild | 1654 |
-| nvd | 927 |
-| malware_download | 618 |
-| Mirai | 487 |
-| elf | 449 |
+| exploited-in-the-wild | 1655 |
+| nvd | 979 |
+| malware_download | 678 |
+| elf | 490 |
+| Mirai | 486 |
 
 ## Multi-source overlaps
 
@@ -88,11 +88,11 @@ _Generated 2026-07-27T17:39:30Z_
 | ipv4: 94[.]154[.]43[.]102 | binarydefense_banlist, ci_army_list, ipsum_level5, threatfox_export_json |
 | cve: CVE-2024-30088 | cisa_kev, nist_nvd_recent |
 | cve: CVE-2024-35250 | cisa_kev, nist_nvd_recent |
+| cve: CVE-2025-68686 | cisa_kev, nist_nvd_recent |
 | cve: CVE-2026-0770 | cisa_kev, nist_nvd_recent |
 | cve: CVE-2026-45498 | cisa_kev, nist_nvd_recent |
 | cve: CVE-2026-5281 | cisa_kev, nist_nvd_recent |
 | cve: CVE-2026-60137 | cisa_kev, nist_nvd_recent |
 | cve: CVE-2026-63030 | cisa_kev, nist_nvd_recent |
-| cve: CVE-2026-9082 | cisa_kev, nist_nvd_recent |
 
 For more detail see [diagnostics/REPORT.md](diagnostics/REPORT.md) and the machine-readable feeds in [iocs/](iocs/).
