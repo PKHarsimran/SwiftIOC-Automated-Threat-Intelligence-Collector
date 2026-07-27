@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-07-27T11:14:44Z_
+_Generated 2026-07-27T14:22:28Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-07-27T11:14:44Z |
+| Generated | 2026-07-27T14:22:28Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 1894 |
+| Duplicates removed | 1896 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
 | Multi-source overlaps | 21 |
 | Score (min / avg / max) | 79 / 79.9 / 96 |
-| High-score indicators (≥80) | 8778 |
+| High-score indicators (≥80) | 9060 |
 | Corroborated (2+ sources) | 21 |
 | Earliest first_seen | 2015-04-16T16:59:45Z |
-| Newest first_seen | 2026-07-27T11:03:23Z |
+| Newest first_seen | 2026-07-27T14:15:04Z |
 
 ## Top indicators by score
 
@@ -39,44 +39,44 @@ _Generated 2026-07-27T11:14:44Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4594 |
-| greensnow_blocklist | 3028 |
-| threatfox_export_json | 2860 |
+| blocklist_de_ssh | 4660 |
+| threatfox_export_json | 3142 |
+| greensnow_blocklist | 3133 |
 | spamhaus_drop | 1664 |
 | cisa_kev | 1653 |
-| tor_exit_nodes | 1380 |
+| tor_exit_nodes | 1386 |
 | ipsum_level5 | 990 |
-| malwarebazaar_recent | 905 |
+| malwarebazaar_recent | 974 |
 | binarydefense_banlist | 771 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 2805 |
-| cve | 2509 |
+| cve | 2665 |
+| sha256 | 2522 |
 | ipv4_cidr | 1663 |
-| url | 717 |
-| md5 | 657 |
-| domain | 609 |
-| ipv4 | 594 |
-| sha1 | 349 |
+| url | 764 |
+| md5 | 715 |
+| domain | 611 |
+| ipv4 | 557 |
+| sha1 | 406 |
 | ja3 | 97 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 2962 |
-| threatfox | 2769 |
-| cve | 2509 |
+| threatfox | 2907 |
+| malware | 2668 |
+| cve | 2665 |
 | drop | 1663 |
 | spamhaus | 1663 |
 | exploited-in-the-wild | 1653 |
-| nvd | 864 |
-| Mirai | 642 |
-| malware_download | 607 |
-| elf | 435 |
+| nvd | 1020 |
+| malware_download | 639 |
+| high | 510 |
+| Mirai | 475 |
 
 ## Multi-source overlaps
 
