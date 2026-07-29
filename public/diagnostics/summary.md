@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-07-29T10:34:46Z_
+_Generated 2026-07-29T14:00:03Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-07-29T10:34:46Z |
+| Generated | 2026-07-29T14:00:03Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 2411 |
+| Duplicates removed | 2547 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 24 |
-| Score (min / avg / max) | 79 / 79.9 / 96 |
-| High-score indicators (≥80) | 9019 |
-| Corroborated (2+ sources) | 24 |
+| Multi-source overlaps | 25 |
+| Score (min / avg / max) | 79 / 80.0 / 96 |
+| High-score indicators (≥80) | 9410 |
+| Corroborated (2+ sources) | 25 |
 | Earliest first_seen | 2017-07-14T18:08:15Z |
-| Newest first_seen | 2026-07-29T10:27:11Z |
+| Newest first_seen | 2026-07-29T13:55:07Z |
 
 ## Top indicators by score
 
@@ -39,44 +39,44 @@ _Generated 2026-07-29T10:34:46Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 9567 |
-| threatfox_export_json | 3236 |
-| greensnow_blocklist | 2456 |
+| blocklist_de_ssh | 9555 |
+| greensnow_blocklist | 3153 |
+| threatfox_export_json | 2866 |
 | spamhaus_drop | 1667 |
 | cisa_kev | 1655 |
 | binarydefense_banlist | 1410 |
-| tor_exit_nodes | 1376 |
+| tor_exit_nodes | 1374 |
 | ipsum_level5 | 1277 |
-| malwarebazaar_recent | 972 |
+| malwarebazaar_recent | 970 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 2589 |
-| cve | 2246 |
+| sha256 | 2352 |
+| cve | 2258 |
 | ipv4_cidr | 1666 |
-| domain | 1296 |
-| url | 726 |
-| md5 | 724 |
-| sha1 | 390 |
-| ipv4 | 266 |
+| domain | 1284 |
+| url | 1046 |
+| md5 | 687 |
+| sha1 | 355 |
+| ipv4 | 255 |
 | ja3 | 97 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3299 |
-| malware | 2692 |
-| cve | 2246 |
+| threatfox | 3152 |
+| malware | 2828 |
+| cve | 2258 |
 | drop | 1666 |
 | spamhaus | 1666 |
 | exploited-in-the-wild | 1655 |
-| ClickFix | 853 |
+| malware_download | 884 |
+| ClickFix | 811 |
 | Mac | 689 |
-| wordpress | 603 |
-| nvd | 601 |
+| nvd | 613 |
 
 ## Multi-source overlaps
 
