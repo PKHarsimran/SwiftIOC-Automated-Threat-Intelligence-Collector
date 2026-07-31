@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-07-31T06:39:46Z_
+_Generated 2026-07-31T10:33:42Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-07-31T06:39:46Z |
+| Generated | 2026-07-31T10:33:42Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 2890 |
+| Duplicates removed | 2426 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
 | Multi-source overlaps | 31 |
-| Score (min / avg / max) | 77 / 79.9 / 96 |
-| High-score indicators (≥80) | 8701 |
+| Score (min / avg / max) | 79 / 79.9 / 96 |
+| High-score indicators (≥80) | 8786 |
 | Corroborated (2+ sources) | 31 |
 | Earliest first_seen | 2013-04-12T22:55:01Z |
-| Newest first_seen | 2026-07-31T06:20:54Z |
+| Newest first_seen | 2026-07-31T10:14:20Z |
 
 ## Top indicators by score
 
@@ -41,44 +41,44 @@ _Generated 2026-07-31T06:39:46Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 6936 |
-| greensnow_blocklist | 3665 |
-| threatfox_export_json | 2643 |
+| blocklist_de_ssh | 4506 |
+| threatfox_export_json | 2670 |
+| greensnow_blocklist | 2416 |
 | ipsum_level5 | 1780 |
 | binarydefense_banlist | 1758 |
 | spamhaus_drop | 1666 |
 | cisa_kev | 1656 |
 | tor_exit_nodes | 1365 |
-| malwarebazaar_recent | 812 |
+| malwarebazaar_recent | 788 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 2302 |
-| sha256 | 2206 |
-| domain | 1793 |
-| ipv4_cidr | 1666 |
-| url | 657 |
-| md5 | 548 |
-| ipv4 | 416 |
-| sha1 | 315 |
+| domain | 2609 |
+| cve | 2040 |
+| sha256 | 1938 |
+| ipv4_cidr | 1665 |
+| url | 693 |
+| ipv4 | 426 |
+| md5 | 279 |
+| sha1 | 253 |
 | ja3 | 97 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3451 |
-| malware | 2484 |
-| cve | 2302 |
-| drop | 1666 |
-| spamhaus | 1666 |
+| threatfox | 3887 |
+| malware | 2311 |
+| ClickFix | 2176 |
+| cve | 2040 |
+| drop | 1665 |
+| spamhaus | 1665 |
 | exploited-in-the-wild | 1656 |
-| ClickFix | 1343 |
+| etherhiding | 1443 |
 | Mac | 685 |
-| c2 | 664 |
-| nvd | 662 |
+| c2 | 665 |
 
 ## Multi-source overlaps
 
