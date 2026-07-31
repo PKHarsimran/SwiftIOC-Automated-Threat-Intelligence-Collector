@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-07-31T02:22:05Z_
+_Generated 2026-07-31T06:39:46Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-07-31T02:22:05Z |
+| Generated | 2026-07-31T06:39:46Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3137 |
+| Duplicates removed | 2890 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 25 |
-| Score (min / avg / max) | 78 / 79.9 / 96 |
-| High-score indicators (≥80) | 8793 |
-| Corroborated (2+ sources) | 25 |
+| Multi-source overlaps | 31 |
+| Score (min / avg / max) | 77 / 79.9 / 96 |
+| High-score indicators (≥80) | 8701 |
+| Corroborated (2+ sources) | 31 |
 | Earliest first_seen | 2013-04-12T22:55:01Z |
-| Newest first_seen | 2026-07-31T02:15:50Z |
+| Newest first_seen | 2026-07-31T06:20:54Z |
 
 ## Top indicators by score
 
@@ -39,27 +39,27 @@ _Generated 2026-07-31T02:22:05Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 9388 |
-| greensnow_blocklist | 3760 |
-| threatfox_export_json | 2988 |
+| blocklist_de_ssh | 6936 |
+| greensnow_blocklist | 3665 |
+| threatfox_export_json | 2643 |
 | ipsum_level5 | 1780 |
 | binarydefense_banlist | 1758 |
-| spamhaus_drop | 1667 |
+| spamhaus_drop | 1666 |
 | cisa_kev | 1656 |
-| tor_exit_nodes | 1371 |
-| malwarebazaar_recent | 847 |
+| tor_exit_nodes | 1365 |
+| malwarebazaar_recent | 812 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
 | cve | 2302 |
-| sha256 | 2188 |
-| domain | 1785 |
+| sha256 | 2206 |
+| domain | 1793 |
 | ipv4_cidr | 1666 |
-| url | 685 |
+| url | 657 |
 | md5 | 548 |
-| ipv4 | 414 |
+| ipv4 | 416 |
 | sha1 | 315 |
 | ja3 | 97 |
 
@@ -67,16 +67,16 @@ _Generated 2026-07-31T02:22:05Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3443 |
-| malware | 2492 |
+| threatfox | 3451 |
+| malware | 2484 |
 | cve | 2302 |
 | drop | 1666 |
 | spamhaus | 1666 |
 | exploited-in-the-wild | 1656 |
-| ClickFix | 1344 |
-| Mac | 687 |
-| c2 | 666 |
-| nvd | 656 |
+| ClickFix | 1343 |
+| Mac | 685 |
+| c2 | 664 |
+| nvd | 662 |
 
 ## Multi-source overlaps
 
@@ -86,11 +86,11 @@ _Generated 2026-07-31T02:22:05Z_
 | ipv4: 94[.]154[.]43[.]102 | binarydefense_banlist, ci_army_list, ipsum_level5, threatfox_export_json |
 | ipv4: 217[.]60[.]195[.]187 | binarydefense_banlist, blocklist_de_ssh, threatfox_export_json |
 | ipv4: 45[.]90[.]163[.]37 | binarydefense_banlist, ci_army_list, threatfox_export_json |
+| cve: CVE-2022-47966 | cisa_kev, nist_nvd_recent |
+| cve: CVE-2023-27997 | cisa_kev, nist_nvd_recent |
+| cve: CVE-2023-47246 | cisa_kev, nist_nvd_recent |
+| cve: CVE-2023-4966 | cisa_kev, nist_nvd_recent |
+| cve: CVE-2024-21338 | cisa_kev, nist_nvd_recent |
 | cve: CVE-2024-30088 | cisa_kev, nist_nvd_recent |
-| cve: CVE-2024-35250 | cisa_kev, nist_nvd_recent |
-| cve: CVE-2025-68686 | cisa_kev, nist_nvd_recent |
-| cve: CVE-2026-0770 | cisa_kev, nist_nvd_recent |
-| cve: CVE-2026-31431 | cisa_kev, nist_nvd_recent |
-| cve: CVE-2026-45498 | cisa_kev, nist_nvd_recent |
 
 For more detail see [diagnostics/REPORT.md](diagnostics/REPORT.md) and the machine-readable feeds in [iocs/](iocs/).
