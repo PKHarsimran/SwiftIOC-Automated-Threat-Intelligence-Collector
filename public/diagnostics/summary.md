@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-07-31T13:52:27Z_
+_Generated 2026-07-31T17:25:00Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-07-31T13:52:27Z |
+| Generated | 2026-07-31T17:25:00Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 2592 |
+| Duplicates removed | 2537 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
 | Multi-source overlaps | 31 |
-| Score (min / avg / max) | 79 / 79.9 / 96 |
-| High-score indicators (≥80) | 8883 |
+| Score (min / avg / max) | 78 / 79.8 / 96 |
+| High-score indicators (≥80) | 8821 |
 | Corroborated (2+ sources) | 31 |
-| Earliest first_seen | 2013-04-12T22:55:01Z |
-| Newest first_seen | 2026-07-31T13:44:37Z |
+| Earliest first_seen | 2013-03-22T21:55:00Z |
+| Newest first_seen | 2026-07-31T17:17:31Z |
 
 ## Top indicators by score
 
@@ -39,26 +39,26 @@ _Generated 2026-07-31T13:52:27Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4478 |
-| greensnow_blocklist | 3093 |
-| threatfox_export_json | 2860 |
+| blocklist_de_ssh | 4448 |
+| greensnow_blocklist | 3130 |
+| threatfox_export_json | 2835 |
 | ipsum_level5 | 1780 |
 | binarydefense_banlist | 1758 |
 | spamhaus_drop | 1666 |
 | cisa_kev | 1656 |
-| tor_exit_nodes | 1365 |
-| malwarebazaar_recent | 731 |
+| tor_exit_nodes | 1363 |
+| malwarebazaar_recent | 711 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| domain | 2595 |
-| cve | 2039 |
-| sha256 | 1845 |
+| domain | 2528 |
+| cve | 2043 |
+| sha256 | 1886 |
 | ipv4_cidr | 1665 |
-| url | 847 |
-| ipv4 | 355 |
+| url | 866 |
+| ipv4 | 358 |
 | md5 | 292 |
 | sha1 | 265 |
 | ja3 | 97 |
@@ -67,16 +67,16 @@ _Generated 2026-07-31T13:52:27Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3840 |
-| malware | 2359 |
-| ClickFix | 2174 |
-| cve | 2039 |
+| threatfox | 3777 |
+| malware | 2418 |
+| ClickFix | 2113 |
+| cve | 2043 |
 | drop | 1665 |
 | spamhaus | 1665 |
 | exploited-in-the-wild | 1656 |
-| etherhiding | 1443 |
-| malware_download | 768 |
-| Mac | 685 |
+| etherhiding | 1442 |
+| malware_download | 786 |
+| Mac | 626 |
 
 ## Multi-source overlaps
 
