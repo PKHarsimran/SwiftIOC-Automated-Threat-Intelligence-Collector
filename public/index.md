@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-08-01T09:53:45Z_
+_Generated 2026-08-01T13:07:50Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-01T09:53:45Z |
+| Generated | 2026-08-01T13:07:50Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3165 |
+| Duplicates removed | 2994 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 326 |
+| Multi-source overlaps | 167 |
 | Score (min / avg / max) | 76 / 79.7 / 96 |
-| High-score indicators (≥80) | 8012 |
-| Corroborated (2+ sources) | 326 |
+| High-score indicators (≥80) | 7827 |
+| Corroborated (2+ sources) | 167 |
 | Earliest first_seen | 2013-03-22T21:55:00Z |
-| Newest first_seen | 2026-08-01T09:53:28Z |
+| Newest first_seen | 2026-08-01T13:07:42Z |
 
 ## Top indicators by score
 
@@ -41,26 +41,26 @@ _Generated 2026-08-01T09:53:45Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4463 |
-| greensnow_blocklist | 3620 |
+| blocklist_de_ssh | 4468 |
+| greensnow_blocklist | 3037 |
 | ipsum_level5 | 2078 |
 | binarydefense_banlist | 2030 |
-| threatfox_export_json | 1917 |
+| threatfox_export_json | 1782 |
 | spamhaus_drop | 1665 |
 | cisa_kev | 1656 |
 | tor_exit_nodes | 1386 |
-| malwarebazaar_recent | 702 |
+| malwarebazaar_recent | 679 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 2318 |
-| sha256 | 2117 |
-| domain | 2013 |
+| cve | 2327 |
+| sha256 | 2123 |
+| domain | 2000 |
 | ipv4_cidr | 1665 |
-| ipv4 | 677 |
-| url | 556 |
+| url | 712 |
+| ipv4 | 519 |
 | md5 | 292 |
 | sha1 | 265 |
 | ja3 | 97 |
@@ -69,16 +69,16 @@ _Generated 2026-08-01T09:53:45Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3283 |
-| malware | 2348 |
-| cve | 2318 |
+| threatfox | 3277 |
+| malware | 2505 |
+| cve | 2327 |
 | drop | 1665 |
 | spamhaus | 1665 |
 | exploited-in-the-wild | 1656 |
-| ClickFix | 1559 |
+| ClickFix | 1560 |
 | etherhiding | 1518 |
-| nvd | 684 |
-| c2 | 589 |
+| nvd | 694 |
+| malware_download | 637 |
 
 ## Multi-source overlaps
 
