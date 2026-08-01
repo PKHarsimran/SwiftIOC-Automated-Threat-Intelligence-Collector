@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-08-01T02:23:09Z_
+_Generated 2026-08-01T06:23:58Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-01T02:23:09Z |
+| Generated | 2026-08-01T06:23:58Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3348 |
+| Duplicates removed | 3161 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 32 |
-| Score (min / avg / max) | 77 / 79.7 / 96 |
-| High-score indicators (≥80) | 8475 |
-| Corroborated (2+ sources) | 32 |
+| Multi-source overlaps | 533 |
+| Score (min / avg / max) | 76 / 79.7 / 96 |
+| High-score indicators (≥80) | 8568 |
+| Corroborated (2+ sources) | 533 |
 | Earliest first_seen | 2013-03-22T21:55:00Z |
-| Newest first_seen | 2026-08-01T02:19:58Z |
+| Newest first_seen | 2026-08-01T06:23:50Z |
 
 ## Top indicators by score
 
@@ -41,26 +41,26 @@ _Generated 2026-08-01T02:23:09Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4436 |
+| blocklist_de_ssh | 4450 |
 | greensnow_blocklist | 3642 |
-| threatfox_export_json | 2584 |
+| threatfox_export_json | 2559 |
 | ipsum_level5 | 2078 |
 | binarydefense_banlist | 2030 |
 | spamhaus_drop | 1666 |
 | cisa_kev | 1656 |
-| tor_exit_nodes | 1374 |
-| malwarebazaar_recent | 710 |
+| tor_exit_nodes | 1388 |
+| malwarebazaar_recent | 723 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| domain | 2522 |
-| cve | 2052 |
-| sha256 | 2025 |
+| cve | 2210 |
+| sha256 | 2069 |
+| domain | 1942 |
 | ipv4_cidr | 1665 |
-| url | 693 |
-| ipv4 | 389 |
+| ipv4 | 862 |
+| url | 598 |
 | md5 | 292 |
 | sha1 | 265 |
 | ja3 | 97 |
@@ -69,30 +69,30 @@ _Generated 2026-08-01T02:23:09Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3789 |
-| malware | 2397 |
-| ClickFix | 2069 |
-| cve | 2052 |
+| threatfox | 3187 |
+| malware | 2344 |
+| cve | 2210 |
 | drop | 1665 |
 | spamhaus | 1665 |
 | exploited-in-the-wild | 1656 |
+| ClickFix | 1486 |
 | etherhiding | 1442 |
-| malware_download | 626 |
-| c2 | 586 |
+| c2 | 585 |
+| nvd | 575 |
 
 ## Multi-source overlaps
 
 | Indicator | Sources |
 | --- | --- |
+| ipv4: 192[.]142[.]28[.]77 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, et_compromised, greensnow_blocklist, ipsum_level5 |
+| ipv4: 116[.]99[.]49[.]208 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, greensnow_blocklist, ipsum_level5 |
+| ipv4: 167[.]94[.]146[.]49 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, greensnow_blocklist, ipsum_level5 |
+| ipv4: 195[.]178[.]110[.]137 | binarydefense_banlist, blocklist_de_ssh, et_compromised, greensnow_blocklist, ipsum_level5 |
+| ipv4: 45[.]198[.]224[.]26 | binarydefense_banlist, blocklist_de_ssh, et_compromised, greensnow_blocklist, ipsum_level5 |
+| ipv4: 77[.]90[.]185[.]20 | binarydefense_banlist, blocklist_de_ssh, et_compromised, greensnow_blocklist, ipsum_level5 |
 | ipv4: 94[.]154[.]43[.]77 | binarydefense_banlist, blocklist_de_ssh, et_compromised, ipsum_level5, threatfox_export_json |
-| ipv4: 5[.]61[.]209[.]44 | binarydefense_banlist, ci_army_list, ipsum_level5, threatfox_export_json |
-| ipv4: 94[.]154[.]43[.]102 | binarydefense_banlist, ci_army_list, ipsum_level5, threatfox_export_json |
-| ipv4: 217[.]60[.]195[.]187 | binarydefense_banlist, blocklist_de_ssh, threatfox_export_json |
-| ipv4: 45[.]90[.]163[.]37 | binarydefense_banlist, ci_army_list, threatfox_export_json |
-| cve: CVE-2022-47966 | cisa_kev, nist_nvd_recent |
-| cve: CVE-2023-27997 | cisa_kev, nist_nvd_recent |
-| cve: CVE-2023-47246 | cisa_kev, nist_nvd_recent |
-| cve: CVE-2023-4966 | cisa_kev, nist_nvd_recent |
-| cve: CVE-2024-21338 | cisa_kev, nist_nvd_recent |
+| ipv4: 118[.]216[.]88[.]229 | blocklist_de_ssh, ci_army_list, et_compromised, ipsum_level5 |
+| ipv4: 118[.]26[.]111[.]107 | binarydefense_banlist, blocklist_de_ssh, greensnow_blocklist, ipsum_level5 |
+| ipv4: 144[.]202[.]92[.]17 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, ipsum_level5 |
 
 For more detail see [diagnostics/REPORT.md](diagnostics/REPORT.md) and the machine-readable feeds in [iocs/](iocs/).
