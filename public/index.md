@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-08-03T14:30:14Z_
+_Generated 2026-08-03T17:46:23Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-03T14:30:14Z |
+| Generated | 2026-08-03T17:46:23Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 5253 |
+| Duplicates removed | 2083 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 39 |
-| Score (min / avg / max) | 79 / 79.9 / 96 |
-| High-score indicators (≥80) | 8454 |
-| Corroborated (2+ sources) | 39 |
+| Multi-source overlaps | 40 |
+| Score (min / avg / max) | 78 / 79.9 / 96 |
+| High-score indicators (≥80) | 8498 |
+| Corroborated (2+ sources) | 40 |
 | Earliest first_seen | 2013-03-22T21:55:00Z |
-| Newest first_seen | 2026-08-03T14:21:08Z |
+| Newest first_seen | 2026-08-03T17:32:06Z |
 
 ## Top indicators by score
 
@@ -41,44 +41,44 @@ _Generated 2026-08-03T14:30:14Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| malwarebazaar_recent | 5339 |
-| blocklist_de_ssh | 4338 |
-| greensnow_blocklist | 2874 |
+| blocklist_de_ssh | 4348 |
+| greensnow_blocklist | 2912 |
 | spamhaus_drop | 1665 |
 | cisa_kev | 1656 |
 | ipsum_level5 | 1622 |
-| tor_exit_nodes | 1398 |
-| threatfox_export_json | 1171 |
+| tor_exit_nodes | 1400 |
+| threatfox_export_json | 993 |
 | binarydefense_banlist | 825 |
+| et_compromised | 586 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3800 |
-| cve | 2334 |
+| sha256 | 3887 |
+| cve | 2346 |
 | ipv4_cidr | 1664 |
-| url | 871 |
+| url | 768 |
 | domain | 440 |
 | md5 | 322 |
 | sha1 | 284 |
-| ipv4 | 188 |
+| ipv4 | 192 |
 | ja3 | 97 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 4265 |
-| cve | 2334 |
+| malware | 4227 |
+| cve | 2346 |
 | drop | 1664 |
 | spamhaus | 1664 |
+| threatfox | 1663 |
 | exploited-in-the-wild | 1656 |
-| threatfox | 1636 |
-| malware_download | 771 |
-| nvd | 703 |
-| Mirai | 643 |
-| Mozi | 330 |
+| nvd | 715 |
+| Mirai | 665 |
+| malware_download | 646 |
+| high | 307 |
 
 ## Multi-source overlaps
 
