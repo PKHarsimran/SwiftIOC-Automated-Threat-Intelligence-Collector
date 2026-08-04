@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-08-03T20:58:53Z_
+_Generated 2026-08-04T02:04:25Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-03T20:58:53Z |
+| Generated | 2026-08-04T02:04:25Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 2087 |
+| Duplicates removed | 2752 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
 | Multi-source overlaps | 41 |
-| Score (min / avg / max) | 77 / 79.9 / 96 |
-| High-score indicators (≥80) | 8523 |
+| Score (min / avg / max) | 78 / 79.8 / 96 |
+| High-score indicators (≥80) | 8151 |
 | Corroborated (2+ sources) | 41 |
 | Earliest first_seen | 2013-03-22T21:55:00Z |
-| Newest first_seen | 2026-08-03T20:49:12Z |
+| Newest first_seen | 2026-08-04T01:53:29Z |
 
 ## Top indicators by score
 
@@ -39,44 +39,44 @@ _Generated 2026-08-03T20:58:53Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4371 |
-| greensnow_blocklist | 2931 |
+| blocklist_de_ssh | 4650 |
+| greensnow_blocklist | 3385 |
+| ipsum_level5 | 1772 |
 | spamhaus_drop | 1665 |
 | cisa_kev | 1657 |
-| ipsum_level5 | 1622 |
 | tor_exit_nodes | 1398 |
-| threatfox_export_json | 996 |
-| binarydefense_banlist | 825 |
-| malwarebazaar_recent | 595 |
+| binarydefense_banlist | 1198 |
+| threatfox_export_json | 903 |
+| et_compromised | 559 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3945 |
-| cve | 2353 |
+| sha256 | 4008 |
+| cve | 2355 |
 | ipv4_cidr | 1664 |
-| url | 671 |
-| domain | 463 |
+| url | 625 |
+| domain | 458 |
 | md5 | 322 |
 | sha1 | 284 |
-| ipv4 | 201 |
+| ipv4 | 187 |
 | ja3 | 97 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 4180 |
-| cve | 2353 |
-| threatfox | 1703 |
+| malware | 4193 |
+| cve | 2355 |
+| threatfox | 1688 |
 | drop | 1664 |
 | spamhaus | 1664 |
 | exploited-in-the-wild | 1657 |
-| nvd | 722 |
-| Mirai | 703 |
-| malware_download | 541 |
-| Mozi | 314 |
+| Mirai | 738 |
+| nvd | 724 |
+| malware_download | 491 |
+| high | 312 |
 
 ## Multi-source overlaps
 
