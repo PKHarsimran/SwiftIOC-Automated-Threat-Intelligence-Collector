@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-08-07T00:51:26Z_
+_Generated 2026-08-07T05:36:16Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-07T00:51:26Z |
+| Generated | 2026-08-07T05:36:16Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3002 |
+| Duplicates removed | 3234 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
 | Multi-source overlaps | 105 |
 | Score (min / avg / max) | 79 / 79.8 / 96 |
-| High-score indicators (≥80) | 7447 |
+| High-score indicators (≥80) | 7337 |
 | Corroborated (2+ sources) | 105 |
 | Earliest first_seen | 2017-07-14T18:08:15Z |
-| Newest first_seen | 2026-08-07T00:40:04Z |
+| Newest first_seen | 2026-08-07T05:29:52Z |
 
 ## Top indicators by score
 
@@ -39,26 +39,26 @@ _Generated 2026-08-07T00:51:26Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 9829 |
-| greensnow_blocklist | 4230 |
+| blocklist_de_ssh | 8641 |
+| greensnow_blocklist | 4195 |
 | binarydefense_banlist | 2111 |
+| ipsum_level5 | 2004 |
 | spamhaus_drop | 1682 |
-| ipsum_level5 | 1680 |
 | cisa_kev | 1661 |
 | tor_exit_nodes | 1391 |
-| malwarebazaar_recent | 1162 |
-| threatfox_export_json | 1048 |
+| malwarebazaar_recent | 1130 |
+| threatfox_export_json | 1039 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 4370 |
+| sha256 | 4405 |
 | cve | 2297 |
 | ipv4_cidr | 1681 |
-| domain | 583 |
-| url | 469 |
-| ipv4 | 255 |
+| domain | 602 |
+| url | 411 |
+| ipv4 | 259 |
 | md5 | 136 |
 | sha1 | 112 |
 | ja3 | 97 |
@@ -67,16 +67,16 @@ _Generated 2026-08-07T00:51:26Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 4632 |
+| malware | 4611 |
 | cve | 2297 |
 | drop | 1681 |
 | spamhaus | 1681 |
 | exploited-in-the-wild | 1661 |
-| threatfox | 1290 |
-| Mirai | 1158 |
+| threatfox | 1311 |
+| Mirai | 1185 |
 | nvd | 728 |
-| high | 482 |
-| malware_download | 404 |
+| high | 485 |
+| malware_download | 348 |
 
 ## Multi-source overlaps
 
@@ -84,7 +84,6 @@ _Generated 2026-08-07T00:51:26Z_
 | --- | --- |
 | ipv4: 94[.]154[.]43[.]77 | binarydefense_banlist, blocklist_de_ssh, et_compromised, ipsum_level5, threatfox_export_json |
 | ipv4: 5[.]61[.]209[.]44 | binarydefense_banlist, ci_army_list, ipsum_level5, threatfox_export_json |
-| ipv4: 94[.]154[.]43[.]102 | binarydefense_banlist, ci_army_list, ipsum_level5, threatfox_export_json |
 | ipv4: 94[.]154[.]43[.]249 | binarydefense_banlist, ci_army_list, ipsum_level5, threatfox_export_json |
 | cve: CVE-2009-3960 | cisa_kev, nist_nvd_recent |
 | cve: CVE-2012-1710 | cisa_kev, nist_nvd_recent |
@@ -92,5 +91,6 @@ _Generated 2026-08-07T00:51:26Z_
 | cve: CVE-2012-4681 | cisa_kev, nist_nvd_recent |
 | cve: CVE-2015-2291 | cisa_kev, nist_nvd_recent |
 | cve: CVE-2017-12615 | cisa_kev, nist_nvd_recent |
+| cve: CVE-2017-6884 | cisa_kev, nist_nvd_recent |
 
 For more detail see [diagnostics/REPORT.md](diagnostics/REPORT.md) and the machine-readable feeds in [iocs/](iocs/).
