@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-08-07T08:54:09Z_
+_Generated 2026-08-07T12:52:30Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-07T08:54:09Z |
+| Generated | 2026-08-07T12:52:30Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3199 |
+| Duplicates removed | 3033 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
 | Multi-source overlaps | 106 |
 | Score (min / avg / max) | 79 / 79.8 / 96 |
-| High-score indicators (≥80) | 7312 |
+| High-score indicators (≥80) | 7424 |
 | Corroborated (2+ sources) | 106 |
 | Earliest first_seen | 2017-07-14T18:08:15Z |
-| Newest first_seen | 2026-08-07T08:36:57Z |
+| Newest first_seen | 2026-08-07T12:39:31Z |
 
 ## Top indicators by score
 
@@ -39,26 +39,26 @@ _Generated 2026-08-07T08:54:09Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 8858 |
-| greensnow_blocklist | 4199 |
+| blocklist_de_ssh | 8942 |
+| greensnow_blocklist | 3485 |
 | binarydefense_banlist | 2111 |
 | ipsum_level5 | 2004 |
 | spamhaus_drop | 1682 |
 | cisa_kev | 1661 |
 | tor_exit_nodes | 1390 |
-| threatfox_export_json | 1015 |
-| malwarebazaar_recent | 992 |
+| malwarebazaar_recent | 1074 |
+| threatfox_export_json | 973 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 4389 |
-| cve | 2279 |
+| sha256 | 4263 |
+| cve | 2255 |
 | ipv4_cidr | 1681 |
-| domain | 650 |
-| url | 452 |
-| ipv4 | 274 |
+| domain | 685 |
+| url | 557 |
+| ipv4 | 284 |
 | md5 | 101 |
 | ja3 | 97 |
 | sha1 | 77 |
@@ -67,16 +67,16 @@ _Generated 2026-08-07T08:54:09Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 4658 |
-| cve | 2279 |
+| malware | 4671 |
+| cve | 2255 |
 | drop | 1681 |
 | spamhaus | 1681 |
 | exploited-in-the-wild | 1661 |
-| threatfox | 1283 |
-| Mirai | 1211 |
-| nvd | 710 |
-| high | 478 |
-| malware_download | 376 |
+| threatfox | 1294 |
+| Mirai | 1105 |
+| nvd | 686 |
+| malware_download | 495 |
+| high | 484 |
 
 ## Multi-source overlaps
 
