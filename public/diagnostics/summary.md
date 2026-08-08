@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-08-08T12:36:54Z_
+_Generated 2026-08-08T16:26:22Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-08T12:36:54Z |
+| Generated | 2026-08-08T16:26:22Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 2846 |
+| Duplicates removed | 2834 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
 | Multi-source overlaps | 109 |
-| Score (min / avg / max) | 78 / 79.6 / 96 |
-| High-score indicators (≥80) | 6856 |
+| Score (min / avg / max) | 78 / 79.7 / 96 |
+| High-score indicators (≥80) | 7455 |
 | Corroborated (2+ sources) | 109 |
 | Earliest first_seen | 2017-07-14T18:08:15Z |
-| Newest first_seen | 2026-08-08T12:14:28Z |
+| Newest first_seen | 2026-08-08T16:18:03Z |
 
 ## Top indicators by score
 
@@ -39,26 +39,26 @@ _Generated 2026-08-08T12:36:54Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4809 |
-| greensnow_blocklist | 3386 |
+| blocklist_de_ssh | 4768 |
+| greensnow_blocklist | 3420 |
 | binarydefense_banlist | 2362 |
 | ipsum_level5 | 1774 |
 | spamhaus_drop | 1684 |
 | cisa_kev | 1662 |
-| tor_exit_nodes | 1414 |
-| threatfox_export_json | 1364 |
-| malwarebazaar_recent | 851 |
+| tor_exit_nodes | 1416 |
+| threatfox_export_json | 1297 |
+| urlhaus_recent_urls | 910 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 4385 |
-| cve | 2043 |
+| sha256 | 3789 |
+| cve | 2118 |
 | ipv4_cidr | 1683 |
-| domain | 762 |
-| url | 534 |
-| ipv4 | 228 |
+| url | 1053 |
+| domain | 785 |
+| ipv4 | 207 |
 | md5 | 146 |
 | sha1 | 122 |
 | ja3 | 97 |
@@ -67,16 +67,16 @@ _Generated 2026-08-08T12:36:54Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 4717 |
-| cve | 2043 |
+| malware | 4644 |
+| cve | 2118 |
 | drop | 1683 |
 | spamhaus | 1683 |
 | exploited-in-the-wild | 1662 |
-| threatfox | 1459 |
-| Mirai | 1150 |
-| nvd | 475 |
-| malware_download | 470 |
-| ClearFake | 405 |
+| threatfox | 1457 |
+| Mirai | 1250 |
+| malware_download | 993 |
+| elf | 691 |
+| mirai | 670 |
 
 ## Multi-source overlaps
 
