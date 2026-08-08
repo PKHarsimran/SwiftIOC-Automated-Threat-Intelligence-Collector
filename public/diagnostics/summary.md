@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-08-08T01:12:25Z_
+_Generated 2026-08-08T04:51:27Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-08T01:12:25Z |
+| Generated | 2026-08-08T04:51:27Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3333 |
+| Duplicates removed | 3218 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
 | Multi-source overlaps | 109 |
 | Score (min / avg / max) | 78 / 79.8 / 96 |
-| High-score indicators (≥80) | 7267 |
+| High-score indicators (≥80) | 7057 |
 | Corroborated (2+ sources) | 109 |
 | Earliest first_seen | 2017-07-14T18:08:15Z |
-| Newest first_seen | 2026-08-08T01:05:07Z |
+| Newest first_seen | 2026-08-08T04:37:07Z |
 
 ## Top indicators by score
 
@@ -39,26 +39,26 @@ _Generated 2026-08-08T01:12:25Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 9128 |
-| greensnow_blocklist | 4055 |
+| blocklist_de_ssh | 9126 |
+| greensnow_blocklist | 3990 |
 | binarydefense_banlist | 2362 |
 | ipsum_level5 | 1774 |
 | spamhaus_drop | 1683 |
 | cisa_kev | 1662 |
-| threatfox_export_json | 1419 |
-| tor_exit_nodes | 1414 |
-| malwarebazaar_recent | 1053 |
+| threatfox_export_json | 1426 |
+| tor_exit_nodes | 1415 |
+| malwarebazaar_recent | 1013 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 4427 |
-| cve | 2030 |
+| sha256 | 4462 |
+| cve | 2039 |
 | ipv4_cidr | 1682 |
-| domain | 748 |
-| url | 537 |
-| ipv4 | 211 |
+| domain | 709 |
+| url | 531 |
+| ipv4 | 212 |
 | md5 | 146 |
 | sha1 | 122 |
 | ja3 | 97 |
@@ -67,16 +67,16 @@ _Generated 2026-08-08T01:12:25Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 4768 |
-| cve | 2030 |
+| malware | 4798 |
+| cve | 2039 |
 | drop | 1682 |
 | spamhaus | 1682 |
 | exploited-in-the-wild | 1662 |
-| threatfox | 1422 |
-| Mirai | 1127 |
-| malware_download | 479 |
-| nvd | 462 |
-| ClearFake | 368 |
+| threatfox | 1383 |
+| Mirai | 1142 |
+| malware_download | 474 |
+| nvd | 471 |
+| ClearFake | 388 |
 
 ## Multi-source overlaps
 
