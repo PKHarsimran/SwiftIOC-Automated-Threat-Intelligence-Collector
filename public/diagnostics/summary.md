@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-08-08T04:51:27Z_
+_Generated 2026-08-08T08:34:04Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-08T04:51:27Z |
+| Generated | 2026-08-08T08:34:04Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3218 |
+| Duplicates removed | 2999 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 109 |
-| Score (min / avg / max) | 78 / 79.8 / 96 |
-| High-score indicators (≥80) | 7057 |
-| Corroborated (2+ sources) | 109 |
+| Multi-source overlaps | 111 |
+| Score (min / avg / max) | 79 / 79.8 / 96 |
+| High-score indicators (≥80) | 6767 |
+| Corroborated (2+ sources) | 111 |
 | Earliest first_seen | 2017-07-14T18:08:15Z |
-| Newest first_seen | 2026-08-08T04:37:07Z |
+| Newest first_seen | 2026-08-08T08:33:58Z |
 
 ## Top indicators by score
 
@@ -39,26 +39,26 @@ _Generated 2026-08-08T04:51:27Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 9126 |
-| greensnow_blocklist | 3990 |
+| blocklist_de_ssh | 4798 |
+| greensnow_blocklist | 3993 |
 | binarydefense_banlist | 2362 |
 | ipsum_level5 | 1774 |
-| spamhaus_drop | 1683 |
+| spamhaus_drop | 1684 |
 | cisa_kev | 1662 |
-| threatfox_export_json | 1426 |
-| tor_exit_nodes | 1415 |
-| malwarebazaar_recent | 1013 |
+| tor_exit_nodes | 1414 |
+| threatfox_export_json | 1363 |
+| malwarebazaar_recent | 892 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 4462 |
-| cve | 2039 |
-| ipv4_cidr | 1682 |
-| domain | 709 |
-| url | 531 |
-| ipv4 | 212 |
+| sha256 | 4483 |
+| cve | 2041 |
+| ipv4_cidr | 1683 |
+| domain | 731 |
+| url | 479 |
+| ipv4 | 218 |
 | md5 | 146 |
 | sha1 | 122 |
 | ja3 | 97 |
@@ -67,16 +67,16 @@ _Generated 2026-08-08T04:51:27Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 4798 |
-| cve | 2039 |
-| drop | 1682 |
-| spamhaus | 1682 |
+| malware | 4755 |
+| cve | 2041 |
+| drop | 1683 |
+| spamhaus | 1683 |
 | exploited-in-the-wild | 1662 |
-| threatfox | 1383 |
-| Mirai | 1142 |
-| malware_download | 474 |
-| nvd | 471 |
-| ClearFake | 388 |
+| threatfox | 1425 |
+| Mirai | 1144 |
+| nvd | 473 |
+| malware_download | 410 |
+| ClearFake | 379 |
 
 ## Multi-source overlaps
 
