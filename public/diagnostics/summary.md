@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-08-09T12:38:50Z_
+_Generated 2026-08-09T16:27:46Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-09T12:38:50Z |
+| Generated | 2026-08-09T16:27:46Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3161 |
+| Duplicates removed | 3111 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 194 |
-| Score (min / avg / max) | 76 / 79.7 / 96 |
-| High-score indicators (≥80) | 7040 |
-| Corroborated (2+ sources) | 194 |
+| Multi-source overlaps | 114 |
+| Score (min / avg / max) | 77 / 79.7 / 96 |
+| High-score indicators (≥80) | 7057 |
+| Corroborated (2+ sources) | 114 |
 | Earliest first_seen | 2017-07-14T18:08:15Z |
-| Newest first_seen | 2026-08-09T12:38:45Z |
+| Newest first_seen | 2026-08-09T16:19:22Z |
 
 ## Top indicators by score
 
@@ -39,26 +39,26 @@ _Generated 2026-08-09T12:38:50Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4854 |
-| greensnow_blocklist | 3265 |
+| blocklist_de_ssh | 4956 |
+| greensnow_blocklist | 3308 |
 | binarydefense_banlist | 2604 |
 | ipsum_level5 | 1947 |
 | spamhaus_drop | 1684 |
 | cisa_kev | 1662 |
-| threatfox_export_json | 1473 |
 | tor_exit_nodes | 1408 |
-| malwarebazaar_recent | 684 |
+| threatfox_export_json | 1154 |
+| malwarebazaar_recent | 776 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3850 |
-| cve | 2234 |
+| sha256 | 3992 |
+| cve | 2288 |
 | ipv4_cidr | 1683 |
-| url | 738 |
-| domain | 681 |
-| ipv4 | 317 |
+| url | 694 |
+| domain | 620 |
+| ipv4 | 226 |
 | md5 | 212 |
 | sha1 | 188 |
 | ja3 | 97 |
@@ -67,30 +67,30 @@ _Generated 2026-08-09T12:38:50Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 4320 |
-| cve | 2234 |
+| malware | 4431 |
+| cve | 2288 |
 | drop | 1683 |
 | spamhaus | 1683 |
 | exploited-in-the-wild | 1662 |
-| threatfox | 1587 |
-| Mirai | 1389 |
-| malware_download | 673 |
-| nvd | 666 |
-| ClearFake | 438 |
+| threatfox | 1502 |
+| Mirai | 1411 |
+| nvd | 720 |
+| malware_download | 642 |
+| ClearFake | 385 |
 
 ## Multi-source overlaps
 
 | Indicator | Sources |
 | --- | --- |
-| ipv4: 118[.]26[.]111[.]107 | blocklist_de_ssh, ci_army_list, et_compromised, greensnow_blocklist, ipsum_level5 |
-| ipv4: 119[.]148[.]49[.]82 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, et_compromised, ipsum_level5 |
-| ipv4: 148[.]66[.]142[.]9 | blocklist_de_ssh, ci_army_list, et_compromised, greensnow_blocklist, ipsum_level5 |
-| ipv4: 167[.]94[.]146[.]48 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, greensnow_blocklist, ipsum_level5 |
-| ipv4: 167[.]94[.]146[.]51 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, greensnow_blocklist, ipsum_level5 |
-| ipv4: 167[.]94[.]146[.]52 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, greensnow_blocklist, ipsum_level5 |
-| ipv4: 167[.]94[.]146[.]53 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, greensnow_blocklist, ipsum_level5 |
-| ipv4: 195[.]178[.]110[.]137 | binarydefense_banlist, blocklist_de_ssh, et_compromised, greensnow_blocklist, ipsum_level5 |
-| ipv4: 45[.]198[.]224[.]26 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, et_compromised, ipsum_level5 |
-| ipv4: 77[.]90[.]185[.]20 | binarydefense_banlist, blocklist_de_ssh, et_compromised, greensnow_blocklist, ipsum_level5 |
+| ipv4: 94[.]154[.]43[.]77 | binarydefense_banlist, blocklist_de_ssh, et_compromised, ipsum_level5, threatfox_export_json |
+| ipv4: 5[.]61[.]209[.]44 | binarydefense_banlist, ci_army_list, ipsum_level5, threatfox_export_json |
+| ipv4: 94[.]154[.]43[.]249 | binarydefense_banlist, ci_army_list, ipsum_level5, threatfox_export_json |
+| ipv4: 91[.]92[.]40[.]5 | ci_army_list, et_compromised, threatfox_export_json |
+| ipv4: 94[.]154[.]43[.]46 | binarydefense_banlist, ipsum_level5, threatfox_export_json |
+| cve: CVE-2009-3960 | cisa_kev, nist_nvd_recent |
+| cve: CVE-2012-1710 | cisa_kev, nist_nvd_recent |
+| cve: CVE-2012-1723 | cisa_kev, nist_nvd_recent |
+| cve: CVE-2012-4681 | cisa_kev, nist_nvd_recent |
+| cve: CVE-2015-2291 | cisa_kev, nist_nvd_recent |
 
 For more detail see [diagnostics/REPORT.md](diagnostics/REPORT.md) and the machine-readable feeds in [iocs/](iocs/).
