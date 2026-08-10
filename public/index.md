@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-08-09T20:25:50Z_
+_Generated 2026-08-10T01:19:19Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-09T20:25:50Z |
+| Generated | 2026-08-10T01:19:19Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3031 |
+| Duplicates removed | 3346 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
 | Multi-source overlaps | 114 |
 | Score (min / avg / max) | 77 / 79.7 / 96 |
-| High-score indicators (≥80) | 6913 |
+| High-score indicators (≥80) | 6840 |
 | Corroborated (2+ sources) | 114 |
 | Earliest first_seen | 2017-07-14T18:08:15Z |
-| Newest first_seen | 2026-08-09T20:19:06Z |
+| Newest first_seen | 2026-08-10T01:14:31Z |
 
 ## Top indicators by score
 
@@ -27,8 +27,8 @@ _Generated 2026-08-09T20:25:50Z_
 | --- | ---: |
 | ipv4: `94[.]154[.]43[.]77` | score 96, 5 sources |
 | ipv4: `5[.]61[.]209[.]44` | score 96, 4 sources |
+| ipv4: `91[.]92[.]40[.]5` | score 96, 4 sources |
 | ipv4: `94[.]154[.]43[.]249` | score 96, 4 sources |
-| ipv4: `91[.]92[.]40[.]5` | score 96, 3 sources |
 | ipv4: `94[.]154[.]43[.]46` | score 96, 3 sources |
 | ipv4_cidr: `195.178.110.0/24` | score 88, 2 sources |
 | ipv4_cidr: `204.76.203.0/24` | score 88, 2 sources |
@@ -41,44 +41,44 @@ _Generated 2026-08-09T20:25:50Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4933 |
-| greensnow_blocklist | 3222 |
-| binarydefense_banlist | 2604 |
-| ipsum_level5 | 1947 |
+| blocklist_de_ssh | 4880 |
+| greensnow_blocklist | 3783 |
+| binarydefense_banlist | 2818 |
+| ipsum_level5 | 1697 |
 | spamhaus_drop | 1684 |
 | cisa_kev | 1662 |
-| tor_exit_nodes | 1407 |
-| threatfox_export_json | 915 |
-| malwarebazaar_recent | 722 |
+| tor_exit_nodes | 1402 |
+| threatfox_export_json | 887 |
+| malwarebazaar_recent | 698 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 4020 |
-| cve | 2350 |
+| sha256 | 4073 |
+| cve | 2407 |
 | ipv4_cidr | 1683 |
-| url | 664 |
-| domain | 578 |
+| url | 613 |
+| domain | 546 |
 | md5 | 212 |
-| ipv4 | 208 |
 | sha1 | 188 |
+| ipv4 | 181 |
 | ja3 | 97 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 4432 |
-| cve | 2350 |
+| malware | 4437 |
+| cve | 2407 |
 | drop | 1683 |
 | spamhaus | 1683 |
 | exploited-in-the-wild | 1662 |
-| threatfox | 1439 |
-| Mirai | 1418 |
-| nvd | 782 |
-| malware_download | 615 |
-| high | 406 |
+| Mirai | 1439 |
+| threatfox | 1377 |
+| nvd | 839 |
+| malware_download | 567 |
+| high | 413 |
 
 ## Multi-source overlaps
 
@@ -86,8 +86,8 @@ _Generated 2026-08-09T20:25:50Z_
 | --- | --- |
 | ipv4: 94[.]154[.]43[.]77 | binarydefense_banlist, blocklist_de_ssh, et_compromised, ipsum_level5, threatfox_export_json |
 | ipv4: 5[.]61[.]209[.]44 | binarydefense_banlist, ci_army_list, ipsum_level5, threatfox_export_json |
+| ipv4: 91[.]92[.]40[.]5 | ci_army_list, et_compromised, ipsum_level5, threatfox_export_json |
 | ipv4: 94[.]154[.]43[.]249 | binarydefense_banlist, ci_army_list, ipsum_level5, threatfox_export_json |
-| ipv4: 91[.]92[.]40[.]5 | ci_army_list, et_compromised, threatfox_export_json |
 | ipv4: 94[.]154[.]43[.]46 | binarydefense_banlist, ipsum_level5, threatfox_export_json |
 | cve: CVE-2009-3960 | cisa_kev, nist_nvd_recent |
 | cve: CVE-2012-1710 | cisa_kev, nist_nvd_recent |
