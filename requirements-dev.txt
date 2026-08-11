@@ -1,5 +1,5 @@
 -r requirements.txt
 pytest>=9.1.1
-ruff>=0.15.21
+ruff>=0.16.2
 pyright>=1.1.411
 stix2>=3.0.2  # optional: validates the STIX 2.1 bundle in tests
