@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-08-12T05:27:38Z_
+_Generated 2026-08-12T09:06:48Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-12T05:27:38Z |
+| Generated | 2026-08-12T09:06:48Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3525 |
+| Duplicates removed | 3445 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 169 |
+| Multi-source overlaps | 168 |
 | Score (min / avg / max) | 79 / 80.0 / 96 |
-| High-score indicators (≥80) | 9057 |
-| Corroborated (2+ sources) | 169 |
+| High-score indicators (≥80) | 8637 |
+| Corroborated (2+ sources) | 168 |
 | Earliest first_seen | 2017-02-03T07:59:00Z |
-| Newest first_seen | 2026-08-12T05:23:14Z |
+| Newest first_seen | 2026-08-12T09:05:08Z |
 
 ## Top indicators by score
 
@@ -39,44 +39,44 @@ _Generated 2026-08-12T05:27:38Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 8991 |
-| greensnow_blocklist | 3540 |
+| blocklist_de_ssh | 9575 |
+| greensnow_blocklist | 3501 |
 | binarydefense_banlist | 3300 |
-| malwarebazaar_recent | 2281 |
+| malwarebazaar_recent | 2335 |
 | ipsum_level5 | 1900 |
 | spamhaus_drop | 1687 |
 | cisa_kev | 1665 |
-| tor_exit_nodes | 1361 |
-| threatfox_export_json | 1093 |
+| tor_exit_nodes | 1337 |
+| threatfox_export_json | 1034 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3549 |
-| cve | 2310 |
+| sha256 | 3504 |
+| cve | 2292 |
 | ipv4_cidr | 1686 |
-| url | 1261 |
-| domain | 524 |
-| ipv4 | 253 |
-| md5 | 164 |
-| sha1 | 156 |
+| url | 1285 |
+| domain | 557 |
+| ipv4 | 269 |
+| md5 | 159 |
+| sha1 | 151 |
 | ja3 | 97 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 4440 |
-| cve | 2310 |
+| malware | 4412 |
+| cve | 2292 |
 | drop | 1686 |
 | spamhaus | 1686 |
 | exploited-in-the-wild | 1665 |
-| threatfox | 1471 |
-| malware_download | 1068 |
-| Mirai | 976 |
-| nvd | 790 |
-| elf | 727 |
+| threatfox | 1516 |
+| malware_download | 1073 |
+| Mirai | 1003 |
+| nvd | 772 |
+| elf | 742 |
 
 ## Multi-source overlaps
 
