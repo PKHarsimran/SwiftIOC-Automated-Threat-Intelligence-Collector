@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-08-13T12:58:13Z_
+_Generated 2026-08-13T16:51:42Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-13T12:58:13Z |
+| Generated | 2026-08-13T16:51:42Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3580 |
+| Duplicates removed | 3560 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
 | Multi-source overlaps | 199 |
-| Score (min / avg / max) | 79 / 80.1 / 96 |
-| High-score indicators (≥80) | 8975 |
+| Score (min / avg / max) | 77 / 80.0 / 96 |
+| High-score indicators (≥80) | 8912 |
 | Corroborated (2+ sources) | 199 |
 | Earliest first_seen | 2017-02-03T07:59:00Z |
-| Newest first_seen | 2026-08-13T12:57:58Z |
+| Newest first_seen | 2026-08-13T16:51:35Z |
 
 ## Top indicators by score
 
@@ -38,45 +38,45 @@ _Generated 2026-08-13T12:58:13Z_
 
 | Source | Indicators |
 | --- | ---: |
-| ci_army_list | 14999 |
-| blocklist_de_ssh | 5318 |
+| ci_army_list | 15000 |
+| blocklist_de_ssh | 5339 |
 | binarydefense_banlist | 3541 |
-| greensnow_blocklist | 3189 |
+| greensnow_blocklist | 3221 |
 | ipsum_level5 | 2056 |
 | spamhaus_drop | 1686 |
 | cisa_kev | 1665 |
-| malwarebazaar_recent | 1418 |
-| threatfox_export_json | 1387 |
-| tor_exit_nodes | 1333 |
+| threatfox_export_json | 1441 |
+| tor_exit_nodes | 1332 |
+| malwarebazaar_recent | 1243 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3653 |
+| sha256 | 3768 |
 | cve | 2238 |
-| ipv4_cidr | 1687 |
-| url | 1118 |
-| domain | 685 |
-| ipv4 | 275 |
-| md5 | 127 |
-| sha1 | 120 |
+| ipv4_cidr | 1688 |
+| url | 937 |
+| domain | 730 |
+| ipv4 | 271 |
+| md5 | 139 |
+| sha1 | 132 |
 | ja3 | 97 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 4460 |
+| malware | 4364 |
 | cve | 2238 |
-| drop | 1687 |
-| spamhaus | 1687 |
+| drop | 1688 |
+| spamhaus | 1688 |
 | exploited-in-the-wild | 1665 |
-| threatfox | 1526 |
-| Mirai | 1041 |
-| malware_download | 952 |
+| threatfox | 1621 |
+| Mirai | 1071 |
+| malware_download | 755 |
 | nvd | 745 |
-| mirai | 575 |
+| Vidar | 509 |
 
 ## Multi-source overlaps
 
