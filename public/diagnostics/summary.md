@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-08-15T20:16:34Z_
+_Generated 2026-08-16T01:00:01Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-15T20:16:34Z |
+| Generated | 2026-08-16T01:00:01Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 1984 |
+| Duplicates removed | 2186 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 218 |
-| Score (min / avg / max) | 79 / 80.0 / 96 |
-| High-score indicators (≥80) | 8718 |
-| Corroborated (2+ sources) | 218 |
+| Multi-source overlaps | 214 |
+| Score (min / avg / max) | 78 / 80.0 / 96 |
+| High-score indicators (≥80) | 8205 |
+| Corroborated (2+ sources) | 214 |
 | Earliest first_seen | 2017-07-14T18:08:15Z |
-| Newest first_seen | 2026-08-15T20:05:29Z |
+| Newest first_seen | 2026-08-16T00:49:17Z |
 
 ## Top indicators by score
 
@@ -39,44 +39,44 @@ _Generated 2026-08-15T20:16:34Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4978 |
-| threatfox_export_json | 2972 |
-| greensnow_blocklist | 2821 |
+| blocklist_de_ssh | 5022 |
+| greensnow_blocklist | 3409 |
+| threatfox_export_json | 2928 |
 | ipsum_level5 | 1803 |
 | spamhaus_drop | 1687 |
 | cisa_kev | 1665 |
-| tor_exit_nodes | 1383 |
-| malwarebazaar_recent | 765 |
-| et_compromised | 551 |
+| tor_exit_nodes | 1405 |
+| binarydefense_banlist | 864 |
+| malwarebazaar_recent | 694 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3002 |
-| cve | 1998 |
-| domain | 1907 |
+| sha256 | 3035 |
+| cve | 2006 |
+| domain | 1893 |
 | ipv4_cidr | 1686 |
-| url | 567 |
+| url | 557 |
 | md5 | 264 |
 | sha1 | 253 |
-| ipv4 | 226 |
+| ipv4 | 209 |
 | ja3 | 97 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3113 |
-| malware | 3111 |
-| cve | 1998 |
+| malware | 3136 |
+| threatfox | 3076 |
+| cve | 2006 |
 | drop | 1686 |
 | spamhaus | 1686 |
 | exploited-in-the-wild | 1665 |
 | ClickFix | 1601 |
 | etherhiding | 1412 |
 | Sepolia | 927 |
-| Mirai | 897 |
+| Mirai | 899 |
 
 ## Multi-source overlaps
 
