@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-08-16T12:29:02Z_
+_Generated 2026-08-16T16:18:02Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-16T12:29:02Z |
+| Generated | 2026-08-16T16:18:02Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 1797 |
+| Duplicates removed | 1841 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 213 |
-| Score (min / avg / max) | 78 / 79.9 / 96 |
-| High-score indicators (≥80) | 7533 |
-| Corroborated (2+ sources) | 213 |
+| Multi-source overlaps | 211 |
+| Score (min / avg / max) | 79 / 79.9 / 96 |
+| High-score indicators (≥80) | 7805 |
+| Corroborated (2+ sources) | 211 |
 | Earliest first_seen | 2017-07-14T18:08:15Z |
-| Newest first_seen | 2026-08-16T12:22:20Z |
+| Newest first_seen | 2026-08-16T16:09:22Z |
 
 ## Top indicators by score
 
@@ -39,12 +39,12 @@ _Generated 2026-08-16T12:29:02Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4982 |
-| greensnow_blocklist | 2494 |
-| threatfox_export_json | 1959 |
+| blocklist_de_ssh | 4961 |
+| greensnow_blocklist | 2504 |
+| threatfox_export_json | 2238 |
 | spamhaus_drop | 1687 |
 | cisa_kev | 1665 |
-| tor_exit_nodes | 1498 |
+| tor_exit_nodes | 1499 |
 | ipsum_level5 | 1463 |
 | binarydefense_banlist | 864 |
 | et_compromised | 551 |
@@ -53,30 +53,30 @@ _Generated 2026-08-16T12:29:02Z_
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3130 |
-| cve | 1983 |
-| domain | 1780 |
+| sha256 | 3045 |
+| cve | 2023 |
+| domain | 1724 |
 | ipv4_cidr | 1686 |
-| url | 627 |
-| md5 | 264 |
-| sha1 | 253 |
-| ipv4 | 180 |
+| url | 594 |
+| md5 | 297 |
+| sha1 | 286 |
+| ipv4 | 248 |
 | ja3 | 97 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 3333 |
-| threatfox | 2902 |
-| cve | 1983 |
+| malware | 3173 |
+| threatfox | 3019 |
+| cve | 2023 |
 | drop | 1686 |
 | spamhaus | 1686 |
 | exploited-in-the-wild | 1665 |
-| ClickFix | 1501 |
-| etherhiding | 1412 |
+| ClickFix | 1472 |
+| etherhiding | 1413 |
 | Sepolia | 927 |
-| Mirai | 895 |
+| Mirai | 876 |
 
 ## Multi-source overlaps
 
