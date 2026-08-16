@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-08-16T08:22:02Z_
+_Generated 2026-08-16T12:29:02Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-16T08:22:02Z |
+| Generated | 2026-08-16T12:29:02Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 1989 |
+| Duplicates removed | 1797 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
 | Multi-source overlaps | 213 |
-| Score (min / avg / max) | 78 / 80.0 / 96 |
-| High-score indicators (≥80) | 7847 |
+| Score (min / avg / max) | 78 / 79.9 / 96 |
+| High-score indicators (≥80) | 7533 |
 | Corroborated (2+ sources) | 213 |
 | Earliest first_seen | 2017-07-14T18:08:15Z |
-| Newest first_seen | 2026-08-16T08:07:23Z |
+| Newest first_seen | 2026-08-16T12:22:20Z |
 
 ## Top indicators by score
 
@@ -41,44 +41,44 @@ _Generated 2026-08-16T08:22:02Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5004 |
-| greensnow_blocklist | 3254 |
-| threatfox_export_json | 2594 |
+| blocklist_de_ssh | 4982 |
+| greensnow_blocklist | 2494 |
+| threatfox_export_json | 1959 |
 | spamhaus_drop | 1687 |
 | cisa_kev | 1665 |
-| tor_exit_nodes | 1496 |
+| tor_exit_nodes | 1498 |
 | ipsum_level5 | 1463 |
 | binarydefense_banlist | 864 |
-| malwarebazaar_recent | 555 |
+| et_compromised | 551 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3087 |
-| cve | 1980 |
-| domain | 1859 |
+| sha256 | 3130 |
+| cve | 1983 |
+| domain | 1780 |
 | ipv4_cidr | 1686 |
-| url | 573 |
+| url | 627 |
 | md5 | 264 |
 | sha1 | 253 |
-| ipv4 | 201 |
+| ipv4 | 180 |
 | ja3 | 97 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 3213 |
-| threatfox | 3025 |
-| cve | 1980 |
+| malware | 3333 |
+| threatfox | 2902 |
+| cve | 1983 |
 | drop | 1686 |
 | spamhaus | 1686 |
 | exploited-in-the-wild | 1665 |
-| ClickFix | 1600 |
+| ClickFix | 1501 |
 | etherhiding | 1412 |
 | Sepolia | 927 |
-| Mirai | 899 |
+| Mirai | 895 |
 
 ## Multi-source overlaps
 
