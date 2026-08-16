@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-08-16T04:30:23Z_
+_Generated 2026-08-16T08:22:02Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-16T04:30:23Z |
+| Generated | 2026-08-16T08:22:02Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 2169 |
+| Duplicates removed | 1989 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
 | Multi-source overlaps | 213 |
-| Score (min / avg / max) | 79 / 80.0 / 96 |
-| High-score indicators (≥80) | 8026 |
+| Score (min / avg / max) | 78 / 80.0 / 96 |
+| High-score indicators (≥80) | 7847 |
 | Corroborated (2+ sources) | 213 |
 | Earliest first_seen | 2017-07-14T18:08:15Z |
-| Newest first_seen | 2026-08-16T04:13:15Z |
+| Newest first_seen | 2026-08-16T08:07:23Z |
 
 ## Top indicators by score
 
@@ -39,41 +39,41 @@ _Generated 2026-08-16T04:30:23Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5015 |
-| greensnow_blocklist | 3391 |
-| threatfox_export_json | 2770 |
+| blocklist_de_ssh | 5004 |
+| greensnow_blocklist | 3254 |
+| threatfox_export_json | 2594 |
 | spamhaus_drop | 1687 |
 | cisa_kev | 1665 |
-| tor_exit_nodes | 1488 |
+| tor_exit_nodes | 1496 |
 | ipsum_level5 | 1463 |
 | binarydefense_banlist | 864 |
-| malwarebazaar_recent | 704 |
+| malwarebazaar_recent | 555 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3064 |
-| cve | 1978 |
-| domain | 1878 |
+| sha256 | 3087 |
+| cve | 1980 |
+| domain | 1859 |
 | ipv4_cidr | 1686 |
-| url | 572 |
+| url | 573 |
 | md5 | 264 |
 | sha1 | 253 |
-| ipv4 | 208 |
+| ipv4 | 201 |
 | ja3 | 97 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 3186 |
-| threatfox | 3054 |
-| cve | 1978 |
+| malware | 3213 |
+| threatfox | 3025 |
+| cve | 1980 |
 | drop | 1686 |
 | spamhaus | 1686 |
 | exploited-in-the-wild | 1665 |
-| ClickFix | 1601 |
+| ClickFix | 1600 |
 | etherhiding | 1412 |
 | Sepolia | 927 |
 | Mirai | 899 |
