@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-08-16T01:00:01Z_
+_Generated 2026-08-16T04:30:23Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-16T01:00:01Z |
+| Generated | 2026-08-16T04:30:23Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 2186 |
+| Duplicates removed | 2169 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 214 |
-| Score (min / avg / max) | 78 / 80.0 / 96 |
-| High-score indicators (≥80) | 8205 |
-| Corroborated (2+ sources) | 214 |
+| Multi-source overlaps | 213 |
+| Score (min / avg / max) | 79 / 80.0 / 96 |
+| High-score indicators (≥80) | 8026 |
+| Corroborated (2+ sources) | 213 |
 | Earliest first_seen | 2017-07-14T18:08:15Z |
-| Newest first_seen | 2026-08-16T00:49:17Z |
+| Newest first_seen | 2026-08-16T04:13:15Z |
 
 ## Top indicators by score
 
@@ -39,37 +39,37 @@ _Generated 2026-08-16T01:00:01Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5022 |
-| greensnow_blocklist | 3409 |
-| threatfox_export_json | 2928 |
-| ipsum_level5 | 1803 |
+| blocklist_de_ssh | 5015 |
+| greensnow_blocklist | 3391 |
+| threatfox_export_json | 2770 |
 | spamhaus_drop | 1687 |
 | cisa_kev | 1665 |
-| tor_exit_nodes | 1405 |
+| tor_exit_nodes | 1488 |
+| ipsum_level5 | 1463 |
 | binarydefense_banlist | 864 |
-| malwarebazaar_recent | 694 |
+| malwarebazaar_recent | 704 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3035 |
-| cve | 2006 |
-| domain | 1893 |
+| sha256 | 3064 |
+| cve | 1978 |
+| domain | 1878 |
 | ipv4_cidr | 1686 |
-| url | 557 |
+| url | 572 |
 | md5 | 264 |
 | sha1 | 253 |
-| ipv4 | 209 |
+| ipv4 | 208 |
 | ja3 | 97 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 3136 |
-| threatfox | 3076 |
-| cve | 2006 |
+| malware | 3186 |
+| threatfox | 3054 |
+| cve | 1978 |
 | drop | 1686 |
 | spamhaus | 1686 |
 | exploited-in-the-wild | 1665 |
