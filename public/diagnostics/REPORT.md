@@ -4,52 +4,52 @@
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-17T12:36:03Z |
+| Generated | 2026-08-17T16:21:07Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 1562 |
-| Carried forward | 4219 |
+| Duplicates removed | 1489 |
+| Carried forward | 4145 |
 | Expired (score < 20) | 0 |
 | Aged out (> 30d) | 0 |
-| Pruned over cap (10000) | 25954 |
+| Pruned over cap (10000) | 25852 |
 | Stored | 10000 |
-| Score (min / avg / max) | 77 / 79.9 / 96 |
-| High-confidence indicators | 7442 |
-| Earliest first_seen | 2017-07-14T18:08:15Z |
-| Newest first_seen | 2026-08-17T12:33:11Z |
+| Score (min / avg / max) | 79 / 79.9 / 96 |
+| High-confidence indicators | 7404 |
+| Earliest first_seen | 2013-09-24T10:35:52Z |
+| Newest first_seen | 2026-08-18T00:00:00Z |
 
 ## Per-source counts
 
 | Source | Indicators |
 | --- | ---: |
 | binarydefense_banlist | 1161 |
-| blocklist_de_ssh | 4877 |
+| blocklist_de_ssh | 4860 |
 | ci_army_list | 15000 |
-| cisa_kev | 1665 |
+| cisa_kev | 1666 |
 | dshield_block | 20 |
 | et_compromised | 551 |
 | feodo_ipblocklist | 5 |
-| greensnow_blocklist | 2664 |
+| greensnow_blocklist | 2725 |
 | ipsum_level5 | 814 |
-| malwarebazaar_recent | 644 |
+| malwarebazaar_recent | 665 |
 | nist_nvd_recent | 200 |
 | openphish_feed | 300 |
 | spamhaus_drop | 1688 |
 | sslbl_ja3 | 97 |
-| threatfox_export_json | 1624 |
-| tor_exit_nodes | 1505 |
-| urlhaus_recent_urls | 482 |
+| threatfox_export_json | 1527 |
+| tor_exit_nodes | 1494 |
+| urlhaus_recent_urls | 423 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3453 |
+| sha256 | 3503 |
 | cve | 2258 |
 | ipv4_cidr | 1687 |
-| url | 836 |
-| domain | 784 |
+| domain | 835 |
+| url | 756 |
 | md5 | 309 |
 | sha1 | 298 |
-| ipv4 | 278 |
+| ipv4 | 257 |
 | ja3 | 97 |
