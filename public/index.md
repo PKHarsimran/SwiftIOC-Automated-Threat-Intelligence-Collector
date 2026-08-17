@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-08-17T08:36:41Z_
+_Generated 2026-08-17T12:36:03Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-17T08:36:41Z |
+| Generated | 2026-08-17T12:36:03Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 1693 |
+| Duplicates removed | 1562 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
 | Multi-source overlaps | 210 |
-| Score (min / avg / max) | 77 / 79.8 / 96 |
-| High-score indicators (≥80) | 7257 |
+| Score (min / avg / max) | 77 / 79.9 / 96 |
+| High-score indicators (≥80) | 7440 |
 | Corroborated (2+ sources) | 210 |
 | Earliest first_seen | 2017-07-14T18:08:15Z |
-| Newest first_seen | 2026-08-17T08:34:38Z |
+| Newest first_seen | 2026-08-17T12:33:11Z |
 
 ## Top indicators by score
 
@@ -41,44 +41,44 @@ _Generated 2026-08-17T08:36:41Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4881 |
-| greensnow_blocklist | 3036 |
-| spamhaus_drop | 1687 |
+| blocklist_de_ssh | 4877 |
+| greensnow_blocklist | 2664 |
+| spamhaus_drop | 1688 |
 | cisa_kev | 1665 |
-| tor_exit_nodes | 1506 |
-| threatfox_export_json | 1485 |
+| threatfox_export_json | 1624 |
+| tor_exit_nodes | 1505 |
 | binarydefense_banlist | 1161 |
 | ipsum_level5 | 814 |
-| malwarebazaar_recent | 617 |
+| malwarebazaar_recent | 644 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3391 |
-| cve | 2212 |
-| ipv4_cidr | 1686 |
-| domain | 1035 |
-| url | 732 |
-| md5 | 297 |
-| sha1 | 286 |
-| ipv4 | 264 |
+| sha256 | 3453 |
+| cve | 2258 |
+| ipv4_cidr | 1687 |
+| url | 836 |
+| domain | 784 |
+| md5 | 309 |
+| sha1 | 298 |
+| ipv4 | 278 |
 | ja3 | 97 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 3637 |
-| threatfox | 2367 |
-| cve | 2212 |
-| drop | 1686 |
-| spamhaus | 1686 |
+| malware | 3766 |
+| cve | 2258 |
+| threatfox | 2191 |
+| drop | 1687 |
+| spamhaus | 1687 |
 | exploited-in-the-wild | 1665 |
-| Mirai | 1082 |
-| nvd | 742 |
-| ClickFix | 611 |
-| malware_download | 560 |
+| Mirai | 1097 |
+| nvd | 788 |
+| malware_download | 639 |
+| Vidar | 564 |
 
 ## Multi-source overlaps
 
