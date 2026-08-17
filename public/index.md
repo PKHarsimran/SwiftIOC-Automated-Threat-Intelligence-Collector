@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-08-17T00:57:49Z_
+_Generated 2026-08-17T04:35:42Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-17T00:57:49Z |
+| Generated | 2026-08-17T04:35:42Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 1985 |
+| Duplicates removed | 1743 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
 | Multi-source overlaps | 209 |
-| Score (min / avg / max) | 78 / 79.9 / 96 |
-| High-score indicators (≥80) | 7094 |
+| Score (min / avg / max) | 78 / 79.8 / 96 |
+| High-score indicators (≥80) | 7037 |
 | Corroborated (2+ sources) | 209 |
 | Earliest first_seen | 2017-07-14T18:08:15Z |
-| Newest first_seen | 2026-08-17T00:48:21Z |
+| Newest first_seen | 2026-08-17T04:20:16Z |
 
 ## Top indicators by score
 
@@ -41,44 +41,44 @@ _Generated 2026-08-17T00:57:49Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4950 |
-| greensnow_blocklist | 2918 |
+| blocklist_de_ssh | 4943 |
+| greensnow_blocklist | 2950 |
 | spamhaus_drop | 1687 |
 | cisa_kev | 1665 |
-| tor_exit_nodes | 1504 |
-| ipsum_level5 | 1463 |
-| threatfox_export_json | 1256 |
+| tor_exit_nodes | 1501 |
+| threatfox_export_json | 1330 |
 | binarydefense_banlist | 1161 |
-| malwarebazaar_recent | 611 |
+| ipsum_level5 | 814 |
+| malwarebazaar_recent | 608 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3315 |
-| cve | 2112 |
+| sha256 | 3335 |
+| cve | 2119 |
 | ipv4_cidr | 1686 |
-| domain | 1415 |
-| url | 561 |
+| domain | 1329 |
+| url | 612 |
 | md5 | 297 |
 | sha1 | 286 |
-| ipv4 | 231 |
+| ipv4 | 239 |
 | ja3 | 97 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 3437 |
-| threatfox | 2666 |
-| cve | 2112 |
+| malware | 3492 |
+| threatfox | 2604 |
+| cve | 2119 |
 | drop | 1686 |
 | spamhaus | 1686 |
 | exploited-in-the-wild | 1665 |
-| ClickFix | 1120 |
-| etherhiding | 1066 |
-| Mirai | 1045 |
-| Sepolia | 927 |
+| Mirai | 1046 |
+| ClickFix | 995 |
+| etherhiding | 926 |
+| Sepolia | 787 |
 
 ## Multi-source overlaps
 
