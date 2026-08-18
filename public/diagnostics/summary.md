@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-08-18T00:56:34Z_
+_Generated 2026-08-18T04:31:42Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-18T00:56:34Z |
+| Generated | 2026-08-18T04:31:42Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 1747 |
+| Duplicates removed | 2142 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
 | Multi-source overlaps | 209 |
-| Score (min / avg / max) | 78 / 79.9 / 96 |
-| High-score indicators (≥80) | 7221 |
+| Score (min / avg / max) | 79 / 79.9 / 96 |
+| High-score indicators (≥80) | 7090 |
 | Corroborated (2+ sources) | 209 |
 | Earliest first_seen | 2013-09-24T10:35:52Z |
-| Newest first_seen | 2026-08-18T00:51:16Z |
+| Newest first_seen | 2026-08-18T04:15:14Z |
 
 ## Top indicators by score
 
@@ -39,44 +39,44 @@ _Generated 2026-08-18T00:56:34Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4808 |
-| greensnow_blocklist | 3180 |
+| blocklist_de_ssh | 4799 |
+| greensnow_blocklist | 3183 |
 | spamhaus_drop | 1693 |
 | cisa_kev | 1666 |
-| tor_exit_nodes | 1517 |
-| threatfox_export_json | 1493 |
+| tor_exit_nodes | 1535 |
+| threatfox_export_json | 1498 |
 | binarydefense_banlist | 1488 |
-| ipsum_level5 | 814 |
-| malwarebazaar_recent | 734 |
+| ipsum_level5 | 988 |
+| malwarebazaar_recent | 817 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3565 |
-| cve | 2263 |
+| sha256 | 3647 |
+| cve | 2152 |
 | ipv4_cidr | 1692 |
-| domain | 800 |
-| url | 734 |
-| md5 | 309 |
-| sha1 | 298 |
-| ipv4 | 242 |
+| domain | 815 |
+| url | 747 |
+| md5 | 308 |
+| sha1 | 297 |
+| ipv4 | 245 |
 | ja3 | 97 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 3747 |
-| cve | 2263 |
-| threatfox | 2198 |
+| malware | 3846 |
+| threatfox | 2210 |
+| cve | 2152 |
 | drop | 1692 |
 | spamhaus | 1692 |
 | exploited-in-the-wild | 1666 |
-| Mirai | 1110 |
-| nvd | 793 |
-| Vidar | 564 |
-| malware_download | 510 |
+| Mirai | 1179 |
+| nvd | 682 |
+| Vidar | 556 |
+| malware_download | 526 |
 
 ## Multi-source overlaps
 
