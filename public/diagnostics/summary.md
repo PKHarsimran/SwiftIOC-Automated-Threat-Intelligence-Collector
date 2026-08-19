@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-08-18T20:17:20Z_
+_Generated 2026-08-19T00:56:56Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-18T20:17:20Z |
+| Generated | 2026-08-19T00:56:56Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 1886 |
+| Duplicates removed | 2012 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
 | Multi-source overlaps | 210 |
 | Score (min / avg / max) | 79 / 80.1 / 96 |
-| High-score indicators (≥80) | 9575 |
+| High-score indicators (≥80) | 9602 |
 | Corroborated (2+ sources) | 210 |
 | Earliest first_seen | 2013-09-24T10:35:52Z |
-| Newest first_seen | 2026-08-18T20:05:09Z |
+| Newest first_seen | 2026-08-19T00:46:26Z |
 
 ## Top indicators by score
 
@@ -39,26 +39,26 @@ _Generated 2026-08-18T20:17:20Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4807 |
-| threatfox_export_json | 4016 |
-| greensnow_blocklist | 2781 |
+| blocklist_de_ssh | 4844 |
+| threatfox_export_json | 4023 |
+| greensnow_blocklist | 3212 |
+| binarydefense_banlist | 1821 |
 | spamhaus_drop | 1693 |
 | cisa_kev | 1670 |
-| tor_exit_nodes | 1540 |
-| binarydefense_banlist | 1488 |
+| tor_exit_nodes | 1542 |
+| malwarebazaar_recent | 1033 |
 | ipsum_level5 | 988 |
-| malwarebazaar_recent | 959 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| domain | 2901 |
-| cve | 2182 |
-| sha256 | 1822 |
+| domain | 2932 |
+| cve | 2113 |
+| sha256 | 1981 |
 | ipv4_cidr | 1692 |
-| url | 829 |
-| ipv4 | 244 |
+| url | 727 |
+| ipv4 | 225 |
 | md5 | 118 |
 | sha1 | 115 |
 | ja3 | 97 |
@@ -67,16 +67,16 @@ _Generated 2026-08-18T20:17:20Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3790 |
-| malware | 2236 |
-| cve | 2182 |
-| etherhiding | 1962 |
+| threatfox | 3796 |
+| malware | 2299 |
+| cve | 2113 |
+| etherhiding | 1985 |
 | drop | 1692 |
 | spamhaus | 1692 |
 | exploited-in-the-wild | 1670 |
-| ClickFix | 800 |
-| nvd | 709 |
-| Mirai | 650 |
+| ClickFix | 825 |
+| Mirai | 743 |
+| nvd | 640 |
 
 ## Multi-source overlaps
 
