@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-08-19T08:32:12Z_
+_Generated 2026-08-19T12:38:01Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-19T08:32:12Z |
+| Generated | 2026-08-19T12:38:01Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 2383 |
+| Duplicates removed | 2257 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
 | Multi-source overlaps | 210 |
-| Score (min / avg / max) | 79 / 80.1 / 96 |
-| High-score indicators (≥80) | 9506 |
+| Score (min / avg / max) | 79 / 80.2 / 96 |
+| High-score indicators (≥80) | 9896 |
 | Corroborated (2+ sources) | 210 |
 | Earliest first_seen | 2013-09-24T10:35:52Z |
-| Newest first_seen | 2026-08-19T08:22:57Z |
+| Newest first_seen | 2026-08-19T12:24:11Z |
 
 ## Top indicators by score
 
@@ -39,44 +39,44 @@ _Generated 2026-08-19T08:32:12Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4819 |
-| threatfox_export_json | 4083 |
-| greensnow_blocklist | 3213 |
+| blocklist_de_ssh | 4799 |
+| threatfox_export_json | 4340 |
+| greensnow_blocklist | 2783 |
 | binarydefense_banlist | 1821 |
 | spamhaus_drop | 1693 |
 | cisa_kev | 1670 |
-| tor_exit_nodes | 1551 |
+| tor_exit_nodes | 1548 |
+| malwarebazaar_recent | 1250 |
 | ipsum_level5 | 1228 |
-| malwarebazaar_recent | 1200 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| domain | 2949 |
-| cve | 2118 |
-| sha256 | 1877 |
+| domain | 2721 |
+| cve | 2141 |
+| sha256 | 1962 |
 | ipv4_cidr | 1692 |
-| url | 783 |
-| ipv4 | 271 |
-| md5 | 107 |
-| sha1 | 106 |
+| url | 786 |
+| ipv4 | 354 |
+| md5 | 124 |
+| sha1 | 123 |
 | ja3 | 97 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3826 |
-| malware | 2264 |
-| cve | 2118 |
+| threatfox | 3706 |
+| malware | 2361 |
+| cve | 2141 |
 | etherhiding | 1985 |
 | drop | 1692 |
 | spamhaus | 1692 |
 | exploited-in-the-wild | 1670 |
-| ClickFix | 858 |
-| Mirai | 811 |
-| nvd | 645 |
+| Mirai | 869 |
+| ClickFix | 828 |
+| nvd | 668 |
 
 ## Multi-source overlaps
 
