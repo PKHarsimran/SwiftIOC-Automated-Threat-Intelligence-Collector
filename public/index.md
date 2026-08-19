@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-08-19T00:56:56Z_
+_Generated 2026-08-19T04:31:49Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-19T00:56:56Z |
+| Generated | 2026-08-19T04:31:49Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 2012 |
+| Duplicates removed | 2524 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
 | Multi-source overlaps | 210 |
 | Score (min / avg / max) | 79 / 80.1 / 96 |
-| High-score indicators (≥80) | 9602 |
+| High-score indicators (≥80) | 9722 |
 | Corroborated (2+ sources) | 210 |
 | Earliest first_seen | 2013-09-24T10:35:52Z |
-| Newest first_seen | 2026-08-19T00:46:26Z |
+| Newest first_seen | 2026-08-19T04:17:13Z |
 
 ## Top indicators by score
 
@@ -41,26 +41,26 @@ _Generated 2026-08-19T00:56:56Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4844 |
-| threatfox_export_json | 4023 |
-| greensnow_blocklist | 3212 |
+| blocklist_de_ssh | 4866 |
+| threatfox_export_json | 3972 |
+| greensnow_blocklist | 3205 |
 | binarydefense_banlist | 1821 |
 | spamhaus_drop | 1693 |
 | cisa_kev | 1670 |
-| tor_exit_nodes | 1542 |
-| malwarebazaar_recent | 1033 |
-| ipsum_level5 | 988 |
+| tor_exit_nodes | 1540 |
+| ipsum_level5 | 1228 |
+| malwarebazaar_recent | 1208 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| domain | 2932 |
-| cve | 2113 |
-| sha256 | 1981 |
+| domain | 2941 |
+| cve | 2116 |
+| sha256 | 1899 |
 | ipv4_cidr | 1692 |
-| url | 727 |
-| ipv4 | 225 |
+| url | 790 |
+| ipv4 | 232 |
 | md5 | 118 |
 | sha1 | 115 |
 | ja3 | 97 |
@@ -69,16 +69,16 @@ _Generated 2026-08-19T00:56:56Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3796 |
-| malware | 2299 |
-| cve | 2113 |
+| threatfox | 3816 |
+| malware | 2276 |
+| cve | 2116 |
 | etherhiding | 1985 |
 | drop | 1692 |
 | spamhaus | 1692 |
 | exploited-in-the-wild | 1670 |
 | ClickFix | 825 |
-| Mirai | 743 |
-| nvd | 640 |
+| Mirai | 807 |
+| nvd | 643 |
 
 ## Multi-source overlaps
 
