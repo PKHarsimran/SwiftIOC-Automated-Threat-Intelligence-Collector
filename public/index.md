@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-08-19T16:25:00Z_
+_Generated 2026-08-19T20:20:19Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-19T16:25:00Z |
+| Generated | 2026-08-19T20:20:19Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 2234 |
+| Duplicates removed | 2243 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 212 |
-| Score (min / avg / max) | 79 / 80.1 / 96 |
-| High-score indicators (≥80) | 9558 |
-| Corroborated (2+ sources) | 212 |
+| Multi-source overlaps | 213 |
+| Score (min / avg / max) | 79 / 80.2 / 96 |
+| High-score indicators (≥80) | 9961 |
+| Corroborated (2+ sources) | 213 |
 | Earliest first_seen | 2013-09-24T10:35:52Z |
-| Newest first_seen | 2026-08-19T16:12:24Z |
+| Newest first_seen | 2026-08-19T20:09:59Z |
 
 ## Top indicators by score
 
@@ -41,26 +41,26 @@ _Generated 2026-08-19T16:25:00Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4819 |
-| threatfox_export_json | 3949 |
-| greensnow_blocklist | 2812 |
+| blocklist_de_ssh | 4857 |
+| threatfox_export_json | 4079 |
+| greensnow_blocklist | 2784 |
 | binarydefense_banlist | 1821 |
 | spamhaus_drop | 1693 |
-| cisa_kev | 1670 |
-| tor_exit_nodes | 1543 |
-| malwarebazaar_recent | 1331 |
+| cisa_kev | 1671 |
+| tor_exit_nodes | 1519 |
+| malwarebazaar_recent | 1385 |
 | ipsum_level5 | 1228 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| domain | 2562 |
-| cve | 2208 |
-| sha256 | 2058 |
+| cve | 2381 |
+| domain | 2328 |
+| sha256 | 2134 |
 | ipv4_cidr | 1692 |
-| url | 780 |
-| ipv4 | 356 |
+| url | 723 |
+| ipv4 | 398 |
 | md5 | 124 |
 | sha1 | 123 |
 | ja3 | 97 |
@@ -69,16 +69,16 @@ _Generated 2026-08-19T16:25:00Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3548 |
-| malware | 2452 |
-| cve | 2208 |
-| etherhiding | 1938 |
+| threatfox | 3367 |
+| malware | 2460 |
+| cve | 2381 |
 | drop | 1692 |
 | spamhaus | 1692 |
-| exploited-in-the-wild | 1670 |
-| Mirai | 899 |
-| nvd | 737 |
-| ClickFix | 705 |
+| exploited-in-the-wild | 1671 |
+| etherhiding | 1653 |
+| Mirai | 959 |
+| nvd | 910 |
+| ClickFix | 733 |
 
 ## Multi-source overlaps
 
