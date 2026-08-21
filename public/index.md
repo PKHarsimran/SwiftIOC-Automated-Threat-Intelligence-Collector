@@ -2,31 +2,31 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-08-20T20:21:51Z_
+_Generated 2026-08-21T01:00:45Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-20T20:21:51Z |
+| Generated | 2026-08-21T01:00:45Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 2489 |
+| Duplicates removed | 2642 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 215 |
-| Score (min / avg / max) | 77 / 79.7 / 96 |
-| High-score indicators (≥80) | 7902 |
-| Corroborated (2+ sources) | 215 |
+| Multi-source overlaps | 229 |
+| Score (min / avg / max) | 76 / 79.7 / 96 |
+| High-score indicators (≥80) | 7799 |
+| Corroborated (2+ sources) | 229 |
 | Earliest first_seen | 2013-09-24T10:35:52Z |
-| Newest first_seen | 2026-08-20T20:05:07Z |
+| Newest first_seen | 2026-08-21T01:00:20Z |
 
 ## Top indicators by score
 
 | Indicator | Score / corroboration |
 | --- | ---: |
-| ipv4: `91[.]92[.]40[.]5` | score 96, 5 sources |
 | ipv4: `5[.]61[.]209[.]44` | score 96, 4 sources |
+| ipv4: `91[.]92[.]40[.]5` | score 94, 5 sources |
 | ipv4_cidr: `195.178.110.0/24` | score 88, 2 sources |
 | ipv4_cidr: `204.76.203.0/24` | score 88, 2 sources |
 | ipv4_cidr: `213.209.159.0/24` | score 88, 2 sources |
@@ -41,26 +41,26 @@ _Generated 2026-08-20T20:21:51Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5099 |
-| greensnow_blocklist | 2872 |
-| binarydefense_banlist | 2081 |
-| threatfox_export_json | 2026 |
+| blocklist_de_ssh | 5104 |
+| greensnow_blocklist | 3255 |
+| binarydefense_banlist | 2399 |
+| threatfox_export_json | 1960 |
 | spamhaus_drop | 1699 |
 | cisa_kev | 1673 |
-| tor_exit_nodes | 1516 |
+| tor_exit_nodes | 1519 |
 | ipsum_level5 | 1239 |
-| malwarebazaar_recent | 1198 |
+| malwarebazaar_recent | 1141 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 2397 |
+| sha256 | 2462 |
 | cve | 2253 |
-| domain | 2179 |
+| domain | 2201 |
 | ipv4_cidr | 1698 |
-| url | 776 |
-| ipv4 | 417 |
+| url | 683 |
+| ipv4 | 423 |
 | ja3 | 97 |
 | md5 | 93 |
 | sha1 | 90 |
@@ -69,30 +69,30 @@ _Generated 2026-08-20T20:21:51Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3176 |
-| malware | 2774 |
+| threatfox | 3144 |
+| malware | 2792 |
 | cve | 2253 |
 | drop | 1698 |
 | spamhaus | 1698 |
 | exploited-in-the-wild | 1673 |
 | etherhiding | 1428 |
-| Mirai | 996 |
-| ClickFix | 844 |
+| Mirai | 1018 |
+| ClickFix | 818 |
 | nvd | 780 |
 
 ## Multi-source overlaps
 
 | Indicator | Sources |
 | --- | --- |
+| ipv4: 160[.]119[.]76[.]27 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, greensnow_blocklist, ipsum_level5 |
+| ipv4: 167[.]94[.]146[.]59 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, greensnow_blocklist, ipsum_level5 |
+| ipv4: 195[.]178[.]110[.]137 | binarydefense_banlist, blocklist_de_ssh, et_compromised, greensnow_blocklist, ipsum_level5 |
+| ipv4: 195[.]178[.]110[.]218 | binarydefense_banlist, blocklist_de_ssh, et_compromised, greensnow_blocklist, ipsum_level5 |
+| ipv4: 2[.]57[.]122[.]53 | binarydefense_banlist, blocklist_de_ssh, et_compromised, greensnow_blocklist, ipsum_level5 |
+| ipv4: 45[.]198[.]224[.]26 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, et_compromised, ipsum_level5 |
+| ipv4: 77[.]90[.]185[.]20 | binarydefense_banlist, blocklist_de_ssh, et_compromised, greensnow_blocklist, ipsum_level5 |
 | ipv4: 91[.]92[.]40[.]5 | blocklist_de_ssh, ci_army_list, et_compromised, ipsum_level5, threatfox_export_json |
 | ipv4: 94[.]154[.]43[.]77 | binarydefense_banlist, blocklist_de_ssh, et_compromised, ipsum_level5, threatfox_export_json |
-| ipv4: 5[.]61[.]209[.]44 | binarydefense_banlist, ci_army_list, ipsum_level5, threatfox_export_json |
-| cve: CVE-2009-3960 | cisa_kev, nist_nvd_recent |
-| cve: CVE-2010-0188 | cisa_kev, nist_nvd_recent |
-| cve: CVE-2010-0738 | cisa_kev, nist_nvd_recent |
-| cve: CVE-2010-1428 | cisa_kev, nist_nvd_recent |
-| cve: CVE-2010-2861 | cisa_kev, nist_nvd_recent |
-| cve: CVE-2012-0507 | cisa_kev, nist_nvd_recent |
-| cve: CVE-2012-1710 | cisa_kev, nist_nvd_recent |
+| ipv4: 167[.]94[.]146[.]62 | binarydefense_banlist, ci_army_list, greensnow_blocklist, ipsum_level5 |
 
 For more detail see [diagnostics/REPORT.md](diagnostics/REPORT.md) and the machine-readable feeds in [iocs/](iocs/).
