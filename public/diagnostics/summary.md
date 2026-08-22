@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-08-21T20:19:31Z_
+_Generated 2026-08-22T00:57:13Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-21T20:19:31Z |
+| Generated | 2026-08-22T00:57:13Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 2517 |
+| Duplicates removed | 2726 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 871 |
-| Score (min / avg / max) | 76 / 79.6 / 96 |
-| High-score indicators (≥80) | 7418 |
-| Corroborated (2+ sources) | 871 |
+| Multi-source overlaps | 918 |
+| Score (min / avg / max) | 75 / 79.5 / 96 |
+| High-score indicators (≥80) | 7400 |
+| Corroborated (2+ sources) | 918 |
 | Earliest first_seen | 2013-09-24T10:35:52Z |
-| Newest first_seen | 2026-08-21T20:19:24Z |
+| Newest first_seen | 2026-08-22T00:56:45Z |
 
 ## Top indicators by score
 
@@ -39,26 +39,26 @@ _Generated 2026-08-21T20:19:31Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5167 |
-| greensnow_blocklist | 2895 |
-| binarydefense_banlist | 2399 |
+| blocklist_de_ssh | 5188 |
+| greensnow_blocklist | 3435 |
+| binarydefense_banlist | 2659 |
 | spamhaus_drop | 1699 |
 | cisa_kev | 1674 |
-| tor_exit_nodes | 1482 |
+| tor_exit_nodes | 1370 |
 | ipsum_level5 | 1283 |
-| threatfox_export_json | 1190 |
-| malwarebazaar_recent | 866 |
+| threatfox_export_json | 1185 |
+| malwarebazaar_recent | 931 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 2796 |
-| cve | 2401 |
+| sha256 | 2908 |
+| cve | 2404 |
 | ipv4_cidr | 1698 |
-| ipv4 | 1144 |
-| domain | 892 |
-| url | 776 |
+| ipv4 | 1122 |
+| url | 800 |
+| domain | 775 |
 | md5 | 101 |
 | ja3 | 97 |
 | sha1 | 95 |
@@ -67,16 +67,16 @@ _Generated 2026-08-21T20:19:31Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 3184 |
-| cve | 2401 |
-| threatfox | 1966 |
+| malware | 3316 |
+| cve | 2404 |
+| threatfox | 1784 |
 | drop | 1698 |
 | spamhaus | 1698 |
 | exploited-in-the-wild | 1674 |
-| Mirai | 1133 |
-| nvd | 928 |
-| blocklist | 657 |
-| aggregated | 639 |
+| Mirai | 1169 |
+| nvd | 931 |
+| blocklist | 704 |
+| aggregated | 676 |
 
 ## Multi-source overlaps
 
