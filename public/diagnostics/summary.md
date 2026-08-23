@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-08-23T08:22:49Z_
+_Generated 2026-08-23T12:28:55Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-23T08:22:49Z |
+| Generated | 2026-08-23T12:28:55Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 2796 |
+| Duplicates removed | 2545 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 415 |
-| Score (min / avg / max) | 76 / 79.8 / 96 |
-| High-score indicators (≥80) | 6859 |
-| Corroborated (2+ sources) | 415 |
+| Multi-source overlaps | 219 |
+| Score (min / avg / max) | 77 / 79.8 / 96 |
+| High-score indicators (≥80) | 6930 |
+| Corroborated (2+ sources) | 219 |
 | Earliest first_seen | 2013-09-24T10:35:52Z |
-| Newest first_seen | 2026-08-23T08:22:41Z |
+| Newest first_seen | 2026-08-23T12:28:46Z |
 
 ## Top indicators by score
 
@@ -39,58 +39,58 @@ _Generated 2026-08-23T08:22:49Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5248 |
-| greensnow_blocklist | 3299 |
+| blocklist_de_ssh | 5246 |
 | binarydefense_banlist | 2918 |
-| spamhaus_drop | 1700 |
+| greensnow_blocklist | 2577 |
+| spamhaus_drop | 1702 |
 | cisa_kev | 1674 |
-| threatfox_export_json | 1440 |
-| tor_exit_nodes | 1374 |
+| threatfox_export_json | 1441 |
+| tor_exit_nodes | 1384 |
 | ipsum_level5 | 1204 |
-| malwarebazaar_recent | 781 |
+| malwarebazaar_recent | 677 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3513 |
-| cve | 2460 |
-| ipv4_cidr | 1699 |
-| domain | 862 |
-| url | 506 |
-| ipv4 | 502 |
-| md5 | 184 |
-| sha1 | 177 |
+| sha256 | 3598 |
+| cve | 2477 |
+| ipv4_cidr | 1701 |
+| domain | 801 |
+| url | 565 |
+| ipv4 | 308 |
+| md5 | 230 |
+| sha1 | 223 |
 | ja3 | 97 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 3656 |
-| cve | 2460 |
-| threatfox | 1892 |
-| drop | 1699 |
-| spamhaus | 1699 |
+| malware | 3752 |
+| cve | 2477 |
+| threatfox | 1973 |
+| drop | 1701 |
+| spamhaus | 1701 |
 | exploited-in-the-wild | 1674 |
-| Mirai | 1384 |
-| nvd | 988 |
-| high | 530 |
-| malware_download | 376 |
+| Mirai | 1408 |
+| nvd | 1005 |
+| high | 536 |
+| malware_download | 433 |
 
 ## Multi-source overlaps
 
 | Indicator | Sources |
 | --- | --- |
-| ipv4: 77[.]239[.]124[.]102 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, et_compromised, greensnow_blocklist, ipsum_level5 |
 | ipv4: 77[.]239[.]124[.]108 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, et_compromised, ipsum_level5, threatfox_export_json |
-| ipv4: 144[.]225[.]6[.]182 | blocklist_de_ssh, ci_army_list, et_compromised, greensnow_blocklist, ipsum_level5 |
-| ipv4: 160[.]119[.]76[.]27 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, greensnow_blocklist, ipsum_level5 |
-| ipv4: 167[.]94[.]146[.]48 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, greensnow_blocklist, ipsum_level5 |
-| ipv4: 167[.]94[.]146[.]54 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, greensnow_blocklist, ipsum_level5 |
-| ipv4: 167[.]94[.]146[.]55 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, greensnow_blocklist, ipsum_level5 |
-| ipv4: 167[.]94[.]146[.]57 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, greensnow_blocklist, ipsum_level5 |
-| ipv4: 167[.]94[.]146[.]58 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, greensnow_blocklist, ipsum_level5 |
-| ipv4: 167[.]94[.]146[.]59 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, greensnow_blocklist, ipsum_level5 |
+| ipv4: 5[.]61[.]209[.]44 | binarydefense_banlist, ci_army_list, ipsum_level5, threatfox_export_json |
+| cve: CVE-2009-3960 | cisa_kev, nist_nvd_recent |
+| cve: CVE-2010-0188 | cisa_kev, nist_nvd_recent |
+| cve: CVE-2010-0738 | cisa_kev, nist_nvd_recent |
+| cve: CVE-2010-1428 | cisa_kev, nist_nvd_recent |
+| cve: CVE-2010-2861 | cisa_kev, nist_nvd_recent |
+| cve: CVE-2012-0507 | cisa_kev, nist_nvd_recent |
+| cve: CVE-2012-1710 | cisa_kev, nist_nvd_recent |
+| cve: CVE-2012-1723 | cisa_kev, nist_nvd_recent |
 
 For more detail see [diagnostics/REPORT.md](diagnostics/REPORT.md) and the machine-readable feeds in [iocs/](iocs/).
