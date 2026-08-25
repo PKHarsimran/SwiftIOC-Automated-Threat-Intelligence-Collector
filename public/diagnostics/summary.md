@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-08-24T20:23:43Z_
+_Generated 2026-08-25T00:58:58Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-24T20:23:43Z |
+| Generated | 2026-08-25T00:58:58Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 2725 |
+| Duplicates removed | 2802 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
 | Multi-source overlaps | 218 |
 | Score (min / avg / max) | 78 / 79.9 / 96 |
-| High-score indicators (≥80) | 7368 |
+| High-score indicators (≥80) | 7104 |
 | Corroborated (2+ sources) | 218 |
 | Earliest first_seen | 2017-07-14T18:08:15Z |
-| Newest first_seen | 2026-08-24T20:18:16Z |
+| Newest first_seen | 2026-08-25T00:53:27Z |
 
 ## Top indicators by score
 
@@ -39,26 +39,26 @@ _Generated 2026-08-24T20:23:43Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5181 |
-| binarydefense_banlist | 3147 |
-| greensnow_blocklist | 2900 |
+| blocklist_de_ssh | 5179 |
+| greensnow_blocklist | 3374 |
+| binarydefense_banlist | 3163 |
 | spamhaus_drop | 1702 |
 | cisa_kev | 1675 |
-| threatfox_export_json | 1674 |
-| tor_exit_nodes | 1399 |
+| threatfox_export_json | 1639 |
+| tor_exit_nodes | 1398 |
 | ipsum_level5 | 1310 |
-| malwarebazaar_recent | 760 |
+| malwarebazaar_recent | 756 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3737 |
-| cve | 2443 |
+| sha256 | 3765 |
+| cve | 2450 |
 | ipv4_cidr | 1704 |
-| domain | 798 |
-| url | 519 |
-| ipv4 | 273 |
+| domain | 700 |
+| url | 587 |
+| ipv4 | 268 |
 | md5 | 218 |
 | sha1 | 211 |
 | ja3 | 97 |
@@ -67,16 +67,16 @@ _Generated 2026-08-24T20:23:43Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 3752 |
-| cve | 2443 |
-| threatfox | 2001 |
+| malware | 3800 |
+| cve | 2450 |
+| threatfox | 1946 |
 | drop | 1704 |
 | spamhaus | 1704 |
 | exploited-in-the-wild | 1675 |
-| Mirai | 1496 |
-| nvd | 972 |
-| high | 506 |
-| ClickFix | 369 |
+| Mirai | 1511 |
+| nvd | 979 |
+| high | 508 |
+| ClickFix | 376 |
 
 ## Multi-source overlaps
 
