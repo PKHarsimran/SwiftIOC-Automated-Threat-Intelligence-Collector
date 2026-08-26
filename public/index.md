@@ -2,31 +2,31 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-08-26T04:37:45Z_
+_Generated 2026-08-26T08:36:50Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-26T04:37:45Z |
+| Generated | 2026-08-26T08:36:50Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 1917 |
+| Duplicates removed | 1856 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 221 |
+| Multi-source overlaps | 223 |
 | Score (min / avg / max) | 78 / 79.9 / 96 |
-| High-score indicators (≥80) | 7207 |
-| Corroborated (2+ sources) | 221 |
+| High-score indicators (≥80) | 7338 |
+| Corroborated (2+ sources) | 223 |
 | Earliest first_seen | 2017-07-14T18:08:15Z |
-| Newest first_seen | 2026-08-26T04:27:22Z |
+| Newest first_seen | 2026-08-26T08:27:29Z |
 
 ## Top indicators by score
 
 | Indicator | Score / corroboration |
 | --- | ---: |
 | ipv4: `77[.]239[.]124[.]108` | score 96, 6 sources |
-| ipv4: `5[.]61[.]209[.]44` | score 93, 4 sources |
+| ipv4: `5[.]61[.]209[.]44` | score 91, 4 sources |
 | ipv4_cidr: `195.178.110.0/24` | score 88, 2 sources |
 | ipv4_cidr: `204.76.203.0/24` | score 88, 2 sources |
 | ipv4_cidr: `213.209.159.0/24` | score 88, 2 sources |
@@ -41,44 +41,44 @@ _Generated 2026-08-26T04:37:45Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5334 |
-| greensnow_blocklist | 3678 |
-| threatfox_export_json | 1984 |
+| blocklist_de_ssh | 5315 |
+| greensnow_blocklist | 3697 |
+| threatfox_export_json | 2069 |
 | spamhaus_drop | 1703 |
 | cisa_kev | 1676 |
 | tor_exit_nodes | 1407 |
 | ipsum_level5 | 951 |
-| malwarebazaar_recent | 686 |
+| malwarebazaar_recent | 763 |
 | et_compromised | 546 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3248 |
+| sha256 | 3235 |
 | cve | 2533 |
 | ipv4_cidr | 1702 |
-| url | 759 |
-| domain | 651 |
-| ipv4 | 450 |
-| md5 | 283 |
-| sha1 | 277 |
+| url | 841 |
+| domain | 576 |
+| ipv4 | 503 |
+| md5 | 260 |
+| sha1 | 253 |
 | ja3 | 97 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 3275 |
+| malware | 3350 |
 | cve | 2533 |
-| threatfox | 2390 |
+| threatfox | 2317 |
 | drop | 1702 |
 | spamhaus | 1702 |
 | exploited-in-the-wild | 1676 |
-| Mirai | 1192 |
+| Mirai | 1141 |
 | nvd | 1064 |
 | high | 561 |
-| malware_download | 368 |
+| malware_download | 432 |
 
 ## Multi-source overlaps
 
