@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-08-29T02:39:29Z_
+_Generated 2026-08-29T10:40:56Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-29T02:39:29Z |
+| Generated | 2026-08-29T10:40:56Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 5515 |
-| Sources reporting | 17 |
+| Duplicates removed | 4263 |
+| Sources reporting | 16 |
 | Indicator types | 9 |
 | Multi-source overlaps | 250 |
-| Score (min / avg / max) | 78 / 80.0 / 96 |
-| High-score indicators (≥80) | 7691 |
+| Score (min / avg / max) | 77 / 79.9 / 96 |
+| High-score indicators (≥80) | 7324 |
 | Corroborated (2+ sources) | 250 |
 | Earliest first_seen | 2017-07-14T18:08:15Z |
-| Newest first_seen | 2026-08-29T02:16:00Z |
+| Newest first_seen | 2026-08-29T10:31:29Z |
 
 ## Top indicators by score
 
@@ -41,44 +41,44 @@ _Generated 2026-08-29T02:39:29Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 13233 |
-| greensnow_blocklist | 5386 |
+| blocklist_de_ssh | 13341 |
+| greensnow_blocklist | 3234 |
 | ipsum_level5 | 2800 |
-| threatfox_export_json | 1976 |
+| threatfox_export_json | 1805 |
 | spamhaus_drop | 1706 |
 | cisa_kev | 1685 |
-| tor_exit_nodes | 1406 |
+| tor_exit_nodes | 1416 |
 | binarydefense_banlist | 1062 |
-| malwarebazaar_recent | 900 |
+| malwarebazaar_recent | 804 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3137 |
+| sha256 | 3289 |
 | cve | 2506 |
 | ipv4_cidr | 1705 |
-| domain | 1159 |
-| url | 557 |
-| ipv4 | 285 |
-| md5 | 280 |
+| domain | 1047 |
+| url | 601 |
+| md5 | 281 |
 | sha1 | 274 |
+| ipv4 | 200 |
 | ja3 | 97 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 3218 |
+| malware | 3451 |
 | cve | 2506 |
-| threatfox | 2481 |
+| threatfox | 2253 |
 | drop | 1705 |
 | spamhaus | 1705 |
 | exploited-in-the-wild | 1685 |
-| Mirai | 1083 |
+| Mirai | 1147 |
 | nvd | 1035 |
-| etherhiding | 721 |
 | Sepolia | 680 |
+| etherhiding | 680 |
 
 ## Multi-source overlaps
 
