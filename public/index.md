@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-08-30T09:41:00Z_
+_Generated 2026-08-30T15:55:16Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-30T09:41:00Z |
+| Generated | 2026-08-30T15:55:16Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 4977 |
+| Duplicates removed | 4570 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
 | Multi-source overlaps | 249 |
-| Score (min / avg / max) | 78 / 79.9 / 96 |
-| High-score indicators (≥80) | 7114 |
+| Score (min / avg / max) | 78 / 79.8 / 96 |
+| High-score indicators (≥80) | 6567 |
 | Corroborated (2+ sources) | 249 |
 | Earliest first_seen | 2017-07-14T18:08:15Z |
-| Newest first_seen | 2026-08-30T09:32:49Z |
+| Newest first_seen | 2026-08-30T15:35:23Z |
 
 ## Top indicators by score
 
@@ -41,43 +41,43 @@ _Generated 2026-08-30T09:41:00Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 7760 |
-| greensnow_blocklist | 5092 |
+| blocklist_de_ssh | 7565 |
+| greensnow_blocklist | 4180 |
 | ipsum_level5 | 2790 |
 | spamhaus_drop | 1706 |
 | cisa_kev | 1685 |
-| threatfox_export_json | 1545 |
-| tor_exit_nodes | 1429 |
+| tor_exit_nodes | 1432 |
 | binarydefense_banlist | 1297 |
-| malwarebazaar_recent | 887 |
+| threatfox_export_json | 826 |
+| malwarebazaar_recent | 802 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3474 |
-| cve | 2666 |
+| sha256 | 3356 |
+| cve | 2694 |
 | ipv4_cidr | 1705 |
-| domain | 896 |
-| url | 542 |
+| domain | 891 |
+| url | 632 |
 | md5 | 215 |
 | sha1 | 208 |
-| ipv4 | 197 |
+| ipv4 | 202 |
 | ja3 | 97 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 3686 |
-| cve | 2666 |
-| threatfox | 1850 |
+| malware | 3677 |
+| cve | 2694 |
+| threatfox | 1831 |
 | drop | 1705 |
 | spamhaus | 1705 |
 | exploited-in-the-wild | 1685 |
-| Mirai | 1254 |
-| nvd | 1197 |
-| high | 617 |
+| nvd | 1225 |
+| Mirai | 1196 |
+| high | 626 |
 | Sepolia | 591 |
 
 ## Multi-source overlaps
