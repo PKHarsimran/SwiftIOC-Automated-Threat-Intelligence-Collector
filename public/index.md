@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-08-30T15:55:16Z_
+_Generated 2026-08-30T19:00:06Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-30T15:55:16Z |
+| Generated | 2026-08-30T19:00:06Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 4570 |
+| Duplicates removed | 4604 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 249 |
-| Score (min / avg / max) | 78 / 79.8 / 96 |
-| High-score indicators (≥80) | 6567 |
-| Corroborated (2+ sources) | 249 |
+| Multi-source overlaps | 246 |
+| Score (min / avg / max) | 78 / 79.7 / 96 |
+| High-score indicators (≥80) | 6513 |
+| Corroborated (2+ sources) | 246 |
 | Earliest first_seen | 2017-07-14T18:08:15Z |
-| Newest first_seen | 2026-08-30T15:35:23Z |
+| Newest first_seen | 2026-08-30T18:52:06Z |
 
 ## Top indicators by score
 
@@ -41,43 +41,43 @@ _Generated 2026-08-30T15:55:16Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 7565 |
-| greensnow_blocklist | 4180 |
+| blocklist_de_ssh | 7530 |
+| greensnow_blocklist | 4129 |
 | ipsum_level5 | 2790 |
 | spamhaus_drop | 1706 |
 | cisa_kev | 1685 |
-| tor_exit_nodes | 1432 |
+| tor_exit_nodes | 1425 |
 | binarydefense_banlist | 1297 |
-| threatfox_export_json | 826 |
-| malwarebazaar_recent | 802 |
+| malwarebazaar_recent | 822 |
+| threatfox_export_json | 753 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3356 |
-| cve | 2694 |
+| sha256 | 3363 |
+| cve | 2852 |
 | ipv4_cidr | 1705 |
-| domain | 891 |
-| url | 632 |
+| domain | 868 |
+| url | 532 |
 | md5 | 215 |
 | sha1 | 208 |
-| ipv4 | 202 |
+| ipv4 | 160 |
 | ja3 | 97 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 3677 |
-| cve | 2694 |
-| threatfox | 1831 |
+| malware | 3573 |
+| cve | 2852 |
+| threatfox | 1774 |
 | drop | 1705 |
 | spamhaus | 1705 |
 | exploited-in-the-wild | 1685 |
-| nvd | 1225 |
-| Mirai | 1196 |
-| high | 626 |
+| nvd | 1383 |
+| Mirai | 1165 |
+| high | 697 |
 | Sepolia | 591 |
 
 ## Multi-source overlaps
