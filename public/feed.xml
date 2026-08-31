@@ -3,305 +3,305 @@
   <title>SwiftIOC — Newest High-Confidence IOCs</title>
   <link>https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector</link>
   <description>Freshest scored, cross-source-corroborated indicators of compromise.</description>
-  <lastBuildDate>Mon, 31 Aug 2026 18:39:17 +0000</lastBuildDate>
+  <lastBuildDate>Mon, 31 Aug 2026 23:34:27 +0000</lastBuildDate>
     <item>
-      <title>[80] ipv4_cidr: 91.92.42.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">49ef355d-6c46-5047-b154-36ec85fe48b4</guid>
-      <pubDate>Mon, 31 Aug 2026 18:39:04 +0000</pubDate>
+      <title>[80] url: hxxp://196[.]189[.]9[.]27:45275/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,arm,elf,mirai,Mozi</description>
+      <guid isPermaLink="false">7e581de3-353b-5021-9e98-d302c9948c19</guid>
+      <pubDate>Mon, 31 Aug 2026 23:22:14 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 91.92.47.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">2aee54b7-147f-5097-8a0f-8318c43c974c</guid>
-      <pubDate>Mon, 31 Aug 2026 18:39:04 +0000</pubDate>
+      <title>[80] url: hxxp://105[.]225[.]115[.]56:60839/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,mirai</description>
+      <guid isPermaLink="false">027c7076-5e94-57cf-879f-c9afef1f92d1</guid>
+      <pubDate>Mon, 31 Aug 2026 23:22:07 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 93.152.221.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">9361ae33-8ef1-5a23-8ceb-ca55fc4370ca</guid>
-      <pubDate>Mon, 31 Aug 2026 18:39:04 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxp://59[.]97[.]253[.]172:56845/i</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,elf,mips,Mozi</description>
-      <guid isPermaLink="false">5047dac4-591b-5161-9c6a-51e5db697b62</guid>
-      <pubDate>Mon, 31 Aug 2026 18:15:28 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] domain: noi403e7[.]shop-cardioslim-tea[.]com</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClearFake,mac-0x0f14,macos,threatfox</description>
-      <guid isPermaLink="false">d70eaffc-fd69-540a-9761-4feab287af89</guid>
-      <pubDate>Mon, 31 Aug 2026 18:13:04 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] domain: shop-cardioslim-tea[.]com</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: 31August2026,ClearFake,Commandline,MacOS,threatfox</description>
-      <guid isPermaLink="false">039804b6-e97d-56f3-8773-6325cd478c25</guid>
-      <pubDate>Mon, 31 Aug 2026 18:10:56 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxps://38[.]54[.]37[.]216/main[.]exe</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,38-54-37-216,exe,ua-wget</description>
-      <guid isPermaLink="false">9ef18db2-61a8-5fa4-9aae-de9f55af2c81</guid>
-      <pubDate>Mon, 31 Aug 2026 17:59:17 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxp://64[.]89[.]163[.]22/test[.]elf</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,elf</description>
-      <guid isPermaLink="false">ca9bf631-4180-5458-bbcf-360e200924a9</guid>
-      <pubDate>Mon, 31 Aug 2026 17:58:33 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxp://91[.]92[.]242[.]236/files-129312398/files/file_37d17c54c9f9f26a[.]exe</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,c2-monitor-auto,dropped-by-amadey</description>
-      <guid isPermaLink="false">5872d572-f076-5028-803e-98b1235e9e94</guid>
-      <pubDate>Mon, 31 Aug 2026 17:55:13 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] ipv4: 167[.]71[.]38[.]182</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Aisuru,c2,threatfox</description>
-      <guid isPermaLink="false">312fde69-949f-5cc2-b155-61fe7d4a682f</guid>
-      <pubDate>Mon, 31 Aug 2026 17:54:04 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxp://60[.]18[.]56[.]204:38296/i</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,elf,mips,Mozi</description>
-      <guid isPermaLink="false">e5eb5471-96ab-5c79-9700-481f9fde8c88</guid>
-      <pubDate>Mon, 31 Aug 2026 17:49:22 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxp://59[.]97[.]253[.]172:56845/bin[.]sh</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,elf,mips,Mozi</description>
-      <guid isPermaLink="false">bde6ea70-934c-5c97-960c-f64152cb89bc</guid>
-      <pubDate>Mon, 31 Aug 2026 17:46:18 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxps://192[.]253[.]248[.]52/dl</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,192-253-248-52,ua-wget</description>
-      <guid isPermaLink="false">c807a7b6-13e9-5c40-951f-e8cd3a479a1b</guid>
-      <pubDate>Mon, 31 Aug 2026 17:45:08 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxps://192[.]253[.]248[.]52/get</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,192-253-248-52,ua-wget</description>
-      <guid isPermaLink="false">08fa02c1-068e-5dce-bc6b-3f664981790d</guid>
-      <pubDate>Mon, 31 Aug 2026 17:44:07 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: 384aaa85f6b4a29cff32ee08050c1f83becbbed5</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
-      <guid isPermaLink="false">f6cc4918-292d-5c11-9af8-115a404f4a74</guid>
-      <pubDate>Mon, 31 Aug 2026 17:43:03 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: b6e2438e04735efcb31d6b71465423ae546ebc8b</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
-      <guid isPermaLink="false">f4f1c7e0-36a5-56b3-8cc1-9b6b35904c30</guid>
-      <pubDate>Mon, 31 Aug 2026 17:43:03 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxp://185[.]242[.]3[.]87/w3[.]sh</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,185-242-3-87,sh,ua-wget</description>
-      <guid isPermaLink="false">1f5c570d-cc58-523a-ab9b-99889b1b04d0</guid>
-      <pubDate>Mon, 31 Aug 2026 17:42:17 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxp://185[.]242[.]3[.]87/run[.]sh</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,185-242-3-87,sh,ua-wget</description>
-      <guid isPermaLink="false">95e1396d-8fed-5f00-9e58-c8ea67e80541</guid>
-      <pubDate>Mon, 31 Aug 2026 17:42:16 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxp://185[.]242[.]3[.]87/check3[.]sh</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,185-242-3-87,sh,ua-wget</description>
-      <guid isPermaLink="false">6a90c225-9f71-5e42-97a2-160edb05593b</guid>
-      <pubDate>Mon, 31 Aug 2026 17:41:14 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxp://185[.]242[.]3[.]87/softwaretech</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,185-242-3-87,elf,mirai,ua-wget</description>
-      <guid isPermaLink="false">7cf2a78c-5959-5c00-986f-c3c6f183adea</guid>
-      <pubDate>Mon, 31 Aug 2026 17:41:14 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: 225a9f66baea642b2fe6ce0e21566c3a91aa7230</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
-      <guid isPermaLink="false">55c69a65-776f-5b7d-8c31-2c74bd611303</guid>
-      <pubDate>Mon, 31 Aug 2026 17:40:46 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: aa61c90dbca7f7fabae7fe010bdfc7a9d43cc666</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
-      <guid isPermaLink="false">a4877e00-3034-5184-8f5a-e9933984ebd1</guid>
-      <pubDate>Mon, 31 Aug 2026 17:40:46 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: d9f83fee80e8e6405e72f0111d3b9758f87e1e28</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
-      <guid isPermaLink="false">fd653586-bccb-5c80-b9a0-749109447345</guid>
-      <pubDate>Mon, 31 Aug 2026 17:40:46 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxp://64[.]89[.]163[.]22/9c[.]elf</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,64-89-163-22,elf,Mettle,ua-wget</description>
-      <guid isPermaLink="false">d6196dc7-b323-5f8f-9de4-0749c8d4c537</guid>
-      <pubDate>Mon, 31 Aug 2026 17:39:23 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxp://64[.]89[.]163[.]22/auto[.]sh</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,64-89-163-22,Mettle,sh,ua-wget</description>
-      <guid isPermaLink="false">bef4fa73-d962-5a6e-a5c6-8a3137e3f9d0</guid>
-      <pubDate>Mon, 31 Aug 2026 17:39:18 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxp://64[.]89[.]163[.]22/test[.]sh</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,64-89-163-22,Mettle,sh,ua-wget</description>
-      <guid isPermaLink="false">e5ca6d43-c4c8-51dd-8673-d253e7ad7134</guid>
-      <pubDate>Mon, 31 Aug 2026 17:39:18 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: 726113de1ac1d200deb99369bf65e58837edb8ac</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
-      <guid isPermaLink="false">03c9d158-13f8-5638-9016-c4b3eadbaa98</guid>
-      <pubDate>Mon, 31 Aug 2026 17:38:16 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: 77c8319218d12a2327c9a33384477a1e54e12198</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,Mettle</description>
-      <guid isPermaLink="false">10930876-dbab-560d-8619-e74c52a5c0fc</guid>
-      <pubDate>Mon, 31 Aug 2026 17:38:16 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: e9567b611bf469b037ef974ad53b049b0b1189db</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,Mettle</description>
-      <guid isPermaLink="false">accddcc2-3aa1-5622-b1b0-5e7bfa4013d5</guid>
-      <pubDate>Mon, 31 Aug 2026 17:36:14 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: 48fb2d5babbf3fb38fab03754949fe82300cdcaa</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
-      <guid isPermaLink="false">02655a32-6bfc-5759-8a4e-3814a4c01f43</guid>
-      <pubDate>Mon, 31 Aug 2026 17:34:32 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxp://138[.]124[.]60[.]116/s</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,138-124-60-116,sh,ua-wget</description>
-      <guid isPermaLink="false">b9ab8f06-89fa-5d45-8a65-bae3a6b925a6</guid>
-      <pubDate>Mon, 31 Aug 2026 17:33:20 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: 25138a841a19e9fcfd8d90595c9be9bc4d1e08b9</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
-      <guid isPermaLink="false">7c9c9d91-2d5f-5e3b-a6c2-0f8fefd11b4e</guid>
-      <pubDate>Mon, 31 Aug 2026 17:29:05 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxps://198348[.]gl/collect</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,sh</description>
-      <guid isPermaLink="false">dc6ae0d1-6ad9-5ba4-bb5f-626c60e593b8</guid>
-      <pubDate>Mon, 31 Aug 2026 17:23:34 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: 6c882504efe40b98a8e9201ac559296c015d3c58</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
-      <guid isPermaLink="false">41bdbe55-5991-5c97-b262-df42edbce15c</guid>
-      <pubDate>Mon, 31 Aug 2026 17:19:04 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: 2357c4364953ef25a826e40e3ef965541aacb13d</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
-      <guid isPermaLink="false">c54b5971-42ae-5b68-8c3e-3bd8395561fd</guid>
-      <pubDate>Mon, 31 Aug 2026 17:17:22 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxp://178[.]16[.]54[.]109/b[.]exe</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,dropped-by-Phorpiex,phorpiex</description>
-      <guid isPermaLink="false">af5fc01f-8ab6-5517-b869-4a751cba58f9</guid>
-      <pubDate>Mon, 31 Aug 2026 17:11:06 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxp://178[.]16[.]54[.]109/s[.]exe</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,dropped-by-Phorpiex,phorpiex</description>
-      <guid isPermaLink="false">ba7ea224-a1a7-5d2d-9fab-f72a543113a7</guid>
-      <pubDate>Mon, 31 Aug 2026 17:11:06 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: 5e8956dfe321a14dc054b07daf1159be723519ab</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,Phorpiex</description>
-      <guid isPermaLink="false">4e499203-5993-5894-b238-f025b7cc62b7</guid>
-      <pubDate>Mon, 31 Aug 2026 17:10:25 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: b37c0045a65f7a33d25dc0a19b7b57ff7b9bba94</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,Phorpiex</description>
-      <guid isPermaLink="false">7d970819-c82d-554a-bf59-7dd064cc83b9</guid>
-      <pubDate>Mon, 31 Aug 2026 17:10:24 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: 92be9e0c60548a8b4ff7c30c8a7f44574e959f1b</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,Vidar</description>
-      <guid isPermaLink="false">6ce0d3bf-23bd-542a-b66c-c47ad260a5e9</guid>
-      <pubDate>Mon, 31 Aug 2026 17:10:22 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] domain: iuhdcqg0[.]shop-dentilock[.]com</title>
+      <title>[80] domain: c16xfxw4[.]shop-enerflow[.]com</title>
       <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClearFake,mac-0x68dc,macos,threatfox</description>
-      <guid isPermaLink="false">a26d0f6c-7cd6-5372-b1de-c023010e870d</guid>
-      <pubDate>Mon, 31 Aug 2026 17:08:03 +0000</pubDate>
+      <guid isPermaLink="false">1342a108-086e-519f-b279-40026c0a80c5</guid>
+      <pubDate>Mon, 31 Aug 2026 23:10:50 +0000</pubDate>
     </item>
     <item>
-      <title>[80] domain: shop-dentilock[.]com</title>
+      <title>[80] url: hxxps://usertunelaccount1[.]royalbnkmail[.]com/Bin/ScreenConnect[.]ClientSetup[.]msi</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,connectwise,d52f85,dropped-by-amadey</description>
+      <guid isPermaLink="false">7712707a-808b-5aa0-b2a8-5c49484ddf4f</guid>
+      <pubDate>Mon, 31 Aug 2026 23:09:09 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] domain: shop-enerflow[.]com</title>
       <description>Score 80, confidence high, sources: threatfox_export_json, tags: 31August2026,ClearFake,Commandline,MacOS,threatfox</description>
-      <guid isPermaLink="false">c41a655f-aca9-5b39-a851-f3a0ebf6f253</guid>
-      <pubDate>Mon, 31 Aug 2026 17:05:59 +0000</pubDate>
+      <guid isPermaLink="false">926f2f9d-a613-54db-953e-bb42ecaba0f0</guid>
+      <pubDate>Mon, 31 Aug 2026 23:07:10 +0000</pubDate>
     </item>
     <item>
-      <title>[80] domain: gen[.]12naga[.]org</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: threatfox,vidar</description>
-      <guid isPermaLink="false">f0c0aca9-a560-54e0-8b71-18553c25768a</guid>
-      <pubDate>Mon, 31 Aug 2026 17:00:45 +0000</pubDate>
+      <title>[80] url: hxxp://218[.]28[.]151[.]239:60344/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,elf,mips,Mozi</description>
+      <guid isPermaLink="false">a2a28b6a-0627-510e-94c7-8416de89d19f</guid>
+      <pubDate>Mon, 31 Aug 2026 22:54:16 +0000</pubDate>
     </item>
     <item>
-      <title>[80] url: hxxps://gen[.]12naga[.]org/</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: threatfox,vidar</description>
-      <guid isPermaLink="false">ec6b0b6d-5176-5e32-a548-f04433e5306b</guid>
-      <pubDate>Mon, 31 Aug 2026 17:00:45 +0000</pubDate>
+      <title>[80] url: hxxp://196[.]189[.]9[.]27:45275/bin[.]sh</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,arm,elf,mirai,Mozi</description>
+      <guid isPermaLink="false">40506503-a569-50cc-82b3-7f73f6b5a708</guid>
+      <pubDate>Mon, 31 Aug 2026 22:49:13 +0000</pubDate>
     </item>
     <item>
-      <title>[80] url: hxxp://194[.]150[.]166[.]178/Bin/ScreenConnect[.]ClientSetup[.]exe</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,194-150-166-178,connectwise,exe,ua-wget</description>
-      <guid isPermaLink="false">0c6db5c4-5efd-5ef9-80d9-f90944d3f1f7</guid>
-      <pubDate>Mon, 31 Aug 2026 16:56:11 +0000</pubDate>
+      <title>[80] domain: ecuador[.]embajada[.]gob[.]ve</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClickFix,Mac,threatfox</description>
+      <guid isPermaLink="false">6ac047e0-ba65-5c0e-9eb9-a969b8405bdf</guid>
+      <pubDate>Mon, 31 Aug 2026 22:35:25 +0000</pubDate>
     </item>
     <item>
-      <title>[80] url: hxxp://77[.]110[.]114[.]53/run[.]exe</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,77-110-114-53,exe,ua-wget</description>
-      <guid isPermaLink="false">fc747568-cf5e-52a6-9b9f-1558c834de27</guid>
-      <pubDate>Mon, 31 Aug 2026 16:54:14 +0000</pubDate>
+      <title>[80] domain: edpartnerspk[.]com</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClickFix,Mac,threatfox</description>
+      <guid isPermaLink="false">df03b651-6a10-53da-89cc-5d66838458d1</guid>
+      <pubDate>Mon, 31 Aug 2026 22:34:30 +0000</pubDate>
     </item>
     <item>
-      <title>[80] sha256: bc0fde6faf391419e8166160036c375f60b2ed06</title>
+      <title>[80] domain: electroste99[.]life</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClickFix,Mac,c2,threatfox</description>
+      <guid isPermaLink="false">87e46026-f2a8-568b-b53c-e906e2a69eaa</guid>
+      <pubDate>Mon, 31 Aug 2026 22:33:30 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] domain: ecortiella[.]com</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClickFix,Mac,threatfox</description>
+      <guid isPermaLink="false">f00072e0-65f0-5d47-8e17-e2a3dcc6c72f</guid>
+      <pubDate>Mon, 31 Aug 2026 22:32:24 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxp://189[.]127[.]169[.]20:55533/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,mirai</description>
+      <guid isPermaLink="false">51722f7f-7993-5117-8477-7f47cefabf56</guid>
+      <pubDate>Mon, 31 Aug 2026 22:27:08 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] domain: dynalarme[.]fr</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClickFix,Mac,threatfox</description>
+      <guid isPermaLink="false">f5b5374b-7a16-5f81-a28f-3e87ac89d2bc</guid>
+      <pubDate>Mon, 31 Aug 2026 22:26:31 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] domain: 9ngdq1sh[.]shop-cogniclear[.]com</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClearFake,mac-0x0f14,macos,threatfox</description>
+      <guid isPermaLink="false">2ccdbdd8-ed09-52fe-adb0-f7edc8332c90</guid>
+      <pubDate>Mon, 31 Aug 2026 22:25:18 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] domain: shop-cogniclear[.]com</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: 31August2026,ClearFake,Commandline,MacOS,threatfox</description>
+      <guid isPermaLink="false">5ffb1a05-ab7a-5cdd-887d-66b0aff83f0b</guid>
+      <pubDate>Mon, 31 Aug 2026 22:21:52 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxp://218[.]28[.]151[.]239:60344/bin[.]sh</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,elf,mips,Mozi</description>
+      <guid isPermaLink="false">8df87e7d-4177-52c6-9bc6-3dec3ba6a338</guid>
+      <pubDate>Mon, 31 Aug 2026 22:18:23 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] domain: cliff-bell[.]com</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClickFix,Mac,threatfox</description>
+      <guid isPermaLink="false">552bd6d7-bff9-5b8a-a194-a1220fd68069</guid>
+      <pubDate>Mon, 31 Aug 2026 22:12:23 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] domain: chrgasa[.]org</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClickFix,Mac,threatfox</description>
+      <guid isPermaLink="false">ecc6732a-7e9f-5e05-817a-cf28e9ac8c4c</guid>
+      <pubDate>Mon, 31 Aug 2026 22:10:35 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxp://cdire[.]shop:9048/events</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: remus,threatfox</description>
+      <guid isPermaLink="false">04c44395-a141-5472-a91f-32e7ece83046</guid>
+      <pubDate>Mon, 31 Aug 2026 22:10:23 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: 4a172b157731784573017964dd6f63c0c11ef631</title>
       <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
-      <guid isPermaLink="false">877ce57b-ec3c-5f59-ad65-f5247641cc2f</guid>
-      <pubDate>Mon, 31 Aug 2026 16:52:59 +0000</pubDate>
+      <guid isPermaLink="false">f7c4b6fa-be4b-505d-8888-bd93699198fb</guid>
+      <pubDate>Mon, 31 Aug 2026 22:04:52 +0000</pubDate>
     </item>
     <item>
-      <title>[80] sha256: f03c9290411b85f93f5ddeff9b853f0a36bbd111</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,ConnectWise</description>
-      <guid isPermaLink="false">d2a9ff7a-d331-57fe-af7f-cec9e2519be7</guid>
-      <pubDate>Mon, 31 Aug 2026 16:52:59 +0000</pubDate>
+      <title>[80] url: hxxp://123[.]245[.]99[.]52:39875/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,arm,elf,mirai,Mozi</description>
+      <guid isPermaLink="false">97ce8260-69cd-5253-b72b-1cf8425ee0bd</guid>
+      <pubDate>Mon, 31 Aug 2026 22:04:18 +0000</pubDate>
     </item>
     <item>
-      <title>[80] sha256: 35956c8badaade31e0f19f3ab49dfaa399982b4f</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,ConnectWise</description>
-      <guid isPermaLink="false">b0ddef34-b330-5679-b201-707aeaa70191</guid>
-      <pubDate>Mon, 31 Aug 2026 16:52:39 +0000</pubDate>
+      <title>[80] sha256: 573821a96bad4ce150c4572878fec8cc6e3e86e7</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
+      <guid isPermaLink="false">4051ccf8-9610-5b49-9bfb-73f82d40a6d4</guid>
+      <pubDate>Mon, 31 Aug 2026 21:57:36 +0000</pubDate>
     </item>
     <item>
-      <title>[80] sha256: ad72caca510a6133f9053c007398271b7479b37c</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,ConnectWise</description>
-      <guid isPermaLink="false">e045826f-03e3-53db-9fb6-c70b7b821a4b</guid>
-      <pubDate>Mon, 31 Aug 2026 16:52:36 +0000</pubDate>
+      <title>[80] sha256: 4aad3031ad0a1a184f95ac6f3ead1ad7a7e9bf5c</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
+      <guid isPermaLink="false">62502efc-1996-5c35-9894-f6e4ed4bb65f</guid>
+      <pubDate>Mon, 31 Aug 2026 21:57:35 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxp://189[.]127[.]169[.]20:55533/bin[.]sh</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,mirai</description>
+      <guid isPermaLink="false">7a55024c-23df-5171-9d48-977b741221ff</guid>
+      <pubDate>Mon, 31 Aug 2026 21:57:08 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxp://cdire[.]shop:9048/categories</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: remus,threatfox</description>
+      <guid isPermaLink="false">895786ba-1bd9-5d09-8014-9daf589432d6</guid>
+      <pubDate>Mon, 31 Aug 2026 21:55:03 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxp://nopxs[.]shop:8839/settings</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: remus,threatfox</description>
+      <guid isPermaLink="false">954a4dc8-f950-5d1f-bdf9-3445aadc552f</guid>
+      <pubDate>Mon, 31 Aug 2026 21:55:03 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: e75facbeb36e23d03115d5117d60fd3af142d8cd</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
+      <guid isPermaLink="false">40977175-294c-5dfa-9878-c0e263610af9</guid>
+      <pubDate>Mon, 31 Aug 2026 21:53:38 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] domain: bloguc[.]com</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClickFix,Mac,threatfox</description>
+      <guid isPermaLink="false">4b5c6b01-c99e-5be3-a11a-91f147413f8d</guid>
+      <pubDate>Mon, 31 Aug 2026 21:49:44 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxp://cdire[.]shop:9048/folders</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: remus,threatfox</description>
+      <guid isPermaLink="false">d937009a-94dd-5f36-b339-6ba4fbfed60b</guid>
+      <pubDate>Mon, 31 Aug 2026 21:49:43 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxp://oceanvw[.]click:3215/folders</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: remus,threatfox</description>
+      <guid isPermaLink="false">52cd7650-a9ab-5930-96c7-9e1069f3e8be</guid>
+      <pubDate>Mon, 31 Aug 2026 21:49:43 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: b7d44c3f893ba202a979e5300d2ea49df6b511fe</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,Mirai</description>
+      <guid isPermaLink="false">fefbb076-7981-5aa2-959d-6ae2f74b4766</guid>
+      <pubDate>Mon, 31 Aug 2026 21:44:18 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] domain: mwks2u0x[.]shop-burnblend[.]com</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClearFake,mac-0x76c7,macos,threatfox</description>
+      <guid isPermaLink="false">9411ef53-1594-58a9-be1e-0f1ae53ae735</guid>
+      <pubDate>Mon, 31 Aug 2026 21:43:53 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: bf9b90148cd2f01001b64d65f9b113c36f84f096</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,Mirai</description>
+      <guid isPermaLink="false">31f84e54-7b4b-5ad2-97c9-eab7876f99fd</guid>
+      <pubDate>Mon, 31 Aug 2026 21:43:41 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] domain: shop-burnblend[.]com</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: 31August2026,ClearFake,Commandline,MacOS,threatfox</description>
+      <guid isPermaLink="false">9176a0e7-943f-5706-9df2-13307a6707cc</guid>
+      <pubDate>Mon, 31 Aug 2026 21:40:28 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: 43896fa46d4f1f2b97f115d1e19860ed82aed0a5</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,Mirai</description>
+      <guid isPermaLink="false">d9d5c408-5153-5e77-8407-eb45c372f486</guid>
+      <pubDate>Mon, 31 Aug 2026 21:38:19 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: 13340cdf1462b2e3b595a3c294252e2232673006</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,Mirai</description>
+      <guid isPermaLink="false">01fef029-1956-5282-a067-375c8cfa1687</guid>
+      <pubDate>Mon, 31 Aug 2026 21:37:38 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: 1f11f26e05ac27be94b48d8dbf0f4c1a449ebf9e</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,Mirai</description>
+      <guid isPermaLink="false">9e96268d-669b-54bf-b964-90e5622c1769</guid>
+      <pubDate>Mon, 31 Aug 2026 21:36:24 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxp://42[.]177[.]58[.]99:47553/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,elf,mips,Mozi</description>
+      <guid isPermaLink="false">d3413b9b-6855-558b-a2db-880be16f93ea</guid>
+      <pubDate>Mon, 31 Aug 2026 21:36:13 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: 16c2963d501e079f7a5c5236416e0a338a407f97</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,Mirai</description>
+      <guid isPermaLink="false">bd8f6fd8-2bbf-5672-ae1b-61c2a5418d5d</guid>
+      <pubDate>Mon, 31 Aug 2026 21:35:47 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: 2bb5d3ae00a131b1b5fb3f0aefc9d8b6a0846937</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,Mirai</description>
+      <guid isPermaLink="false">18512fab-36dd-5ba1-be44-1eafd28e3c87</guid>
+      <pubDate>Mon, 31 Aug 2026 21:35:46 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] domain: qqzl80cb[.]shop-biodentix[.]com</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClearFake,mac-0xdcf2,macos,threatfox</description>
+      <guid isPermaLink="false">45c9a9df-1362-57be-a187-8554315a6db6</guid>
+      <pubDate>Mon, 31 Aug 2026 21:32:39 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxp://123[.]245[.]99[.]52:39875/bin[.]sh</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,arm,elf,mirai,Mozi</description>
+      <guid isPermaLink="false">09c80964-f3bb-521e-868b-7b8e0a44e368</guid>
+      <pubDate>Mon, 31 Aug 2026 21:32:25 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] domain: shop-biodentix[.]com</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: 31August2026,ClearFake,Commandline,MacOS,threatfox</description>
+      <guid isPermaLink="false">e3fafec3-9935-5fd7-b1ad-5701a9473834</guid>
+      <pubDate>Mon, 31 Aug 2026 21:31:25 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxp://45[.]172[.]218[.]181:45337/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,mirai</description>
+      <guid isPermaLink="false">1da2477c-519a-5d82-8edf-89096ec8d7fc</guid>
+      <pubDate>Mon, 31 Aug 2026 21:31:07 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: 3765e7a7e28043839e46f913d21a7d4bc014834e</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,Mirai</description>
+      <guid isPermaLink="false">8d517e18-7581-5a0b-a166-77b57a18482b</guid>
+      <pubDate>Mon, 31 Aug 2026 21:29:57 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] domain: autoescolalp[.]com[.]br</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClickFix,Mac,threatfox</description>
+      <guid isPermaLink="false">e3da01cc-19a4-577e-a275-4982c6734627</guid>
+      <pubDate>Mon, 31 Aug 2026 21:29:20 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: dfa47761cd3974771244f97e8937f6959dc01ae2</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,Mirai</description>
+      <guid isPermaLink="false">b60c62bc-06f8-5236-86dc-d2a5be596992</guid>
+      <pubDate>Mon, 31 Aug 2026 21:28:18 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: f0d73a21f5e66b88fbf372f1fc5fcfe80ae87cef</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,Mirai</description>
+      <guid isPermaLink="false">b783a719-ef81-52de-af42-3d75a62538ad</guid>
+      <pubDate>Mon, 31 Aug 2026 21:27:56 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: 1cbf3376cac7d42df0f0ebcab40d693f96df17f5</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,Mirai</description>
+      <guid isPermaLink="false">d28a55c2-aa43-5523-8dfd-0016495ad8ec</guid>
+      <pubDate>Mon, 31 Aug 2026 21:19:12 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: bb5a1c9cdb4a13e2b26b91bc9b2178ba0eb9d735</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
+      <guid isPermaLink="false">0dc9f9b8-d9a0-5ee0-ad14-158cecf3f6e1</guid>
+      <pubDate>Mon, 31 Aug 2026 21:19:10 +0000</pubDate>
     </item>
 </channel></rss>

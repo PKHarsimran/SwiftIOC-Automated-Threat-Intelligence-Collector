@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-08-31T18:39:16Z_
+_Generated 2026-08-31T23:34:26Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-08-31T18:39:16Z |
+| Generated | 2026-08-31T23:34:26Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 4683 |
+| Duplicates removed | 5022 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 246 |
-| Score (min / avg / max) | 77 / 79.8 / 96 |
-| High-score indicators (≥80) | 6830 |
-| Corroborated (2+ sources) | 246 |
+| Multi-source overlaps | 247 |
+| Score (min / avg / max) | 78 / 79.8 / 96 |
+| High-score indicators (≥80) | 6777 |
+| Corroborated (2+ sources) | 247 |
 | Earliest first_seen | 2017-07-14T18:08:15Z |
-| Newest first_seen | 2026-08-31T18:39:04Z |
+| Newest first_seen | 2026-08-31T23:22:14Z |
 
 ## Top indicators by score
 
@@ -39,26 +39,26 @@ _Generated 2026-08-31T18:39:16Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 6992 |
-| greensnow_blocklist | 4258 |
+| blocklist_de_ssh | 6910 |
+| greensnow_blocklist | 4958 |
 | ipsum_level5 | 2885 |
 | spamhaus_drop | 1708 |
 | cisa_kev | 1687 |
 | binarydefense_banlist | 1558 |
-| tor_exit_nodes | 1427 |
-| threatfox_export_json | 823 |
-| malwarebazaar_recent | 749 |
+| tor_exit_nodes | 1429 |
+| threatfox_export_json | 843 |
+| malwarebazaar_recent | 728 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3566 |
-| cve | 3260 |
+| sha256 | 3612 |
+| cve | 3191 |
 | ipv4_cidr | 1708 |
-| url | 634 |
-| domain | 204 |
-| ipv4 | 200 |
+| url | 599 |
+| domain | 241 |
+| ipv4 | 221 |
 | md5 | 169 |
 | sha1 | 162 |
 | ja3 | 97 |
@@ -67,16 +67,16 @@ _Generated 2026-08-31T18:39:16Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 3906 |
-| cve | 3260 |
-| nvd | 1791 |
+| malware | 3908 |
+| cve | 3191 |
+| nvd | 1722 |
 | drop | 1708 |
 | spamhaus | 1708 |
 | exploited-in-the-wild | 1687 |
-| Mirai | 1208 |
-| threatfox | 1027 |
-| high | 856 |
-| malware_download | 522 |
+| Mirai | 1234 |
+| threatfox | 1094 |
+| high | 818 |
+| medium | 500 |
 
 ## Multi-source overlaps
 
