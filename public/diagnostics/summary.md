@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-09-03T15:40:56Z_
+_Generated 2026-09-03T19:02:43Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-03T15:40:56Z |
+| Generated | 2026-09-03T19:02:43Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 4447 |
+| Duplicates removed | 4444 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
 | Multi-source overlaps | 251 |
-| Score (min / avg / max) | 78 / 79.9 / 96 |
-| High-score indicators (≥80) | 7102 |
+| Score (min / avg / max) | 77 / 79.9 / 96 |
+| High-score indicators (≥80) | 6931 |
 | Corroborated (2+ sources) | 251 |
 | Earliest first_seen | 2017-07-14T18:08:15Z |
-| Newest first_seen | 2026-09-03T15:40:45Z |
+| Newest first_seen | 2026-09-03T18:49:18Z |
 
 ## Top indicators by score
 
@@ -39,26 +39,26 @@ _Generated 2026-09-03T15:40:56Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 11456 |
-| greensnow_blocklist | 4463 |
+| blocklist_de_ssh | 11304 |
+| greensnow_blocklist | 4552 |
 | ipsum_level5 | 3111 |
 | spamhaus_drop | 1710 |
 | cisa_kev | 1694 |
-| tor_exit_nodes | 1402 |
-| threatfox_export_json | 1326 |
-| malwarebazaar_recent | 760 |
-| urlhaus_recent_urls | 736 |
+| tor_exit_nodes | 1400 |
+| threatfox_export_json | 1322 |
+| binarydefense_banlist | 715 |
+| malwarebazaar_recent | 699 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3121 |
-| sha256 | 2858 |
+| cve | 3133 |
+| sha256 | 2900 |
 | ipv4_cidr | 1709 |
-| url | 1025 |
-| domain | 544 |
-| ipv4 | 261 |
+| url | 992 |
+| domain | 534 |
+| ipv4 | 250 |
 | md5 | 193 |
 | sha1 | 192 |
 | ja3 | 97 |
@@ -67,16 +67,16 @@ _Generated 2026-09-03T15:40:56Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 3504 |
-| cve | 3121 |
+| malware | 3507 |
+| cve | 3133 |
 | drop | 1709 |
 | spamhaus | 1709 |
 | exploited-in-the-wild | 1694 |
-| nvd | 1648 |
-| threatfox | 1567 |
+| nvd | 1660 |
+| threatfox | 1552 |
 | Mirai | 893 |
-| malware_download | 870 |
-| high | 759 |
+| malware_download | 831 |
+| high | 762 |
 
 ## Multi-source overlaps
 
