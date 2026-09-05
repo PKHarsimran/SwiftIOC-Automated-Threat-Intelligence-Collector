@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-09-05T11:46:36Z_
+_Generated 2026-09-05T14:26:23Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-05T11:46:36Z |
+| Generated | 2026-09-05T14:26:23Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 4799 |
+| Duplicates removed | 4860 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
 | Multi-source overlaps | 254 |
 | Score (min / avg / max) | 77 / 79.8 / 96 |
-| High-score indicators (≥80) | 6537 |
+| High-score indicators (≥80) | 6512 |
 | Corroborated (2+ sources) | 254 |
 | Earliest first_seen | 2017-07-14T18:08:15Z |
-| Newest first_seen | 2026-09-05T11:39:11Z |
+| Newest first_seen | 2026-09-05T14:05:07Z |
 
 ## Top indicators by score
 
@@ -41,26 +41,26 @@ _Generated 2026-09-05T11:46:36Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 11244 |
-| greensnow_blocklist | 4296 |
+| blocklist_de_ssh | 11306 |
+| greensnow_blocklist | 4390 |
 | ipsum_level5 | 3353 |
 | spamhaus_drop | 1709 |
 | cisa_kev | 1695 |
 | tor_exit_nodes | 1341 |
 | binarydefense_banlist | 1325 |
-| threatfox_export_json | 909 |
-| malwarebazaar_recent | 741 |
+| threatfox_export_json | 914 |
+| malwarebazaar_recent | 733 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3221 |
-| cve | 3116 |
+| sha256 | 3306 |
+| cve | 3142 |
 | ipv4_cidr | 1710 |
-| url | 741 |
-| domain | 417 |
-| ipv4 | 323 |
+| url | 670 |
+| domain | 364 |
+| ipv4 | 336 |
 | md5 | 188 |
 | sha1 | 187 |
 | ja3 | 97 |
@@ -69,16 +69,16 @@ _Generated 2026-09-05T11:46:36Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 3554 |
-| cve | 3116 |
+| malware | 3545 |
+| cve | 3142 |
 | drop | 1710 |
 | spamhaus | 1710 |
 | exploited-in-the-wild | 1695 |
-| nvd | 1645 |
-| threatfox | 1523 |
-| Mirai | 945 |
-| high | 751 |
-| malware_download | 576 |
+| nvd | 1671 |
+| threatfox | 1506 |
+| Mirai | 955 |
+| high | 767 |
+| medium | 530 |
 
 ## Multi-source overlaps
 
