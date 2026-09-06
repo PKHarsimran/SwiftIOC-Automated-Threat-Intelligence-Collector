@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-09-06T17:57:48Z_
+_Generated 2026-09-06T21:54:27Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-06T17:57:48Z |
+| Generated | 2026-09-06T21:54:27Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 4871 |
+| Duplicates removed | 4845 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 256 |
-| Score (min / avg / max) | 78 / 79.9 / 96 |
-| High-score indicators (≥80) | 7138 |
-| Corroborated (2+ sources) | 256 |
+| Multi-source overlaps | 257 |
+| Score (min / avg / max) | 79 / 80.0 / 96 |
+| High-score indicators (≥80) | 7514 |
+| Corroborated (2+ sources) | 257 |
 | Earliest first_seen | 2017-07-14T18:08:15Z |
-| Newest first_seen | 2026-09-06T17:51:21Z |
+| Newest first_seen | 2026-09-06T21:47:26Z |
 
 ## Top indicators by score
 
@@ -41,26 +41,26 @@ _Generated 2026-09-06T17:57:48Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5514 |
-| greensnow_blocklist | 4123 |
+| blocklist_de_ssh | 5640 |
+| greensnow_blocklist | 4134 |
 | ipsum_level5 | 3365 |
-| threatfox_export_json | 1897 |
+| threatfox_export_json | 1917 |
 | spamhaus_drop | 1709 |
 | cisa_kev | 1695 |
 | binarydefense_banlist | 1617 |
 | tor_exit_nodes | 1340 |
-| malwarebazaar_recent | 610 |
+| et_compromised | 564 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3233 |
-| sha256 | 2730 |
+| cve | 3093 |
+| sha256 | 2755 |
 | ipv4_cidr | 1708 |
-| domain | 1097 |
-| url | 366 |
-| ipv4 | 323 |
+| domain | 1106 |
+| url | 461 |
+| ipv4 | 334 |
 | md5 | 224 |
 | sha1 | 222 |
 | ja3 | 97 |
@@ -69,16 +69,16 @@ _Generated 2026-09-06T17:57:48Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| cve | 3233 |
-| malware | 2686 |
-| threatfox | 2279 |
-| nvd | 1762 |
+| cve | 3093 |
+| malware | 2780 |
+| threatfox | 2325 |
 | drop | 1708 |
 | spamhaus | 1708 |
 | exploited-in-the-wild | 1695 |
-| ClickFix | 844 |
-| high | 788 |
-| Mirai | 651 |
+| nvd | 1623 |
+| ClickFix | 861 |
+| high | 728 |
+| Mirai | 673 |
 
 ## Multi-source overlaps
 
