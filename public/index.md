@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-09-07T17:06:52Z_
+_Generated 2026-09-07T22:28:25Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-07T17:06:52Z |
+| Generated | 2026-09-07T22:28:25Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 4845 |
+| Duplicates removed | 4847 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
 | Multi-source overlaps | 496 |
 | Score (min / avg / max) | 79 / 80.3 / 96 |
-| High-score indicators (≥80) | 9058 |
+| High-score indicators (≥80) | 9366 |
 | Corroborated (2+ sources) | 496 |
 | Earliest first_seen | 2017-07-14T18:08:15Z |
-| Newest first_seen | 2026-09-07T16:56:46Z |
+| Newest first_seen | 2026-09-07T22:17:22Z |
 
 ## Top indicators by score
 
@@ -41,44 +41,44 @@ _Generated 2026-09-07T17:06:52Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5758 |
-| greensnow_blocklist | 4349 |
+| blocklist_de_ssh | 5626 |
+| greensnow_blocklist | 4384 |
 | ipsum_level5 | 3200 |
-| threatfox_export_json | 2301 |
+| threatfox_export_json | 2211 |
 | binarydefense_banlist | 1877 |
 | spamhaus_drop | 1708 |
 | cisa_kev | 1695 |
 | tor_exit_nodes | 1341 |
-| malwarebazaar_recent | 666 |
+| malwarebazaar_recent | 825 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 2704 |
-| sha1 | 2082 |
+| cve | 2681 |
+| sha1 | 1816 |
 | ipv4_cidr | 1707 |
-| domain | 1414 |
-| sha256 | 913 |
-| url | 577 |
-| ipv4 | 315 |
-| md5 | 191 |
+| domain | 1455 |
+| sha256 | 1064 |
+| url | 710 |
+| ipv4 | 333 |
+| md5 | 137 |
 | ja3 | 97 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 3154 |
-| cve | 2704 |
-| threatfox | 2581 |
+| malware | 3205 |
+| cve | 2681 |
+| threatfox | 2553 |
 | drop | 1707 |
 | spamhaus | 1707 |
 | exploited-in-the-wild | 1695 |
-| nvd | 1234 |
-| ClickFix | 1001 |
-| Mirai | 752 |
-| high | 500 |
+| nvd | 1211 |
+| ClickFix | 1019 |
+| Mirai | 701 |
+| malware_download | 510 |
 
 ## Multi-source overlaps
 
