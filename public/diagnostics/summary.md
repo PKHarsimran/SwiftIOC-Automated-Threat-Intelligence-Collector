@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-09-07T08:51:15Z_
+_Generated 2026-09-07T17:06:52Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-07T08:51:15Z |
+| Generated | 2026-09-07T17:06:52Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 5199 |
+| Duplicates removed | 4845 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 257 |
-| Score (min / avg / max) | 79 / 80.0 / 96 |
-| High-score indicators (≥80) | 8059 |
-| Corroborated (2+ sources) | 257 |
+| Multi-source overlaps | 496 |
+| Score (min / avg / max) | 79 / 80.3 / 96 |
+| High-score indicators (≥80) | 9058 |
+| Corroborated (2+ sources) | 496 |
 | Earliest first_seen | 2017-07-14T18:08:15Z |
-| Newest first_seen | 2026-09-07T08:43:23Z |
+| Newest first_seen | 2026-09-07T16:56:46Z |
 
 ## Top indicators by score
 
@@ -39,44 +39,44 @@ _Generated 2026-09-07T08:51:15Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5621 |
-| greensnow_blocklist | 5069 |
+| blocklist_de_ssh | 5758 |
+| greensnow_blocklist | 4349 |
 | ipsum_level5 | 3200 |
-| threatfox_export_json | 2293 |
+| threatfox_export_json | 2301 |
 | binarydefense_banlist | 1877 |
-| spamhaus_drop | 1709 |
+| spamhaus_drop | 1708 |
 | cisa_kev | 1695 |
-| tor_exit_nodes | 1340 |
-| malwarebazaar_recent | 671 |
+| tor_exit_nodes | 1341 |
+| malwarebazaar_recent | 666 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 2787 |
-| cve | 2753 |
-| ipv4_cidr | 1708 |
-| domain | 1320 |
-| url | 516 |
-| ipv4 | 331 |
-| md5 | 245 |
-| sha1 | 243 |
+| cve | 2704 |
+| sha1 | 2082 |
+| ipv4_cidr | 1707 |
+| domain | 1414 |
+| sha256 | 913 |
+| url | 577 |
+| ipv4 | 315 |
+| md5 | 191 |
 | ja3 | 97 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 2799 |
-| cve | 2753 |
-| threatfox | 2647 |
-| drop | 1708 |
-| spamhaus | 1708 |
+| malware | 3154 |
+| cve | 2704 |
+| threatfox | 2581 |
+| drop | 1707 |
+| spamhaus | 1707 |
 | exploited-in-the-wild | 1695 |
-| nvd | 1283 |
-| ClickFix | 1022 |
-| Mirai | 690 |
-| high | 563 |
+| nvd | 1234 |
+| ClickFix | 1001 |
+| Mirai | 752 |
+| high | 500 |
 
 ## Multi-source overlaps
 
