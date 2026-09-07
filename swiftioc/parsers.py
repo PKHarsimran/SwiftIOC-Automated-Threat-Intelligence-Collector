@@ -127,7 +127,8 @@ def fetch_nvd_recent(url: str, ref_url: str, source: str, ws: datetime) -> List[
     # Match the NVD host by parsed hostname, not a substring of the whole URL,
     # so a lookalike like nvd.nist.gov.evil.com or ?x=nvd.nist.gov can't trip it.
     # Use endswith so the real config host (services.nvd.nist.gov) still matches.
-    if host == "nvd.nist.gov" or host.endswith(".nvd.nist.gov"):
+    is_nvd_host = host == "nvd.nist.gov" or host.endswith(".nvd.nist.gov")
+    if is_nvd_host:
         query = parse_qs(parsed.query)
         if not any(k in query for k in ("lastModStartDate", "pubStartDate")):
             fmt = "%Y-%m-%dT%H:%M:%S.000"
@@ -144,6 +145,35 @@ def fetch_nvd_recent(url: str, ref_url: str, source: str, ws: datetime) -> List[
     records = data.get("vulnerabilities") if isinstance(data, dict) else None
     if not isinstance(records, list):
         return []
+    # NVD uses offset pagination. The configured page size is 200 but busy
+    # modification windows routinely exceed that, so only consuming the first
+    # page silently dropped valid CVEs. Keep every page from this bounded time
+    # query while preserving the configured resultsPerPage value.
+    if is_nvd_host:
+        page_url = urlparse(url)
+        page_query = parse_qs(page_url.query)
+        try:
+            start_index = int(page_query.get("startIndex", ["0"])[0])
+            page_size = int(data.get("resultsPerPage") or page_query.get("resultsPerPage", [len(records)])[0])
+            total_results = int(data.get("totalResults") or len(records))
+        except (TypeError, ValueError):
+            start_index, page_size, total_results = 0, len(records), len(records)
+        if page_size > 0:
+            for next_index in range(start_index + page_size, start_index + total_results, page_size):
+                page_query["startIndex"] = [str(next_index)]
+                next_url = page_url._replace(query=urlencode(page_query, doseq=True)).geturl()
+                try:
+                    next_data = json.loads(ensure_text(_pkg.http_get(next_url, name=source)))
+                except json.JSONDecodeError:
+                    logger.warning("%s returned invalid JSON at startIndex %d", source, next_index)
+                    break
+                next_records = next_data.get("vulnerabilities") if isinstance(next_data, dict) else None
+                if not isinstance(next_records, list):
+                    logger.warning("%s returned no vulnerability list at startIndex %d", source, next_index)
+                    break
+                records.extend(next_records)
+                if not next_records:
+                    break
     out: List[Indicator] = []
 
     def extract_severity(entry: Dict[str, Any]) -> Optional[str]:
@@ -951,4 +981,3 @@ def fetch_universal(
         )
 
     return list(uniq.values())
-
