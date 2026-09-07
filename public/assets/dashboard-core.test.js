@@ -156,6 +156,12 @@ test('normalizes shared filter values and exports spreadsheet-safe CSV', () => {
   assert.match(csv, /"phishing, credential-theft"/);
 });
 
+test('exports an empty CSV with only its header when no rows are supplied', () => {
+  const csv = core.rowsToCsv([]);
+  assert.equal(csv.split('\r\n').filter(Boolean).length, 1);
+  assert.match(csv, /"Indicator"/);
+});
+
 test('dashboard markup keeps IDs and labelled controls consistent', () => {
   const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
   const ids = Array.from(html.matchAll(/\sid="([^"]+)"/g), (match) => match[1]);
