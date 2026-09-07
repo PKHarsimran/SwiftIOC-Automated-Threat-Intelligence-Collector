@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import json
-from dataclasses import fields as dataclass_fields
+from dataclasses import fields as dataclass_fields, replace
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -188,7 +188,11 @@ def merge_with_previous(current: List[Indicator], previous: List[Indicator]) -> 
     for prev in previous:
         k = prev.key()
         if k not in uniq:
-            uniq[k] = prev
+            # Keep the loaded snapshot immutable. The CLI rescoring pass
+            # mutates current rows; sharing this object with ``previous`` made
+            # SOC Delta compare the new score with itself and hid decay/band
+            # changes. It also corrupted removal payloads with the new score.
+            uniq[k] = replace(prev)
             carried += 1
             continue
         cur = uniq[k]
