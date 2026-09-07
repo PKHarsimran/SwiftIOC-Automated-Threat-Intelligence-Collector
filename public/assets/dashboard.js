@@ -2343,7 +2343,9 @@
         filterCount.textContent = String(count);
       }
       if (shareButton) shareButton.disabled = !state.rows.length;
-      if (downloadButton) downloadButton.disabled = !state.matches.length;
+      if (downloadButton) {
+        downloadButton.disabled = !state.rows.length || !state.matches.length;
+      }
     };
 
     const apply = ({ sync = true } = {}) => {
@@ -2500,6 +2502,7 @@
       } catch (error) {
         console.error('Unable to load live preview', error);
         state.rows = [];
+        state.matches = [];
         render([]);
         updateSummary([], []);
         if (summary.meta) summary.meta.hidden = true;
