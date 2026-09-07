@@ -1851,6 +1851,7 @@
     const clearButton = qs('[data-preview-clear]', container);
     const shareButton = qs('[data-preview-share]', container);
     const downloadButton = qs('[data-preview-download]', container);
+    const downloadNote = qs('[data-preview-download-note]', container);
     const filterCount = qs('[data-preview-filter-count]', container);
     const refreshButton = qs('[data-preview-refresh]');
     const sortButtons = qsa('[data-preview-sort]', table);
@@ -2345,6 +2346,20 @@
       if (shareButton) shareButton.disabled = !state.rows.length;
       if (downloadButton) {
         downloadButton.disabled = !state.rows.length || !state.matches.length;
+        downloadButton.setAttribute(
+          'aria-label',
+          state.matches.length
+            ? 'Download ' + formatNumber(state.matches.length) + ' matching indicators as CSV'
+            : 'Download matching indicators as CSV'
+        );
+      }
+      if (downloadNote) {
+        downloadNote.hidden = !state.rows.length;
+        downloadNote.textContent = state.matches.length
+          ? formatNumber(state.matches.length) + ' matching indicator' +
+            (state.matches.length === 1 ? '' : 's') +
+            ' currently loaded in the preview.'
+          : 'No matching indicators currently loaded in the preview.';
       }
     };
 
@@ -2600,6 +2615,19 @@
         state.search = '';
         searchInput.value = '';
         apply();
+      }
+    });
+    document.addEventListener('keydown', (event) => {
+      const target = event.target;
+      const isTyping = target instanceof HTMLElement && (
+        target.matches('input, select, textarea, [contenteditable="true"]')
+      );
+      if (event.key === '/' && !isTyping && !event.metaKey && !event.ctrlKey && !event.altKey) {
+        event.preventDefault();
+        searchInput?.focus();
+      }
+      if (event.key === 'Escape' && !isTyping) {
+        facetMenus.forEach((menu) => { menu.open = false; });
       }
     });
     clearButton?.addEventListener('click', () => {
