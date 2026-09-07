@@ -268,6 +268,17 @@ def test_dshield_block_parser_skips_malformed_rows(monkeypatch):
     assert out == []
 
 
+def test_feodo_parser_rejects_malformed_ip_rows(monkeypatch):
+    payload = (
+        "first_seen_utc,dst_ip,dst_port,c2_status,last_online,malware\n"
+        "2026-09-07 00:00:00,not-an-ip,443,online,2026-09-07,Dridex\n"
+        "2026-09-07 00:00:00,192.0.2.44,443,online,2026-09-07,Dridex\n"
+    )
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
+    out = si.fetch_feodo_ipblocklist("http://x", "ref", "feodo", si.now_utc())
+    assert [(i.type, i.indicator) for i in out] == [("ipv4", "192[.]0[.]2[.]44")]
+
+
 def test_spamhaus_drop_parser_rejects_out_of_range_octets(monkeypatch):
     # Regression: a digit-only regex admitted 999.999.999.999/24 as a valid
     # CIDR; classify() correctly rejects it via ipaddress.
@@ -383,6 +394,7 @@ def test_rss_parser_extracts_iocs_from_entries(monkeypatch):
         entries = [FakeEntry()]
         feed = type("F", (), {"updated": None})()
 
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: "<rss />")
     monkeypatch.setattr(si, "load_feedparser", lambda: type("M", (), {"parse": staticmethod(lambda *a, **k: FakeFeed())}))
     ws = si.now_utc().replace(year=2000)
     out = si.fetch_rss("http://blog.example.com/feed", "ref", "test_blog", ws)
@@ -396,6 +408,7 @@ def test_rss_parser_handles_parse_failure(monkeypatch):
     def boom(*a, **k):
         raise RuntimeError("network down")
 
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: "<rss />")
     monkeypatch.setattr(si, "load_feedparser", lambda: type("M", (), {"parse": staticmethod(boom)}))
     ws = si.now_utc().replace(year=2000)
     out = si.fetch_rss("http://x", "ref", "test_blog", ws)
@@ -1154,6 +1167,32 @@ def test_nvd_parser_keeps_old_cve_recently_modified(monkeypatch):
     assert out[0].first_seen.startswith("2023-03-01")  # true original publish date preserved
 
 
+def test_nvd_parser_fetches_all_result_pages(monkeypatch):
+    now = si.now_utc()
+    calls = []
+
+    def page(cve):
+        return {"cve": {
+            "id": cve, "published": si.iso(now), "lastModified": si.iso(now),
+            "descriptions": [], "metrics": {},
+        }}
+
+    def fake_get(url, *a, **k):
+        from urllib.parse import parse_qs, urlparse
+        calls.append(url)
+        start = int(parse_qs(urlparse(url).query).get("startIndex", ["0"])[0])
+        records = [page("CVE-2026-0001"), page("CVE-2026-0002")] if start == 0 else [page("CVE-2026-0003")]
+        return json.dumps({"totalResults": 3, "resultsPerPage": 2, "startIndex": start, "vulnerabilities": records})
+
+    monkeypatch.setattr(si, "http_get", fake_get)
+    out = si.fetch_nvd_recent(
+        "https://services.nvd.nist.gov/rest/json/cves/2.0/?resultsPerPage=2", "ref", "nvd", now - timedelta(minutes=1),
+    )
+    assert [row.indicator for row in out] == ["CVE-2026-0001", "CVE-2026-0002", "CVE-2026-0003"]
+    assert len(calls) == 2
+    assert "startIndex=2" in calls[1]
+
+
 def test_threatfox_export_endpoint_shape(monkeypatch):
     # The real export endpoint returns {"<ioc_id>": [entry, ...]} with
     # ioc_value/first_seen_utc/ip:port/md5_hash spellings and comma-string
@@ -1194,6 +1233,16 @@ def test_threatfox_export_endpoint_shape(monkeypatch):
     assert si.refang(by_type["ipv4"].indicator) == "203.0.113.9"
     assert by_type["ipv4"].confidence == "medium"
     assert by_type["md5"].confidence == "low"
+
+
+def test_threatfox_ip_port_accepts_bracketed_ipv6(monkeypatch):
+    payload = json.dumps([{
+        "ioc": "[2001:db8::8]:443", "ioc_type": "ip:port",
+        "first_seen": "2026-09-07T00:00:00Z",
+    }])
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
+    out = si.fetch_threatfox_export_json("http://x", "ref", "tf", si.now_utc().replace(year=2000))
+    assert [(i.type, si.refang(i.indicator)) for i in out] == [("ipv6", "2001:db8::8")]
 
 
 def test_blocklist_txt_plain_ip_feeds(monkeypatch):

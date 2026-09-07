@@ -139,3 +139,21 @@ def test_cli_main_duplicates_removed_not_conflated_with_persist_feed_growth(tmp_
     assert diag["total_before_dedup"] == 5
     assert diag["duplicates_removed"] == 2
     assert diag["total"] == 13
+
+
+def test_cli_warns_on_large_source_volume_drop(tmp_path, monkeypatch):
+    sources = tmp_path / "sources.yml"
+    _write_sources_yml(sources)
+    out_dir = tmp_path / "out"
+    (out_dir / "diagnostics").mkdir(parents=True)
+    (out_dir / "diagnostics" / "run.json").write_text(
+        json.dumps({"counts": {"src_a": 10, "src_b": 2}}), encoding="utf-8"
+    )
+    monkeypatch.setattr(si, "http_get", _fake_http_get)
+    rc = _run_main(monkeypatch, [
+        "swiftioc", "--sources", str(sources), "--out-dir", str(out_dir), "--skip-rss",
+        "--warn-if-volume-drop", "src_a=50",
+    ])
+    assert rc == 0
+    diag = json.loads((out_dir / "diagnostics" / "run.json").read_text(encoding="utf-8"))
+    assert diag["volume_drops"] == [{"source": "src_a", "previous": 10, "current": 3, "drop_percent": 70.0}]

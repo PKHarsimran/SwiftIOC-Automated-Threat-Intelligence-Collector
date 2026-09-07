@@ -66,8 +66,15 @@ def lookup(db_path: Path, indicator: str) -> Optional[dict]:
         row = con.execute("SELECT * FROM indicators WHERE indicator = ?", (variant,)).fetchone()
         if row:
             break
+    if row:
+        # Preserve the collection schedule so --at can check the last actual
+        # feed snapshot at or before a requested day. first_run/last_run alone
+        # cannot distinguish continuous presence from an IOC that disappeared
+        # and later reappeared.
+        result = dict(row)
+        result["_run_timestamps"] = [r[0] for r in con.execute("SELECT run_ts FROM runs ORDER BY run_ts")]
     con.close()
-    return dict(row) if row else None
+    return result if row else None
 
 
 def render(row: dict, at: Optional[datetime]) -> str:
@@ -87,11 +94,15 @@ def render(row: dict, at: Optional[datetime]) -> str:
         # date (e.g. first_run_ts at 14:00 UTC) still counts as present.
         at_start_ts = int(at.replace(tzinfo=timezone.utc).timestamp())
         at_end_ts = at_start_ts + 86399
-        prior = [(ts, sc) for ts, sc in series if ts <= at_end_ts]
-        if row["first_run_ts"] <= at_end_ts and at_start_ts <= row["last_run_ts"] and prior:
-            lines.append(f"On {at.date()}: ✔ present, score {prior[-1][1]}")
+        runs = row.get("_run_timestamps", [])
+        snapshot = max((ts for ts in runs if ts <= at_end_ts), default=None)
+        scores_by_run = dict(series)
+        if snapshot is not None and snapshot in scores_by_run:
+            lines.append(f"On {at.date()}: ✔ present, score {scores_by_run[snapshot]}")
         elif at_end_ts < row["first_run_ts"]:
             lines.append(f"On {at.date()}: ✘ not yet reported (first appeared {_fmt_ts(row['first_run_ts'])[:10]})")
+        elif snapshot is None or (series and snapshot < series[0][0]):
+            lines.append(f"On {at.date()}: ? presence is outside the indexed score history")
         else:
             lines.append(f"On {at.date()}: ✘ not present in the feed at that time")
     return "\n".join(lines)

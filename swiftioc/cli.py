@@ -121,6 +121,8 @@ def main() -> int:
     ap.add_argument("--source-window", action="append", default=[], help="Override lookback per source: name=HOURS")
     ap.add_argument("--fail-on-empty", nargs="*", default=None, help="Fail if any listed sources return zero")
     ap.add_argument("--fail-if-stale", action="append", default=[], help="Fail if source newest first_seen older than HOURS: name=HOURS")
+    ap.add_argument("--warn-if-volume-drop", action="append", default=[],
+                    help="Warn if a source's count drops by PERCENT versus the previous run: name=PERCENT")
     ap.add_argument("--grace-on-404", action="append", default=[], help="Treat 404 on these sources as empty but non-fatal: name")
 
     # logging / diag
@@ -198,6 +200,17 @@ def main() -> int:
     with args.sources.open("r", encoding="utf-8") as f:
         cfg = yaml.safe_load(f) or {}
 
+    out_dir: Path = args.out_dir
+    previous_counts: Dict[str, int] = {}
+    previous_diag = out_dir / "diagnostics" / "run.json"
+    if previous_diag.exists():
+        try:
+            raw_previous = json.loads(previous_diag.read_text(encoding="utf-8"))
+            if isinstance(raw_previous, dict) and isinstance(raw_previous.get("counts"), dict):
+                previous_counts = {str(k): int(v) for k, v in raw_previous["counts"].items()}
+        except (OSError, ValueError, TypeError):
+            logger.warning("Could not read previous source counts from %s", previous_diag)
+
     # collect
     rows, counts, stats = collect_from_yaml(
         cfg,
@@ -216,8 +229,6 @@ def main() -> int:
     # retention) below, and duplicates_removed must reflect cross-source
     # dedup alone, not get conflated with those later mutations.
     deduped_count = len(rows)
-
-    out_dir: Path = args.out_dir
 
     # Living feed: merge the previously published feed so indicators persist
     # across runs. Re-observed entries refresh (score resets to full); entries
@@ -312,6 +323,16 @@ def main() -> int:
     raw_total = stats.get("raw_total", deduped_count)
     duplicates_removed = max(raw_total - deduped_count, 0)
     empty_sources = sorted([name for name, count in counts.items() if count == 0])
+    volume_drops = []
+    for name, threshold in parse_name_int_pairs(args.warn_if_volume_drop, "--warn-if-volume-drop").items():
+        previous = previous_counts.get(name)
+        current = counts.get(name)
+        if previous is None or previous <= 0 or current is None:
+            continue
+        drop_pct = round((previous - current) * 100 / previous, 1)
+        if drop_pct >= threshold:
+            volume_drops.append({"source": name, "previous": previous, "current": current, "drop_percent": drop_pct})
+            logger.warning("%s volume dropped %.1f%% (%d -> %d)", name, drop_pct, previous, current)
     scores = [r.score for r in rows]
     # Full-feed aggregates the dashboard renders without downloading the whole
     # feed: score bands, corroboration count, and top tags.
@@ -362,6 +383,7 @@ def main() -> int:
         "earliest_first_seen": earliest,
         "newest_first_seen": latest,
         "empty_sources": empty_sources,
+        "volume_drops": volume_drops,
         "failures": stats.get("failures", []),
         "version": 3,
         "ts": run_ts,
@@ -419,6 +441,8 @@ def main() -> int:
             issues.append(f"- ⚠️ **{src}**: {err}")
         for src in empty_sources:
             issues.append(f"- ⚠️ **{src}** returned zero indicators")
+        for drop in volume_drops:
+            issues.append(f"- ⚠️ **{drop['source']}** volume dropped {drop['drop_percent']}% ({drop['previous']} → {drop['current']})")
         if issues:
             report_lines.extend(["## Issues", "", *issues, ""])
         args.report.write_text("\n".join(report_lines), encoding="utf-8")
@@ -465,6 +489,8 @@ def main() -> int:
         issues_summary.append(f"- ⚠️ **{src}**: {err}")
     for src in empty_sources:
         issues_summary.append(f"- ⚠️ **{src}** returned zero indicators")
+    for drop in volume_drops:
+        issues_summary.append(f"- ⚠️ **{drop['source']}** volume dropped {drop['drop_percent']}% ({drop['previous']} → {drop['current']})")
     if issues_summary:
         summary_lines.extend(["", "#### Issues", "", *issues_summary])
     summary_lines.append("")
