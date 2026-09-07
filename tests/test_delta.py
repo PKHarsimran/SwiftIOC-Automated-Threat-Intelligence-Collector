@@ -52,3 +52,21 @@ def test_delta_without_baseline_does_not_flood_first_run():
     )
     assert delta["events"] == []
     assert delta["counts"] == {"added": 0, "updated": 0, "removed": 0}
+
+
+def test_carried_forward_rescoring_does_not_mutate_delta_baseline():
+    previous = indicator("decaying.example", score=65)
+    merged, carried = si.merge_with_previous([], [previous])
+    assert carried == 1
+    assert merged[0] is not previous
+    merged[0].score = 59
+    delta = si.build_delta(
+        [previous], merged, generated_at="2026-09-08T04:00:00Z"
+    )
+    assert previous.score == 65
+    assert delta["counts"] == {"added": 0, "updated": 1, "removed": 0}
+    assert delta["events"][0]["changes"]["score"] == {"from": 65, "to": 59}
+    removed = si.build_delta(
+        [previous], [], generated_at="2026-09-08T08:00:00Z"
+    )
+    assert removed["events"][0]["previous"]["score"] == 65
