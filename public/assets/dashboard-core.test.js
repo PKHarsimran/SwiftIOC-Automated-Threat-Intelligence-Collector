@@ -143,10 +143,12 @@ test('sanitizes unsupported URL-controlled facets', () => {
 });
 
 test('normalizes shared filter values and exports spreadsheet-safe CSV', () => {
-  const state = core.readViewState('?type=DOMAIN&source=Feed-A&signal=HIGH');
+  const state = core.readViewState('?type=DOMAIN&source=Feed-A&signal=HIGH&score_band=HIGH&age_band=WEEK');
   assert.deepEqual(state.types, ['domain']);
   assert.deepEqual(state.sources, ['feed-a']);
   assert.equal(state.signal, 'high');
+  assert.deepEqual(state.scoreBands, ['high']);
+  assert.deepEqual(state.ageBands, ['week']);
   const csv = core.rowsToCsv([{
     indicator: '=HYPERLINK("https://example.invalid")',
     type: 'domain',
@@ -182,4 +184,5 @@ test('dashboard markup keeps IDs and labelled controls consistent', () => {
     'Export links must not render stray greater-than characters'
   );
   assert.match(html, /data-preview-download/);
+  assert.match(html, /data-preview-download-note/);
 });
