@@ -1622,6 +1622,15 @@
     setStatText('high-confidence', formatNumber(stats.highConfidence ?? 0));
     setStatText('corroborated', formatNumber(stats.corroborated ?? 0));
     setStatText('avg-score', stats.avgScore != null ? String(stats.avgScore) : '—');
+    const deltaRoot = qs('[data-delta-root]');
+    const delta = dataset?.diag?.delta_counts;
+    const hasDeltaBaseline = dataset?.diag?.delta_baseline_available === true;
+    if (deltaRoot) deltaRoot.hidden = !hasDeltaBaseline;
+    if (hasDeltaBaseline && delta) {
+      setStatText('delta-added', formatNumber(delta.added));
+      setStatText('delta-updated', formatNumber(delta.updated));
+      setStatText('delta-removed', formatNumber(delta.removed));
+    }
     const hcPct =
       stats.total > 0 ? ((stats.highConfidence ?? 0) / stats.total) * 100 : 0;
     setStatText('high-confidence-caption', `${hcPct.toFixed(1)}% of the feed`);
