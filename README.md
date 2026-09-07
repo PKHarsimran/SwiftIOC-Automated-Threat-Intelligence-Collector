@@ -391,6 +391,7 @@ public/
 │   ├── latest.jsonl
 │   ├── delta.json              # SOC Delta envelope + counts
 │   ├── delta.jsonl             # stream-friendly change events
+│   ├── taxii2-envelope.json    # TAXII 2.1 envelope containing STIX objects
 │   ├── high_confidence.csv    # curated: score ≥80 or 2+ sources
 │   ├── high_confidence.jsonl  # same, machine-readable
 │   ├── dashboard.jsonl        # compact top-N feed the web dashboard loads
