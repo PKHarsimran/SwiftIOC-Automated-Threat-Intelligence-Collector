@@ -188,8 +188,11 @@ def http_get(url: str, *, name: str, kind: str = "text", timeout: int = 20) -> s
         _validate_redirect_target(current_url)
         r = s.get(current_url, headers=headers, timeout=timeout, stream=True, allow_redirects=False)
 
-    dt = time.perf_counter() - t0
     raw = _read_capped(r, MAX_RESPONSE_BYTES)
+    # Measure the complete fetch, including streamed response-body download.
+    # Recording the time immediately after receiving headers made a slow
+    # large feed look artificially fast in the dashboard diagnostics.
+    dt = time.perf_counter() - t0
     # Record telemetry before raise_for_status so failed statuses are captured.
     _FETCH_METRICS[name] = {
         "ms": round(dt * 1000),
@@ -228,4 +231,3 @@ def load_feedparser() -> Any:
         return _FEEDPARSER
     except ModuleNotFoundError as e:
         raise SystemExit("Missing 'feedparser'. Install it or run with --skip-rss") from e
-

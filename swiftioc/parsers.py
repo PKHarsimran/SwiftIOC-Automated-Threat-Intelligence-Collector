@@ -368,7 +368,16 @@ def fetch_threatfox_export_json(url: str, ref_url: str, source: str, ws: datetim
         if itype == "ip:port":
             # "1.2.3.4:443" -> classify the bare address; keeps the value
             # comparable with other IP feeds so corroboration can match.
-            host = ioc.rsplit(":", 1)[0]
+            # IPv6 endpoints are RFC 3986 bracketed ("[2001:db8::1]:443").
+            # Splitting that form leaves brackets around the address, which
+            # classify() correctly rejects; unwrap it before validation.
+            if ioc.startswith("["):
+                end = ioc.find("]")
+                if end == -1 or not ioc[end + 1 :].startswith(":"):
+                    continue
+                host = ioc[1:end]
+            else:
+                host = ioc.rsplit(":", 1)[0]
             t = classify(host)
             if t not in {"ipv4", "ipv6"}:
                 continue
@@ -424,6 +433,10 @@ def fetch_feodo_ipblocklist(
             ip = row[1].strip()
             family = row[5].strip() if len(row) > 5 else ""
         except Exception:
+            continue
+        # A malformed value was previously emitted with a hardcoded ipv4
+        # type, bypassing the normal false-positive/validation path.
+        if classify(ip) != "ipv4":
             continue
 
         if not disable_window and seen and seen < ws:
@@ -938,5 +951,4 @@ def fetch_universal(
         )
 
     return list(uniq.values())
-
 

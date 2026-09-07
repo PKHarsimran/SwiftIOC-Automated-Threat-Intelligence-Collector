@@ -69,6 +69,20 @@ def test_http_get_returns_body_on_success(monkeypatch):
     assert hc.http_get("http://feed.example/x", name="src") == "hello world"
 
 
+def test_http_get_latency_includes_streamed_body(monkeypatch):
+    clock = [10.0]
+
+    class DelayedResponse(FakeResponse):
+        def iter_content(self, chunk_size=65536):
+            clock[0] += 0.125
+            yield from super().iter_content(chunk_size)
+
+    monkeypatch.setattr(hc.time, "perf_counter", lambda: clock[0])
+    _use_fake_session(monkeypatch, [DelayedResponse(body=b"body")])
+    hc.http_get("http://feed.example/x", name="src")
+    assert hc.get_fetch_metrics()["src"]["ms"] == 125
+
+
 def test_http_get_rejects_oversized_content_length(monkeypatch):
     huge = str(hc.MAX_RESPONSE_BYTES + 1)
     _use_fake_session(monkeypatch, [FakeResponse(headers={"Content-Length": huge}, body=b"x")])

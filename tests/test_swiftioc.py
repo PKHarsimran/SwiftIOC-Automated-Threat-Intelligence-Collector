@@ -268,6 +268,17 @@ def test_dshield_block_parser_skips_malformed_rows(monkeypatch):
     assert out == []
 
 
+def test_feodo_parser_rejects_malformed_ip_rows(monkeypatch):
+    payload = (
+        "first_seen_utc,dst_ip,dst_port,c2_status,last_online,malware\n"
+        "2026-09-07 00:00:00,not-an-ip,443,online,2026-09-07,Dridex\n"
+        "2026-09-07 00:00:00,192.0.2.44,443,online,2026-09-07,Dridex\n"
+    )
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
+    out = si.fetch_feodo_ipblocklist("http://x", "ref", "feodo", si.now_utc())
+    assert [(i.type, i.indicator) for i in out] == [("ipv4", "192[.]0[.]2[.]44")]
+
+
 def test_spamhaus_drop_parser_rejects_out_of_range_octets(monkeypatch):
     # Regression: a digit-only regex admitted 999.999.999.999/24 as a valid
     # CIDR; classify() correctly rejects it via ipaddress.
@@ -1194,6 +1205,16 @@ def test_threatfox_export_endpoint_shape(monkeypatch):
     assert si.refang(by_type["ipv4"].indicator) == "203.0.113.9"
     assert by_type["ipv4"].confidence == "medium"
     assert by_type["md5"].confidence == "low"
+
+
+def test_threatfox_ip_port_accepts_bracketed_ipv6(monkeypatch):
+    payload = json.dumps([{
+        "ioc": "[2001:db8::8]:443", "ioc_type": "ip:port",
+        "first_seen": "2026-09-07T00:00:00Z",
+    }])
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
+    out = si.fetch_threatfox_export_json("http://x", "ref", "tf", si.now_utc().replace(year=2000))
+    assert [(i.type, si.refang(i.indicator)) for i in out] == [("ipv6", "2001:db8::8")]
 
 
 def test_blocklist_txt_plain_ip_feeds(monkeypatch):

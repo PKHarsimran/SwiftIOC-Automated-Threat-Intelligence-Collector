@@ -32,6 +32,9 @@ def _make_index(tmp_path: Path, rows) -> Path:
             PRIMARY KEY (type, indicator))"""
     )
     con.executemany("INSERT INTO indicators VALUES (?,?,?,?,?,?,?,?,?,?)", rows)
+    con.execute("CREATE TABLE runs (run_ts INTEGER PRIMARY KEY, total INTEGER NOT NULL)")
+    run_timestamps = sorted({ts for row in rows for ts, _score in json.loads(row[-1])})
+    con.executemany("INSERT INTO runs VALUES (?, ?)", [(ts, 1) for ts in run_timestamps])
     con.commit()
     con.close()
     return db
@@ -72,6 +75,7 @@ def test_render_point_in_time(tmp_path):
         "run_count": 10, "max_score": 85, "last_score": 85,
         "last_sources": "feodo", "last_tags": "c2",
         "score_series": json.dumps(series),
+        "_run_timestamps": [_ts(2026, 2, 1), _ts(2026, 3, 1)],
     }
     # Before it was first reported.
     out_before = mod.render(row, datetime(2026, 1, 15))
@@ -97,10 +101,25 @@ def test_render_at_treats_first_seen_day_as_present(tmp_path):
         "run_count": 1, "max_score": 70, "last_score": 70,
         "last_sources": "feodo", "last_tags": "c2",
         "score_series": json.dumps(series),
+        "_run_timestamps": [first_seen_ts],
     }
     out = mod.render(row, datetime(2026, 3, 1))
     assert "present, score 70" in out
     assert "not yet reported" not in out
+
+
+def test_render_at_does_not_treat_an_absence_gap_as_presence(tmp_path):
+    mod = _load_timeline()
+    series = [[_ts(2026, 1, 1), 80], [_ts(2026, 3, 1), 70]]
+    row = {
+        "indicator": "1.2.3.4", "type": "ipv4",
+        "first_run_ts": _ts(2026, 1, 1), "last_run_ts": _ts(2026, 3, 1),
+        "run_count": 2, "max_score": 80, "last_score": 70,
+        "last_sources": "feodo", "last_tags": "c2",
+        "score_series": json.dumps(series),
+        "_run_timestamps": [_ts(2026, 1, 1), _ts(2026, 2, 1), _ts(2026, 3, 1)],
+    }
+    assert "not present" in mod.render(row, datetime(2026, 2, 15))
 
 
 def test_sparkline_bounds():
