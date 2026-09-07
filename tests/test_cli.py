@@ -71,6 +71,7 @@ def test_cli_main_end_to_end_writes_expected_outputs(tmp_path, monkeypatch):
         "iocs/stix2.json", "iocs/high_confidence.csv", "iocs/high_confidence.jsonl",
         "iocs/dashboard.jsonl", "badge.json", "diagnostics/run.json", "diagnostics/REPORT.md",
         "iocs/delta.json", "iocs/delta.jsonl",
+        "iocs/taxii2-envelope.json",
         "changelog/CHANGELOG.md",
     ]:
         assert (out_dir / rel).exists(), f"missing output: {rel}"
