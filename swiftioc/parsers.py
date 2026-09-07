@@ -18,6 +18,7 @@ from __future__ import annotations
 import csv
 import io
 import json
+import os
 import re
 from datetime import datetime, timedelta
 from importlib import import_module
@@ -28,7 +29,7 @@ import requests
 import swiftioc as _pkg
 
 from .extract import extract_indicators_from_text
-from .http_client import choose_ua, ensure_text, logger
+from .http_client import ensure_text, logger
 from .models import (
     DATE_FIELD_RE,
     JA3_RE,
@@ -114,7 +115,7 @@ def fetch_cisa_kev(url: str, ref_url: str, source: str, ws: datetime) -> List[In
 
 
 @register_parser("nvd", "nist_nvd", "nist_nvd_recent")
-def fetch_nvd_recent(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
+def fetch_nvd_recent(url: str, ref_url: str, source: str, ws: datetime, *, api_key_env: Optional[str] = None) -> List[Indicator]:
     now = now_utc()
     # The NVD 2.0 API returns the *oldest* CVEs first (startIndex 0), so an
     # unfiltered query yields 1999-era CVEs that the lookback window then drops,
@@ -136,7 +137,9 @@ def fetch_nvd_recent(url: str, ref_url: str, source: str, ws: datetime) -> List[
             query["lastModStartDate"] = [start.strftime(fmt)]
             query["lastModEndDate"] = [now.strftime(fmt)]
             url = parsed._replace(query=urlencode(query, doseq=True)).geturl()
-    text = ensure_text(_pkg.http_get(url, name=source))
+    api_key = os.environ.get(api_key_env) if api_key_env else None
+    request_headers = {"apiKey": api_key} if api_key else None
+    text = ensure_text(_pkg.http_get(url, name=source, headers=request_headers))
     try:
         data = json.loads(text)
     except json.JSONDecodeError:
@@ -163,7 +166,7 @@ def fetch_nvd_recent(url: str, ref_url: str, source: str, ws: datetime) -> List[
                 page_query["startIndex"] = [str(next_index)]
                 next_url = page_url._replace(query=urlencode(page_query, doseq=True)).geturl()
                 try:
-                    next_data = json.loads(ensure_text(_pkg.http_get(next_url, name=source)))
+                    next_data = json.loads(ensure_text(_pkg.http_get(next_url, name=source, headers=request_headers)))
                 except json.JSONDecodeError:
                     logger.warning("%s returned invalid JSON at startIndex %d", source, next_index)
                     break
@@ -762,7 +765,11 @@ def fetch_rss(url: str, ref_url: str, source: str, ws: datetime, *, per_entry_ca
             return []
         raise
     try:
-        feed = fp.parse(url, request_headers=choose_ua())
+        # Fetch through the shared client so RSS gets the same retry, response
+        # cap, redirect validation, raw capture, and diagnostics as every
+        # other source. Passing a URL directly to feedparser bypassed all of
+        # those controls.
+        feed = fp.parse(ensure_text(_pkg.http_get(url, name=source)))
     except Exception as exc:
         logger.warning("RSS parse failed for %s: %s", source, exc)
         return []

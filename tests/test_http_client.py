@@ -41,7 +41,7 @@ class FakeSession:
         self.calls = []
 
     def get(self, url, headers=None, timeout=None, stream=None, allow_redirects=None):
-        self.calls.append(url)
+        self.calls.append((url, headers))
         return self._responses.pop(0)
 
 
@@ -90,6 +90,12 @@ def test_http_get_aggregates_paginated_source_metrics(monkeypatch):
     assert hc.get_fetch_metrics()["src"] == {"ms": 0, "bytes": 7, "status": 200, "requests": 2}
 
 
+def test_http_get_allows_parser_specific_headers(monkeypatch):
+    fake = _use_fake_session(monkeypatch, [FakeResponse(body=b"ok")])
+    hc.http_get("http://feed.example/x", name="src", headers={"apiKey": "test-key"})
+    assert fake.calls[0][1]["apiKey"] == "test-key"
+
+
 def test_http_get_rejects_oversized_content_length(monkeypatch):
     huge = str(hc.MAX_RESPONSE_BYTES + 1)
     _use_fake_session(monkeypatch, [FakeResponse(headers={"Content-Length": huge}, body=b"x")])
@@ -121,7 +127,7 @@ def test_http_get_follows_redirect_to_public_host(monkeypatch):
         ],
     )
     assert hc.http_get("http://feed.example/x", name="src") == "final content"
-    assert fake.calls == ["http://feed.example/x", "http://93.184.216.34/final"]
+    assert [url for url, _headers in fake.calls] == ["http://feed.example/x", "http://93.184.216.34/final"]
 
 
 def test_http_get_blocks_redirect_to_link_local_metadata_ip(monkeypatch):

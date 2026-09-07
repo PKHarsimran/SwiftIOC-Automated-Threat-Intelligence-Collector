@@ -394,6 +394,7 @@ def test_rss_parser_extracts_iocs_from_entries(monkeypatch):
         entries = [FakeEntry()]
         feed = type("F", (), {"updated": None})()
 
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: "<rss />")
     monkeypatch.setattr(si, "load_feedparser", lambda: type("M", (), {"parse": staticmethod(lambda *a, **k: FakeFeed())}))
     ws = si.now_utc().replace(year=2000)
     out = si.fetch_rss("http://blog.example.com/feed", "ref", "test_blog", ws)
@@ -407,6 +408,7 @@ def test_rss_parser_handles_parse_failure(monkeypatch):
     def boom(*a, **k):
         raise RuntimeError("network down")
 
+    monkeypatch.setattr(si, "http_get", lambda *a, **k: "<rss />")
     monkeypatch.setattr(si, "load_feedparser", lambda: type("M", (), {"parse": staticmethod(boom)}))
     ws = si.now_utc().replace(year=2000)
     out = si.fetch_rss("http://x", "ref", "test_blog", ws)

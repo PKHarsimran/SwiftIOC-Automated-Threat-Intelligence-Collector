@@ -3,8 +3,11 @@ from __future__ import annotations
 
 import csv
 import json
+import os
 import re
+import tempfile
 import uuid
+from contextlib import contextmanager
 from dataclasses import asdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -27,6 +30,28 @@ STIX_HASH_NAMES = {"md5": "MD5", "sha1": "SHA-1", "sha256": "SHA-256", "sha512":
 
 # ---------------- writers ----------------
 CSV_HEADER = ["indicator", "type", "source", "first_seen", "last_seen", "confidence", "score", "sightings", "tlp", "tags", "reference", "context"]
+
+
+@contextmanager
+def _atomic_text_writer(path: Path, *, newline: Optional[str] = None):
+    """Write a complete replacement beside ``path`` before publishing it.
+
+    Consumers polling a public feed must see either the previous complete file
+    or the new complete file, never a partially-written export from a stopped
+    collection run.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    handle = tempfile.NamedTemporaryFile("w", encoding="utf-8", newline=newline, dir=path.parent, delete=False)
+    temp_path = Path(handle.name)
+    try:
+        with handle:
+            yield handle
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temp_path, path)
+    except Exception:
+        temp_path.unlink(missing_ok=True)
+        raise
 
 
 _CSV_FORMULA_TRIGGERS = ("=", "+", "-", "@", "\t", "\r")
@@ -53,8 +78,7 @@ def _csv_row(r: Indicator) -> List[Any]:
 
 
 def write_csv(path: Path, rows: List[Indicator]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", newline="", encoding="utf-8") as f:
+    with _atomic_text_writer(path, newline="") as f:
         w = csv.writer(f)
         w.writerow(CSV_HEADER)
         for r in rows:
@@ -62,8 +86,7 @@ def write_csv(path: Path, rows: List[Indicator]) -> None:
 
 
 def write_tsv(path: Path, rows: List[Indicator]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", newline="", encoding="utf-8") as f:
+    with _atomic_text_writer(path, newline="") as f:
         w = csv.writer(f, delimiter="\t")
         w.writerow(CSV_HEADER)
         for r in rows:
@@ -71,14 +94,12 @@ def write_tsv(path: Path, rows: List[Indicator]) -> None:
 
 
 def write_json(path: Path, rows: List[Indicator]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8") as f:
+    with _atomic_text_writer(path) as f:
         json.dump([asdict(r) for r in rows], f, ensure_ascii=False, indent=2)
 
 
 def write_jsonl(path: Path, rows: List[Indicator]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8") as f:
+    with _atomic_text_writer(path) as f:
         for r in rows:
             f.write(json.dumps(asdict(r), ensure_ascii=False) + "\n")
 
@@ -122,8 +143,7 @@ def write_dashboard_feed(path: Path, rows: List[Indicator], *, limit: int = 1000
             break
         chosen.setdefault(r.key(), r)
     ranked = sorted(chosen.values(), key=key, reverse=True)[:limit]
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8") as f:
+    with _atomic_text_writer(path) as f:
         for r in ranked:
             f.write(
                 json.dumps(
@@ -173,7 +193,6 @@ def _stix_pattern(itype: str, indicator: str) -> Optional[str]:
 
 
 def write_stix(path: Path, rows: List[Indicator]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
     now = iso(now_utc())
     common = {
         "created": now,
@@ -225,7 +244,7 @@ def write_stix(path: Path, rows: List[Indicator]) -> None:
             "x_swiftioc_source": r.source, "x_swiftioc_tlp": r.tlp, "x_swiftioc_reference": r.reference,
         })
     bundle = {"type": "bundle", "id": f"bundle--{uuid.uuid5(STIX_NAMESPACE, 'bundle:' + now)}", "objects": objects}
-    with path.open("w", encoding="utf-8") as f:
+    with _atomic_text_writer(path) as f:
         json.dump(bundle, f, ensure_ascii=False, indent=2)
 
 
@@ -452,5 +471,4 @@ def write_changelog(path: Path, counts: Dict[str, int], total: int, *, max_entri
     entries = entries[-max_entries:]
     body = "# Changelog\n\n" + "\n\n".join(entries) + "\n"
     path.write_text(body, encoding="utf-8")
-
 

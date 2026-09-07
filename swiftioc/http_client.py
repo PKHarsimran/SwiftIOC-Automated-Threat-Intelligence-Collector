@@ -171,13 +171,16 @@ def _read_capped(r: requests.Response, max_bytes: int) -> bytes:
     return b"".join(chunks)
 
 
-def http_get(url: str, *, name: str, kind: str = "text", timeout: int = 20) -> str | bytes:
+def http_get(
+    url: str, *, name: str, kind: str = "text", timeout: int = 20, headers: Optional[Dict[str, str]] = None,
+) -> str | bytes:
     s = ensure_session()
-    headers = choose_ua()
+    request_headers = choose_ua()
+    request_headers.update(headers or {})
     t0 = time.perf_counter()
 
     current_url = url
-    r = s.get(current_url, headers=headers, timeout=timeout, stream=True, allow_redirects=False)
+    r = s.get(current_url, headers=request_headers, timeout=timeout, stream=True, allow_redirects=False)
     hops = 0
     while r.is_redirect or r.is_permanent_redirect:
         location = r.headers.get("Location")
@@ -187,7 +190,7 @@ def http_get(url: str, *, name: str, kind: str = "text", timeout: int = 20) -> s
             raise requests.exceptions.TooManyRedirects(f"Exceeded {MAX_REDIRECTS} redirects fetching {url!r}")
         current_url = urljoin(current_url, location)
         _validate_redirect_target(current_url)
-        r = s.get(current_url, headers=headers, timeout=timeout, stream=True, allow_redirects=False)
+        r = s.get(current_url, headers=request_headers, timeout=timeout, stream=True, allow_redirects=False)
 
     raw = _read_capped(r, MAX_RESPONSE_BYTES)
     # Measure the complete fetch, including streamed response-body download.
