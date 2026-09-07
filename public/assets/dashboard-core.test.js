@@ -142,6 +142,20 @@ test('sanitizes unsupported URL-controlled facets', () => {
   assert.equal(state.age, 'all');
 });
 
+test('normalizes shared filter values and exports spreadsheet-safe CSV', () => {
+  const state = core.readViewState('?type=DOMAIN&source=Feed-A&signal=HIGH');
+  assert.deepEqual(state.types, ['domain']);
+  assert.deepEqual(state.sources, ['feed-a']);
+  assert.equal(state.signal, 'high');
+  const csv = core.rowsToCsv([{
+    indicator: '=HYPERLINK("https://example.invalid")',
+    type: 'domain',
+    tags: ['phishing', 'credential-theft'],
+  }]);
+  assert.match(csv, /"'=HYPERLINK\(""https:\/\/example\.invalid""\)"/);
+  assert.match(csv, /"phishing, credential-theft"/);
+});
+
 test('dashboard markup keeps IDs and labelled controls consistent', () => {
   const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
   const ids = Array.from(html.matchAll(/\sid="([^"]+)"/g), (match) => match[1]);
@@ -161,4 +175,5 @@ test('dashboard markup keeps IDs and labelled controls consistent', () => {
     false,
     'Export links must not render stray greater-than characters'
   );
+  assert.match(html, /data-preview-download/);
 });
