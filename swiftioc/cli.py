@@ -26,6 +26,7 @@ from .scoring import (
 )
 from .writers import (
     write_badge_json,
+    build_stix_bundle,
     write_changelog,
     build_delta,
     write_csv,
@@ -38,6 +39,7 @@ from .writers import (
     write_misp_feed,
     write_rss_feed,
     write_stix,
+    write_taxii_envelope,
     write_tsv,
 )
 
@@ -273,7 +275,12 @@ def main() -> int:
     write_tsv(out_dir / "iocs" / "latest.tsv", rows)
     write_json(out_dir / "iocs" / "latest.json", rows)
     write_jsonl(out_dir / "iocs" / "latest.jsonl", rows)
-    write_stix(out_dir / "iocs" / "stix2.json", rows)
+    stix_bundle = build_stix_bundle(rows)
+    write_stix(out_dir / "iocs" / "stix2.json", rows, bundle=stix_bundle)
+    taxii_objects = write_taxii_envelope(
+        out_dir / "iocs" / "taxii2-envelope.json", rows, bundle=stix_bundle
+    )
+    logger.info("Static TAXII 2.1 envelope: %d objects", taxii_objects)
 
     # Curated "block-ready" feed: only high-score or multi-source-confirmed
     # indicators, sorted strongest-first so the top of the file is the most
