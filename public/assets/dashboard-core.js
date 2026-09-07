@@ -199,10 +199,10 @@
       types: params.getAll('type').map(lower).filter(Boolean),
       sources: params.getAll('source').map(lower).filter(Boolean),
       tags: params.getAll('tag').map(lower).filter(Boolean),
-      scoreBands: params.getAll('score_band').filter((value) =>
+      scoreBands: params.getAll('score_band').map(lower).filter((value) =>
         ['high', 'elevated', 'moderate', 'aging'].includes(value)
       ),
-      ageBands: params.getAll('age_band').filter((value) =>
+      ageBands: params.getAll('age_band').map(lower).filter((value) =>
         ['day', 'week', 'month', 'older', 'unknown'].includes(value)
       ),
       type: lower(params.get('type')) || 'all',
