@@ -48,6 +48,42 @@
     return one && one !== 'all' ? [one] : [];
   };
 
+  // CSV cells beginning with spreadsheet formula prefixes can execute when a
+  // downloaded investigation file is opened. Prefix them with an apostrophe so
+  // an IOC remains data in Excel, LibreOffice, and similar tools.
+  const csvCell = (value) => {
+    let text = stringValue(value);
+    if (/^[=+\-@]/.test(text)) text = "'" + text;
+    return '"' + text.replace(/"/g, '""') + '"';
+  };
+
+  const rowsToCsv = (rows) => {
+    const columns = [
+      ['indicator', 'Indicator'],
+      ['type', 'Type'],
+      ['score', 'Score'],
+      ['confidence', 'Confidence'],
+      ['source', 'Sources'],
+      ['firstSeen', 'First seen'],
+      ['lastSeen', 'Last seen'],
+      ['tags', 'Tags'],
+      ['reference', 'Reference'],
+      ['context', 'Context'],
+    ];
+    const values = Array.isArray(rows) ? rows : [];
+    return [
+      columns.map(([, label]) => csvCell(label)).join(','),
+      ...values.map((row) => columns.map(([key]) => {
+        const value = key === 'tags' && Array.isArray(row?.tags)
+          ? row.tags.join(', ')
+          : key === 'source' && Array.isArray(row?.sourceList)
+          ? row.sourceList.join(', ')
+          : row?.[key];
+        return csvCell(value);
+      }).join(',')),
+    ].join('\r\n') + '\r\n';
+  };
+
   const scoreBand = (row) => {
     const score = effectiveScore(row);
     if (score >= 80) return 'high';
@@ -156,22 +192,22 @@
 
   const readViewState = (search = '', hash = '') => {
     const params = new URLSearchParams(search);
-    const signal = params.get('signal');
+    const signal = lower(params.get('signal'));
     const score = Number(params.get('score')) || 0;
     const age = params.get('age') || 'all';
     const state = {
-      types: params.getAll('type').filter(Boolean),
-      sources: params.getAll('source').filter(Boolean),
-      tags: params.getAll('tag').filter(Boolean),
-      scoreBands: params.getAll('score_band').filter((value) =>
+      types: params.getAll('type').map(lower).filter(Boolean),
+      sources: params.getAll('source').map(lower).filter(Boolean),
+      tags: params.getAll('tag').map(lower).filter(Boolean),
+      scoreBands: params.getAll('score_band').map(lower).filter((value) =>
         ['high', 'elevated', 'moderate', 'aging'].includes(value)
       ),
-      ageBands: params.getAll('age_band').filter((value) =>
+      ageBands: params.getAll('age_band').map(lower).filter((value) =>
         ['day', 'week', 'month', 'older', 'unknown'].includes(value)
       ),
-      type: params.get('type') || 'all',
-      source: params.get('source') || 'all',
-      tag: params.get('tag') || 'all',
+      type: lower(params.get('type')) || 'all',
+      source: lower(params.get('source')) || 'all',
+      tag: lower(params.get('tag')) || 'all',
       signal: ['all', 'high', 'corroborated', 'new'].includes(signal)
         ? signal
         : 'all',
@@ -236,6 +272,7 @@
     matchesRow,
     readViewState,
     refang,
+    rowsToCsv,
     writeViewUrl,
   };
 });

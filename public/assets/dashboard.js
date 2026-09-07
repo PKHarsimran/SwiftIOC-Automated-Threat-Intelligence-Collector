@@ -204,6 +204,22 @@
     URL.revokeObjectURL(url);
   };
 
+  const downloadCsv = (rows) => {
+    if (!dashboardCore?.rowsToCsv || !rows.length) return false;
+    const blob = new Blob([dashboardCore.rowsToCsv(rows)], {
+      type: 'text/csv;charset=utf-8',
+    });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'swiftioc-matching-indicators.csv';
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+    return true;
+  };
+
   // Compact label for a possibly multi-source row: "feodo +2".
   const primarySourceLabel = (row) => {
     if (!row) return 'unknown';
@@ -1834,6 +1850,8 @@
     const searchInput = qs('[data-preview-search]', container);
     const clearButton = qs('[data-preview-clear]', container);
     const shareButton = qs('[data-preview-share]', container);
+    const downloadButton = qs('[data-preview-download]', container);
+    const downloadNote = qs('[data-preview-download-note]', container);
     const filterCount = qs('[data-preview-filter-count]', container);
     const refreshButton = qs('[data-preview-refresh]');
     const sortButtons = qsa('[data-preview-sort]', table);
@@ -1877,6 +1895,7 @@
       stats: null,
       sourcePool: 0,
       loading: false,
+      matches: [],
     };
 
     const urlKeys = ['type', 'source', 'tag', 'signal', 'score', 'age', 'rows', 'sort', 'dir'];
@@ -2325,10 +2344,28 @@
         filterCount.textContent = String(count);
       }
       if (shareButton) shareButton.disabled = !state.rows.length;
+      if (downloadButton) {
+        downloadButton.disabled = !state.rows.length || !state.matches.length;
+        downloadButton.setAttribute(
+          'aria-label',
+          state.matches.length
+            ? 'Download ' + formatNumber(state.matches.length) + ' matching indicators as CSV'
+            : 'Download matching indicators as CSV'
+        );
+      }
+      if (downloadNote) {
+        downloadNote.hidden = !state.rows.length;
+        downloadNote.textContent = state.matches.length
+          ? formatNumber(state.matches.length) + ' matching indicator' +
+            (state.matches.length === 1 ? '' : 's') +
+            ' currently loaded in the preview.'
+          : 'No matching indicators currently loaded in the preview.';
+      }
     };
 
     const apply = ({ sync = true } = {}) => {
       const matches = filteredRows().sort(compare);
+      state.matches = matches;
       const displayed = matches.slice(0, state.limit);
       render(displayed);
       updateSummary(matches, displayed);
@@ -2446,6 +2483,7 @@
         refreshButton,
         clearButton,
         shareButton,
+        downloadButton,
       ].forEach((control) => {
         if (control) control.disabled = disabled;
       });
@@ -2479,6 +2517,7 @@
       } catch (error) {
         console.error('Unable to load live preview', error);
         state.rows = [];
+        state.matches = [];
         render([]);
         updateSummary([], []);
         if (summary.meta) summary.meta.hidden = true;
@@ -2492,7 +2531,7 @@
         Object.values(facetRoots).forEach((root) => {
           root.disabled = !hasRows;
         });
-        [signalSelect, sortSelect, searchInput, shareButton]
+        [signalSelect, sortSelect, searchInput, shareButton, downloadButton]
           .forEach((control) => {
             if (control) control.disabled = !hasRows;
           });
@@ -2578,6 +2617,19 @@
         apply();
       }
     });
+    document.addEventListener('keydown', (event) => {
+      const target = event.target;
+      const isTyping = target instanceof HTMLElement && (
+        target.matches('input, select, textarea, [contenteditable="true"]')
+      );
+      if (event.key === '/' && !isTyping && !event.metaKey && !event.ctrlKey && !event.altKey) {
+        event.preventDefault();
+        searchInput?.focus();
+      }
+      if (event.key === 'Escape' && !isTyping) {
+        facetMenus.forEach((menu) => { menu.open = false; });
+      }
+    });
     clearButton?.addEventListener('click', () => {
       Object.assign(state, {
         types: [],
@@ -2601,6 +2653,14 @@
     shareButton?.addEventListener('click', async () => {
       const url = writeUrl({ includeSearch: true });
       await copyOrPrompt(url.toString(), 'Shareable dashboard view copied.', 'Copy this shareable link:');
+    });
+    downloadButton?.addEventListener('click', () => {
+      if (downloadCsv(state.matches)) {
+        showToast(
+          'Downloaded ' + formatNumber(state.matches.length) +
+            ' matching indicator' + (state.matches.length === 1 ? '' : 's') + '.'
+        );
+      }
     });
     refreshButton?.addEventListener('click', () => load({ forceRefresh: true }));
     retryButton?.addEventListener('click', () => load({ forceRefresh: true }));
