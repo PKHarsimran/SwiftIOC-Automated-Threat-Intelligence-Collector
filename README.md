@@ -357,6 +357,7 @@ Run `python -m swiftioc --help` for the full list of switches. Highlights:
 | `--grace-on-404 name…` | Treat HTTP 404 for listed sources as a non-fatal empty result. |
 | `--fail-on-empty name…` | Fail the run if any listed sources return zero indicators. |
 | `--fail-if-stale name=N` | Fail when the newest indicator from `name` is older than `N` hours. |
+| `--warn-if-volume-drop name=N` | Warn when a source returns at least `N` percent fewer rows than the prior run. |
 | `--save-raw-dir PATH` | Persist raw feed responses for later inspection. |
 | `--diag-json PATH` | Write diagnostics JSON (defaults to `<out-dir>/diagnostics/run.json`). |
 | `--report PATH` | Write Markdown run report (defaults to `<out-dir>/diagnostics/REPORT.md`). |
