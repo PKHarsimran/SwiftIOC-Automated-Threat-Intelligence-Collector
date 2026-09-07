@@ -251,6 +251,23 @@
           aria-label="Proportion of indicators by score band"></div>
       </section>
 
+      <section class="delta-strip" data-delta-root hidden aria-labelledby="delta-heading">
+        <div class="delta-copy">
+          <p class="eyebrow">SOC Delta · since the previous collection</p>
+          <h2 id="delta-heading">What changed</h2>
+          <p>Poll the small event stream for additions, material updates, and removals from the published feed.</p>
+        </div>
+        <dl class="delta-counts">
+          <div><dt>Added</dt><dd data-stat="delta-added">0</dd></div>
+          <div><dt>Updated</dt><dd data-stat="delta-updated">0</dd></div>
+          <div><dt>Removed</dt><dd data-stat="delta-removed">0</dd></div>
+        </dl>
+        <div class="delta-actions">
+          <a class="button-link primary" href="iocs/delta.json" download>Delta JSON</a>
+          <a class="button-link" href="iocs/delta.jsonl" download>Event stream</a>
+        </div>
+      </section>
+
       <div class="dashboard-main">
         <section
           id="live-preview"
