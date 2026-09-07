@@ -207,10 +207,11 @@ def main() -> int:
 
     out_dir: Path = args.out_dir
     previous_feed_path = out_dir / "iocs" / "latest.jsonl"
-    baseline_available = previous_feed_path.exists()
-    previous_rows = load_previous_feed(previous_feed_path) if baseline_available else []
+    previous_rows = load_previous_feed(previous_feed_path) if previous_feed_path.exists() else []
+    baseline_available = False
     previous_counts: Dict[str, int] = {}
     previous_generated_at: Optional[str] = None
+    previous_total: Optional[int] = None
     previous_diag = out_dir / "diagnostics" / "run.json"
     if previous_diag.exists():
         try:
@@ -219,8 +220,18 @@ def main() -> int:
                 previous_counts = {str(k): int(v) for k, v in raw_previous["counts"].items()}
             if isinstance(raw_previous, dict) and isinstance(raw_previous.get("ts"), str):
                 previous_generated_at = raw_previous["ts"]
+            if isinstance(raw_previous, dict) and isinstance(raw_previous.get("total"), int):
+                previous_total = raw_previous["total"]
         except (OSError, ValueError, TypeError):
             logger.warning("Could not read previous source counts from %s", previous_diag)
+    if previous_feed_path.exists() and previous_total is not None and previous_total == len(previous_rows):
+        baseline_available = True
+    elif previous_feed_path.exists():
+        logger.warning(
+            "Ignoring unvalidated SOC Delta baseline: diagnostics expected %s rows, loaded %d",
+            previous_total if previous_total is not None else "unknown",
+            len(previous_rows),
+        )
 
     # collect
     rows, counts, stats = collect_from_yaml(
