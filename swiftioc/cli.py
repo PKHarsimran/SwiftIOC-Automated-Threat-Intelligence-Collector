@@ -27,10 +27,13 @@ from .scoring import (
 from .writers import (
     write_badge_json,
     write_changelog,
+    build_delta,
     write_csv,
     write_dashboard_feed,
+    write_delta,
     write_history,
     write_json,
+    write_json_document,
     write_jsonl,
     write_misp_feed,
     write_rss_feed,
@@ -201,13 +204,19 @@ def main() -> int:
         cfg = yaml.safe_load(f) or {}
 
     out_dir: Path = args.out_dir
+    previous_feed_path = out_dir / "iocs" / "latest.jsonl"
+    baseline_available = previous_feed_path.exists()
+    previous_rows = load_previous_feed(previous_feed_path) if baseline_available else []
     previous_counts: Dict[str, int] = {}
+    previous_generated_at: Optional[str] = None
     previous_diag = out_dir / "diagnostics" / "run.json"
     if previous_diag.exists():
         try:
             raw_previous = json.loads(previous_diag.read_text(encoding="utf-8"))
             if isinstance(raw_previous, dict) and isinstance(raw_previous.get("counts"), dict):
                 previous_counts = {str(k): int(v) for k, v in raw_previous["counts"].items()}
+            if isinstance(raw_previous, dict) and isinstance(raw_previous.get("ts"), str):
+                previous_generated_at = raw_previous["ts"]
         except (OSError, ValueError, TypeError):
             logger.warning("Could not read previous source counts from %s", previous_diag)
 
@@ -235,8 +244,7 @@ def main() -> int:
     # no longer being reported decay by age until they expire below --min-score.
     carried_forward = 0
     if args.persist_feed:
-        previous = load_previous_feed(out_dir / "iocs" / "latest.jsonl")
-        rows, carried_forward = merge_with_previous(rows, previous)
+        rows, carried_forward = merge_with_previous(rows, previous_rows)
         logger.info("Persisted feed: carried forward %d indicators from previous run", carried_forward)
 
     score_now = now_utc()
@@ -287,6 +295,18 @@ def main() -> int:
     logger.info("Dashboard feed: top %d rows written", dashboard_written)
 
     run_ts = iso(now_utc())
+    delta = build_delta(
+        previous_rows,
+        rows,
+        generated_at=run_ts,
+        previous_generated_at=previous_generated_at,
+        baseline_available=baseline_available,
+    )
+    write_delta(out_dir / "iocs" / "delta.json", out_dir / "iocs" / "delta.jsonl", delta)
+    logger.info(
+        "SOC Delta: %d added, %d updated, %d removed",
+        delta["counts"]["added"], delta["counts"]["updated"], delta["counts"]["removed"],
+    )
 
     if args.misp_feed:
         misp_count = write_misp_feed(out_dir / "misp", high_conf, run_ts=run_ts)
@@ -375,6 +395,8 @@ def main() -> int:
         "corroborated_total": corroborated_total,
         "high_confidence_total": len(high_conf),
         "high_confidence_score": args.high_confidence_score,
+        "delta_counts": delta["counts"],
+        "delta_baseline_available": delta["baseline_available"],
         "counts": counts,
         "stored_counts": stored_counts,
         "type_counts": {k: v for k, v in type_totals},
@@ -389,7 +411,7 @@ def main() -> int:
         "ts": run_ts,
     }
     if args.diag_json:
-        args.diag_json.write_text(json.dumps(diag, ensure_ascii=False, indent=2), encoding="utf-8")
+        write_json_document(args.diag_json, diag)
 
     if args.report:
         report_lines: List[str] = [
