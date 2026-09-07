@@ -204,6 +204,22 @@
     URL.revokeObjectURL(url);
   };
 
+  const downloadCsv = (rows) => {
+    if (!dashboardCore?.rowsToCsv || !rows.length) return false;
+    const blob = new Blob([dashboardCore.rowsToCsv(rows)], {
+      type: 'text/csv;charset=utf-8',
+    });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'swiftioc-matching-indicators.csv';
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+    return true;
+  };
+
   // Compact label for a possibly multi-source row: "feodo +2".
   const primarySourceLabel = (row) => {
     if (!row) return 'unknown';
@@ -1834,6 +1850,7 @@
     const searchInput = qs('[data-preview-search]', container);
     const clearButton = qs('[data-preview-clear]', container);
     const shareButton = qs('[data-preview-share]', container);
+    const downloadButton = qs('[data-preview-download]', container);
     const filterCount = qs('[data-preview-filter-count]', container);
     const refreshButton = qs('[data-preview-refresh]');
     const sortButtons = qsa('[data-preview-sort]', table);
@@ -1877,6 +1894,7 @@
       stats: null,
       sourcePool: 0,
       loading: false,
+      matches: [],
     };
 
     const urlKeys = ['type', 'source', 'tag', 'signal', 'score', 'age', 'rows', 'sort', 'dir'];
@@ -2325,10 +2343,12 @@
         filterCount.textContent = String(count);
       }
       if (shareButton) shareButton.disabled = !state.rows.length;
+      if (downloadButton) downloadButton.disabled = !state.matches.length;
     };
 
     const apply = ({ sync = true } = {}) => {
       const matches = filteredRows().sort(compare);
+      state.matches = matches;
       const displayed = matches.slice(0, state.limit);
       render(displayed);
       updateSummary(matches, displayed);
@@ -2446,6 +2466,7 @@
         refreshButton,
         clearButton,
         shareButton,
+        downloadButton,
       ].forEach((control) => {
         if (control) control.disabled = disabled;
       });
@@ -2492,7 +2513,7 @@
         Object.values(facetRoots).forEach((root) => {
           root.disabled = !hasRows;
         });
-        [signalSelect, sortSelect, searchInput, shareButton]
+        [signalSelect, sortSelect, searchInput, shareButton, downloadButton]
           .forEach((control) => {
             if (control) control.disabled = !hasRows;
           });
@@ -2601,6 +2622,14 @@
     shareButton?.addEventListener('click', async () => {
       const url = writeUrl({ includeSearch: true });
       await copyOrPrompt(url.toString(), 'Shareable dashboard view copied.', 'Copy this shareable link:');
+    });
+    downloadButton?.addEventListener('click', () => {
+      if (downloadCsv(state.matches)) {
+        showToast(
+          'Downloaded ' + formatNumber(state.matches.length) +
+            ' matching indicator' + (state.matches.length === 1 ? '' : 's') + '.'
+        );
+      }
     });
     refreshButton?.addEventListener('click', () => load({ forceRefresh: true }));
     retryButton?.addEventListener('click', () => load({ forceRefresh: true }));
