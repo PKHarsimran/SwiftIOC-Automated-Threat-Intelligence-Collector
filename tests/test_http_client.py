@@ -83,6 +83,13 @@ def test_http_get_latency_includes_streamed_body(monkeypatch):
     assert hc.get_fetch_metrics()["src"]["ms"] == 125
 
 
+def test_http_get_aggregates_paginated_source_metrics(monkeypatch):
+    _use_fake_session(monkeypatch, [FakeResponse(body=b"one"), FakeResponse(body=b"twos")])
+    hc.http_get("http://feed.example/one", name="src")
+    hc.http_get("http://feed.example/two", name="src")
+    assert hc.get_fetch_metrics()["src"] == {"ms": 0, "bytes": 7, "status": 200, "requests": 2}
+
+
 def test_http_get_rejects_oversized_content_length(monkeypatch):
     huge = str(hc.MAX_RESPONSE_BYTES + 1)
     _use_fake_session(monkeypatch, [FakeResponse(headers={"Content-Length": huge}, body=b"x")])

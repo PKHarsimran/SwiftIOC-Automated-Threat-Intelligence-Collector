@@ -43,8 +43,9 @@ _SESSION: Optional[requests.Session] = None
 _FEEDPARSER = None
 _SAVE_RAW_DIR: Optional[Path] = None
 HTTP_DEBUG = False
-# Per-fetch telemetry ({name: {ms, bytes, status}}) filled by http_get, drained
-# into diagnostics so the dashboard can show a feed-health / latency panel.
+# Per-source telemetry ({name: {ms, bytes, status, requests}}) filled by
+# http_get, drained into diagnostics so the dashboard can show a feed-health /
+# latency panel. A parser may make several paginated or fallback requests.
 _FETCH_METRICS: Dict[str, Dict[str, Any]] = {}
 
 
@@ -194,10 +195,12 @@ def http_get(url: str, *, name: str, kind: str = "text", timeout: int = 20) -> s
     # large feed look artificially fast in the dashboard diagnostics.
     dt = time.perf_counter() - t0
     # Record telemetry before raise_for_status so failed statuses are captured.
+    previous = _FETCH_METRICS.get(name, {})
     _FETCH_METRICS[name] = {
-        "ms": round(dt * 1000),
-        "bytes": len(raw),
+        "ms": previous.get("ms", 0) + round(dt * 1000),
+        "bytes": previous.get("bytes", 0) + len(raw),
         "status": r.status_code,
+        "requests": previous.get("requests", 0) + 1,
     }
     if HTTP_DEBUG:
         logger.debug("HTTP %s %.2fs %s [%s]", r.status_code, dt, current_url, name)
