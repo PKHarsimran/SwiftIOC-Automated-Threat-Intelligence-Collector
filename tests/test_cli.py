@@ -189,3 +189,26 @@ def test_cli_delta_tracks_changes_between_published_runs(tmp_path, monkeypatch):
     assert {event["current"]["indicator"] for event in delta["events"] if event["action"] == "added"} == {
         "4[.]4[.]4[.]4"
     }
+
+
+def test_cli_rejects_truncated_delta_baseline(tmp_path, monkeypatch):
+    sources = tmp_path / "sources.yml"
+    _write_sources_yml(sources)
+    out_dir = tmp_path / "out"
+    iocs = out_dir / "iocs"
+    diagnostics = out_dir / "diagnostics"
+    iocs.mkdir(parents=True)
+    diagnostics.mkdir(parents=True)
+    (iocs / "latest.jsonl").write_text('{"truncated":', encoding="utf-8")
+    (diagnostics / "run.json").write_text(
+        json.dumps({"total": 250, "counts": {}, "ts": "2026-09-08T00:00:00Z"}),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(si, "http_get", _fake_http_get)
+    assert _run_main(monkeypatch, [
+        "swiftioc", "--sources", str(sources), "--out-dir", str(out_dir), "--skip-rss",
+    ]) == 0
+    delta = json.loads((iocs / "delta.json").read_text())
+    assert delta["baseline_available"] is False
+    assert delta["events"] == []
+    assert delta["counts"] == {"added": 0, "updated": 0, "removed": 0}
