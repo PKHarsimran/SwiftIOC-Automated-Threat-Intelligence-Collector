@@ -14,7 +14,7 @@ from typing import Any, Dict, List, Optional
 
 from .http_client import logger
 from .models import Indicator, iso, now_utc, parse_dt, refang
-from .scoring import source_count
+from .scoring import explain_score, source_count
 
 # Stable namespace for deterministic STIX 2.1 identifiers (uuid5).
 STIX_NAMESPACE = uuid.uuid5(uuid.NAMESPACE_DNS, "swiftioc.threatintel")
@@ -252,6 +252,10 @@ def write_dashboard_feed(path: Path, rows: List[Indicator], *, limit: int = 1000
                         "score": r.score,
                         "sightings": r.sightings,
                         "tags": r.tags,
+                        "reference": r.reference,
+                        "context": r.context,
+                        "tlp": r.tlp,
+                        "score_factors": explain_score(r),
                     },
                     ensure_ascii=False,
                 )
@@ -287,7 +291,7 @@ def _stix_pattern(itype: str, indicator: str) -> Optional[str]:
     return None
 
 
-def write_stix(path: Path, rows: List[Indicator]) -> None:
+def build_stix_bundle(rows: List[Indicator]) -> Dict[str, Any]:
     now = iso(now_utc())
     common = {
         "created": now,
@@ -338,9 +342,27 @@ def write_stix(path: Path, rows: List[Indicator]) -> None:
             "labels": [t for t in r.tags.split(",") if t],
             "x_swiftioc_source": r.source, "x_swiftioc_tlp": r.tlp, "x_swiftioc_reference": r.reference,
         })
-    bundle = {"type": "bundle", "id": f"bundle--{uuid.uuid5(STIX_NAMESPACE, 'bundle:' + now)}", "objects": objects}
-    with _atomic_text_writer(path) as f:
-        json.dump(bundle, f, ensure_ascii=False, indent=2)
+    return {"type": "bundle", "id": f"bundle--{uuid.uuid5(STIX_NAMESPACE, 'bundle:' + now)}", "objects": objects}
+
+
+def write_stix(
+    path: Path, rows: List[Indicator], *, bundle: Optional[Dict[str, Any]] = None,
+) -> None:
+    write_json_document(path, bundle or build_stix_bundle(rows))
+
+
+def write_taxii_envelope(
+    path: Path, rows: List[Indicator], *, bundle: Optional[Dict[str, Any]] = None,
+) -> int:
+    """Publish the current STIX objects in a TAXII 2.1 envelope.
+
+    This static representation lets TAXII-aware importers consume the same
+    object list without requiring a long-running TAXII server. HTTP discovery,
+    filtering, and pagination remain a future server concern.
+    """
+    objects = (bundle or build_stix_bundle(rows))["objects"]
+    write_json_document(path, {"more": False, "objects": objects})
+    return len(objects)
 
 
 # ---------------- MISP feed ----------------
