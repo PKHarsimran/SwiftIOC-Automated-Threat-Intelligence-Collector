@@ -32,6 +32,7 @@ from .http_client import choose_ua, ensure_text, logger
 from .models import (
     DATE_FIELD_RE,
     JA3_RE,
+    SHA256_RE,
     TAGS_FIELD_RE,
     Indicator,
     classify,
@@ -283,24 +284,21 @@ def fetch_malwarebazaar_csv(
             raise
     out: List[Indicator] = []
     now = now_utc()
-    for row in csv.reader(io.StringIO(text)):
-        if not row or row[0].startswith("#"):
+    # Export columns: first_seen_utc, sha256_hash, md5_hash, sha1_hash,
+    # reporter, file_name, file_type_guess, mime_type, signature, ...
+    # Spaces precede quoted fields in the live export; skipinitialspace
+    # keeps commas in quoted filenames from shifting subsequent columns.
+    for row in csv.reader(io.StringIO(text), skipinitialspace=True):
+        if len(row) < 2 or row[0].strip().startswith("#"):
             continue
-        try:
-            first_seen = parse_dt(row[0].strip())
-            sha256 = (row[3] if len(row) > 3 else "").strip().strip('"')
-            sig_raw = ""
-            if len(row) > 8:
-                sig_raw = row[8]
-            elif len(row) > 7:
-                sig_raw = row[7]
-            sig = sig_raw.strip().strip('"')
-            if sig.lower() in {"", "n/a", "na", "none"}:
-                sig = ""
-        except Exception:
+        first_seen = parse_dt(row[0].strip())
+        sha256 = row[1].strip()
+        if not SHA256_RE.fullmatch(sha256):
             continue
-        if not sha256:
-            continue
+        # Column 7 is MIME type, never a fallback malware signature.
+        sig = row[8].strip() if len(row) > 8 else ""
+        if sig.lower() in {"", "n/a", "na", "none"}:
+            sig = ""
         if first_seen and first_seen < ws:
             continue
         out.append(

@@ -1089,11 +1089,11 @@ def test_sslbl_ja3_column_order(monkeypatch):
 
 
 def test_malwarebazaar_hash_is_high_confidence(monkeypatch):
-    # Parser reads sha256 from row[3] and signature from row[8].
+    # MalwareBazaar columns: first_seen_utc, sha256_hash, md5_hash, sha1_hash.
     sha = "a" * 64
     payload = (
         "# comment banner\n"
-        '"2025-01-01 00:00:00","md5x","sha1x","' + sha + '","reporter",'
+        f'"2025-01-01 00:00:00","{sha}","{"b" * 32}","{"c" * 40}","reporter",'
         '"sample.exe","exe","application/x-dosexec","AgentTesla"\n'
     )
     monkeypatch.setattr(si, "http_get", lambda *a, **k: payload)
