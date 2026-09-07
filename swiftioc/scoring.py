@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 from .fp import is_false_positive
-from .models import Indicator, merge_conf, now_utc, parse_dt
+from .models import Indicator, classify, merge_conf, now_utc, parse_dt
 
 
 # ---------------- scoring: corroboration + age decay ----------------
@@ -122,7 +122,9 @@ def load_previous_feed(path: Path) -> List[Indicator]:
     Tolerant of missing files, malformed lines, and schema drift (unknown
     keys are ignored; rows missing required fields are skipped). Entries that
     the current false-positive rules would reject are dropped on load, so an
-    improved FP list retroactively cleans the carried-forward feed.
+    improved FP list retroactively cleans the carried-forward feed. File
+    hashes are validated and reclassified to repair legacy type mismatches
+    (notably MalwareBazaar SHA-1 values previously labeled as SHA-256).
     """
     if not path.exists():
         return []
@@ -142,6 +144,14 @@ def load_previous_feed(path: Path) -> List[Indicator]:
             ind = Indicator(**{k: v for k, v in data.items() if k in field_names})
         except TypeError:
             continue
+        if ind.type in {"md5", "sha1", "sha256", "sha512"}:
+            if not isinstance(ind.indicator, str):
+                continue
+            actual_type = classify(ind.indicator)
+            if actual_type not in {"md5", "sha1", "sha256", "sha512"}:
+                continue
+            ind.type = actual_type
+            ind.indicator = ind.indicator.strip().lower()
         if is_false_positive(ind.type, ind.indicator):
             continue
         out.append(ind)
@@ -159,6 +169,7 @@ def merge_with_previous(current: List[Indicator], previous: List[Indicator]) -> 
     Returns (merged, carried_forward).
     """
     uniq: Dict[Tuple[str, str], Indicator] = {i.key(): i for i in current}
+    current_keys = set(uniq)
     carried = 0
     for prev in previous:
         k = prev.key()
@@ -176,9 +187,16 @@ def merge_with_previous(current: List[Indicator], previous: List[Indicator]) -> 
         merged_sources = set(filter(None, cur.source.split(","))) | set(filter(None, prev.source.split(",")))
         cur.source = ",".join(sorted(merged_sources))
         cur.confidence = merge_conf(cur.confidence, prev.confidence)
-        # Re-observed this run: one more sighting on top of the accumulated
-        # history. max() guards against a malformed/reset previous count.
-        cur.sightings = max(prev.sightings, 1) + 1
+        if k in current_keys:
+            # Multiple legacy rows can converge after hash-type repair.
+            # Count this run once, retaining the largest historical count.
+            cur.sightings = max(cur.sightings, max(prev.sightings, 1) + 1)
+        else:
+            # Duplicate previous-only rows are not a fresh observation.
+            p_last = parse_dt(prev.last_seen)
+            c_last = parse_dt(cur.last_seen)
+            if p_last and (c_last is None or p_last > c_last):
+                cur.last_seen = prev.last_seen
+            cur.sightings = max(cur.sightings, prev.sightings, 1)
     merged = sorted(uniq.values(), key=lambda r: (r.type, r.indicator, r.source))
     return merged, carried
-
