@@ -441,6 +441,16 @@
   };
 
   const explainScore = (row) => {
+    const factors = row?.scoreFactors;
+    if (factors && typeof factors.confidence_base === 'number') {
+      const age = typeof factors.age_hours === 'number'
+        ? Math.round(factors.age_hours) + 'h old'
+        : 'unknown age';
+      return 'Score ' + factors.score + ' = confidence base ' +
+        factors.confidence_base + ' + corroboration ' +
+        factors.corroboration_bonus + ', adjusted for ' + age +
+        ' using a ' + Math.round(factors.half_life_hours / 24) + '-day half-life.';
+    }
     const sourceText = (row?.sourceCount || 0) >= 2
       ? 'confirmed by ' + row.sourceCount + ' independent sources'
       : 'reported by one source';
@@ -1112,6 +1122,10 @@
       reference,
       context,
       tlp,
+      scoreFactors:
+        row.score_factors && typeof row.score_factors === 'object'
+          ? row.score_factors
+          : null,
       isDuplicate: Boolean(row.is_duplicate || row.duplicate),
       raw: row,
     };
@@ -1622,6 +1636,15 @@
     setStatText('high-confidence', formatNumber(stats.highConfidence ?? 0));
     setStatText('corroborated', formatNumber(stats.corroborated ?? 0));
     setStatText('avg-score', stats.avgScore != null ? String(stats.avgScore) : '—');
+    const deltaRoot = qs('[data-delta-root]');
+    const delta = dataset?.diag?.delta_counts;
+    const hasDeltaBaseline = dataset?.diag?.delta_baseline_available === true;
+    if (deltaRoot) deltaRoot.hidden = !hasDeltaBaseline;
+    if (hasDeltaBaseline && delta) {
+      setStatText('delta-added', formatNumber(delta.added));
+      setStatText('delta-updated', formatNumber(delta.updated));
+      setStatText('delta-removed', formatNumber(delta.removed));
+    }
     const hcPct =
       stats.total > 0 ? ((stats.highConfidence ?? 0) / stats.total) * 100 : 0;
     setStatText('high-confidence-caption', `${hcPct.toFixed(1)}% of the feed`);

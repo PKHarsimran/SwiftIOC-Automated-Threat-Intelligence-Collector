@@ -370,6 +370,13 @@ Run `python -m swiftioc --help` for the full list of switches. Highlights:
 | `--log-file-level LEVEL` | Control the file log level (default `DEBUG`). |
 
 ## 📦 Outputs & diagnostics
+
+Every run also publishes `iocs/delta.json` and `iocs/delta.jsonl`. These SOC
+Delta feeds describe indicators added to the published snapshot, removed from
+it, or materially changed since the previous run. A removal means the IOC is no
+longer in the current SwiftIOC snapshot; it does not assert that the IOC is
+benign. The first run emits an empty delta until a baseline exists.
+
 The collector populates the following structure (paths relative to `--out-dir`):
 
 ```
@@ -382,6 +389,9 @@ public/
 │   ├── latest.tsv
 │   ├── latest.json
 │   ├── latest.jsonl
+│   ├── delta.json              # SOC Delta envelope + counts
+│   ├── delta.jsonl             # stream-friendly change events
+│   ├── taxii2-envelope.json    # TAXII 2.1 envelope containing STIX objects
 │   ├── high_confidence.csv    # curated: score ≥80 or 2+ sources
 │   ├── high_confidence.jsonl  # same, machine-readable
 │   ├── dashboard.jsonl        # compact top-N feed the web dashboard loads

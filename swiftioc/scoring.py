@@ -2,10 +2,10 @@
 from __future__ import annotations
 
 import json
-from dataclasses import fields as dataclass_fields
+from dataclasses import fields as dataclass_fields, replace
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from .fp import is_false_positive
 from .models import Indicator, classify, merge_conf, now_utc, parse_dt
@@ -43,13 +43,8 @@ DECAY_HALF_LIFE_HOURS: Dict[str, float] = {
 DEFAULT_HALF_LIFE_HOURS = 24 * 14.0
 
 
-def compute_score(indicator: Indicator, now: Optional[datetime] = None) -> int:
-    """Score an indicator 0-100: confidence base + corroboration, decayed by age.
-
-    Decay is exponential on hours since ``last_seen`` with a per-type
-    half-life, so a freshly observed indicator keeps its full score and a
-    stale one fades until it drops below the expiry threshold.
-    """
+def explain_score(indicator: Indicator, now: Optional[datetime] = None) -> Dict[str, Any]:
+    """Return the score and the factors used to calculate it."""
     now = now or now_utc()
     base = SCORE_BASE.get(indicator.confidence, 50)
     n_sources = len([s for s in indicator.source.split(",") if s.strip()])
@@ -58,7 +53,26 @@ def compute_score(indicator: Indicator, now: Optional[datetime] = None) -> int:
     age_hours = max((now - last).total_seconds() / 3600.0, 0.0)
     half_life = DECAY_HALF_LIFE_HOURS.get(indicator.type, DEFAULT_HALF_LIFE_HOURS)
     decay = 0.5 ** (age_hours / half_life)
-    return max(0, min(100, round((base + bonus) * decay)))
+    score = max(0, min(100, round((base + bonus) * decay)))
+    return {
+        "score": score,
+        "confidence_base": base,
+        "source_count": n_sources,
+        "corroboration_bonus": bonus,
+        "age_hours": round(age_hours, 1),
+        "half_life_hours": half_life,
+        "decay_factor": round(decay, 4),
+    }
+
+
+def compute_score(indicator: Indicator, now: Optional[datetime] = None) -> int:
+    """Score an indicator 0-100: confidence base + corroboration, decayed by age.
+
+    Decay is exponential on hours since ``last_seen`` with a per-type
+    half-life, so a freshly observed indicator keeps its full score and a
+    stale one fades until it drops below the expiry threshold.
+    """
+    return int(explain_score(indicator, now)["score"])
 
 
 def source_count(indicator: Indicator) -> int:
@@ -174,7 +188,11 @@ def merge_with_previous(current: List[Indicator], previous: List[Indicator]) -> 
     for prev in previous:
         k = prev.key()
         if k not in uniq:
-            uniq[k] = prev
+            # Keep the loaded snapshot immutable. The CLI rescoring pass
+            # mutates current rows; sharing this object with ``previous`` made
+            # SOC Delta compare the new score with itself and hid decay/band
+            # changes. It also corrupted removal payloads with the new score.
+            uniq[k] = replace(prev)
             carried += 1
             continue
         cur = uniq[k]
