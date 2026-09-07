@@ -141,6 +141,13 @@ def _validate_redirect_target(url: str) -> None:
         raise requests.exceptions.RequestException(f"Refusing redirect to a non-public host: {url!r}")
 
 
+def _origin(url: str) -> tuple[str, str, int]:
+    """Return a normalized HTTP origin for redirect credential handling."""
+    parsed = urlparse(url)
+    default_port = 443 if parsed.scheme.lower() == "https" else 80
+    return (parsed.scheme.lower(), (parsed.hostname or "").lower(), parsed.port or default_port)
+
+
 def _read_capped(r: requests.Response, max_bytes: int) -> bytes:
     """Read a streamed response body, aborting before it exceeds max_bytes.
 
@@ -188,7 +195,15 @@ def http_get(
         hops += 1
         if not location or hops > MAX_REDIRECTS:
             raise requests.exceptions.TooManyRedirects(f"Exceeded {MAX_REDIRECTS} redirects fetching {url!r}")
-        current_url = urljoin(current_url, location)
+        next_url = urljoin(current_url, location)
+        if _origin(next_url) != _origin(current_url):
+            # A redirect is untrusted until its target is validated. Never
+            # forward credentials (for example an NVD API key) to another
+            # origin, even when that host resolves to a public address.
+            for key in list(request_headers):
+                if key.lower() in {"apikey", "authorization", "cookie", "proxy-authorization"}:
+                    del request_headers[key]
+        current_url = next_url
         _validate_redirect_target(current_url)
         r = s.get(current_url, headers=request_headers, timeout=timeout, stream=True, allow_redirects=False)
 

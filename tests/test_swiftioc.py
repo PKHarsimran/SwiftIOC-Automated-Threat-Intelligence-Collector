@@ -12,6 +12,7 @@ import uuid
 from datetime import timedelta
 
 import pytest
+import requests
 
 import swiftioc as si
 
@@ -1191,6 +1192,26 @@ def test_nvd_parser_fetches_all_result_pages(monkeypatch):
     assert [row.indicator for row in out] == ["CVE-2026-0001", "CVE-2026-0002", "CVE-2026-0003"]
     assert len(calls) == 2
     assert "startIndex=2" in calls[1]
+
+
+def test_nvd_parser_keeps_completed_pages_when_later_page_fails(monkeypatch):
+    now = si.now_utc()
+
+    def fake_get(url, *a, **k):
+        from urllib.parse import parse_qs, urlparse
+        start = int(parse_qs(urlparse(url).query).get("startIndex", ["0"])[0])
+        if start:
+            raise requests.exceptions.RequestException("rate limited")
+        return json.dumps({"totalResults": 2, "resultsPerPage": 1, "vulnerabilities": [{"cve": {
+            "id": "CVE-2026-0001", "published": si.iso(now), "lastModified": si.iso(now),
+            "descriptions": [], "metrics": {},
+        }}]})
+
+    monkeypatch.setattr(si, "http_get", fake_get)
+    rows = si.fetch_nvd_recent(
+        "https://services.nvd.nist.gov/rest/json/cves/2.0/?resultsPerPage=1", "ref", "nvd", now - timedelta(minutes=1),
+    )
+    assert [row.indicator for row in rows] == ["CVE-2026-0001"]
 
 
 def test_threatfox_export_endpoint_shape(monkeypatch):

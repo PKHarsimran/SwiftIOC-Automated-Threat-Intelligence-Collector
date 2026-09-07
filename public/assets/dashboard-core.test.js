@@ -156,4 +156,9 @@ test('dashboard markup keeps IDs and labelled controls consistent', () => {
       html.indexOf('src="assets/dashboard.js'),
     'Pure helpers must load before the dashboard controller'
   );
+  assert.equal(
+    /<\/a>\s*>\s*<a\b/.test(html),
+    false,
+    'Export links must not render stray greater-than characters'
+  );
 });

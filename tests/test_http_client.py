@@ -130,6 +130,21 @@ def test_http_get_follows_redirect_to_public_host(monkeypatch):
     assert [url for url, _headers in fake.calls] == ["http://feed.example/x", "http://93.184.216.34/final"]
 
 
+def test_http_get_strips_credentials_on_cross_origin_redirect(monkeypatch):
+    fake = _use_fake_session(
+        monkeypatch,
+        [
+            FakeResponse(status_code=302, headers={"Location": "https://93.184.216.34/final"}, is_redirect=True),
+            FakeResponse(body=b"final content"),
+        ],
+    )
+    hc.http_get("https://feed.example/x", name="src", headers={"apiKey": "secret", "Authorization": "Bearer secret"})
+    redirected_headers = fake.calls[1][1]
+    assert "apiKey" not in redirected_headers
+    assert "Authorization" not in redirected_headers
+    assert "User-Agent" in redirected_headers
+
+
 def test_http_get_blocks_redirect_to_link_local_metadata_ip(monkeypatch):
     _use_fake_session(
         monkeypatch,
