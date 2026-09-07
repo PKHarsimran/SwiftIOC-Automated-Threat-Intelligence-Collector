@@ -43,6 +43,9 @@ def _atomic_text_writer(path: Path, *, newline: Optional[str] = None):
     path.parent.mkdir(parents=True, exist_ok=True)
     handle = tempfile.NamedTemporaryFile("w", encoding="utf-8", newline=newline, dir=path.parent, delete=False)
     temp_path = Path(handle.name)
+    # NamedTemporaryFile defaults to 0600; preserve public read access after
+    # os.replace for deployments where the static server runs as another user.
+    os.chmod(temp_path, 0o644)
     try:
         with handle:
             yield handle
@@ -471,4 +474,3 @@ def write_changelog(path: Path, counts: Dict[str, int], total: int, *, max_entri
     entries = entries[-max_entries:]
     body = "# Changelog\n\n" + "\n\n".join(entries) + "\n"
     path.write_text(body, encoding="utf-8")
-
