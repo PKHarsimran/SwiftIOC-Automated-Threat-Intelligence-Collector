@@ -167,8 +167,8 @@ def fetch_nvd_recent(url: str, ref_url: str, source: str, ws: datetime, *, api_k
                 next_url = page_url._replace(query=urlencode(page_query, doseq=True)).geturl()
                 try:
                     next_data = json.loads(ensure_text(_pkg.http_get(next_url, name=source, headers=request_headers)))
-                except json.JSONDecodeError:
-                    logger.warning("%s returned invalid JSON at startIndex %d", source, next_index)
+                except (json.JSONDecodeError, requests.exceptions.RequestException) as exc:
+                    logger.warning("%s pagination stopped at startIndex %d: %s", source, next_index, exc)
                     break
                 next_records = next_data.get("vulnerabilities") if isinstance(next_data, dict) else None
                 if not isinstance(next_records, list):
