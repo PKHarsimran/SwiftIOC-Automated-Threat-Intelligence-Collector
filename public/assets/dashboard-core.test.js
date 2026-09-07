@@ -185,4 +185,6 @@ test('dashboard markup keeps IDs and labelled controls consistent', () => {
   );
   assert.match(html, /data-preview-download/);
   assert.match(html, /data-preview-download-note/);
+  assert.match(html, /data-delta-root/);
+  assert.match(html, /iocs\/delta\.jsonl/);
 });
