@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-09-06T21:54:27Z_
+_Generated 2026-09-07T02:31:53Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-06T21:54:27Z |
+| Generated | 2026-09-07T02:31:53Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 4845 |
+| Duplicates removed | 5421 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 257 |
-| Score (min / avg / max) | 79 / 80.0 / 96 |
-| High-score indicators (≥80) | 7514 |
-| Corroborated (2+ sources) | 257 |
+| Multi-source overlaps | 256 |
+| Score (min / avg / max) | 78 / 80.0 / 96 |
+| High-score indicators (≥80) | 7541 |
+| Corroborated (2+ sources) | 256 |
 | Earliest first_seen | 2017-07-14T18:08:15Z |
-| Newest first_seen | 2026-09-06T21:47:26Z |
+| Newest first_seen | 2026-09-07T02:25:02Z |
 
 ## Top indicators by score
 
@@ -41,13 +41,13 @@ _Generated 2026-09-06T21:54:27Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5640 |
-| greensnow_blocklist | 4134 |
-| ipsum_level5 | 3365 |
-| threatfox_export_json | 1917 |
+| blocklist_de_ssh | 5617 |
+| greensnow_blocklist | 4982 |
+| ipsum_level5 | 3200 |
+| threatfox_export_json | 1953 |
+| binarydefense_banlist | 1877 |
 | spamhaus_drop | 1709 |
 | cisa_kev | 1695 |
-| binarydefense_banlist | 1617 |
 | tor_exit_nodes | 1340 |
 | et_compromised | 564 |
 
@@ -55,12 +55,12 @@ _Generated 2026-09-06T21:54:27Z_
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3093 |
+| cve | 3060 |
 | sha256 | 2755 |
 | ipv4_cidr | 1708 |
-| domain | 1106 |
-| url | 461 |
-| ipv4 | 334 |
+| domain | 1153 |
+| url | 465 |
+| ipv4 | 316 |
 | md5 | 224 |
 | sha1 | 222 |
 | ja3 | 97 |
@@ -69,16 +69,16 @@ _Generated 2026-09-06T21:54:27Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| cve | 3093 |
-| malware | 2780 |
-| threatfox | 2325 |
+| cve | 3060 |
+| malware | 2784 |
+| threatfox | 2354 |
 | drop | 1708 |
 | spamhaus | 1708 |
 | exploited-in-the-wild | 1695 |
-| nvd | 1623 |
-| ClickFix | 861 |
-| high | 728 |
-| Mirai | 673 |
+| nvd | 1590 |
+| ClickFix | 862 |
+| high | 714 |
+| Mirai | 661 |
 
 ## Multi-source overlaps
 
