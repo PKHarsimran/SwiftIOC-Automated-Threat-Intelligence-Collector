@@ -71,6 +71,7 @@ from .scoring import (
     SCORE_BASE,
     apply_retention,
     compute_score,
+    explain_score,
     high_confidence_rows,
     load_previous_feed,
     merge_with_previous,
@@ -107,6 +108,7 @@ from .collect import (
 )
 from .writers import (
     CSV_HEADER,
+    build_stix_bundle,
     MISP_ATTRIBUTE_TYPES,
     MISP_CATEGORY_BY_TYPE,
     STIX_HASH_NAMES,
@@ -126,6 +128,7 @@ from .writers import (
     write_misp_feed,
     write_rss_feed,
     write_stix,
+    write_taxii_envelope,
     write_tsv,
 )
 from .logging_utils import JsonLineFormatter, configure_logging
@@ -150,7 +153,7 @@ __all__ = [
     "choose_ua", "save_raw", "load_feedparser", "UA_POOL", "DEFAULT_UAS",
     "reset_fetch_metrics", "get_fetch_metrics",
     # scoring
-    "compute_score", "source_count", "high_confidence_rows",
+    "compute_score", "explain_score", "source_count", "high_confidence_rows",
     "apply_retention", "load_previous_feed", "merge_with_previous",
     "SCORE_BASE", "CORROBORATION_BONUS", "CORROBORATION_CAP",
     "DECAY_HALF_LIFE_HOURS", "DEFAULT_HALF_LIFE_HOURS",
@@ -165,9 +168,9 @@ __all__ = [
     "collect_from_yaml", "parse_name_int_pairs", "type_counts",
     "type_breakdown", "top_tags",
     # writers
-    "write_csv", "write_tsv", "write_json", "write_json_document", "write_jsonl", "write_stix",
+    "write_csv", "write_tsv", "write_json", "write_json_document", "write_jsonl", "write_stix", "write_taxii_envelope",
     "write_misp_feed", "write_rss_feed", "write_badge_json", "write_history",
-    "write_changelog", "write_dashboard_feed", "build_delta", "write_delta", "CSV_HEADER",
+    "write_changelog", "write_dashboard_feed", "build_delta", "write_delta", "build_stix_bundle", "CSV_HEADER",
     "STIX_NAMESPACE", "STIX_IDENTITY_ID", "STIX_TLP_ID", "STIX_HASH_NAMES",
     "MISP_ATTRIBUTE_TYPES", "MISP_CATEGORY_BY_TYPE",
     # logging
