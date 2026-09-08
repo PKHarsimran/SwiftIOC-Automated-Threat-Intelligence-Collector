@@ -48,7 +48,27 @@ Choose the shortest path for what you are trying to do:
 SwiftIOC deduplicates by `(type, indicator)`: `CVE-2020-1234` and
 `CVE-2020-5678` stay separate even if both appear in NVD or share a generic
 `cve` tag. Reports about **the same CVE** are combined under that CVE ID while
-keeping `reports.cisa_kev` and `reports.nvd` separately. The campaign graph and
+keeping `reports.cisa_kev` and `reports.nvd` separately. The site opens on
+**Known exploited**, showing only confirmed KEV entries, newest additions first.
+It never fills an empty watchlist with unconfirmed CVEs. **Ransomware evidence**
+requires CISA's explicit `Known` ransomware-use value; `Unknown` does not qualify.
+**All CVEs · prioritized** includes exploitation reports and other CVEs, newest
+NVD publications first within each group. The JSON export uses that full priority ordering, with
+rejected records last. CVE ID year and generic IOC scores do not establish recency.
+
+Use **Added to KEV · 30 days**, **Published · 7 days**, or **Updated · 7 days**
+to focus on recent catalog additions, disclosures, or provider record edits.
+These are different events: an old CVE added to KEV today belongs in the first
+view, and an old CVE edited today belongs in the third, not the newly published
+view. Date windows use UTC provider timestamps and exclude unknown, invalid,
+and future dates. Search and exploitation filters apply within each view.
+
+NVD rejected records are hidden by default, with a count and an opt-in control;
+they remain in exports for auditability. Cards expose provider dates and CISA
+actions. A snapshot older than 24 hours is flagged, and old or missing KEV check
+dates are labeled as historical evidence. Neither a fresh snapshot nor KEV
+membership proves attacks are happening now. These are triage priorities;
+match affected products to your assets before deciding remediation. The campaign graph and
 Discovery desk use observables; CVEs have their own searchable, paginated view.
 
 Each collector run writes these additive exports:
@@ -188,7 +208,7 @@ high-fidelity IOCs from authoritative sources. The project emphasises:
   user, persists output through `/data`, and exposes the collector self-test as
   its health check.
 - **Retention / "top IOCs" curation** – `--max-age-days` drops indicators not
-  seen recently and `--max-store` keeps only the top N by score and recency, so
+  seen recently and `--max-store` prioritizes recently checked KEV entries, then fills the remaining slots by score and recency, so
   the published feed stays small, fresh, and high-signal (think *KEV catalogue,
   but for indicators*) instead of an unbounded dump. The scheduled workflow
   curates to the last 30 days and the top 10,000 indicators.
@@ -363,6 +383,13 @@ score = (confidence base + corroboration bonus) × 0.5^(age / half-life)
   domains in two, curated CIDR blocks and JA3 fingerprints in a month, file
   hashes over six months, and CVEs over a year.
 
+When a storage cap is set, non-rejected CVEs with a KEV catalog check in the
+past 24 hours take priority over generic IOC scores, with newest KEV additions
+first. Stale, missing, or future check dates receive no special retention
+priority. Score expiry and maximum-age rules still apply, and the cap remains
+strict; if qualifying KEV records alone exceed it, older additions are pruned.
+Source failures and per-source limits can still restrict upstream coverage.
+
 With `--persist-feed` (enabled in the scheduled collection workflow) the
 previous `latest.jsonl` is merged into each run, making the published feed
 **stateful**: re-observed indicators refresh to full score with their original
@@ -487,7 +514,7 @@ Run `python -m swiftioc --help` for the full list of switches. Highlights:
 | `--min-score N` | Expire indicators whose decayed score falls below `N` (default `20`). |
 | `--high-confidence-score N` | Score at/above which an indicator enters the curated `high_confidence` feed (default `80`; multi-source indicators always qualify). |
 | `--max-age-days N` | Retention: drop indicators whose `last_seen` is older than `N` days. |
-| `--max-store N` | Retention: keep only the top `N` indicators by score/recency (KEVIntel-style curation; keeps the stored feed small and high-signal). |
+| `--max-store N` | Retention: keep at most `N`; non-rejected KEV entries checked within 24 hours take priority (newest catalog additions first), then other records by score/recency. |
 | `--dashboard-rows N` | Rows in the compact `dashboard.jsonl` the web dashboard downloads (default `1000`, ~2–3% of the full feed's size). |
 | `--site-url URL` | Public site URL used as the RSS `<link>` (override for forks/custom domains). |
 | `--rss-limit N` | Number of items in `feed.xml` (default `50`). |

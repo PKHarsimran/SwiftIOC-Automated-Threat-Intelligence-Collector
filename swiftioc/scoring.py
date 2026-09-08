@@ -101,8 +101,10 @@ def apply_retention(
     """Curate the stored feed to the most recent + top-scoring indicators.
 
     This is the "top IOCs" retention (KEVIntel-style): first drop anything not
-    seen within ``max_age_days``, then keep only the ``max_store`` strongest by
-    (score, corroboration, recency). Returns ``(rows, aged_out, pruned)``.
+    seen within ``max_age_days``. Within ``max_store``, non-rejected CVEs with
+    KEV evidence checked within 24 hours take priority (newest additions first).
+    Remaining rows retain score/corroboration/recency ordering.
+    Returns ``(rows, aged_out, pruned)``.
     Both bounds are optional and off by default.
     """
     now = now or now_utc()
@@ -121,11 +123,17 @@ def apply_retention(
         # (a fetch-order artifact) rather than a real recency signal.
         # first_seen is stable across runs and reflects genuine discovery
         # recency.
-        rows = sorted(
-            rows,
-            key=lambda r: (r.score, source_count(r), r.first_seen, r.indicator),
-            reverse=True,
-        )
+        def retention_key(row: Indicator) -> tuple:
+            kev = row.vulnerability.get("cisa_kev")
+            nvd = row.vulnerability.get("nvd")
+            checked = parse_dt(kev.get("catalog_checked_at")) if isinstance(kev, dict) else None
+            rejected = isinstance(nvd, dict) and str(nvd.get("status") or "").strip().lower() == "rejected"
+            protected = bool(row.type == "cve" and checked and timedelta(0) <= now - checked <= timedelta(hours=24) and not rejected)
+            added = parse_dt(kev.get("date_added")) if protected and isinstance(kev, dict) else None
+            kev_recency = added.timestamp() if added and added <= now else float("-inf")
+            return protected, kev_recency, row.score, source_count(row), row.first_seen, row.indicator
+
+        rows = sorted(rows, key=retention_key, reverse=True)
         pruned = len(rows) - max_store
         rows = rows[:max_store]
     return rows, aged_out, pruned

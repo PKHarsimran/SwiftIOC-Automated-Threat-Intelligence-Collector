@@ -136,3 +136,69 @@ def test_invalid_cve_ids_are_not_accepted_or_truncated(cve, monkeypatch):
     assert si.fetch_nvd_recent("https://example.invalid", "ref", "nvd", ws) == []
     assert si.classify(cve) != "cve"
     assert not [r for r in si.extract_indicators_from_text(cve) if r[0] == "cve"]
+
+
+
+def test_vulnerability_export_prioritizes_latest_kev_additions_and_publications(tmp_path):
+    now = si.parse_dt("2026-09-08T12:00:00Z")
+    rows = [
+        indicator("CVE-2026-1001", vulnerability={"cisa_kev": {"date_added": "2021-01-01"}}),
+        indicator("CVE-1900-1002", vulnerability={"cisa_kev": {"date_added": "2026-09-08"}}),
+        indicator("CVE-1900-1003", vulnerability={"nvd": {"published_at": "2026-09-08T10:00:00"}}),
+        indicator("CVE-2026-1004", vulnerability={"nvd": {"published_at": "2020-01-01", "modified_at": "2026-09-08T11:30:00Z"}}),
+        indicator("CVE-2026-1005", vulnerability={"cisa_kev": {"date_added": "2026-09-08"}, "nvd": {"status": "Rejected"}}),
+        indicator("CVE-2026-1006", vulnerability={"nvd": {"published_at": "2030-01-01"}}),
+        indicator("CVE-2026-1007", vulnerability={"nvd": {"published_at": "2026-02-30"}}),
+    ]
+    before = deepcopy(rows)
+    expected = ["CVE-1900-1002", "CVE-2026-1001", "CVE-1900-1003", "CVE-2026-1004", "CVE-2026-1006", "CVE-2026-1007", "CVE-2026-1005"]
+    assert [r["cve_id"] for r in vulnerability_records(rows, now=now)] == expected
+    assert rows == before
+    write_collections(tmp_path, rows, generated_at="2026-09-08T12:00:00Z")
+    doc = json.loads((tmp_path / "vulnerabilities.json").read_text())
+    assert [r["cve_id"] for r in doc["items"]] == expected
+    assert doc["counts"]["vulnerabilities"] == 7  # Rejected entries remain auditable.
+
+
+
+def test_retention_reserves_space_for_recently_checked_kev_evidence():
+    now = si.now_utc()
+    high_ioc = indicator("8.8.8.8", "ipv4", score=99)
+    old_kev = indicator("CVE-1900-1001", score=95, vulnerability={"cisa_kev": {
+        "catalog_checked_at": si.iso(now), "date_added": "2020-01-01"}})
+    new_kev = indicator("CVE-1900-1002", score=80, vulnerability={"cisa_kev": {
+        "catalog_checked_at": si.iso(now), "date_added": si.iso(now - timedelta(hours=1))}})
+    before = deepcopy([high_ioc, old_kev, new_kev])
+    kept, aged, pruned = si.apply_retention([high_ioc, old_kev, new_kev], max_store=2, now=now)
+    assert [r.indicator for r in kept] == [new_kev.indicator, old_kev.indicator]
+    assert aged == 0 and pruned == 1
+    one, _, _ = si.apply_retention([old_kev, new_kev], max_store=1, now=now)
+    assert one == [new_kev]
+    assert [high_ioc, old_kev, new_kev] == before
+    cutoff_now = si.parse_dt(si.iso(now))
+    assert cutoff_now is not None
+    old_kev.vulnerability["cisa_kev"]["catalog_checked_at"] = si.iso(cutoff_now - timedelta(hours=24))
+    boundary, _, _ = si.apply_retention([high_ioc, old_kev], max_store=1, now=cutoff_now)
+    assert boundary == [old_kev]
+    old_kev.vulnerability["cisa_kev"]["catalog_checked_at"] = si.iso(cutoff_now - timedelta(hours=24, seconds=1))
+    stale, _, _ = si.apply_retention([high_ioc, old_kev], max_store=1, now=cutoff_now)
+    assert stale == [high_ioc]
+    new_kev.last_seen = si.iso(now - timedelta(days=40))
+    retained, aged, _ = si.apply_retention([high_ioc, new_kev], max_store=1, max_age_days=30, now=now)
+    assert retained == [high_ioc] and aged == 1  # Never bypass configured expiry.
+
+
+@pytest.mark.parametrize(("checked", "status"), [
+    (None, "Analyzed"), ("invalid", "Analyzed"),
+    ("2020-01-01", "Analyzed"), ("2099-01-01", "Analyzed"),
+    ("fresh", "Rejected"),
+])
+def test_retention_does_not_promote_stale_unknown_future_or_rejected_kev(checked, status):
+    now = si.now_utc()
+    row = indicator("CVE-1900-1001", score=50, tags="cve,exploited-in-the-wild", vulnerability={
+        "cisa_kev": {"catalog_checked_at": si.iso(now) if checked == "fresh" else checked, "date_added": "2020-01-01"},
+        "nvd": {"status": status},
+    })
+    high_ioc = indicator("8.8.8.8", "ipv4", score=99)
+    retained, _, _ = si.apply_retention([row, high_ioc], max_store=1, now=now)
+    assert retained == [high_ioc]

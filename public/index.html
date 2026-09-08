@@ -46,7 +46,7 @@
       });
     </script>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/styles.css?v=15" />
+    <link rel="stylesheet" href="assets/styles.css?v=16" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -325,11 +325,20 @@
         <div class="discovery-heading">
           <div>
             <p class="eyebrow">Vulnerability collection · one record per CVE</p>
-            <h2 id="vulnerability-heading">Understand what needs patching.</h2>
+            <h2 id="vulnerability-heading">Known exploited. Newly disclosed. Prioritized.</h2>
             <p>Separate vulnerabilities from network and file indicators. Inspect known exploitation, affected products, and each provider’s evidence without joining unrelated CVEs into a campaign.</p>
           </div>
           <a class="button ghost" href="collections/vulnerabilities.json" data-vulnerability-download>Get collection JSON ↗</a>
         </div>
+        <div class="discovery-lenses vulnerability-views" role="group" aria-label="Vulnerability view">
+          <button type="button" data-vulnerability-view="exploited" aria-pressed="true">Known exploited</button>
+          <button type="button" data-vulnerability-view="ransomware" aria-pressed="false">Ransomware evidence</button>
+          <button type="button" data-vulnerability-view="priority" aria-pressed="false">All CVEs · prioritized</button>
+          <button type="button" data-vulnerability-view="kev30" aria-pressed="false">Added to KEV · 30 days</button>
+          <button type="button" data-vulnerability-view="published7" aria-pressed="false">Published · 7 days</button>
+          <button type="button" data-vulnerability-view="updated7" aria-pressed="false">Updated · 7 days</button>
+        </div>
+        <p class="discovery-scope" data-vulnerability-view-help>Confirmed KEV records only, newest catalog additions first. An empty result means this collection has no matching KEV evidence; other CVEs are available in All CVEs.</p>
         <div class="vulnerability-toolbar">
           <label>Find a vulnerability
             <input type="search" data-vulnerability-search placeholder="CVE, vendor, product, or description" autocomplete="off" />
@@ -344,6 +353,8 @@
           </label>
           <button type="button" class="button ghost" data-vulnerability-refresh>Refresh collection</button>
         </div>
+        <label class="vulnerability-rejected-control"><input type="checkbox" data-vulnerability-include-rejected /> Include NVD rejected records</label>
+        <p class="vulnerability-freshness" data-vulnerability-freshness role="status" hidden></p>
         <p class="discovery-status" data-vulnerability-status role="status">Loading the vulnerability collection…</p>
         <div class="discovery-cards vulnerability-cards" data-vulnerability-cards></div>
         <div class="vulnerability-pagination">
@@ -975,7 +986,7 @@
     </div>
 
     <div class="toast" data-toast role="status" aria-live="polite" aria-atomic="true" hidden></div>
-    <script defer src="assets/dashboard-core.js?v=15"></script>
-    <script defer src="assets/dashboard.js?v=15"></script>
+    <script defer src="assets/dashboard-core.js?v=16"></script>
+    <script defer src="assets/dashboard.js?v=16"></script>
   </body>
 </html>

@@ -10,6 +10,7 @@ this suite) so nothing touches the network.
 from __future__ import annotations
 
 import json
+from typing import Any, Dict
 
 import swiftioc as si
 
@@ -219,3 +220,22 @@ def test_cli_rejects_truncated_delta_baseline(tmp_path, monkeypatch):
     assert delta["baseline_available"] is False
     assert delta["events"] == []
     assert delta["counts"] == {"added": 0, "updated": 0, "removed": 0}
+
+
+
+def test_cli_retains_fresh_kev_before_higher_scoring_ioc_when_capped(tmp_path, monkeypatch):
+    sources = tmp_path / "sources.yml"
+    _write_sources_yml(sources)
+    now = si.iso(si.now_utc())
+    base: Dict[str, Any] = dict(first_seen=now, last_seen=now, confidence="high", tlp="CLEAR", tags="", reference="https://example.invalid", context="test")
+    kev = si.Indicator(indicator="CVE-1900-1234", type="cve", source="kev", vulnerability={
+        "cisa_kev": {"catalog_checked_at": now, "date_added": now}}, **base)
+    ip = si.Indicator(indicator="8.8.8.8", type="ipv4", source="a,b,c", **base)
+    monkeypatch.setattr("swiftioc.cli.collect_from_yaml", lambda *a, **kw: ([ip, kev], {"kev": 1, "a": 1}, {"raw_total": 2}))
+    out_dir = tmp_path / "out"
+    assert _run_main(monkeypatch, ["swiftioc", "--sources", str(sources), "--out-dir", str(out_dir), "--max-store", "1"]) == 0
+    document = json.loads((out_dir / "collections/vulnerabilities.json").read_text())
+    assert [r["cve_id"] for r in document["items"]] == ["CVE-1900-1234"]
+    retained = json.loads((out_dir / "iocs/latest.jsonl").read_text())
+    assert retained["type"] == "cve"
+    assert (out_dir / "collections/observables.jsonl").read_text() == ""
