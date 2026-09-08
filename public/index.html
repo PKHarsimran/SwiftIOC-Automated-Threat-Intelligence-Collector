@@ -46,7 +46,7 @@
       });
     </script>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/styles.css?v=11" />
+    <link rel="stylesheet" href="assets/styles.css?v=12" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -91,6 +91,7 @@
         </a>
         <div class="nav-links">
           <a href="#ioc-lookup">Check an IOC</a>
+          <a href="#campaign-graph">Campaign graph</a>
           <a href="#live-preview">Browse feed</a>
           <a href="#sources">Sources</a>
           <a href="#indicator-types">Types</a>
@@ -315,6 +316,71 @@
         <div class="delta-actions">
           <a class="button-link primary" href="iocs/delta.json" download>Delta JSON</a>
           <a class="button-link" href="iocs/delta.jsonl" download>Event stream</a>
+        </div>
+      </section>
+
+      <section
+        id="campaign-graph"
+        class="panel campaign-graph-section"
+        data-campaign-root
+        aria-labelledby="campaign-graph-heading"
+        hidden
+      >
+        <div class="panel-header campaign-graph-header">
+          <div>
+            <p class="eyebrow">Campaign lens · inferred relationships</p>
+            <h2 id="campaign-graph-heading" class="panel-title">Threat Campaign Graph</h2>
+            <p class="panel-subtitle">
+              Explore shared tags and reporting sources. These are investigation pivots,
+              not claims of common threat-actor ownership.
+            </p>
+          </div>
+          <div class="campaign-controls" aria-label="Campaign graph controls">
+            <label for="campaign-mode">Connect through</label>
+            <select id="campaign-mode" data-campaign-mode>
+              <option value="all">Tags + sources</option>
+              <option value="tags">Tags only</option>
+              <option value="sources">Sources only</option>
+            </select>
+            <button type="button" class="button ghost" data-campaign-layout>
+              Remix layout
+            </button>
+          </div>
+        </div>
+        <div class="panel-body campaign-graph-body">
+          <div class="campaign-stage" data-campaign-stage>
+            <svg
+              data-campaign-graph
+              viewBox="0 0 1000 520"
+              role="img"
+              aria-label="Interactive relationship graph of indicators, tags, and reporting sources"
+            ></svg>
+            <div class="campaign-empty" data-campaign-empty hidden>
+              <strong>No shared pivots in this preview</strong>
+              <span>Try tags and sources together, or wait for the next feed refresh.</span>
+            </div>
+            <div class="campaign-legend" aria-label="Graph legend">
+              <span><i class="legend-node tag"></i>Tag pivot</span>
+              <span><i class="legend-node source"></i>Source pivot</span>
+              <span><i class="legend-node indicator"></i>Indicator</span>
+            </div>
+          </div>
+          <aside class="campaign-inspector" data-campaign-inspector aria-live="polite">
+            <p class="eyebrow">Selected node</p>
+            <h3 data-campaign-title>Select a node</h3>
+            <p data-campaign-description>
+              Choose a pivot to understand its reach, or choose an indicator to add it to your investigation queue.
+            </p>
+            <dl class="campaign-node-meta" data-campaign-meta hidden>
+              <div><dt>Kind</dt><dd data-campaign-kind>—</dd></div>
+              <div><dt>Connections</dt><dd data-campaign-connections>—</dd></div>
+              <div><dt>Score</dt><dd data-campaign-score>—</dd></div>
+            </dl>
+            <button type="button" class="button detection-export" data-campaign-queue disabled>
+              Add indicator to queue
+            </button>
+            <p class="campaign-summary" data-campaign-summary>Building graph…</p>
+          </aside>
         </div>
       </section>
 
@@ -816,7 +882,7 @@
     </div>
 
     <div class="toast" data-toast role="status" aria-live="polite" aria-atomic="true" hidden></div>
-    <script defer src="assets/dashboard-core.js?v=11"></script>
-    <script defer src="assets/dashboard.js?v=11"></script>
+    <script defer src="assets/dashboard-core.js?v=12"></script>
+    <script defer src="assets/dashboard.js?v=12"></script>
   </body>
 </html>
