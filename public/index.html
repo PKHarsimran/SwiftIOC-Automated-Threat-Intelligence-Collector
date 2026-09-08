@@ -46,7 +46,7 @@
       });
     </script>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/styles.css?v=12" />
+    <link rel="stylesheet" href="assets/styles.css?v=13" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -336,12 +336,22 @@
             </p>
           </div>
           <div class="campaign-controls" aria-label="Campaign graph controls">
-            <label for="campaign-mode">Connect through</label>
-            <select id="campaign-mode" data-campaign-mode>
-              <option value="all">Tags + sources</option>
-              <option value="tags">Tags only</option>
-              <option value="sources">Sources only</option>
-            </select>
+            <div class="campaign-control-field">
+              <label for="campaign-mode">Connect through</label>
+              <select id="campaign-mode" data-campaign-mode>
+                <option value="all">Tags + sources</option>
+                <option value="tags">Tags only</option>
+                <option value="sources">Sources only</option>
+              </select>
+            </div>
+            <div class="campaign-control-field">
+              <label for="campaign-density">Detail level</label>
+              <select id="campaign-density" data-campaign-density>
+                <option value="24">Focused · 24 IOCs</option>
+                <option value="36" selected>Expanded · 36 IOCs</option>
+                <option value="48">Maximum · 48 IOCs</option>
+              </select>
+            </div>
             <button type="button" class="button ghost" data-campaign-layout>
               Remix layout
             </button>
@@ -349,6 +359,12 @@
         </div>
         <div class="panel-body campaign-graph-body">
           <div class="campaign-stage" data-campaign-stage>
+            <dl class="campaign-stage-stats" data-campaign-stats hidden>
+              <div><dt>High risk</dt><dd data-campaign-high>0</dd></div>
+              <div><dt>Corroborated</dt><dd data-campaign-corroborated>0</dd></div>
+              <div><dt>Avg score</dt><dd data-campaign-average>0</dd></div>
+              <div><dt>Visible IOCs</dt><dd data-campaign-visible>0</dd></div>
+            </dl>
             <svg
               data-campaign-graph
               viewBox="0 0 1000 520"
@@ -375,7 +391,20 @@
               <div><dt>Kind</dt><dd data-campaign-kind>—</dd></div>
               <div><dt>Connections</dt><dd data-campaign-connections>—</dd></div>
               <div><dt>Score</dt><dd data-campaign-score>—</dd></div>
+              <div><dt>Sources</dt><dd data-campaign-sources>—</dd></div>
+              <div><dt>Last seen</dt><dd data-campaign-last-seen>—</dd></div>
+              <div><dt>TLP</dt><dd data-campaign-tlp>—</dd></div>
             </dl>
+            <div class="campaign-detail-block" data-campaign-tags hidden>
+              <h4>Intelligence tags</h4>
+              <div class="campaign-tag-list" data-campaign-tag-list></div>
+            </div>
+            <div class="campaign-detail-block" data-campaign-related hidden>
+              <h4 data-campaign-related-heading>Connected nodes</h4>
+              <div class="campaign-related-list" data-campaign-related-list></div>
+            </div>
+            <a class="button ghost campaign-reference" data-campaign-reference
+              target="_blank" rel="noopener noreferrer" hidden>Open source report</a>
             <button type="button" class="button detection-export" data-campaign-queue disabled>
               Add indicator to queue
             </button>
@@ -887,7 +916,7 @@
     </div>
 
     <div class="toast" data-toast role="status" aria-live="polite" aria-atomic="true" hidden></div>
-    <script defer src="assets/dashboard-core.js?v=12"></script>
-    <script defer src="assets/dashboard.js?v=12"></script>
+    <script defer src="assets/dashboard-core.js?v=13"></script>
+    <script defer src="assets/dashboard.js?v=13"></script>
   </body>
 </html>
