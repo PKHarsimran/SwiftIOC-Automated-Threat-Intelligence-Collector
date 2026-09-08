@@ -2810,3 +2810,138 @@ input.lookup-input {
     grid-template-columns: 1fr;
   }
 }
+
+/* Browser-local case building for repeated analyst triage. */
+.investigation-workspace {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border: 1px solid rgba(167, 139, 250, 0.62);
+  border-radius: 1rem;
+  background:
+    linear-gradient(120deg, rgba(109, 40, 217, 0.15), transparent 54%),
+    rgba(8, 15, 28, 0.96);
+  box-shadow: 0 16px 40px rgba(2, 6, 23, 0.3);
+}
+
+.investigation-workspace[hidden] {
+  display: none;
+}
+
+.investigation-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.investigation-heading h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: clamp(1.15rem, 2vw, 1.45rem);
+}
+
+.investigation-heading p:last-child {
+  color: #b8c5d8;
+  font-size: 0.8rem;
+}
+
+.investigation-count {
+  display: inline-grid;
+  min-width: 1.6rem;
+  min-height: 1.6rem;
+  padding-inline: 0.35rem;
+  place-items: center;
+  border: 1px solid rgba(196, 181, 253, 0.48);
+  border-radius: 999px;
+  background: rgba(109, 40, 217, 0.25);
+  color: #ede9fe;
+  font-size: 0.75rem;
+}
+
+.investigation-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.45rem;
+}
+
+.button.danger {
+  border-color: rgba(248, 113, 113, 0.62);
+  color: #fecaca;
+}
+
+.investigation-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0.85rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.investigation-list li {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid rgba(100, 116, 139, 0.56);
+  border-radius: 0.65rem;
+  background: rgba(2, 6, 23, 0.48);
+}
+
+.investigation-identity {
+  display: grid;
+  min-width: 0;
+}
+
+.investigation-identity code {
+  overflow: hidden;
+  color: #f8fafc;
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.investigation-identity span {
+  overflow: hidden;
+  color: #94a3b8;
+  font-size: 0.68rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.queue-action[aria-pressed='true'] {
+  border-color: rgba(167, 139, 250, 0.75);
+  background: rgba(109, 40, 217, 0.2);
+  color: #ede9fe;
+}
+
+@media (max-width: 820px) {
+  .investigation-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .investigation-actions {
+    justify-content: flex-start;
+  }
+
+  .investigation-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .investigation-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .investigation-actions .button {
+    width: 100%;
+  }
+}

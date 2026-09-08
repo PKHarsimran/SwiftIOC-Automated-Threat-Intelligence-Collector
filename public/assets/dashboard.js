@@ -220,6 +220,208 @@
     return true;
   };
 
+  const downloadJsonCollection = (rows) => {
+    if (!rows.length) return false;
+    const blob = new Blob([JSON.stringify(rows, null, 2) + '\n'], {
+      type: 'application/json;charset=utf-8',
+    });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'swiftioc-investigation-workspace.json';
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+    return true;
+  };
+
+  const INVESTIGATION_STORAGE_KEY = 'swiftioc-investigation-workspace-v1';
+  const INVESTIGATION_LIMIT = 50;
+  const investigationListeners = new Set();
+  const investigationKey = (row) => {
+    if (dashboardCore) return dashboardCore.investigationKey(row);
+    const type = normaliseLower(row?.type) || 'unknown';
+    const rawIndicator = normaliseString(row?.indicator);
+    const indicator = type === 'url' ? rawIndicator : rawIndicator.toLowerCase();
+    return rawIndicator ? `${type}\u0000${indicator}` : '';
+  };
+  const cleanInvestigationRows = (value) => dashboardCore?.normaliseInvestigationRows(
+    value,
+    INVESTIGATION_LIMIT
+  ) || (Array.isArray(value) ? value.filter((row) => row?.indicator).slice(0, INVESTIGATION_LIMIT) : []);
+
+  let investigationRows = [];
+  try {
+    investigationRows = cleanInvestigationRows(
+      JSON.parse(window.localStorage.getItem(INVESTIGATION_STORAGE_KEY) || '[]')
+    );
+  } catch (error) {
+    investigationRows = [];
+  }
+
+  const notifyInvestigationListeners = () => {
+    const snapshot = investigationRows.slice();
+    investigationListeners.forEach((listener) => listener(snapshot));
+  };
+
+  const saveInvestigationRows = () => {
+    try {
+      window.localStorage.setItem(
+        INVESTIGATION_STORAGE_KEY,
+        JSON.stringify(investigationRows)
+      );
+    } catch (error) {
+      console.warn('Investigation workspace could not be saved', error);
+    }
+    notifyInvestigationListeners();
+  };
+
+  const investigationWorkspace = {
+    getRows: () => investigationRows.slice(),
+    has: (row) => investigationRows.some(
+      (candidate) => investigationKey(candidate) === investigationKey(row)
+    ),
+    add: (row) => {
+      if (!row?.indicator || investigationWorkspace.has(row)) return false;
+      if (investigationRows.length >= INVESTIGATION_LIMIT) {
+        showToast(`The workspace holds up to ${INVESTIGATION_LIMIT} indicators.`);
+        return false;
+      }
+      investigationRows = cleanInvestigationRows([...investigationRows, row]);
+      saveInvestigationRows();
+      return true;
+    },
+    remove: (row) => {
+      const key = investigationKey(row);
+      const next = investigationRows.filter(
+        (candidate) => investigationKey(candidate) !== key
+      );
+      if (next.length === investigationRows.length) return false;
+      investigationRows = next;
+      saveInvestigationRows();
+      return true;
+    },
+    toggle: (row) => investigationWorkspace.has(row)
+      ? investigationWorkspace.remove(row)
+      : investigationWorkspace.add(row),
+    clear: () => {
+      if (!investigationRows.length) return;
+      investigationRows = [];
+      saveInvestigationRows();
+    },
+    subscribe: (listener) => {
+      investigationListeners.add(listener);
+      return () => investigationListeners.delete(listener);
+    },
+  };
+
+  const syncInvestigationButtons = () => {
+    qsa('[data-investigation-toggle]').forEach((button) => {
+      const row = button._investigationRow;
+      if (!row) return;
+      const selected = investigationWorkspace.has(row);
+      button.setAttribute('aria-pressed', String(selected));
+      button.textContent = selected ? 'Queued' : 'Add to queue';
+      button.title = selected
+        ? 'Remove this indicator from the investigation queue'
+        : 'Keep this indicator in the browser-local investigation queue';
+    });
+  };
+
+  const makeInvestigationButton = (row) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'button ghost row-action queue-action';
+    button.dataset.investigationToggle = '';
+    button._investigationRow = row;
+    button.addEventListener('click', () => {
+      const wasSelected = investigationWorkspace.has(row);
+      if (investigationWorkspace.toggle(row)) {
+        showToast(wasSelected
+          ? 'Removed from the investigation queue.'
+          : 'Added to the investigation queue.');
+      }
+      syncInvestigationButtons();
+    });
+    const selected = investigationWorkspace.has(row);
+    button.setAttribute('aria-pressed', String(selected));
+    button.textContent = selected ? 'Queued' : 'Add to queue';
+    button.title = selected
+      ? 'Remove this indicator from the investigation queue'
+      : 'Keep this indicator in the browser-local investigation queue';
+    return button;
+  };
+
+  const initialiseInvestigationWorkspace = () => {
+    const root = qs('[data-investigation-root]');
+    if (!root) return;
+    const list = qs('[data-investigation-list]', root);
+    const count = qs('[data-investigation-count]', root);
+    const copy = qs('[data-investigation-copy]', root);
+    const csv = qs('[data-investigation-csv]', root);
+    const json = qs('[data-investigation-json]', root);
+    const clear = qs('[data-investigation-clear]', root);
+
+    const render = (rows) => {
+      root.hidden = !rows.length;
+      setText(count, formatNumber(rows.length));
+      if (!list) return;
+      list.innerHTML = '';
+      rows.forEach((row) => {
+        const item = document.createElement('li');
+        const identity = document.createElement('div');
+        identity.className = 'investigation-identity';
+        const indicator = document.createElement('code');
+        indicator.textContent = row.indicator;
+        const meta = document.createElement('span');
+        meta.textContent = [
+          row.type || 'unknown',
+          typeof row.score === 'number' ? `score ${row.score}` : row.confidence,
+          primarySourceLabel(row),
+        ].filter(Boolean).join(' · ');
+        identity.append(indicator, meta);
+
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'button ghost row-action';
+        remove.textContent = 'Remove';
+        remove.setAttribute('aria-label', `Remove ${row.indicator} from investigation queue`);
+        remove.addEventListener('click', () => {
+          investigationWorkspace.remove(row);
+          showToast('Removed from the investigation queue.');
+        });
+        item.append(identity, remove);
+        list.appendChild(item);
+      });
+      syncInvestigationButtons();
+    };
+
+    copy?.addEventListener('click', async () => {
+      const rows = investigationWorkspace.getRows();
+      await copyOrPrompt(
+        rows.map((row) => row.indicator).join('\n'),
+        `Copied ${formatNumber(rows.length)} queued indicators.`,
+        'Copy these queued indicators:'
+      );
+    });
+    csv?.addEventListener('click', () => {
+      const rows = investigationWorkspace.getRows();
+      if (downloadCsv(rows)) showToast(`Exported ${formatNumber(rows.length)} queued indicators.`);
+    });
+    json?.addEventListener('click', () => {
+      const rows = investigationWorkspace.getRows();
+      if (downloadJsonCollection(rows)) showToast(`Exported ${formatNumber(rows.length)} queued indicators.`);
+    });
+    clear?.addEventListener('click', () => {
+      investigationWorkspace.clear();
+      showToast('Investigation queue cleared.');
+    });
+
+    investigationWorkspace.subscribe(render);
+    render(investigationWorkspace.getRows());
+  };
+
   // Compact label for a possibly multi-source row: "feodo +2".
   const primarySourceLabel = (row) => {
     if (!row) return 'unknown';
@@ -2181,7 +2383,9 @@
         downloadJson(row);
         showToast('Indicator JSON downloaded.');
       });
-      actions.append(copy, toggle, download);
+      const queue = makeInvestigationButton(row);
+      actions.append(queue, copy, toggle, download);
+      syncInvestigationButtons();
       actionsCell.appendChild(actions);
       tr.appendChild(actionsCell);
 
@@ -2691,6 +2895,9 @@
     subscribeToDataset((dataset) => {
       if (!state.loading && dataset?.entries?.length) useDataset(dataset);
     });
+    investigationWorkspace.subscribe(() => {
+      if (state.rows.length) syncInvestigationButtons();
+    });
     window.addEventListener('popstate', () => {
       readUrl();
       populateFacets();
@@ -2952,6 +3159,8 @@
             await copyOrPrompt(row.indicator, 'Indicator copied to clipboard.', 'Copy this indicator:');
           })
         );
+        actions.appendChild(makeInvestigationButton(row));
+        syncInvestigationButtons();
         actions.appendChild(
           makeAction('Download JSON', () => downloadJson(row))
         );
@@ -3237,6 +3446,7 @@
    * ========================================================================= */
 
   initialiseTableToggles();
+  initialiseInvestigationWorkspace();
   initialiseStatusBanner();
   initialiseTopThreats();
   initialiseIocLookup();

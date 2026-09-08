@@ -46,7 +46,7 @@
       });
     </script>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/styles.css?v=8" />
+    <link rel="stylesheet" href="assets/styles.css?v=9" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -157,6 +157,40 @@
           aria-atomic="true"
           hidden
         ></div>
+      </section>
+
+      <section
+        id="investigation-workspace"
+        class="investigation-workspace"
+        data-investigation-root
+        aria-labelledby="investigation-heading"
+        hidden
+      >
+        <div class="investigation-heading">
+          <div>
+            <p class="eyebrow">Private analyst workspace</p>
+            <h2 id="investigation-heading">
+              Investigation queue
+              <span class="investigation-count" data-investigation-count>0</span>
+            </h2>
+            <p>Shortlist indicators while you triage. This queue stays in this browser.</p>
+          </div>
+          <div class="investigation-actions">
+            <button type="button" class="button ghost" data-investigation-copy>
+              Copy indicators
+            </button>
+            <button type="button" class="button ghost" data-investigation-csv>
+              Export CSV
+            </button>
+            <button type="button" class="button ghost" data-investigation-json>
+              Export JSON
+            </button>
+            <button type="button" class="button ghost danger" data-investigation-clear>
+              Clear queue
+            </button>
+          </div>
+        </div>
+        <ul class="investigation-list" data-investigation-list aria-label="Queued indicators"></ul>
       </section>
 
       <section
@@ -695,7 +729,7 @@
               rel="nofollow"
               download
               title="Only score ≥80 or indicators confirmed by 2+ sources — block-ready"
-              >★ High-confidence CSV</a
+              >★ High-confidence CSV</a>
             <a
               class="button-link exports-highlight"
               href="iocs/high_confidence.jsonl"
@@ -704,43 +738,43 @@
               rel="nofollow"
               download
               title="Only score ≥80 or indicators confirmed by 2+ sources — block-ready"
-              >★ High-confidence JSONL</a
+              >★ High-confidence JSONL</a>
             <a
               class="button-link"
               href="iocs/latest.csv"
               rel="nofollow"
               download
-              >CSV</a
+              >CSV</a>
             <a
               class="button-link"
               href="iocs/latest.tsv"
               rel="nofollow"
               download
-              >TSV</a
+              >TSV</a>
             <a
               class="button-link"
               href="iocs/latest.json"
               rel="nofollow"
               download
-              >JSON</a
+              >JSON</a>
             <a
               class="button-link"
               href="iocs/latest.jsonl"
               rel="nofollow"
               download
-              >JSONL</a
+              >JSONL</a>
             <a
               class="button-link"
               href="iocs/stix2.json"
               rel="nofollow"
               download
-              >STIX 2.1 bundle</a
+              >STIX 2.1 bundle</a>
             <a
               class="button-link"
               href="iocs/taxii2-envelope.json"
               rel="nofollow"
               download
-              >TAXII 2.1 envelope</a
+              >TAXII 2.1 envelope</a>
           </div>
           <p class="panel-footnote">
             The ★ high-confidence feeds contain only indicators scoring ≥80 or
@@ -754,7 +788,7 @@
     </div>
 
     <div class="toast" data-toast role="status" aria-live="polite" aria-atomic="true" hidden></div>
-    <script defer src="assets/dashboard-core.js?v=8"></script>
-    <script defer src="assets/dashboard.js?v=8"></script>
+    <script defer src="assets/dashboard-core.js?v=9"></script>
+    <script defer src="assets/dashboard.js?v=9"></script>
   </body>
 </html>
