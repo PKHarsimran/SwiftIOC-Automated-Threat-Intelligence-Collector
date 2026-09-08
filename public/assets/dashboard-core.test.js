@@ -220,6 +220,41 @@ test('builds deterministic Suricata rules and rejects injected values', () => {
   assert.doesNotMatch(first, /sid:1;/);
 });
 
+test('builds deterministic campaign pivots and omits singleton relationships', () => {
+  const rows = [
+    { ...row, indicator: 'one.example', tags: ['ransomware', 'feed-a', 'critical'], sourceList: ['feed-a'] },
+    { ...row, indicator: 'two.example', tags: ['ransomware', 'feed-a', 'critical'], sourceList: ['feed-a', 'feed-b'], score: 90 },
+    { ...row, indicator: 'three.example', tags: ['singleton'], sourceList: ['feed-b'], score: 70 },
+  ];
+  const graph = core.buildCampaignGraph(rows, { mode: 'tags' });
+  assert.deepEqual(graph.stats, { pivots: 1, indicators: 2, relationships: 2 });
+  assert.equal(graph.nodes.find((node) => node.kind === 'pivot').label, 'ransomware');
+  assert.equal(graph.nodes.some((node) => node.label === 'singleton'), false);
+  assert.equal(graph.edges.every((edge) => edge.kind === 'tag'), true);
+  assert.deepEqual(
+    core.buildCampaignGraph(rows.slice().reverse(), { mode: 'tags' }),
+    graph
+  );
+});
+
+test('campaign graph respects source mode and graph-size caps', () => {
+  const rows = Array.from({ length: 20 }, (_, index) => ({
+    ...row,
+    indicator: `${index}.example.test`,
+    tags: ['shared-tag'],
+    sourceList: ['shared-source'],
+    score: 100 - index,
+  }));
+  const graph = core.buildCampaignGraph(rows, {
+    mode: 'sources',
+    maxPivots: 1,
+    maxIndicators: 5,
+  });
+  assert.equal(graph.stats.pivots, 1);
+  assert.equal(graph.stats.indicators, 5);
+  assert.equal(graph.nodes.find((node) => node.kind === 'pivot').pivotKind, 'source');
+});
+
 test('dashboard markup keeps IDs and labelled controls consistent', () => {
   const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
   const css = fs.readFileSync(path.join(__dirname, 'styles.css'), 'utf8');
@@ -246,6 +281,7 @@ test('dashboard markup keeps IDs and labelled controls consistent', () => {
   assert.match(html, /data-investigation-list/);
   assert.match(html, /data-investigation-sigma/);
   assert.match(html, /data-investigation-suricata/);
+  assert.match(html, /data-campaign-graph/);
   assert.match(html, /class="signal-radar"/);
   assert.match(html, /data-delta-root/);
   assert.match(html, /iocs\/delta\.jsonl/);
