@@ -164,6 +164,22 @@ test('exports an empty CSV with only its header when no rows are supplied', () =
   assert.match(csv, /"Indicator"/);
 });
 
+test('sanitizes and deduplicates browser-local investigation rows', () => {
+  const rows = core.normaliseInvestigationRows([
+    { ...row, score: 120, sourceList: ['feed-a', '', 'feed-b'] },
+    { ...row, score: 50 },
+    null,
+    { type: 'domain' },
+    { indicator: 'second.example', type: 'domain', score: Number.NaN },
+  ]);
+  assert.equal(rows.length, 2);
+  assert.equal(rows[0].score, 100);
+  assert.deepEqual(rows[0].sourceList, ['feed-a', 'feed-b']);
+  assert.equal(core.investigationKey(rows[0]), 'domain\u0000example[.]evil');
+  assert.equal(Object.hasOwn(rows[1], 'score'), false);
+  assert.deepEqual(core.normaliseInvestigationRows({ rows: [] }), []);
+});
+
 test('dashboard markup keeps IDs and labelled controls consistent', () => {
   const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
   const ids = Array.from(html.matchAll(/\sid="([^"]+)"/g), (match) => match[1]);
@@ -185,7 +201,14 @@ test('dashboard markup keeps IDs and labelled controls consistent', () => {
   );
   assert.match(html, /data-preview-download/);
   assert.match(html, /data-preview-download-note/);
+  assert.match(html, /data-investigation-root/);
+  assert.match(html, /data-investigation-list/);
   assert.match(html, /data-delta-root/);
   assert.match(html, /iocs\/delta\.jsonl/);
   assert.match(html, /iocs\/taxii2-envelope\.json/);
+  assert.equal(
+    (html.match(/<a\b/g) || []).length,
+    (html.match(/<\/a>/g) || []).length,
+    'Every link must have a complete closing tag'
+  );
 });
