@@ -1,15 +1,15 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-09-08T14:01:08Z_
+_Generated 2026-09-08T15:53:17Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-08T14:01:08Z |
+| Generated | 2026-09-08T15:53:17Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 5045 |
+| Duplicates removed | 5019 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-source overlaps | 514 |
@@ -17,7 +17,7 @@ _Generated 2026-09-08T14:01:08Z_
 | High-score indicators (≥80) | 10000 |
 | Corroborated (2+ sources) | 514 |
 | Earliest first_seen | 2019-07-15T19:15:16Z |
-| Newest first_seen | 2026-09-08T13:58:13Z |
+| Newest first_seen | 2026-09-08T15:45:29Z |
 
 ## Top indicators by score
 
@@ -32,49 +32,49 @@ _Generated 2026-09-08T14:01:08Z_
 | ipv4: `45[.]17[.]39[.]120` | score 96, 4 sources |
 | ipv4: `68[.]233[.]116[.]124` | score 96, 4 sources |
 | ipv4: `94[.]154[.]43[.]69` | score 96, 3 sources |
-| ipv4: `197[.]140[.]9[.]148` | score 92, 4 sources |
+| ipv4: `197[.]140[.]9[.]148` | score 91, 4 sources |
 
 ## Per-source totals
 
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5548 |
-| greensnow_blocklist | 4250 |
+| blocklist_de_ssh | 5558 |
+| greensnow_blocklist | 4277 |
 | ipsum_level5 | 3666 |
-| threatfox_export_json | 3281 |
+| threatfox_export_json | 3259 |
 | binarydefense_banlist | 2145 |
 | spamhaus_drop | 1707 |
 | cisa_kev | 1695 |
 | tor_exit_nodes | 1344 |
-| malwarebazaar_recent | 900 |
+| nist_nvd_recent | 1161 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 2468 |
-| domain | 2413 |
-| ipv4_cidr | 1710 |
-| sha256 | 1234 |
+| cve | 2489 |
+| domain | 2419 |
+| ipv4_cidr | 1706 |
+| sha256 | 1239 |
 | sha1 | 921 |
-| url | 823 |
-| ipv4 | 315 |
+| url | 789 |
+| ipv4 | 321 |
 | md5 | 116 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3559 |
-| malware | 2527 |
-| cve | 2468 |
-| drop | 1710 |
-| spamhaus | 1710 |
-| exploited-in-the-wild | 1469 |
-| nvd | 1224 |
+| threatfox | 3579 |
+| malware | 2490 |
+| cve | 2489 |
+| drop | 1706 |
+| spamhaus | 1706 |
+| nvd | 1507 |
+| exploited-in-the-wild | 1207 |
 | etherhiding | 1161 |
-| ClickFix | 929 |
+| ClickFix | 930 |
 | Sepolia | 595 |
 
 ## Multi-source overlaps
