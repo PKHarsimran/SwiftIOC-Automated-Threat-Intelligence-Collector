@@ -3022,6 +3022,18 @@
     const search = qs('[data-vulnerability-search]', root);
     const filter = qs('[data-vulnerability-status-filter]', root);
     const refresh = qs('[data-vulnerability-refresh]', root);
+    const views = qsa('[data-vulnerability-view]', root);
+    const includeRejected = qs('[data-vulnerability-include-rejected]', root);
+    const help = qs('[data-vulnerability-view-help]', root);
+    const freshness = qs('[data-vulnerability-freshness]', root);
+    const viewHelp = {
+      priority: 'Known exploited first (newest KEV additions), then exploitation reports, then other CVEs. Publication dates order each remaining group.',
+      kev30: 'Added to CISA KEV in the past 30 days, newest first. Catalog addition is not the date an attack occurred.',
+      published7: 'NVD publication dates in the past 7 days, newest first. A newly published CVE is not necessarily exploited.',
+      updated7: 'NVD record modifications in the past 7 days, newest first. An edit does not establish a new vulnerability or new exploitation.',
+    };
+    let view = 'priority';
+    let snapshotTime = null;
     const previous = qs('[data-vulnerability-prev]', root);
     const next = qs('[data-vulnerability-next]', root);
     const pageLabel = qs('[data-vulnerability-page]', root);
@@ -3063,7 +3075,18 @@
       card.appendChild(details);
     };
     const render = () => {
-      const matches = dashboardCore.filterVulnerabilities(items, search.value, filter.value);
+      const now = Date.now() / 1000;
+      const matches = dashboardCore.filterVulnerabilities(items, search.value, filter.value, { view, includeRejected: includeRejected.checked, now });
+      const rejectedCount = items.filter((item) => dashboardCore.vulnerabilityFacts(item, now).rejected).length;
+      views.forEach((button) => {
+        button.setAttribute('aria-pressed', String(button.dataset.vulnerabilityView === view));
+        button.disabled = loading;
+      });
+      help.textContent = viewHelp[view];
+      includeRejected.disabled = loading;
+      freshness.hidden = loading || failed || snapshotTime == null || (now - snapshotTime >= 0 && now - snapshotTime <= 86400);
+      freshness.textContent = snapshotTime > now ? 'Snapshot timestamp is in the future. Check the collector clock before treating this data as current.'
+        : 'Snapshot is over 24 hours old. Recent views may be incomplete; refresh and check run diagnostics. Provider dates below describe their own records.';
       const pages = Math.ceil(matches.length / pageSize);
       page = Math.min(page, Math.max(0, pages - 1));
       cards.replaceChildren();
@@ -3074,7 +3097,7 @@
       search.disabled = filter.disabled = loading;
       status.textContent = loading ? 'Loading the vulnerability collection…' : failed
         ? 'Collection unavailable. Refresh to retry; no previous results are displayed.'
-        : `${matches.length} of ${items.length} CVEs · ${items.filter((item) => item.exploitation_status === 'known_exploited').length} with CISA KEV evidence · Snapshot ${generatedAt}${!matches.length ? ' · No matching vulnerabilities.' : ''}`;
+        : `${matches.length} of ${items.length} CVEs · ${matches.filter((item) => item.exploitation_status === 'known_exploited').length} matching with CISA KEV evidence${!includeRejected.checked && rejectedCount ? ` · ${rejectedCount} rejected records hidden` : ''} · Snapshot ${generatedAt}${!matches.length ? ' · No matching vulnerabilities.' : ''}`;
       if (loading || failed) return;
       matches.slice(page * pageSize, (page + 1) * pageSize).forEach((item) => {
         const card = document.createElement('article');
@@ -3085,6 +3108,19 @@
         if (item.title && item.title !== item.cve_id) addText(card, 'p', item.title, 'vulnerability-title');
         const kev = item.reports?.cisa_kev;
         const nvd = item.reports?.nvd;
+        const facts = dashboardCore.vulnerabilityFacts(item, now);
+        const day = (time) => time == null ? 'Unknown / invalid' : new Date(time * 1000).toISOString().slice(0, 10);
+        const timeline = document.createElement('div');
+        timeline.className = 'vulnerability-dates';
+        if (kev) addText(timeline, 'p', `Added to KEV: ${day(facts.added)}`);
+        addText(timeline, 'p', `NVD published: ${day(facts.published)}`);
+        if (facts.modified != null) addText(timeline, 'p', `NVD updated: ${day(facts.modified)}`);
+        card.appendChild(timeline);
+        if (facts.rejected) addText(card, 'p', 'Rejected by NVD · review the provider record before acting.', 'vulnerability-caution');
+        if (item.exploitation_status === 'known_exploited' && (facts.checked == null || now - facts.checked > 86400)) {
+          addText(card, 'p', `Historical KEV evidence · catalog check ${facts.checked == null ? 'unknown' : day(facts.checked)}. Refresh to verify current coverage.`, 'vulnerability-caution');
+        }
+        if (kev?.required_action) addText(card, 'p', `CISA action: ${kev.required_action}`, 'vulnerability-action');
         addText(card, 'p', `Severity: ${nvd?.severity || 'Not supplied'} · ${kev?.product || 'Product not supplied'}${nvd?.status ? ` · NVD: ${nvd.status}` : ''}`, 'vulnerability-meta');
         // Keep long provider descriptions available without making cards unbounded.
         const summary = document.createElement('details');
@@ -3122,6 +3158,7 @@
       loading = true;
       failed = false;
       items = [];
+      snapshotTime = null;
       page = 0;
       render();
       const controller = new AbortController();
@@ -3140,6 +3177,7 @@
           seen.add(item.cve_id);
         }
         items = data.items;
+        snapshotTime = Date.parse(data.generated_at) / 1000;
         generatedAt = new Date(data.generated_at).toLocaleString();
       } catch (error) {
         items = [];
@@ -3150,6 +3188,15 @@
         render();
       }
     };
+    views.forEach((button) => button.addEventListener('click', () => {
+      view = button.dataset.vulnerabilityView;
+      page = 0;
+      render();
+    }));
+    includeRejected.addEventListener('change', () => { page = 0; render(); });
+    // Re-evaluate rolling windows and freshness when an analyst returns to an
+    // open tab, without resetting focus or collapsing evidence every minute.
+    document.addEventListener('visibilitychange', () => { if (!document.hidden && !loading) render(); });
     [search, filter].forEach((control) => control.addEventListener(control === search ? 'input' : 'change', () => { page = 0; render(); }));
     previous.addEventListener('click', () => { page -= 1; render(); });
     next.addEventListener('click', () => { page += 1; render(); });
