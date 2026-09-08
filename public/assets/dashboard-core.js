@@ -690,12 +690,13 @@
     published: vulnerabilityDate(item.reports?.nvd?.published_at, now),
     modified: vulnerabilityDate(item.reports?.nvd?.modified_at, now),
     rejected: lower(item.reports?.nvd?.status) === 'rejected',
+    ransomware: item.exploitation_status === 'known_exploited' && lower(item.reports?.cisa_kev?.ransomware_use) === 'known',
   });
 
   const filterVulnerabilities = (items, search = '', status = 'all', options = {}) => {
     const query = lower(search).trim();
     const now = options.now ?? Date.now() / 1000;
-    const view = ['kev30', 'published7', 'updated7'].includes(options.view) ? options.view : 'priority';
+    const view = ['exploited', 'ransomware', 'kev30', 'published7', 'updated7'].includes(options.view) ? options.view : 'priority';
     const priority = { known_exploited: 0, reported_exploitation: 1, not_established: 2 };
     const recent = (time, days) => time != null && now - time <= days * 86400;
     const orderDate = (item, facts) => view === 'updated7' ? facts.modified
@@ -704,6 +705,8 @@
     return items.map((item) => ({ item, facts: vulnerabilityFacts(item, now) })).filter(({ item, facts }) => {
       if (!options.includeRejected && facts.rejected) return false;
       if (status !== 'all' && item.exploitation_status !== status) return false;
+      if (view === 'exploited' && item.exploitation_status !== 'known_exploited') return false;
+      if (view === 'ransomware' && !facts.ransomware) return false;
       if (view === 'kev30' && (item.exploitation_status !== 'known_exploited' || !recent(facts.added, 30))) return false;
       if (view === 'published7' && !recent(facts.published, 7)) return false;
       if (view === 'updated7' && !recent(facts.modified, 7)) return false;
