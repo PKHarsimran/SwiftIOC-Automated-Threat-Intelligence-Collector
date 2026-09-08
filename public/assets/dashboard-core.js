@@ -423,6 +423,59 @@
     };
   };
 
+  // Rank evidence already present in the loaded sample; never infer global
+  // rarity, attribution, or new activity from absence in a compact feed.
+  const buildDiscovery = (value, mode = 'corroborated', now = Date.now() / 1000) => {
+    const unique = new Map();
+    for (const row of Array.isArray(value) ? value : []) {
+      const key = investigationKey(row);
+      if (key && !unique.has(key)) unique.set(key, row);
+    }
+    const rows = Array.from(unique.values());
+    const sourceNames = new Set(rows.flatMap(rowSources).map(lower));
+    const ignored = new Set(['aggregated', 'blocklist', 'malicious', 'malware', 'high',
+      'critical', 'medium', 'low', 'info', 'unknown', 'ioc', 'multi-list']);
+    const tagsFor = (row) => Array.from(new Set(
+      (Array.isArray(row.tags) ? row.tags : []).map(lower)
+        .filter((tag) => tag && !ignored.has(tag) && !sourceNames.has(tag))
+    ));
+    const counts = new Map();
+    rows.forEach((row) => tagsFor(row).forEach((tag) => counts.set(tag, (counts.get(tag) || 0) + 1)));
+    const findings = [];
+    for (const row of rows) {
+      const sources = Array.from(new Set(rowSources(row).flatMap((source) =>
+        stringValue(source).split(',').map(lower)
+      ).filter((source) => source && !['unknown', 'n/a', 'none', 'unspecified'].includes(source))));
+      let rank;
+      let reason;
+      let label;
+      if (mode === 'recent') {
+        const seen = timestamp(row.lastSeen ?? row.last_seen);
+        const age = seen == null ? Infinity : now - seen;
+        if (age < 0 || age > 86400) continue;
+        rank = seen;
+        label = 'Seen within 24h';
+        reason = 'Last reported within the past 24 hours. A recent sighting does not mean newly discovered activity.';
+      } else if (mode === 'uncommon') {
+        const rare = tagsFor(row).filter((tag) => counts.get(tag) <= 3)
+          .sort((a, b) => counts.get(a) - counts.get(b) || a.localeCompare(b))[0];
+        if (!rare) continue;
+        rank = 4 - counts.get(rare);
+        label = rare;
+        reason = `“${rare}” appears on ${counts.get(rare)} of ${rows.length} indicators in this filtered sample. This is sample rarity, not global rarity.`;
+      } else {
+        if (sources.length < 2) continue;
+        rank = sources.length;
+        label = `${sources.length} reporting sources`;
+        reason = `Reported by ${sources.join(', ')}. Multiple reports provide corroboration, but do not establish source independence.`;
+      }
+      findings.push({ row, label, reason, rank });
+    }
+    findings.sort((a, b) => b.rank - a.rank || effectiveScore(b.row) - effectiveScore(a.row) ||
+      investigationKey(a.row).localeCompare(investigationKey(b.row)));
+    return { total: findings.length, sampleSize: rows.length, findings: findings.slice(0, 6) };
+  };
+
   const scoreBand = (row) => {
     const score = effectiveScore(row);
     if (score >= 80) return 'high';
@@ -608,6 +661,7 @@
   return {
     compareRows,
     buildCampaignGraph,
+    buildDiscovery,
     effectiveScore,
     investigationKey,
     detectionRows,
