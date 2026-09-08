@@ -3014,6 +3014,149 @@
     return span;
   };
 
+  const initialiseVulnerabilities = () => {
+    const root = qs('[data-vulnerability-root]');
+    if (!root || !dashboardCore?.filterVulnerabilities) return;
+    const cards = qs('[data-vulnerability-cards]', root);
+    const status = qs('[data-vulnerability-status]', root);
+    const search = qs('[data-vulnerability-search]', root);
+    const filter = qs('[data-vulnerability-status-filter]', root);
+    const refresh = qs('[data-vulnerability-refresh]', root);
+    const previous = qs('[data-vulnerability-prev]', root);
+    const next = qs('[data-vulnerability-next]', root);
+    const pageLabel = qs('[data-vulnerability-page]', root);
+    const download = qs('[data-vulnerability-download]', root);
+    download.href = resolveIocUrl('collections/vulnerabilities.json');
+    qs('[data-observables-download]', root).href = resolveIocUrl('collections/observables.jsonl');
+    const labels = {
+      known_exploited: 'CISA KEV · known exploited',
+      reported_exploitation: 'Exploitation reported · KEV evidence unavailable',
+      not_established: 'Exploitation not established by this feed',
+    };
+    let items = [];
+    let generatedAt = '';
+    let page = 0;
+    let loading = false;
+    let failed = false;
+    const pageSize = 6;
+    const addText = (parent, tag, value, className = '') => {
+      const element = document.createElement(tag);
+      element.textContent = value;
+      element.className = className;
+      parent.appendChild(element);
+      return element;
+    };
+    const addReport = (card, title, report, fields) => {
+      if (!report || typeof report !== 'object' || Array.isArray(report)) return;
+      const details = document.createElement('details');
+      addText(details, 'summary', title);
+      fields.forEach(([key, label]) => {
+        if (report[key] != null && report[key] !== '') addText(details, 'p', `${label}: ${report[key]}`);
+      });
+      const reference = safeHttpUrl(report.reference);
+      if (reference) {
+        const link = addText(details, 'a', 'Open provider record ↗');
+        link.href = reference;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+      }
+      card.appendChild(details);
+    };
+    const render = () => {
+      const matches = dashboardCore.filterVulnerabilities(items, search.value, filter.value);
+      const pages = Math.ceil(matches.length / pageSize);
+      page = Math.min(page, Math.max(0, pages - 1));
+      cards.replaceChildren();
+      previous.disabled = loading || page === 0;
+      next.disabled = loading || page + 1 >= pages;
+      pageLabel.textContent = `Page ${pages ? page + 1 : 0} of ${pages}`;
+      refresh.disabled = loading;
+      search.disabled = filter.disabled = loading;
+      status.textContent = loading ? 'Loading the vulnerability collection…' : failed
+        ? 'Collection unavailable. Refresh to retry; no previous results are displayed.'
+        : `${matches.length} of ${items.length} CVEs · ${items.filter((item) => item.exploitation_status === 'known_exploited').length} with CISA KEV evidence · Snapshot ${generatedAt}${!matches.length ? ' · No matching vulnerabilities.' : ''}`;
+      if (loading || failed) return;
+      matches.slice(page * pageSize, (page + 1) * pageSize).forEach((item) => {
+        const card = document.createElement('article');
+        card.className = 'discovery-card vulnerability-card';
+        card.dataset.exploitation = item.exploitation_status;
+        addText(card, 'p', labels[item.exploitation_status], 'vulnerability-evidence');
+        addText(card, 'h3', item.cve_id);
+        if (item.title && item.title !== item.cve_id) addText(card, 'p', item.title, 'vulnerability-title');
+        const kev = item.reports?.cisa_kev;
+        const nvd = item.reports?.nvd;
+        addText(card, 'p', `Severity: ${nvd?.severity || 'Not supplied'} · ${kev?.product || 'Product not supplied'}${nvd?.status ? ` · NVD: ${nvd.status}` : ''}`, 'vulnerability-meta');
+        // Keep long provider descriptions available without making cards unbounded.
+        const summary = document.createElement('details');
+        addText(summary, 'summary', 'Read description');
+        addText(summary, 'p', item.description || 'No description supplied.');
+        card.appendChild(summary);
+        addReport(card, 'CISA KEV evidence & action', kev, [
+          ['vendor', 'Vendor'], ['product', 'Product'], ['description', 'CISA description'],
+          ['date_added', 'Added to catalog'], ['catalog_checked_at', 'Catalog checked'],
+          ['required_action', 'Required action'], ['due_date', 'CISA due date (federal directive)'],
+          ['ransomware_use', 'Known ransomware campaign use'], ['notes', 'Notes'],
+        ]);
+        addReport(card, 'NVD publication & severity', nvd, [
+          ['published_at', 'Published'], ['modified_at', 'Modified'], ['status', 'NVD status'],
+          ['severity', 'Severity'], ['description', 'NVD description'],
+        ]);
+        addText(card, 'p', `Reporting sources: ${item.sources.join(', ') || 'Not supplied'}`, 'vulnerability-meta');
+        if (!kev && !nvd) {
+          const reference = safeHttpUrl(item.reference);
+          if (reference) {
+            const link = addText(card, 'a', 'Open reporting source ↗', 'vulnerability-meta');
+            link.href = reference;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+          }
+        }
+        const copy = addText(card, 'button', 'Copy CVE', 'button ghost');
+        copy.type = 'button';
+        copy.addEventListener('click', () => copyOrPrompt(item.cve_id, 'CVE copied.', 'Copy this CVE:'));
+        card.appendChild(copy);
+        cards.appendChild(card);
+      });
+    };
+    const load = async () => {
+      loading = true;
+      failed = false;
+      items = [];
+      page = 0;
+      render();
+      const controller = new AbortController();
+      const timer = window.setTimeout(() => controller.abort(), 20000);
+      try {
+        const response = await fetch(resolveIocUrl('collections/vulnerabilities.json'), { cache: 'no-cache', signal: controller.signal });
+        if (!response.ok) throw new Error('Collection unavailable');
+        const data = await response.json();
+        if (data.schema_version !== 1 || !Array.isArray(data.items) || typeof data.generated_at !== 'string' || !Number.isFinite(Date.parse(data.generated_at))) throw new Error('Invalid collection');
+        const seen = new Set();
+        for (const item of data.items) {
+          if (!item || typeof item.cve_id !== 'string' || !/^CVE-\d{4}-\d{4,}$/.test(item.cve_id) || seen.has(item.cve_id)
+            || !Object.hasOwn(labels, item.exploitation_status) || !Array.isArray(item.sources)
+            || !item.sources.every((source) => typeof source === 'string')
+            || !item.reports || typeof item.reports !== 'object' || Array.isArray(item.reports)) throw new Error('Invalid CVE record');
+          seen.add(item.cve_id);
+        }
+        items = data.items;
+        generatedAt = new Date(data.generated_at).toLocaleString();
+      } catch (error) {
+        items = [];
+        failed = true;
+      } finally {
+        window.clearTimeout(timer);
+        loading = false;
+        render();
+      }
+    };
+    [search, filter].forEach((control) => control.addEventListener(control === search ? 'input' : 'change', () => { page = 0; render(); }));
+    previous.addEventListener('click', () => { page -= 1; render(); });
+    next.addEventListener('click', () => { page += 1; render(); });
+    refresh.addEventListener('click', load);
+    load();
+  };
+
   const initialiseDiscovery = () => {
     const root = qs('[data-discovery-root]');
     if (!root || !dashboardCore?.buildDiscovery) return;
@@ -4070,6 +4213,7 @@
   initialiseTableToggles();
   initialiseInvestigationWorkspace();
   initialiseStatusBanner();
+  initialiseVulnerabilities();
   initialiseDiscovery();
   initialiseCampaignGraph();
   initialiseTopThreats();
