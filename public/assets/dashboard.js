@@ -2285,8 +2285,12 @@
       return [0, 40, 60, 80][confidenceRankForRow(row)] || 0;
     };
 
-    const rowKey = (row) =>
-      normaliseLower(row.type) + '\u0000' + normaliseLower(row.indicator);
+    const rowKey = (row) => {
+      if (dashboardCore?.investigationKey) return dashboardCore.investigationKey(row);
+      const type = normaliseLower(row.type) || 'unknown';
+      const indicator = normaliseString(row.indicator);
+      return type + '\u0000' + (type === 'url' ? indicator : indicator.toLowerCase());
+    };
 
     const sourceCount = (rows) => {
       const sources = new Set();
@@ -3045,6 +3049,14 @@
     let graph = null;
     let selected = null;
     let rotation = 0;
+    if (density && window.matchMedia?.('(max-width: 540px)').matches) {
+      density.value = '24';
+    }
+
+    const compactText = (value, limit = 220) => {
+      const text = normaliseString(value);
+      return text.length > limit ? text.slice(0, limit - 1).trimEnd() + '…' : text;
+    };
 
     const createSvg = (name, attributes = {}) => {
       const element = document.createElementNS(svgNamespace, name);
@@ -3139,7 +3151,7 @@
       if (description) {
         description.textContent = node.kind === 'pivot'
           ? `${formatNumber(node.totalCount)} indicators share this ${node.pivotKind}; ${formatNumber(node.count)} are visible in this graph. Their average risk score is ${node.averageScore}.`
-          : `${node.row?.confidence ? `${node.row.confidence} confidence · ` : ''}Reported by ${primarySourceLabel(node.row)}${node.row?.context ? ` · ${node.row.context}` : ''}.`;
+          : `${node.row?.confidence ? `${node.row.confidence} confidence · ` : ''}Reported by ${primarySourceLabel(node.row)}${node.row?.context ? ` · ${compactText(node.row.context)}` : ''}.`;
       }
       const tags = node.kind === 'indicator' && Array.isArray(node.row?.tags)
         ? node.row.tags.slice(0, 8)
@@ -3180,6 +3192,7 @@
     };
 
     const render = () => {
+      const selectedId = selected?.id;
       graph = dashboardCore.buildCampaignGraph(entries, {
         mode: mode?.value || 'all',
         maxPivots: 8,
@@ -3187,6 +3200,7 @@
       });
       svg.innerHTML = '';
       selected = null;
+      const nextSelected = graph.nodes.find((node) => node.id === selectedId) || null;
       const hasGraph = graph.nodes.length > 0 && graph.edges.length > 0;
       if (empty) empty.hidden = hasGraph;
       svg.hidden = !hasGraph;
@@ -3288,11 +3302,30 @@
           if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
             selectNode(node);
+            return;
+          }
+          const navigation = {
+            ArrowRight: 1,
+            ArrowDown: 1,
+            ArrowLeft: -1,
+            ArrowUp: -1,
+          };
+          if (event.key in navigation || event.key === 'Home' || event.key === 'End') {
+            event.preventDefault();
+            const elements = qsa('[data-graph-node]', svg);
+            const current = elements.indexOf(group);
+            const target = event.key === 'Home'
+              ? 0
+              : event.key === 'End'
+              ? elements.length - 1
+              : (current + navigation[event.key] + elements.length) % elements.length;
+            elements[target]?.focus();
           }
         });
         nodeLayer.appendChild(group);
       });
       svg.appendChild(nodeLayer);
+      if (nextSelected) selectNode(nextSelected);
     };
 
     mode?.addEventListener('change', render);
