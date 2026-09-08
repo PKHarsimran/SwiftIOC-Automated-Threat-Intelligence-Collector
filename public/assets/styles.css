@@ -2945,3 +2945,340 @@ input.lookup-input {
     width: 100%;
   }
 }
+
+/* ===========================================================================
+ * Immersive threat-operations visual layer
+ * ======================================================================= */
+
+[hidden] {
+  display: none !important;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(56, 189, 248, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.025) 1px, transparent 1px);
+  background-size: 52px 52px;
+  mask-image: linear-gradient(to bottom, black, transparent 78%);
+  animation: ambient-grid-drift 24s linear infinite;
+}
+
+.page-wrapper {
+  z-index: 1;
+}
+
+.page-header {
+  position: relative;
+  min-height: 20rem;
+  justify-content: center;
+  overflow: hidden;
+  padding: clamp(1.5rem, 4vw, 3.5rem);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  border-radius: 1.25rem;
+  background:
+    radial-gradient(circle at 82% 50%, rgba(14, 165, 233, 0.17), transparent 23rem),
+    linear-gradient(115deg, rgba(8, 15, 28, 0.96), rgba(8, 20, 38, 0.84));
+  box-shadow: 0 28px 80px rgba(2, 6, 23, 0.42);
+}
+
+.page-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(56, 189, 248, 0.1) 1px, transparent 1px),
+    linear-gradient(rgba(56, 189, 248, 0.08) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mask-image: radial-gradient(circle at 82% 50%, black, transparent 43%);
+  opacity: 0.62;
+}
+
+.page-header-main {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
+
+.page-header-main > div:first-child {
+  max-width: 48rem;
+}
+
+.signal-radar {
+  position: absolute;
+  top: 50%;
+  right: clamp(1rem, 8vw, 6rem);
+  width: clamp(15rem, 26vw, 22rem);
+  aspect-ratio: 1;
+  border: 1px solid rgba(125, 211, 252, 0.2);
+  border-radius: 50%;
+  opacity: 0.72;
+  transform: translateY(-50%);
+}
+
+.radar-ring,
+.radar-crosshair,
+.radar-sweep,
+.radar-blip {
+  position: absolute;
+}
+
+.radar-ring {
+  inset: 50%;
+  border: 1px solid rgba(125, 211, 252, 0.24);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.radar-ring-one { width: 34%; height: 34%; }
+.radar-ring-two { width: 66%; height: 66%; }
+.radar-ring-three { width: 100%; height: 100%; }
+
+.radar-crosshair {
+  inset: 0;
+  border-radius: 50%;
+  background:
+    linear-gradient(transparent calc(50% - 0.5px), rgba(125, 211, 252, 0.22) 50%, transparent calc(50% + 0.5px)),
+    linear-gradient(90deg, transparent calc(50% - 0.5px), rgba(125, 211, 252, 0.22) 50%, transparent calc(50% + 0.5px));
+}
+
+.radar-sweep {
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, rgba(34, 211, 238, 0.5), transparent 17%, transparent);
+  animation: radar-scan 5.5s linear infinite;
+}
+
+.radar-blip {
+  width: 0.48rem;
+  height: 0.48rem;
+  border-radius: 50%;
+  background: #67e8f9;
+  box-shadow: 0 0 0 0 rgba(103, 232, 249, 0.55);
+  animation: radar-blip 2.4s ease-out infinite;
+}
+
+.blip-one { top: 23%; left: 58%; }
+.blip-two { top: 64%; left: 72%; animation-delay: -0.8s; }
+.blip-three { top: 53%; left: 28%; animation-delay: -1.6s; }
+
+.hero-download {
+  position: relative;
+  z-index: 3;
+  overflow: hidden;
+  backdrop-filter: blur(14px);
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.hero-download::after {
+  content: '';
+  position: absolute;
+  inset: -60% auto -60% -45%;
+  width: 35%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+  transform: skewX(-18deg);
+  transition: left 520ms ease;
+}
+
+.hero-download:hover {
+  transform: translateY(-3px);
+}
+
+.hero-download:hover::after {
+  left: 125%;
+}
+
+.status-dot {
+  animation: status-beacon 2.6s ease-out infinite;
+}
+
+.metric-card {
+  position: relative;
+  overflow: hidden;
+  transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.metric-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #38bdf8, #a78bfa, transparent);
+  opacity: 0.72;
+  transform: scaleX(0.25);
+  transition: transform 320ms ease, opacity 320ms ease;
+}
+
+.metric-card:hover {
+  border-color: rgba(125, 211, 252, 0.62);
+  box-shadow: 0 22px 48px rgba(2, 6, 23, 0.44), 0 0 35px rgba(14, 165, 233, 0.08);
+  transform: translateY(-4px);
+}
+
+.metric-card:hover::before {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+.metric-value {
+  background: linear-gradient(110deg, #f8fafc 18%, #7dd3fc 50%, #c4b5fd 82%);
+  background-clip: text;
+  color: transparent;
+}
+
+.score-bar {
+  overflow: hidden;
+  box-shadow: inset 0 0 18px rgba(2, 6, 23, 0.65), 0 0 28px rgba(14, 165, 233, 0.08);
+}
+
+.score-seg {
+  transform-origin: left center;
+  animation: score-segment-in 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--segment-delay, 0ms);
+}
+
+.pointer-reactive {
+  position: relative;
+}
+
+.pointer-reactive::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(
+    22rem circle at var(--spot-x, -30rem) var(--spot-y, -30rem),
+    rgba(125, 211, 252, 0.105),
+    transparent 44%
+  );
+}
+
+.pointer-reactive > * {
+  position: relative;
+  z-index: 1;
+}
+
+.motion-enhanced .reveal-card {
+  opacity: 0;
+  transform: translateY(22px) scale(0.992);
+  transition:
+    opacity 620ms ease calc(var(--reveal-order, 0) * 45ms),
+    transform 620ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--reveal-order, 0) * 45ms);
+}
+
+.motion-enhanced .reveal-card.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+.preview-row-enter {
+  animation: preview-row-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--row-delay, 0ms);
+}
+
+.top-threats.is-visible .threat-card {
+  animation: threat-card-in 540ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.top-threats.is-visible .threat-card:nth-child(2) { animation-delay: 70ms; }
+.top-threats.is-visible .threat-card:nth-child(3) { animation-delay: 140ms; }
+.top-threats.is-visible .threat-card:nth-child(4) { animation-delay: 210ms; }
+.top-threats.is-visible .threat-card:nth-child(5) { animation-delay: 280ms; }
+.top-threats.is-visible .threat-card:nth-child(6) { animation-delay: 350ms; }
+
+.toast:not([hidden]) {
+  animation: toast-arrive 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes ambient-grid-drift {
+  to { background-position: 52px 52px; }
+}
+
+@keyframes radar-scan {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes radar-blip {
+  0%, 28% { opacity: 0; box-shadow: 0 0 0 0 rgba(103, 232, 249, 0.55); }
+  35% { opacity: 1; }
+  72%, 100% { opacity: 0; box-shadow: 0 0 0 0.85rem rgba(103, 232, 249, 0); }
+}
+
+@keyframes status-beacon {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.68; transform: scale(0.78); }
+}
+
+@keyframes score-segment-in {
+  from { opacity: 0.35; transform: scaleX(0); }
+  to { opacity: 1; transform: scaleX(1); }
+}
+
+@keyframes preview-row-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes threat-card-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes toast-arrive {
+  from { opacity: 0; transform: translateY(0.65rem) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (max-width: 820px) {
+  .page-header {
+    min-height: 24rem;
+  }
+
+  .signal-radar {
+    right: -5rem;
+    opacity: 0.28;
+  }
+}
+
+@media (max-width: 540px) {
+  .page-header {
+    min-height: 0;
+    padding: 1.35rem;
+  }
+
+  .signal-radar {
+    top: 22%;
+    right: -7rem;
+    width: 17rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  .radar-sweep,
+  .radar-blip,
+  .status-dot,
+  .score-seg,
+  .preview-row-enter,
+  .top-threats.is-visible .threat-card,
+  .toast:not([hidden]) {
+    animation: none !important;
+  }
+
+  .motion-enhanced .reveal-card,
+  .hero-download,
+  .hero-download::after,
+  .metric-card,
+  .metric-card::before {
+    opacity: 1;
+    transform: none;
+    transition: none !important;
+  }
+}
