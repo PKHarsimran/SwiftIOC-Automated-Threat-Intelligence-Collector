@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import uuid
@@ -109,3 +110,36 @@ def test_detection_pack_records_invalid_observables(tmp_path):
     }
     assert not (tmp_path / "sigma" / "network-iocs.yml").exists()
     assert not (tmp_path / "sigma" / "dns-iocs.yml").exists()
+
+
+def test_suricata_collision_registry_keeps_unchanged_rule_sid(tmp_path):
+    colliding_ip = _indicator("154.91.59.103", "ipv4")
+    colliding_domain = _indicator("fakelouisvuitton.org", "domain")
+    si.write_detection_pack(
+        tmp_path, [colliding_ip, colliding_domain], generated_at="2026-09-08T02:00:00Z"
+    )
+    domain_key = "dns:fakelouisvuitton.org"
+    base_sid = 4_000_000 + int(hashlib.sha256(domain_key.encode()).hexdigest()[:8], 16) % 900_000
+    registry = json.loads((tmp_path / "suricata" / "sid-registry.json").read_text())
+    domain_sid = registry[domain_key]
+    assert domain_sid != base_sid
+
+    si.write_detection_pack(
+        tmp_path, [colliding_domain], generated_at="2026-09-08T03:00:00Z"
+    )
+
+    registry = json.loads((tmp_path / "suricata" / "sid-registry.json").read_text())
+    assert registry[domain_key] == domain_sid
+    assert f"sid:{domain_sid};" in (tmp_path / "suricata" / "swiftioc.rules").read_text()
+
+
+def test_rpz_serial_advances_when_two_revisions_share_a_timestamp(tmp_path):
+    first = si.write_detection_pack(
+        tmp_path, [_indicator("first.example", "domain")], generated_at="2026-09-08T02:00:00Z"
+    )
+    second = si.write_detection_pack(
+        tmp_path, [_indicator("second.example", "domain")], generated_at="2026-09-08T02:00:00Z"
+    )
+
+    assert second["rpz_serial"] == first["rpz_serial"] + 1
+    assert f"({second['rpz_serial']} " in (tmp_path / "dns" / "swiftioc.rpz").read_text()
