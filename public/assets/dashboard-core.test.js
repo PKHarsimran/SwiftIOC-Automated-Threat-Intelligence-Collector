@@ -192,6 +192,34 @@ test('preserves case-sensitive URL paths in investigation identity', () => {
   );
 });
 
+test('builds type-aware Sigma detections from the investigation queue', () => {
+  const sigma = core.rowsToSigma([
+    { indicator: '1[.]2[.]3[.]4', type: 'ipv4' },
+    { indicator: 'evil[.]example', type: 'domain' },
+    { indicator: 'hxxps://evil[.]example/dropper', type: 'url' },
+  ]);
+  assert.match(sigma, /category: network_connection/);
+  assert.match(sigma, /"1\.2\.3\.4"/);
+  assert.match(sigma, /category: dns/);
+  assert.match(sigma, /"\.evil\.example"/);
+  assert.doesNotMatch(sigma, /dropper/);
+});
+
+test('builds deterministic Suricata rules and rejects injected values', () => {
+  const rows = [
+    { indicator: '1[.]2[.]3[.]4', type: 'ipv4' },
+    { indicator: 'evil[.]example', type: 'domain' },
+    { indicator: 'evil.com"; sid:1;', type: 'domain' },
+  ];
+  const first = core.rowsToSuricata(rows);
+  const second = core.rowsToSuricata(rows.slice().reverse());
+  assert.equal(first, second);
+  assert.equal((first.match(/\bsid:\d+;/g) || []).length, 3);
+  assert.match(first, /1\.2\.3\.4/);
+  assert.match(first, /dotprefix; content:"\.evil\.example"/);
+  assert.doesNotMatch(first, /sid:1;/);
+});
+
 test('dashboard markup keeps IDs and labelled controls consistent', () => {
   const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
   const css = fs.readFileSync(path.join(__dirname, 'styles.css'), 'utf8');
@@ -216,6 +244,8 @@ test('dashboard markup keeps IDs and labelled controls consistent', () => {
   assert.match(html, /data-preview-download-note/);
   assert.match(html, /data-investigation-root/);
   assert.match(html, /data-investigation-list/);
+  assert.match(html, /data-investigation-sigma/);
+  assert.match(html, /data-investigation-suricata/);
   assert.match(html, /class="signal-radar"/);
   assert.match(html, /data-delta-root/);
   assert.match(html, /iocs\/delta\.jsonl/);
