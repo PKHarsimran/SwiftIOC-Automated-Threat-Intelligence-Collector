@@ -359,9 +359,12 @@
       )
       .slice(0, maxIndicators);
     const selectedKeys = new Set(selectedRows.map(investigationKey));
+    const renderedPivots = selectedPivots.filter((pivot) =>
+      Array.from(pivot.rows.keys()).some((key) => selectedKeys.has(key))
+    );
 
     const nodes = [
-      ...selectedPivots.map((pivot) => ({
+      ...renderedPivots.map((pivot) => ({
         id: `pivot:${pivot.key}`,
         kind: 'pivot',
         pivotKind: pivot.kind,
@@ -384,7 +387,7 @@
       })),
     ];
     const edges = [];
-    selectedPivots.forEach((pivot) => {
+    renderedPivots.forEach((pivot) => {
       pivot.rows.forEach((_row, key) => {
         if (selectedKeys.has(key)) {
           edges.push({
@@ -404,7 +407,7 @@
       nodes,
       edges,
       stats: {
-        pivots: selectedPivots.length,
+        pivots: renderedPivots.length,
         indicators: selectedRows.length,
         relationships: edges.length,
         highScore: selectedScores.filter((value) => value >= 80).length,
@@ -414,8 +417,8 @@
         averageScore: selectedScores.length
           ? Math.round(selectedScores.reduce((total, value) => total + value, 0) / selectedScores.length)
           : 0,
-        tagPivots: selectedPivots.filter((pivot) => pivot.kind === 'tag').length,
-        sourcePivots: selectedPivots.filter((pivot) => pivot.kind === 'source').length,
+        tagPivots: renderedPivots.filter((pivot) => pivot.kind === 'tag').length,
+        sourcePivots: renderedPivots.filter((pivot) => pivot.kind === 'source').length,
       },
     };
   };
