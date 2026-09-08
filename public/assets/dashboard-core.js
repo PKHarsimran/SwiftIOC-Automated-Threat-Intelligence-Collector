@@ -136,6 +136,160 @@
     return rows;
   };
 
+  const validIpv4 = (value) => {
+    const parts = value.split('.');
+    return parts.length === 4 && parts.every((part) =>
+      /^\d{1,3}$/.test(part) && Number(part) <= 255
+    );
+  };
+
+  const validIpv6 = (value) => {
+    if (!value.includes(':') || !/^[0-9a-f:]+$/i.test(value)) return false;
+    try {
+      return new URL(`http://[${value}]/`).hostname.length > 2;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  const validDomain = (value) => value.length <= 253 && value.includes('.') &&
+    value.split('.').every((label) =>
+      /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/i.test(label)
+    );
+
+  const detectionRows = (value) => {
+    const rows = [];
+    const seen = new Set();
+    for (const row of normaliseInvestigationRows(value, 250)) {
+      const type = lower(row.type);
+      const indicator = refang(row.indicator).replace(/\.$/, '');
+      let valid = false;
+      if (type === 'ipv4') valid = validIpv4(indicator);
+      if (type === 'ipv4_cidr') {
+        const [address, prefix, ...rest] = indicator.split('/');
+        valid = !rest.length && validIpv4(address) && /^\d{1,2}$/.test(prefix) && Number(prefix) <= 32;
+      }
+      if (type === 'ipv6') valid = validIpv6(indicator);
+      if (type === 'ipv6_cidr') {
+        const [address, prefix, ...rest] = indicator.split('/');
+        valid = !rest.length && validIpv6(address) &&
+          /^\d{1,3}$/.test(prefix) && Number(prefix) <= 128;
+      }
+      if (type === 'domain') {
+        valid = validDomain(indicator);
+      }
+      const key = `${type}\u0000${indicator.toLowerCase()}`;
+      if (!valid || seen.has(key)) continue;
+      seen.add(key);
+      rows.push({ ...row, type, indicator });
+    }
+    return rows.sort((a, b) =>
+      a.type.localeCompare(b.type) || a.indicator.localeCompare(b.indicator)
+    );
+  };
+
+  const yamlList = (values, indent) => values
+    .map((value) => `${' '.repeat(indent)}- ${JSON.stringify(value)}`)
+    .join('\n');
+
+  const rowsToSigma = (value) => {
+    const rows = detectionRows(value);
+    const addresses = rows.filter((row) => /^ipv[46]$/.test(row.type)).map((row) => row.indicator);
+    const networks = rows.filter((row) => /^ipv[46]_cidr$/.test(row.type)).map((row) => row.indicator);
+    const domains = rows.filter((row) => row.type === 'domain').map((row) => row.indicator.toLowerCase());
+    const documents = [];
+    if (addresses.length || networks.length) {
+      const networkRule = [
+        'title: SwiftIOC investigation network indicators',
+        'status: experimental',
+        'description: Detects network traffic matching indicators selected in the SwiftIOC analyst workspace.',
+        'author: SwiftIOC analyst workspace',
+        'tags:',
+        '  - attack.command_and_control',
+        'logsource:',
+        '  category: network_connection',
+        'detection:',
+      ];
+      if (addresses.length) networkRule.push(
+        '  ip_source:', '    SourceIp:', yamlList(addresses, 6),
+        '  ip_destination:', '    DestinationIp:', yamlList(addresses, 6)
+      );
+      if (networks.length) networkRule.push(
+        '  ip_source_network:', '    SourceIp|cidr:', yamlList(networks, 6),
+        '  ip_destination_network:', '    DestinationIp|cidr:', yamlList(networks, 6)
+      );
+      networkRule.push(
+        '  condition: 1 of ip_*',
+        'falsepositives:',
+        '  - Legitimate shared infrastructure; validate with local context.',
+        'level: high',
+      );
+      documents.push(networkRule.join('\n'));
+    }
+    if (domains.length) {
+      documents.push([
+        'title: SwiftIOC investigation DNS indicators',
+        'status: experimental',
+        'description: Detects DNS queries matching domains selected in the SwiftIOC analyst workspace.',
+        'author: SwiftIOC analyst workspace',
+        'tags:',
+        '  - attack.command_and_control',
+        'logsource:',
+        '  category: dns',
+        'detection:',
+        '  domain_exact:',
+        '    query:',
+        yamlList(domains, 6),
+        '  domain_subdomain:',
+        '    query|endswith:',
+        yamlList(domains.map((domain) => `.${domain}`), 6),
+        '  condition: domain_exact or domain_subdomain',
+        'falsepositives:',
+        '  - Legitimate shared infrastructure; validate with local context.',
+        'level: high',
+      ].join('\n'));
+    }
+    return documents.join('\n---\n') + (documents.length ? '\n' : '');
+  };
+
+  const stableSid = (text, used) => {
+    let hash = 2166136261;
+    for (let index = 0; index < text.length; index += 1) {
+      hash ^= text.charCodeAt(index);
+      hash = Math.imul(hash, 16777619) >>> 0;
+    }
+    let sid = 4000000 + (hash % 900000);
+    while (used.has(sid)) sid = 4000000 + ((sid - 3999999) % 900000);
+    used.add(sid);
+    return sid;
+  };
+
+  const rowsToSuricata = (value) => {
+    const rules = [
+      '# SwiftIOC analyst-workspace detection pack',
+      '# Review and tune against local allowlists before enabling enforcement.',
+    ];
+    const used = new Set();
+    for (const row of detectionRows(value)) {
+      if (row.type.startsWith('ipv')) {
+        const target = row.indicator.includes(':') ? `[${row.indicator}]` : row.indicator;
+        for (const [direction, header] of [
+          ['inbound', `alert ip ${target} any -> $HOME_NET any`],
+          ['outbound', `alert ip $HOME_NET any -> ${target} any`],
+        ]) {
+          rules.push(`${header} (msg:"SwiftIOC ${direction} investigation match"; ` +
+            `classtype:trojan-activity; sid:${stableSid(`ip:${row.indicator}:${direction}`, used)}; rev:1;)`);
+        }
+      }
+      if (row.type === 'domain') {
+        rules.push('alert dns $HOME_NET any -> any 53 ' +
+          `(msg:"SwiftIOC investigation DNS match"; dns.query; dotprefix; content:".${row.indicator}"; ` +
+          `nocase; endswith; classtype:trojan-activity; sid:${stableSid(`dns:${row.indicator}`, used)}; rev:1;)`);
+      }
+    }
+    return rules.join('\n') + '\n';
+  };
+
   const scoreBand = (row) => {
     const score = effectiveScore(row);
     if (score >= 80) return 'high';
@@ -322,11 +476,14 @@
     compareRows,
     effectiveScore,
     investigationKey,
+    detectionRows,
     matchesRow,
     normaliseInvestigationRows,
     readViewState,
     refang,
     rowsToCsv,
+    rowsToSigma,
+    rowsToSuricata,
     writeViewUrl,
   };
 });
