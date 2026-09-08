@@ -665,8 +665,9 @@
     return items.filter((item) => {
       if (status !== 'all' && item.exploitation_status !== status) return false;
       const kev = item.reports?.cisa_kev || {};
+      const nvd = item.reports?.nvd || {};
       return !query || lower([item.cve_id, item.title, item.description, kev.vendor,
-        kev.product, ...(item.sources || [])].join(' ')).includes(query);
+        kev.product, kev.description, nvd.description, ...(item.sources || [])].join(' ')).includes(query);
     }).sort((a, b) => (priority[a.exploitation_status] ?? 3) - (priority[b.exploitation_status] ?? 3)
       || a.cve_id.localeCompare(b.cve_id));
   };
