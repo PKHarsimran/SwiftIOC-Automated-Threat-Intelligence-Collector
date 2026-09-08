@@ -299,6 +299,7 @@
       'aggregated', 'blocklist', 'critical', 'high', 'info', 'ioc', 'low',
       'malicious', 'malware', 'medium', 'threat-intel', 'threat intelligence',
     ]);
+    const ignoredSources = new Set(['', 'n/a', 'none', 'unknown', 'unspecified']);
     const sourceNames = new Set(rows.flatMap((row) => rowSources(row).map(lower)));
     const pivots = new Map();
 
@@ -324,7 +325,9 @@
         });
       }
       if (mode !== 'tags') {
-        rowSources(row).slice(0, 25).forEach((source) => addPivot('source', source, row));
+        rowSources(row).slice(0, 25).forEach((source) => {
+          if (!ignoredSources.has(lower(source))) addPivot('source', source, row);
+        });
       }
     });
 
