@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import ipaddress
 import json
+import re
 import uuid
 from collections import Counter
 from pathlib import Path
@@ -114,15 +115,20 @@ def _sigma_documents(grouped: Dict[str, List[str]], generated_at: str) -> Dict[s
     return documents
 
 
-def _sid(value: str, used: set[int]) -> int:
+def _sid(value: str, used: set[int], registry: Dict[str, int]) -> int:
+    registered = registry.get(value)
+    if registered is not None and registered not in used:
+        used.add(registered)
+        return registered
     candidate = 4_000_000 + int(hashlib.sha256(value.encode("utf-8")).hexdigest()[:8], 16) % 900_000
     while candidate in used:
         candidate = 4_000_000 + ((candidate - 4_000_000 + 1) % 900_000)
     used.add(candidate)
+    registry[value] = candidate
     return candidate
 
 
-def _suricata_rules(grouped: Dict[str, List[str]]) -> Tuple[str, int]:
+def _suricata_rules(grouped: Dict[str, List[str]], registry: Dict[str, int]) -> Tuple[str, int]:
     rules: List[str] = []
     used: set[int] = set()
     addresses = grouped["ipv4"] + grouped["ipv6"] + grouped["ipv4_cidr"] + grouped["ipv6_cidr"]
@@ -132,13 +138,13 @@ def _suricata_rules(grouped: Dict[str, List[str]]) -> Tuple[str, int]:
             ("inbound", f"alert ip {target} any -> $HOME_NET any"),
             ("outbound", f"alert ip $HOME_NET any -> {target} any"),
         ):
-            sid = _sid(f"ip:{address}:{direction}", used)
+            sid = _sid(f"ip:{address}:{direction}", used, registry)
             rules.append(
                 f'{header} (msg:"SwiftIOC {direction} high-confidence IP match"; '
                 f'classtype:trojan-activity; sid:{sid}; rev:1;)'
             )
     for domain in grouped["domain"]:
-        sid = _sid(f"dns:{domain}", used)
+        sid = _sid(f"dns:{domain}", used, registry)
         rules.append(
             'alert dns $HOME_NET any -> any 53 '
             f'(msg:"SwiftIOC high-confidence DNS match"; dns.query; dotprefix; content:".{domain}"; '
@@ -151,9 +157,42 @@ def _suricata_rules(grouped: Dict[str, List[str]]) -> Tuple[str, int]:
     return header + "\n".join(rules) + ("\n" if rules else ""), len(rules)
 
 
-def _rpz_zone(domains: Sequence[str], generated_at: str) -> str:
+def _load_detection_state(out_dir: Path) -> Tuple[Dict[str, int], int | None]:
+    registry: Dict[str, int] = {}
+    try:
+        previous = json.loads(
+            (out_dir / "suricata" / "sid-registry.json").read_text(encoding="utf-8")
+        )
+    except (OSError, ValueError, TypeError):
+        previous = {}
+    if isinstance(previous, dict):
+        for key, value in previous.items():
+            if isinstance(key, str) and isinstance(value, int) and 1 <= value <= 0xFFFFFFFF:
+                registry[key] = value
+
+    previous_serial: int | None = None
+    try:
+        zone = (out_dir / "dns" / "swiftioc.rpz").read_text(encoding="utf-8")
+        match = re.search(r"root\.localhost\.\s*\((\d+)", zone)
+        if match:
+            value = int(match.group(1))
+            if 0 <= value <= 0xFFFFFFFF:
+                previous_serial = value
+    except OSError:
+        pass
+    return registry, previous_serial
+
+
+def _rpz_serial(generated_at: str, previous: int | None) -> int:
     observed = parse_dt(generated_at)
-    serial = observed.strftime("%Y%m%d%H") if observed else "1"
+    candidate = int(observed.timestamp()) if observed else 1
+    candidate = max(1, min(candidate, 0xFFFFFFFF))
+    if previous is None or candidate > previous:
+        return candidate
+    return 0 if previous == 0xFFFFFFFF else previous + 1
+
+
+def _rpz_zone(domains: Sequence[str], serial: int) -> str:
     lines = [
         "$TTL 300",
         f"@ IN SOA localhost. root.localhost. ({serial} 300 60 86400 60)",
@@ -172,6 +211,7 @@ Generated from the curated high-confidence feed. Treat these artifacts as detect
 - `sigma/network-iocs.yml` matches source or destination IPs in normalized network-connection events.
 - `sigma/dns-iocs.yml` matches malicious domain suffixes in normalized DNS events.
 - `suricata/swiftioc.rules` contains stable-SID inbound, outbound, and DNS alert rules.
+- `suricata/sid-registry.json` preserves collision-resolved SIDs across feed revisions.
 - `dns/swiftioc.rpz` is a response-policy zone for exact domains and their subdomains.
 - `manifest.json` records coverage and every unsupported or invalid indicator type that was skipped.
 
@@ -182,12 +222,17 @@ Compile Sigma for your backend with Sigma CLI, load the Suricata file through yo
 def write_detection_pack(out_dir: Path, rows: Sequence[Indicator], *, generated_at: str) -> Dict[str, Any]:
     """Write Sigma, Suricata, and DNS RPZ artifacts plus an auditable manifest."""
     grouped, skipped = _unique_observables(rows)
+    sid_registry, previous_rpz_serial = _load_detection_state(out_dir)
     sigma = _sigma_documents(grouped, generated_at)
-    suricata, suricata_count = _suricata_rules(grouped)
+    suricata, suricata_count = _suricata_rules(grouped, sid_registry)
+    rpz_serial = _rpz_serial(generated_at, previous_rpz_serial)
     artifacts: Dict[str, str] = {
         **sigma,
         "suricata/swiftioc.rules": suricata,
-        "dns/swiftioc.rpz": _rpz_zone(grouped["domain"], generated_at),
+        "suricata/sid-registry.json": json.dumps(
+            dict(sorted(sid_registry.items())), ensure_ascii=False, indent=2
+        ) + "\n",
+        "dns/swiftioc.rpz": _rpz_zone(grouped["domain"], rpz_serial),
         "README.md": _pack_readme(),
     }
     # Optional Sigma families can disappear as the curated feed changes. Never
@@ -202,6 +247,7 @@ def write_detection_pack(out_dir: Path, rows: Sequence[Indicator], *, generated_
         "generated_at": generated_at,
         "source": "SwiftIOC high-confidence feed",
         "policy": "review-required",
+        "rpz_serial": rpz_serial,
         "included": included,
         "skipped": dict(sorted(skipped.items())),
         "artifacts": {
