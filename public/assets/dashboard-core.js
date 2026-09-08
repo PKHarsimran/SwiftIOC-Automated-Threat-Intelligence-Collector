@@ -673,21 +673,53 @@
     return url;
   };
 
-  const filterVulnerabilities = (items, search = '', status = 'all') => {
+  // NVD timestamps without offsets are UTC, not the analyst's local time.
+  const vulnerabilityDate = (value, now) => {
+    if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}(?:$|T)/.test(value)) return null;
+    const day = value.slice(0, 10);
+    const calendar = Date.parse(`${day}T00:00:00Z`);
+    if (!Number.isFinite(calendar) || new Date(calendar).toISOString().slice(0, 10) !== day) return null;
+    const utc = value.includes('T') && !/(?:Z|[+-]\d{2}:?\d{2})$/i.test(value) ? `${value}Z` : value;
+    const time = Date.parse(utc) / 1000;
+    return Number.isFinite(time) && time <= now ? time : null;
+  };
+
+  const vulnerabilityFacts = (item, now = Date.now() / 1000) => ({
+    added: vulnerabilityDate(item.reports?.cisa_kev?.date_added, now),
+    checked: vulnerabilityDate(item.reports?.cisa_kev?.catalog_checked_at, now),
+    published: vulnerabilityDate(item.reports?.nvd?.published_at, now),
+    modified: vulnerabilityDate(item.reports?.nvd?.modified_at, now),
+    rejected: lower(item.reports?.nvd?.status) === 'rejected',
+  });
+
+  const filterVulnerabilities = (items, search = '', status = 'all', options = {}) => {
     const query = lower(search).trim();
+    const now = options.now ?? Date.now() / 1000;
+    const view = ['kev30', 'published7', 'updated7'].includes(options.view) ? options.view : 'priority';
     const priority = { known_exploited: 0, reported_exploitation: 1, not_established: 2 };
-    return items.filter((item) => {
+    const recent = (time, days) => time != null && now - time <= days * 86400;
+    const orderDate = (item, facts) => view === 'updated7' ? facts.modified
+      : view === 'published7' ? facts.published
+      : item.exploitation_status === 'known_exploited' ? facts.added : facts.published;
+    return items.map((item) => ({ item, facts: vulnerabilityFacts(item, now) })).filter(({ item, facts }) => {
+      if (!options.includeRejected && facts.rejected) return false;
       if (status !== 'all' && item.exploitation_status !== status) return false;
+      if (view === 'kev30' && (item.exploitation_status !== 'known_exploited' || !recent(facts.added, 30))) return false;
+      if (view === 'published7' && !recent(facts.published, 7)) return false;
+      if (view === 'updated7' && !recent(facts.modified, 7)) return false;
       const kev = item.reports?.cisa_kev || {};
       const nvd = item.reports?.nvd || {};
       return !query || lower([item.cve_id, item.title, item.description, kev.vendor,
         kev.product, kev.description, nvd.description, ...(item.sources || [])].join(' ')).includes(query);
-    }).sort((a, b) => (priority[a.exploitation_status] ?? 3) - (priority[b.exploitation_status] ?? 3)
-      || a.cve_id.localeCompare(b.cve_id));
+    }).sort((a, b) => Number(a.facts.rejected) - Number(b.facts.rejected)
+      || (view === 'priority' ? (priority[a.item.exploitation_status] ?? 3) - (priority[b.item.exploitation_status] ?? 3) : 0)
+      || (orderDate(b.item, b.facts) ?? -Infinity) - (orderDate(a.item, a.facts) ?? -Infinity)
+      || a.item.cve_id.localeCompare(b.item.cve_id)).map(({ item }) => item);
   };
 
   return {
     filterVulnerabilities,
+    vulnerabilityFacts,
     compareRows,
     buildCampaignGraph,
     buildDiscovery,
