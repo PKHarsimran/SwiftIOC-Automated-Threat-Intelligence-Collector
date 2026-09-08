@@ -3016,7 +3016,7 @@
 
   const initialiseVulnerabilities = () => {
     const root = qs('[data-vulnerability-root]');
-    if (!root || !dashboardCore?.filterVulnerabilities) return;
+    if (!root || !dashboardCore?.filterVulnerabilities || !dashboardCore?.vulnerabilityFacts) return;
     const cards = qs('[data-vulnerability-cards]', root);
     const status = qs('[data-vulnerability-status]', root);
     const search = qs('[data-vulnerability-search]', root);
@@ -3026,13 +3026,17 @@
     const includeRejected = qs('[data-vulnerability-include-rejected]', root);
     const help = qs('[data-vulnerability-view-help]', root);
     const freshness = qs('[data-vulnerability-freshness]', root);
+    // Old HTML may remain in an intermediary cache during a deployment.
+    if (!includeRejected || !help || !freshness || !views.length) return;
     const viewHelp = {
+      exploited: 'Confirmed KEV records only, newest catalog additions first. An empty result means this collection has no matching KEV evidence; other CVEs are available in All CVEs.',
+      ransomware: 'CISA KEV records explicitly marked Known for ransomware campaign use. Unknown and unreported values do not qualify.',
       priority: 'Known exploited first (newest KEV additions), then exploitation reports, then other CVEs. Publication dates order each remaining group.',
       kev30: 'Added to CISA KEV in the past 30 days, newest first. Catalog addition is not the date an attack occurred.',
       published7: 'NVD publication dates in the past 7 days, newest first. A newly published CVE is not necessarily exploited.',
       updated7: 'NVD record modifications in the past 7 days, newest first. An edit does not establish a new vulnerability or new exploitation.',
     };
-    let view = 'priority';
+    let view = 'exploited';
     let snapshotTime = null;
     const previous = qs('[data-vulnerability-prev]', root);
     const next = qs('[data-vulnerability-next]', root);
@@ -3116,6 +3120,7 @@
         addText(timeline, 'p', `NVD published: ${day(facts.published)}`);
         if (facts.modified != null) addText(timeline, 'p', `NVD updated: ${day(facts.modified)}`);
         card.appendChild(timeline);
+        if (facts.ransomware) addText(card, 'p', 'CISA: known ransomware campaign use', 'vulnerability-caution');
         if (facts.rejected) addText(card, 'p', 'Rejected by NVD · review the provider record before acting.', 'vulnerability-caution');
         if (item.exploitation_status === 'known_exploited' && (facts.checked == null || now - facts.checked > 86400)) {
           addText(card, 'p', `Historical KEV evidence · catalog check ${facts.checked == null ? 'unknown' : day(facts.checked)}. Refresh to verify current coverage.`, 'vulnerability-caution');
