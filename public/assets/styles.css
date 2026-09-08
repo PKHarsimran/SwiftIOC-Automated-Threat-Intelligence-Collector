@@ -3746,3 +3746,10 @@ body::before {
 .vulnerability-card > button { margin-top: auto; align-self: start; }
 .vulnerability-pagination { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 1rem; margin-block: 1.25rem; color: #b7c6d8; font-size: 0.8rem; }
 @media (max-width: 650px) { .vulnerability-toolbar { flex-direction: column; align-items: stretch; } .vulnerability-toolbar label { flex-basis: auto; } }
+
+.vulnerability-views { margin-top: 1.5rem; }
+.vulnerability-dates { padding: 0.6rem 0.8rem; margin-top: 0.9rem; border-left: 2px solid #75b9d2; background: #132739; color: #c0d5e8; font-size: 0.75rem; line-height: 1.6; }
+.vulnerability-dates p { margin: 0.2rem 0; }
+.vulnerability-rejected-control { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #b7c6d8; }
+.vulnerability-caution, .vulnerability-freshness { padding: 0.75rem; border: 1px solid #806739; border-radius: 0.5rem; background: #342a1955; color: #f1d6a6; font-size: 0.76rem; line-height: 1.6; }
+.vulnerability-action { color: #d6e6ef; font-size: 0.8rem; line-height: 1.6; overflow-wrap: anywhere; }
