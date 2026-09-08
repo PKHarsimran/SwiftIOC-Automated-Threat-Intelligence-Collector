@@ -13,6 +13,7 @@ import yaml
 
 from . import http_client
 from .collect import collect_from_yaml, parse_name_int_pairs, top_tags, type_breakdown
+from .detections import write_detection_pack
 from .http_client import UA_POOL, get_fetch_metrics, logger
 from .logging_utils import configure_logging
 from .models import classify, defang_min, iso, now_utc, parse_dt
@@ -307,12 +308,22 @@ def main() -> int:
         len(high_conf), len(rows), args.high_confidence_score,
     )
 
+    run_ts = iso(now_utc())
+    detection_manifest = write_detection_pack(
+        out_dir / "detections", high_conf, generated_at=run_ts
+    )
+    logger.info(
+        "Detection pack: %d Sigma rules, %d Suricata rules, %d RPZ domains",
+        detection_manifest["artifacts"]["sigma_rules"],
+        detection_manifest["artifacts"]["suricata_rules"],
+        detection_manifest["artifacts"]["rpz_domains"],
+    )
+
     dashboard_written = write_dashboard_feed(
         out_dir / "iocs" / "dashboard.jsonl", rows, limit=args.dashboard_rows
     )
     logger.info("Dashboard feed: top %d rows written", dashboard_written)
 
-    run_ts = iso(now_utc())
     delta = build_delta(
         previous_rows,
         rows,
@@ -413,6 +424,7 @@ def main() -> int:
         "corroborated_total": corroborated_total,
         "high_confidence_total": len(high_conf),
         "high_confidence_score": args.high_confidence_score,
+        "detection_pack": detection_manifest["artifacts"],
         "delta_counts": delta["counts"],
         "delta_baseline_available": delta["baseline_available"],
         "counts": counts,
