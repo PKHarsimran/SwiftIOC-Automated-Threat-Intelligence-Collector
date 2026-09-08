@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import json
+from copy import deepcopy
+
+import pytest
 
 import swiftioc as si
 
@@ -70,3 +73,42 @@ def test_carried_forward_rescoring_does_not_mutate_delta_baseline():
         [previous], [], generated_at="2026-09-08T08:00:00Z"
     )
     assert removed["events"][0]["previous"]["score"] == 65
+
+
+@pytest.mark.parametrize(("provider", "field", "old_value", "new_value"), [
+    ("nvd", "severity", "high", "critical"),
+    ("nvd", "status", "Analyzed", "Rejected"),
+    ("cisa_kev", "required_action", "Apply update", "Discontinue use"),
+    ("cisa_kev", "due_date", "2026-09-30", "2026-09-15"),
+])
+def test_delta_reports_provider_evidence_changes(provider, field, old_value, new_value):
+    old = indicator("CVE-1900-1234")
+    old.type = "cve"
+    old.vulnerability = {"cisa_kev": {"catalog_checked_at": "2026-09-08T00:00:00Z"}}
+    old.vulnerability.setdefault(provider, {})[field] = old_value
+    new = deepcopy(old)
+    new.vulnerability[provider][field] = new_value
+    new.vulnerability["cisa_kev"]["catalog_checked_at"] = "2026-09-08T04:00:00Z"
+    baseline = deepcopy(old)
+    delta = si.build_delta([old], [new], generated_at="2026-09-08T04:00:00Z")
+    assert delta["counts"] == {"added": 0, "updated": 1, "removed": 0}
+    event = delta["events"][0]
+    assert event["changes"] == {"vulnerability": {"from": old.vulnerability, "to": new.vulnerability}}
+    assert event["current"]["vulnerability"] == new.vulnerability
+    assert old == baseline
+
+
+def test_delta_ignores_catalog_poll_time_without_losing_provider_report_changes():
+    old = indicator("CVE-1900-1234")
+    old.type = "cve"
+    old.vulnerability = {"cisa_kev": {"required_action": "Apply update", "catalog_checked_at": "2026-09-08T00:00:00Z"}}
+    new = deepcopy(old)
+    new.vulnerability["cisa_kev"]["catalog_checked_at"] = "2026-09-08T04:00:00Z"
+    assert si.build_delta([old], [new], generated_at="now")["events"] == []
+    legacy = deepcopy(old)
+    legacy.vulnerability = {}
+    for before, after in [(legacy, new), (new, legacy)]:
+        delta = si.build_delta([before], [after], generated_at="now")
+        assert delta["counts"]["updated"] == 1
+        assert delta["events"][0]["changes"]["vulnerability"]["to"] == after.vulnerability
+    assert si.build_delta([old], [new], generated_at="now", baseline_available=False)["events"] == []
