@@ -7,9 +7,9 @@ from __future__ import annotations
 
 import ipaddress
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 from dateutil import parser as dtparser
 
@@ -36,6 +36,8 @@ class Indicator:
     # How many collection runs have re-observed this indicator (persisted
     # across runs via the living feed). 1 = seen in this run only.
     sightings: int = 1
+    # Provider-specific CVE evidence; confidence/relevance is not exploitation.
+    vulnerability: Dict[str, Any] = field(default_factory=dict)
 
     def key(self) -> Tuple[str, str]:
         return (self.type, self.indicator)
@@ -130,6 +132,8 @@ def normalize_value(itype: str, value: str) -> str:
     intact — lowercasing credentials would both mangle them and risk merging
     distinct indicators during dedup).
     """
+    if itype == "cve":
+        return value.strip().upper()
     if itype == "domain":
         return value.lower()
     if itype == "url":
