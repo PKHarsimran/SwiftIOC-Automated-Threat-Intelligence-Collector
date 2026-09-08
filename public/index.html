@@ -46,7 +46,7 @@
       });
     </script>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/styles.css?v=10" />
+    <link rel="stylesheet" href="assets/styles.css?v=11" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -194,6 +194,12 @@
             </button>
             <button type="button" class="button ghost" data-investigation-json>
               Export JSON
+            </button>
+            <button type="button" class="button ghost detection-export" data-investigation-sigma>
+              Build Sigma
+            </button>
+            <button type="button" class="button ghost detection-export" data-investigation-suricata>
+              Build Suricata
             </button>
             <button type="button" class="button ghost danger" data-investigation-clear>
               Clear queue
@@ -785,6 +791,18 @@
               rel="nofollow"
               download
               >TAXII 2.1 envelope</a>
+            <a class="button-link detection-download" href="detections/sigma/network-iocs.yml" download>
+              Sigma network rules
+            </a>
+            <a class="button-link detection-download" href="detections/suricata/swiftioc.rules" download>
+              Suricata rules
+            </a>
+            <a class="button-link detection-download" href="detections/dns/swiftioc.rpz" download>
+              DNS RPZ
+            </a>
+            <a class="button-link" href="detections/manifest.json">
+              Detection manifest
+            </a>
           </div>
           <p class="panel-footnote">
             The ★ high-confidence feeds contain only indicators scoring ≥80 or
@@ -798,7 +816,7 @@
     </div>
 
     <div class="toast" data-toast role="status" aria-live="polite" aria-atomic="true" hidden></div>
-    <script defer src="assets/dashboard-core.js?v=10"></script>
-    <script defer src="assets/dashboard.js?v=10"></script>
+    <script defer src="assets/dashboard-core.js?v=11"></script>
+    <script defer src="assets/dashboard.js?v=11"></script>
   </body>
 </html>
