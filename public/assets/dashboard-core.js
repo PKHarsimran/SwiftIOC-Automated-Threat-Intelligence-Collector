@@ -291,7 +291,7 @@
   };
 
   const buildCampaignGraph = (value, options = {}) => {
-    const rows = Array.isArray(value) ? value.filter((row) => row?.indicator) : [];
+    const rows = Array.isArray(value) ? value.filter((row) => row?.indicator && lower(row.type) !== 'cve') : [];
     const mode = ['all', 'tags', 'sources'].includes(options.mode) ? options.mode : 'all';
     const maxPivots = Math.max(1, Math.min(Number(options.maxPivots) || 6, 10));
     const maxIndicators = Math.max(2, Math.min(Number(options.maxIndicators) || 24, 50));
@@ -428,6 +428,7 @@
   const buildDiscovery = (value, mode = 'corroborated', now = Date.now() / 1000) => {
     const unique = new Map();
     for (const row of Array.isArray(value) ? value : []) {
+      if (lower(row?.type) === 'cve') continue;
       const key = investigationKey(row);
       if (key && !unique.has(key)) unique.set(key, row);
     }
@@ -658,7 +659,20 @@
     return url;
   };
 
+  const filterVulnerabilities = (items, search = '', status = 'all') => {
+    const query = lower(search).trim();
+    const priority = { known_exploited: 0, reported_exploitation: 1, not_established: 2 };
+    return items.filter((item) => {
+      if (status !== 'all' && item.exploitation_status !== status) return false;
+      const kev = item.reports?.cisa_kev || {};
+      return !query || lower([item.cve_id, item.title, item.description, kev.vendor,
+        kev.product, ...(item.sources || [])].join(' ')).includes(query);
+    }).sort((a, b) => (priority[a.exploitation_status] ?? 3) - (priority[b.exploitation_status] ?? 3)
+      || a.cve_id.localeCompare(b.cve_id));
+  };
+
   return {
+    filterVulnerabilities,
     compareRows,
     buildCampaignGraph,
     buildDiscovery,
