@@ -1572,6 +1572,12 @@ input.lookup-input:focus-visible {
   background: rgba(239, 68, 68, 0.22);
 }
 
+.exports-grid a.button-link.detection-download {
+  border-color: rgba(34, 211, 238, 0.58);
+  background: linear-gradient(135deg, rgba(8, 145, 178, 0.16), rgba(109, 40, 217, 0.1));
+  color: #cffafe;
+}
+
 @media (max-width: 1100px) {
   .dashboard-main {
     grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.1fr);
@@ -2870,6 +2876,17 @@ input.lookup-input {
 .button.danger {
   border-color: rgba(248, 113, 113, 0.62);
   color: #fecaca;
+}
+
+.button.detection-export {
+  border-color: rgba(34, 211, 238, 0.58);
+  background: linear-gradient(135deg, rgba(8, 145, 178, 0.16), rgba(109, 40, 217, 0.12));
+  color: #cffafe;
+}
+
+.button.detection-export:hover {
+  border-color: rgba(103, 232, 249, 0.9);
+  box-shadow: 0 0 20px rgba(34, 211, 238, 0.14);
 }
 
 .investigation-list {
