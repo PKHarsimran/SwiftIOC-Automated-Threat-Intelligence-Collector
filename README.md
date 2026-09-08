@@ -1,15 +1,21 @@
 # ⚡ SwiftIOC – Open Source Automated Threat Intelligence Collector
 
-[![CI – SwiftIOC](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/ci.yml/badge.svg)](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/ci.yml)
-[![CodeQL](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/codeql.yml/badge.svg)](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/codeql.yml)
-[![Security Policy](https://img.shields.io/badge/security-SECURITY.md-informational)](./SECURITY.md)
+[![CI – SwiftIOC](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/codeql.yml)
+[![Collection](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/collect.yml/badge.svg?branch=main)](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/collect.yml)
 [![IOCs](https://img.shields.io/endpoint?url=https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/badge.json)](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/)
+[![Dashboard](https://img.shields.io/website?url=https%3A%2F%2Fharsim.ca%2FSwiftIOC-Automated-Threat-Intelligence-Collector%2F&label=dashboard&up_message=online&down_message=offline)](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/)
+[![Last commit](https://img.shields.io/github/last-commit/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector?branch=main&label=feed%20activity)](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/commits/main)
+[![License](https://img.shields.io/github/license/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector)](./LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector?style=flat&logo=github)](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/stargazers)
+[![Security Policy](https://img.shields.io/badge/security-policy-informational?logo=github)](./SECURITY.md)
 
 SwiftIOC is an open-source Python threat intelligence automation toolkit that
 keeps recent Indicators of Compromise (IOCs) in machine-readable formats. The
 lightweight collector (`swiftioc/`) ingests threat feeds via YAML
 configuration, normalises and deduplicates the indicators, and exports them to
-CSV, TSV, JSON, JSON Lines, and STIX 2.1 alongside searchable run diagnostics.
+CSV, TSV, JSON, JSON Lines, STIX 2.1, TAXII 2.1, and MISP alongside searchable
+run diagnostics and a compact change stream for continuous ingestion.
 
 Designed for security operations teams, SOC analysts, and cyber threat hunters,
 SwiftIOC runs anywhere Python is available—local workstations, CI/CD pipelines,
@@ -18,7 +24,44 @@ so they can be published directly with GitHub Pages, integrated into SIEM and
 SOAR tooling, or archived for compliance reporting. The repository includes
 ready-to-use examples for rapid deployment in modern DevSecOps workflows.
 
+**[Open the live dashboard](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/)**
+· **[Download the high-confidence CSV](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/iocs/high_confidence.csv)**
+· **[Read the run diagnostics](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/diagnostics/summary.html)**
+
+## 🧭 Start here
+
+Choose the shortest path for what you are trying to do:
+
+| You are… | Start with… | What it gives you |
+| --- | --- | --- |
+| A SOC analyst or threat hunter | [Live dashboard](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/) | Search, filters, score explanations, source context, and a private browser-local investigation queue. |
+| Feeding a SIEM, EDR, firewall, or SOAR | [High-confidence JSONL](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/iocs/high_confidence.jsonl) | The strongest current indicators in a stream-friendly format. |
+| Building continuous automation | [SOC Delta output guide](#-outputs--diagnostics) | Additions, material updates, and removals since the previous validated snapshot. |
+| Using a CTI platform | [Interoperability outputs](#-outputs--diagnostics) or the live [MISP manifest](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/misp/manifest.json) | STIX, TAXII, and MISP objects with stable identifiers for repeatable imports. |
+| Investigating historical activity | [`ioc_timeline.py`](scripts/ioc_timeline.py) | Answer whether an IOC was present, when it appeared, and how its score changed. |
+| Running your own collector | [Quick start](#-quick-start) | A configurable local, container, cron, or GitHub Actions deployment. |
+| Contributing a parser or fix | [Development and testing](#-development--testing) | Setup, test commands, and contribution guidance. |
+
+### Pick the right feed
+
+| Feed | Use it when | Operational note |
+| --- | --- | --- |
+| `high_confidence.csv` | A human needs a small, block-ready spreadsheet or import file. | Review against local allowlists and policy before enforcement. |
+| `high_confidence.jsonl` | A machine ingests strong indicators one record at a time. | Includes score, sources, timestamps, tags, and context. |
+| `latest.jsonl` | You need the complete current SwiftIOC snapshot. | Larger download; use for initial sync and recovery. |
+| `delta.jsonl` | You poll SwiftIOC every collection cycle. | Idempotently apply `added`/`updated`; remove `removed_from_feed` from the working set. |
+| `stix2.json` / `taxii2-envelope.json` | Your CTI tooling understands STIX or TAXII objects. | Objects are built together so their versions remain identical. |
+| `feed.xml` | A person wants high-confidence additions in an RSS reader. | Best for awareness; use JSONL for automation. |
+
+> [!CAUTION]
+> Threat intelligence is evidence for triage, not an automatic verdict. Apply
+> local allowlists, asset context, and response policy before blocking. A
+> `removed_from_feed` event means SwiftIOC no longer publishes that IOC; it does
+> not prove the indicator became benign. Indicators are defanged in human-facing
+> views to reduce accidental activation.
+
 ## 📚 Table of contents
+- [Start here](#-start-here)
 - [SwiftIOC at a glance](#-swiftioc-at-a-glance)
 - [Features](#-features)
 - [GitHub project health](#-github-project-health)
@@ -46,6 +89,12 @@ high-fidelity IOCs from authoritative sources. The project emphasises:
   other CI/CD environments.
 
 ## 🚀 Features
+- **Analyst-first live dashboard** – search raw or defanged IOCs, combine
+  multi-select type/source/tag/score/age filters, inspect score rationale, and
+  shortlist findings in a private investigation queue that persists in the
+  browser. Queue contents can be copied or exported as CSV/JSON without being
+  sent to a server. The interface includes responsive threat visualisations and
+  motion that automatically disables when reduced motion is requested.
 - **YAML-driven feeds** – feed metadata lives in `sources.yml` so collections can
   be changed without touching Python code. The example file includes adapters for
   CISA KEV, NVD, URLhaus, MalwareBazaar, ThreatFox, Feodo Tracker, SSLBL JA3,
@@ -74,6 +123,18 @@ high-fidelity IOCs from authoritative sources. The project emphasises:
   are confirmed by 2+ independent sources, strongest-first. This is the
   block-ready subset for SIEM/firewall ingestion where false positives are
   costly.
+- **SOC Delta stream** – `delta.json` and `delta.jsonl` describe additions,
+  material changes, and removals since the last validated snapshot. Consumers
+  can poll a small change feed during normal operation and reserve the complete
+  snapshot for initial sync or recovery.
+- **Interoperable and verifiable delivery** – the same in-memory STIX objects
+  are published as a STIX 2.1 bundle and static TAXII 2.1 envelope. An optional
+  keyless Sigstore workflow signs canonical feeds, and
+  [`integrations/README.md`](integrations/README.md) provides starter guidance
+  for Splunk, Elastic Security, and Microsoft Sentinel.
+- **Deployment-ready container** – the included image runs as an unprivileged
+  user, persists output through `/data`, and exposes the collector self-test as
+  its health check.
 - **Retention / "top IOCs" curation** – `--max-age-days` drops indicators not
   seen recently and `--max-store` keeps only the top N by score and recency, so
   the published feed stays small, fresh, and high-signal (think *KEV catalogue,
@@ -289,6 +350,33 @@ Artifacts appear under `public/`. Add `--verbose` for progress logging or
 > --sources sources.example.yml --out-dir public` works identically to
 > `python -m swiftioc ...` without the `-m` invocation.
 
+### Container quick start
+
+The included image runs as an unprivileged user and stores generated output in
+`/data`:
+
+```bash
+docker build -t swiftioc .
+docker volume create swiftioc-data
+docker run --rm \
+  -v swiftioc-data:/data \
+  swiftioc
+```
+
+The default container command uses `sources.example.yml`, persists the living
+feed, retains the strongest 10,000 indicators from the last 30 days, and runs a
+built-in health check. Mount your own source configuration when needed:
+
+```bash
+docker run --rm \
+  -v "$PWD/sources.yml:/app/sources.yml:ro" \
+  -v swiftioc-data:/data \
+  swiftioc
+```
+
+For starter mappings and polling guidance for Splunk, Elastic Security, and
+Microsoft Sentinel, see [`integrations/README.md`](integrations/README.md).
+
 
 ## 🧾 Configuring sources
 Create a `sources.yml` to describe the feeds you care about. The file mirrors the
@@ -436,11 +524,18 @@ To publish on GitHub Pages:
 The dashboard ranks preview rows by the collector's 0–100 relevance score
 (corroboration + freshness baked in), then by how many independent sources
 confirm each indicator, so the most dangerous and most corroborated IOCs sit at
-the top of the feed. A "Show" filter isolates high-score (≥80), corroborated
-(2+ sources), or new (last 48h) indicators, and multi-source rows carry a
-`×N confirmed` badge. Mobile breakpoints convert the preview table into
-card-style rows for a phone-friendly experience, and all metadata is defanged
-to stay safe for casual browsing.
+the top of the feed. Multi-select facets combine type, source, tag, score band,
+and age filters; a signal filter isolates high-score (≥80), corroborated (2+
+sources), or new (last 48h) indicators. Analysts can add table or lookup results
+to a private browser-local investigation queue and export that shortlist without
+uploading it anywhere.
+
+The interface includes an animated feed radar, progressive metrics, score-band
+motion, and responsive threat cards. Animations use transform/opacity paths and
+are disabled when the browser reports `prefers-reduced-motion: reduce`. Mobile
+breakpoints convert the preview into card-style rows, collapsed details remain
+hidden until requested, and human-facing IOC metadata stays defanged to reduce
+accidental activation.
 
 ## ⚙️ Running in GitHub Actions
 SwiftIOC runs cleanly inside GitHub Actions and emits artifacts that can be
