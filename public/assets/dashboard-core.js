@@ -290,6 +290,117 @@
     return rules.join('\n') + '\n';
   };
 
+  const buildCampaignGraph = (value, options = {}) => {
+    const rows = Array.isArray(value) ? value.filter((row) => row?.indicator) : [];
+    const mode = ['all', 'tags', 'sources'].includes(options.mode) ? options.mode : 'all';
+    const maxPivots = Math.max(1, Math.min(Number(options.maxPivots) || 6, 10));
+    const maxIndicators = Math.max(2, Math.min(Number(options.maxIndicators) || 24, 50));
+    const ignoredTags = new Set([
+      'aggregated', 'blocklist', 'critical', 'high', 'info', 'ioc', 'low',
+      'malicious', 'malware', 'medium', 'threat-intel', 'threat intelligence',
+    ]);
+    const sourceNames = new Set(rows.flatMap((row) => rowSources(row).map(lower)));
+    const pivots = new Map();
+
+    const addPivot = (kind, label, row) => {
+      const clean = stringValue(label).slice(0, 80);
+      if (!clean) return;
+      const key = `${kind}:${clean.toLowerCase()}`;
+      const pivot = pivots.get(key) || { key, kind, label: clean, rows: new Map(), score: 0 };
+      const rowKey = investigationKey(row);
+      if (!rowKey || pivot.rows.has(rowKey)) return;
+      pivot.rows.set(rowKey, row);
+      pivot.score += effectiveScore(row) + Math.min(Number(row.sourceCount) || rowSources(row).length, 5) * 5;
+      pivots.set(key, pivot);
+    };
+
+    rows.forEach((row) => {
+      if (mode !== 'sources') {
+        const tags = Array.isArray(row.tags) ? row.tags : [];
+        tags.slice(0, 25).forEach((tag) => {
+          if (!ignoredTags.has(lower(tag)) && !sourceNames.has(lower(tag))) {
+            addPivot('tag', tag, row);
+          }
+        });
+      }
+      if (mode !== 'tags') {
+        rowSources(row).slice(0, 25).forEach((source) => addPivot('source', source, row));
+      }
+    });
+
+    const selectedPivots = Array.from(pivots.values())
+      .filter((pivot) => pivot.rows.size >= 2)
+      .sort((a, b) =>
+        (b.rows.size * 100 + b.score / b.rows.size) -
+          (a.rows.size * 100 + a.score / a.rows.size) ||
+        a.key.localeCompare(b.key)
+      )
+      .slice(0, maxPivots);
+
+    const candidateRows = new Map();
+    selectedPivots.forEach((pivot) => {
+      Array.from(pivot.rows.values())
+        .sort((a, b) =>
+          effectiveScore(b) - effectiveScore(a) ||
+          (Number(b.sourceCount) || rowSources(b).length) -
+            (Number(a.sourceCount) || rowSources(a).length) ||
+          stringValue(a.indicator).localeCompare(stringValue(b.indicator))
+        )
+        .slice(0, 12)
+        .forEach((row) => candidateRows.set(investigationKey(row), row));
+    });
+    const selectedRows = Array.from(candidateRows.values())
+      .sort((a, b) =>
+        effectiveScore(b) - effectiveScore(a) ||
+        stringValue(a.indicator).localeCompare(stringValue(b.indicator))
+      )
+      .slice(0, maxIndicators);
+    const selectedKeys = new Set(selectedRows.map(investigationKey));
+
+    const nodes = [
+      ...selectedPivots.map((pivot) => ({
+        id: `pivot:${pivot.key}`,
+        kind: 'pivot',
+        pivotKind: pivot.kind,
+        label: pivot.label,
+        count: Array.from(pivot.rows.keys()).filter((key) => selectedKeys.has(key)).length,
+        totalCount: pivot.rows.size,
+      })),
+      ...selectedRows.map((row) => ({
+        id: `ioc:${investigationKey(row)}`,
+        kind: 'indicator',
+        label: stringValue(row.indicator),
+        score: effectiveScore(row),
+        row,
+      })),
+    ];
+    const edges = [];
+    selectedPivots.forEach((pivot) => {
+      pivot.rows.forEach((_row, key) => {
+        if (selectedKeys.has(key)) {
+          edges.push({
+            source: `pivot:${pivot.key}`,
+            target: `ioc:${key}`,
+            kind: pivot.kind,
+          });
+        }
+      });
+    });
+    edges.sort((a, b) =>
+      a.source.localeCompare(b.source) || a.target.localeCompare(b.target)
+    );
+    return {
+      mode,
+      nodes,
+      edges,
+      stats: {
+        pivots: selectedPivots.length,
+        indicators: selectedRows.length,
+        relationships: edges.length,
+      },
+    };
+  };
+
   const scoreBand = (row) => {
     const score = effectiveScore(row);
     if (score >= 80) return 'high';
@@ -474,6 +585,7 @@
 
   return {
     compareRows,
+    buildCampaignGraph,
     effectiveScore,
     investigationKey,
     detectionRows,
