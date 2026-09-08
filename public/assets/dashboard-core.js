@@ -33,10 +33,16 @@
   };
 
   const timestamp = (value) => {
-    if (typeof value === 'number' && Number.isFinite(value)) {
-      return value > 1e12 ? value / 1000 : value;
+    const text = stringValue(value);
+    if (!text) return null;
+    // Match dashboard parseTimestamp for Unix seconds/milliseconds supplied
+    // as either numbers or strings; do not substitute firstSeen timestamps.
+    const numeric = Number(text);
+    if (Number.isFinite(numeric)) {
+      const time = numeric > 1e12 && numeric < 1e13 ? Math.round(numeric / 1000) : numeric;
+      return Number.isNaN(new Date(time * 1000).getTime()) ? null : time;
     }
-    const parsed = Date.parse(stringValue(value));
+    const parsed = Date.parse(text);
     return Number.isNaN(parsed) ? null : parsed / 1000;
   };
 
@@ -433,7 +439,15 @@
       if (key && !unique.has(key)) unique.set(key, row);
     }
     const rows = Array.from(unique.values());
-    const sourceNames = new Set(rows.flatMap(rowSources).map(lower));
+    // Provider-name tags emitted by our adapters are provenance, including
+    // when the source uses an alias (ci_army_list → cins) or a custom name.
+    // Keep behavior/product/family tags such as tor, scanning, phishing, c2.
+    const sourceNames = new Set([
+      'threatfox', 'cins', 'feodo', 'sslbl', 'spamhaus', 'dshield', 'sans-isc',
+      'openphish', 'greensnow', 'emerging-threats', 'binarydefense', 'ipsum',
+      'urlhaus', 'malwarebazaar',
+      ...rows.flatMap(rowSources).flatMap((source) => stringValue(source).split(',')).map(lower),
+    ]);
     const ignored = new Set(['aggregated', 'blocklist', 'malicious', 'malware', 'high',
       'critical', 'medium', 'low', 'info', 'unknown', 'ioc', 'multi-list']);
     const tagsFor = (row) => Array.from(new Set(
