@@ -180,6 +180,18 @@ test('sanitizes and deduplicates browser-local investigation rows', () => {
   assert.deepEqual(core.normaliseInvestigationRows({ rows: [] }), []);
 });
 
+test('preserves case-sensitive URL paths in investigation identity', () => {
+  const upper = { indicator: 'https://host/Payload?id=ABC', type: 'url' };
+  const lowerPath = { indicator: 'https://host/payload?id=ABC', type: 'url' };
+  assert.notEqual(core.investigationKey(upper), core.investigationKey(lowerPath));
+  assert.equal(core.normaliseInvestigationRows([upper, lowerPath]).length, 2);
+
+  assert.equal(
+    core.investigationKey({ indicator: 'Example[.]COM', type: 'domain' }),
+    core.investigationKey({ indicator: 'example[.]com', type: 'domain' })
+  );
+});
+
 test('dashboard markup keeps IDs and labelled controls consistent', () => {
   const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
   const ids = Array.from(html.matchAll(/\sid="([^"]+)"/g), (match) => match[1]);
