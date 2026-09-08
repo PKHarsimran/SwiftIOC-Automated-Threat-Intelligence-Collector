@@ -516,6 +516,11 @@ Delta feeds describe indicators added to the published snapshot, removed from
 it, or materially changed since the previous run. A removal means the IOC is no
 longer in the current SwiftIOC snapshot; it does not assert that the IOC is
 benign. The first run emits an empty delta until a baseline exists.
+Changes to vulnerability provider reports (including severity, status, required
+actions, and due dates) emit `updated` events with `changes.vulnerability` and
+the complete current record. A change only to CISA's local
+`catalog_checked_at` poll timestamp does not trigger an alert. Provider report
+additions and removals do trigger updates.
 
 The collector populates the following structure (paths relative to `--out-dir`):
 
