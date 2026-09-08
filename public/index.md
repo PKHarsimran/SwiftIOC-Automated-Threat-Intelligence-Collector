@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-09-07T22:28:25Z_
+_Generated 2026-09-08T02:45:10Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-07T22:28:25Z |
+| Generated | 2026-09-08T02:45:10Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 4847 |
+| Duplicates removed | 5952 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
-| Multi-source overlaps | 496 |
+| Multi-source overlaps | 495 |
 | Score (min / avg / max) | 79 / 80.3 / 96 |
-| High-score indicators (≥80) | 9366 |
-| Corroborated (2+ sources) | 496 |
+| High-score indicators (≥80) | 9156 |
+| Corroborated (2+ sources) | 495 |
 | Earliest first_seen | 2017-07-14T18:08:15Z |
-| Newest first_seen | 2026-09-07T22:17:22Z |
+| Newest first_seen | 2026-09-08T02:44:44Z |
 
 ## Top indicators by score
 
@@ -41,27 +41,27 @@ _Generated 2026-09-07T22:28:25Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5626 |
-| greensnow_blocklist | 4384 |
-| ipsum_level5 | 3200 |
-| threatfox_export_json | 2211 |
-| binarydefense_banlist | 1877 |
-| spamhaus_drop | 1708 |
+| blocklist_de_ssh | 5574 |
+| greensnow_blocklist | 5052 |
+| ipsum_level5 | 3666 |
+| binarydefense_banlist | 2145 |
+| threatfox_export_json | 2113 |
+| spamhaus_drop | 1709 |
 | cisa_kev | 1695 |
-| tor_exit_nodes | 1341 |
-| malwarebazaar_recent | 825 |
+| tor_exit_nodes | 1340 |
+| malwarebazaar_recent | 881 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 2681 |
-| sha1 | 1816 |
-| ipv4_cidr | 1707 |
-| domain | 1455 |
-| sha256 | 1064 |
-| url | 710 |
-| ipv4 | 333 |
+| cve | 2648 |
+| sha1 | 1719 |
+| ipv4_cidr | 1708 |
+| domain | 1472 |
+| sha256 | 1126 |
+| url | 744 |
+| ipv4 | 349 |
 | md5 | 137 |
 | ja3 | 97 |
 
@@ -69,16 +69,16 @@ _Generated 2026-09-07T22:28:25Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 3205 |
-| cve | 2681 |
-| threatfox | 2553 |
-| drop | 1707 |
-| spamhaus | 1707 |
+| malware | 3202 |
+| cve | 2648 |
+| threatfox | 2588 |
+| drop | 1708 |
+| spamhaus | 1708 |
 | exploited-in-the-wild | 1695 |
-| nvd | 1211 |
+| nvd | 1178 |
 | ClickFix | 1019 |
-| Mirai | 701 |
-| malware_download | 510 |
+| Mirai | 637 |
+| malware_download | 542 |
 
 ## Multi-source overlaps
 
@@ -89,10 +89,10 @@ _Generated 2026-09-07T22:28:25Z_
 | ipv4: 103[.]176[.]64[.]36 | blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
 | ipv4: 164[.]90[.]236[.]107 | blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
 | ipv4: 197[.]140[.]9[.]148 | blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
-| ipv4: 206[.]42[.]5[.]12 | blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
 | ipv4: 43[.]129[.]53[.]19 | blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
 | ipv4: 43[.]156[.]71[.]43 | blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
 | ipv4: 45[.]17[.]39[.]120 | blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
 | ipv4: 68[.]233[.]116[.]124 | blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
+| ipv4: 152[.]228[.]135[.]87 | blocklist_de_ssh, ipsum_level5, threatfox_export_json |
 
 For more detail see [diagnostics/REPORT.md](diagnostics/REPORT.md) and the machine-readable feeds in [iocs/](iocs/).
