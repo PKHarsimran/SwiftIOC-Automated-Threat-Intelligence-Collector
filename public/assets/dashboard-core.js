@@ -85,9 +85,14 @@
   };
 
   const investigationKey = (row) => {
-    const indicator = lower(row?.indicator);
-    if (!indicator) return '';
-    return `${lower(row?.type) || 'unknown'}\u0000${indicator}`;
+    const type = lower(row?.type) || 'unknown';
+    const rawIndicator = stringValue(row?.indicator);
+    if (!rawIndicator) return '';
+    // URL paths and query components can be case-sensitive. Preserve the full
+    // value for URLs while continuing to collapse harmless case differences
+    // for domains, IPs, hashes, and the other indicator families.
+    const indicator = type === 'url' ? rawIndicator : rawIndicator.toLowerCase();
+    return `${type}\u0000${indicator}`;
   };
 
   // Treat browser storage as untrusted input. Keep only the fields needed by
