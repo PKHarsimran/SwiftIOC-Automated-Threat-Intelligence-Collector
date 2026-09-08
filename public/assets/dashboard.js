@@ -239,8 +239,13 @@
   const INVESTIGATION_STORAGE_KEY = 'swiftioc-investigation-workspace-v1';
   const INVESTIGATION_LIMIT = 50;
   const investigationListeners = new Set();
-  const investigationKey = (row) => dashboardCore?.investigationKey(row) ||
-    `${normaliseLower(row?.type) || 'unknown'}\u0000${normaliseLower(row?.indicator)}`;
+  const investigationKey = (row) => {
+    if (dashboardCore) return dashboardCore.investigationKey(row);
+    const type = normaliseLower(row?.type) || 'unknown';
+    const rawIndicator = normaliseString(row?.indicator);
+    const indicator = type === 'url' ? rawIndicator : rawIndicator.toLowerCase();
+    return rawIndicator ? `${type}\u0000${indicator}` : '';
+  };
   const cleanInvestigationRows = (value) => dashboardCore?.normaliseInvestigationRows(
     value,
     INVESTIGATION_LIMIT
