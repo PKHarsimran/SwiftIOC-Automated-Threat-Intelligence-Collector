@@ -470,3 +470,52 @@ test('recent discovery accepts equivalent ISO, Unix-number, and numeric-string s
   }
   assert.equal(core.buildDiscovery([{ ...row, lastSeen: String(now - 86400) }], 'recent', now).total, 1);
 });
+
+
+const triageNow = Date.parse('2026-09-08T12:00:00Z') / 1000;
+const triageItem = (id, status, added, published, modified = published, nvdStatus = 'Analyzed') => ({
+  cve_id: id, exploitation_status: status, sources: [], reports: {
+    ...(status === 'known_exploited' ? { cisa_kev: { date_added: added } } : {}),
+    nvd: { published_at: published, modified_at: modified, status: nvdStatus },
+  },
+});
+const triageItems = [
+  triageItem('CVE-2026-1001', 'known_exploited', '2021-01-01', '2021-01-01', '2026-09-08T11:00:00'),
+  triageItem('CVE-1900-1002', 'known_exploited', '2026-09-08', '2001-01-01'),
+  triageItem('CVE-1900-1003', 'not_established', null, '2026-09-08T10:00:00'),
+  triageItem('CVE-2026-1004', 'not_established', null, '2020-01-01', '2026-09-08T11:30:00Z'),
+  triageItem('CVE-2026-1005', 'known_exploited', '2026-09-08', '2026-09-08', '2026-09-08', 'Rejected'),
+  triageItem('CVE-2026-1006', 'not_established', null, '2030-01-01', '2030-01-01'),
+];
+
+test('CVE priority uses exploitation evidence and provider dates, not CVE ID or modification date', () => {
+  const before = JSON.stringify(triageItems);
+  const result = core.filterVulnerabilities(triageItems, '', 'all', { now: triageNow });
+  assert.deepEqual(result.map((r) => r.cve_id), ['CVE-1900-1002', 'CVE-2026-1001', 'CVE-1900-1003', 'CVE-2026-1004', 'CVE-2026-1006']);
+  const withRejected = core.filterVulnerabilities(triageItems, '', 'all', { now: triageNow, includeRejected: true });
+  assert.equal(withRejected.at(-1).cve_id, 'CVE-2026-1005');
+  assert.equal(JSON.stringify(triageItems), before);
+});
+
+test('CVE views distinguish recent catalog addition, disclosure, and modification', () => {
+  const ids = (view, status = 'all') => core.filterVulnerabilities(triageItems, '', status, { now: triageNow, view }).map((r) => r.cve_id);
+  assert.deepEqual(ids('kev30'), ['CVE-1900-1002']);
+  assert.deepEqual(ids('published7'), ['CVE-1900-1003']);
+  assert.deepEqual(ids('published7', 'known_exploited'), []);
+  assert.deepEqual(ids('updated7'), ['CVE-2026-1004', 'CVE-2026-1001', 'CVE-1900-1003']);
+  assert.deepEqual(core.filterVulnerabilities(triageItems, 'CVE-1900-1002', 'all', { now: triageNow, view: 'kev30' }).map((r) => r.cve_id), ['CVE-1900-1002']);
+});
+
+test('CVE dates treat offset-free NVD timestamps as UTC and reject invalid/future dates', () => {
+  const expected = Date.parse('2026-09-08T10:00:00Z') / 1000;
+  for (const date of ['2026-09-08T10:00:00', '2026-09-08T10:00:00Z', '2026-09-08T15:30:00+05:30']) {
+    assert.equal(core.vulnerabilityFacts(triageItem('CVE-1900-1234', 'not_established', null, date), triageNow).published, expected);
+  }
+  for (const date of [null, '', 'not a date', '2030-01-01', '2026-02-30', '2026-13-01']) {
+    const item = triageItem('CVE-1900-1234', 'not_established', null, date);
+    assert.equal(core.vulnerabilityFacts(item, triageNow).published, null);
+    assert.equal(core.filterVulnerabilities([item], '', 'all', { now: triageNow, view: 'published7' }).length, 0);
+  }
+  const boundary = new Date((triageNow - 7 * 86400) * 1000).toISOString();
+  assert.equal(core.filterVulnerabilities([triageItem('CVE-1900-1234', 'not_established', null, boundary)], '', 'all', { now: triageNow, view: 'published7' }).length, 1);
+});
