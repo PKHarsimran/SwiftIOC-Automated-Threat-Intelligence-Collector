@@ -158,7 +158,9 @@ DOMAIN_RE = re.compile(r"^(?=.{1,253}$)(?!-)[A-Za-z0-9-]{1,63}(?:\.[A-Za-z0-9-]{
 MD5_RE = re.compile(r"[a-fA-F0-9]{32}")
 SHA1_RE = re.compile(r"[a-fA-F0-9]{40}")
 SHA256_RE = re.compile(r"[A-Fa-f0-9]{64}")
-CVE_RE = re.compile(r"CVE-\d{4}-\d{4,7}", re.I)
+# CVE Record Format allows 4–19 sequence digits. Boundaries also prevent
+# inline extraction from truncating an overlong or otherwise embedded ID.
+CVE_RE = re.compile(r"\bCVE-[0-9]{4}-[0-9]{4,19}\b", re.I)
 
 
 def classify(v: str) -> Optional[str]:
@@ -201,4 +203,3 @@ def classify(v: str) -> Optional[str]:
 
 def merge_conf(a: str, b: str) -> str:
     return a if CONF_RANK.get(a, 0) >= CONF_RANK.get(b, 0) else b
-
