@@ -48,9 +48,12 @@ Choose the shortest path for what you are trying to do:
 SwiftIOC deduplicates by `(type, indicator)`: `CVE-2020-1234` and
 `CVE-2020-5678` stay separate even if both appear in NVD or share a generic
 `cve` tag. Reports about **the same CVE** are combined under that CVE ID while
-keeping `reports.cisa_kev` and `reports.nvd` separately. The default queue
-puts known-exploited CVEs first, newest KEV additions first; exploitation
-reports follow, then other CVEs, newest NVD publications first within each group. The JSON export uses the same priority ordering, with
+keeping `reports.cisa_kev` and `reports.nvd` separately. The site opens on
+**Known exploited**, showing only confirmed KEV entries, newest additions first.
+It never fills an empty watchlist with unconfirmed CVEs. **Ransomware evidence**
+requires CISA's explicit `Known` ransomware-use value; `Unknown` does not qualify.
+**All CVEs · prioritized** includes exploitation reports and other CVEs, newest
+NVD publications first within each group. The JSON export uses that full priority ordering, with
 rejected records last. CVE ID year and generic IOC scores do not establish recency.
 
 Use **Added to KEV · 30 days**, **Published · 7 days**, or **Updated · 7 days**
@@ -205,7 +208,7 @@ high-fidelity IOCs from authoritative sources. The project emphasises:
   user, persists output through `/data`, and exposes the collector self-test as
   its health check.
 - **Retention / "top IOCs" curation** – `--max-age-days` drops indicators not
-  seen recently and `--max-store` keeps only the top N by score and recency, so
+  seen recently and `--max-store` prioritizes recently checked KEV entries, then fills the remaining slots by score and recency, so
   the published feed stays small, fresh, and high-signal (think *KEV catalogue,
   but for indicators*) instead of an unbounded dump. The scheduled workflow
   curates to the last 30 days and the top 10,000 indicators.
@@ -380,6 +383,13 @@ score = (confidence base + corroboration bonus) × 0.5^(age / half-life)
   domains in two, curated CIDR blocks and JA3 fingerprints in a month, file
   hashes over six months, and CVEs over a year.
 
+When a storage cap is set, non-rejected CVEs with a KEV catalog check in the
+past 24 hours take priority over generic IOC scores, with newest KEV additions
+first. Stale, missing, or future check dates receive no special retention
+priority. Score expiry and maximum-age rules still apply, and the cap remains
+strict; if qualifying KEV records alone exceed it, older additions are pruned.
+Source failures and per-source limits can still restrict upstream coverage.
+
 With `--persist-feed` (enabled in the scheduled collection workflow) the
 previous `latest.jsonl` is merged into each run, making the published feed
 **stateful**: re-observed indicators refresh to full score with their original
@@ -504,7 +514,7 @@ Run `python -m swiftioc --help` for the full list of switches. Highlights:
 | `--min-score N` | Expire indicators whose decayed score falls below `N` (default `20`). |
 | `--high-confidence-score N` | Score at/above which an indicator enters the curated `high_confidence` feed (default `80`; multi-source indicators always qualify). |
 | `--max-age-days N` | Retention: drop indicators whose `last_seen` is older than `N` days. |
-| `--max-store N` | Retention: keep only the top `N` indicators by score/recency (KEVIntel-style curation; keeps the stored feed small and high-signal). |
+| `--max-store N` | Retention: keep at most `N`; non-rejected KEV entries checked within 24 hours take priority (newest catalog additions first), then other records by score/recency. |
 | `--dashboard-rows N` | Rows in the compact `dashboard.jsonl` the web dashboard downloads (default `1000`, ~2–3% of the full feed's size). |
 | `--site-url URL` | Public site URL used as the RSS `<link>` (override for forks/custom domains). |
 | `--rss-limit N` | Number of items in `feed.xml` (default `50`). |
