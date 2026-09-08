@@ -238,7 +238,16 @@ test('builds deterministic campaign pivots and omits singleton relationships', (
     { ...row, indicator: 'three.example', tags: ['singleton'], sourceList: ['feed-b'], score: 70 },
   ];
   const graph = core.buildCampaignGraph(rows, { mode: 'tags' });
-  assert.deepEqual(graph.stats, { pivots: 1, indicators: 2, relationships: 2 });
+  assert.deepEqual(graph.stats, {
+    pivots: 1,
+    indicators: 2,
+    relationships: 2,
+    highScore: 2,
+    corroborated: 2,
+    averageScore: 85,
+    tagPivots: 1,
+    sourcePivots: 0,
+  });
   assert.equal(graph.nodes.find((node) => node.kind === 'pivot').label, 'ransomware');
   assert.equal(graph.nodes.some((node) => node.label === 'singleton'), false);
   assert.equal(graph.edges.every((edge) => edge.kind === 'tag'), true);
@@ -264,6 +273,36 @@ test('campaign graph respects source mode and graph-size caps', () => {
   assert.equal(graph.stats.pivots, 1);
   assert.equal(graph.stats.indicators, 5);
   assert.equal(graph.nodes.find((node) => node.kind === 'pivot').pivotKind, 'source');
+});
+
+test('campaign graph does not invent relationships for missing sources', () => {
+  const rows = [
+    { ...row, indicator: 'one.example', source: 'unknown', sourceList: [], sourceCount: 0, tags: [] },
+    { ...row, indicator: 'two.example', source: 'unknown', sourceList: [], sourceCount: 0, tags: [] },
+  ];
+  const graph = core.buildCampaignGraph(rows, { mode: 'sources' });
+  assert.equal(graph.nodes.length, 0);
+  assert.equal(graph.edges.length, 0);
+});
+
+test('campaign graph prunes pivots disconnected by the indicator cap', () => {
+  const rows = ['alpha', 'beta', 'gamma'].flatMap((tag, tagIndex) =>
+    [0, 1].map((index) => ({
+      ...row,
+      indicator: `${tag}-${index}.example`,
+      tags: [tag],
+      score: 100 - tagIndex * 20,
+    }))
+  );
+  const graph = core.buildCampaignGraph(rows, {
+    mode: 'tags',
+    maxPivots: 3,
+    maxIndicators: 2,
+  });
+  assert.equal(graph.stats.pivots, 1);
+  assert.equal(graph.stats.tagPivots, 1);
+  assert.equal(graph.nodes.filter((node) => node.kind === 'pivot').length, 1);
+  assert.equal(graph.edges.length, 2);
 });
 
 test('dashboard markup keeps IDs and labelled controls consistent', () => {
@@ -295,6 +334,10 @@ test('dashboard markup keeps IDs and labelled controls consistent', () => {
   assert.match(html, /data-investigation-sigma/);
   assert.match(html, /data-investigation-suricata/);
   assert.match(html, /data-campaign-graph/);
+  assert.match(html, /data-campaign-graph[\s\S]*?role="group"/);
+  assert.match(html, /data-campaign-density/);
+  assert.match(html, /data-campaign-related-list/);
+  assert.match(html, /data-campaign-reference/);
   assert.match(html, /class="signal-radar"/);
   assert.match(html, /data-delta-root/);
   assert.match(html, /iocs\/delta\.jsonl/);

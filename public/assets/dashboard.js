@@ -2285,8 +2285,12 @@
       return [0, 40, 60, 80][confidenceRankForRow(row)] || 0;
     };
 
-    const rowKey = (row) =>
-      normaliseLower(row.type) + '\u0000' + normaliseLower(row.indicator);
+    const rowKey = (row) => {
+      if (dashboardCore?.investigationKey) return dashboardCore.investigationKey(row);
+      const type = normaliseLower(row.type) || 'unknown';
+      const indicator = normaliseString(row.indicator);
+      return type + '\u0000' + (type === 'url' ? indicator : indicator.toLowerCase());
+    };
 
     const sourceCount = (rows) => {
       const sources = new Set();
@@ -3015,6 +3019,7 @@
     const svg = qs('[data-campaign-graph]', root);
     if (!root || !svg || !dashboardCore?.buildCampaignGraph) return;
     const mode = qs('[data-campaign-mode]', root);
+    const density = qs('[data-campaign-density]', root);
     const remix = qs('[data-campaign-layout]', root);
     const empty = qs('[data-campaign-empty]', root);
     const title = qs('[data-campaign-title]', root);
@@ -3023,6 +3028,20 @@
     const kind = qs('[data-campaign-kind]', root);
     const connections = qs('[data-campaign-connections]', root);
     const score = qs('[data-campaign-score]', root);
+    const sources = qs('[data-campaign-sources]', root);
+    const lastSeen = qs('[data-campaign-last-seen]', root);
+    const tlp = qs('[data-campaign-tlp]', root);
+    const stats = qs('[data-campaign-stats]', root);
+    const high = qs('[data-campaign-high]', root);
+    const corroborated = qs('[data-campaign-corroborated]', root);
+    const average = qs('[data-campaign-average]', root);
+    const visible = qs('[data-campaign-visible]', root);
+    const tagBlock = qs('[data-campaign-tags]', root);
+    const tagList = qs('[data-campaign-tag-list]', root);
+    const relatedBlock = qs('[data-campaign-related]', root);
+    const relatedHeading = qs('[data-campaign-related-heading]', root);
+    const relatedList = qs('[data-campaign-related-list]', root);
+    const reference = qs('[data-campaign-reference]', root);
     const queue = qs('[data-campaign-queue]', root);
     const summary = qs('[data-campaign-summary]', root);
     const svgNamespace = 'http://www.w3.org/2000/svg';
@@ -3030,6 +3049,14 @@
     let graph = null;
     let selected = null;
     let rotation = 0;
+    if (density && window.matchMedia?.('(max-width: 540px)').matches) {
+      density.value = '24';
+    }
+
+    const compactText = (value, limit = 220) => {
+      const text = normaliseString(value);
+      return text.length > limit ? text.slice(0, limit - 1).trimEnd() + '…' : text;
+    };
 
     const createSvg = (name, attributes = {}) => {
       const element = document.createElementNS(svgNamespace, name);
@@ -3041,19 +3068,42 @@
       const pivots = nodes.filter((node) => node.kind === 'pivot');
       const indicators = nodes.filter((node) => node.kind === 'indicator');
       const positions = new Map();
+      const pivotAngles = new Map();
       pivots.forEach((node, index) => {
         const angle = rotation - Math.PI / 2 + (index * Math.PI * 2) / Math.max(pivots.length, 1);
+        pivotAngles.set(node.id, angle);
         positions.set(node.id, {
           x: 500 + Math.cos(angle) * 185,
           y: 260 + Math.sin(angle) * 105,
         });
       });
-      indicators.forEach((node, index) => {
-        const angle = rotation * 0.6 - Math.PI / 2 + (index * Math.PI * 2) / Math.max(indicators.length, 1);
-        const ring = index % 2 ? 1 : 0.88;
+
+      const grouped = new Map(pivots.map((pivot) => [pivot.id, []]));
+      indicators.forEach((node) => {
+        const primaryEdge = graph.edges.find((edge) => edge.target === node.id);
+        const pivotId = primaryEdge?.source || pivots[0]?.id;
+        if (pivotId) grouped.get(pivotId)?.push(node);
+      });
+      grouped.forEach((members, pivotId) => {
+        const center = pivotAngles.get(pivotId) ?? -Math.PI / 2;
+        members.forEach((node, index) => {
+          const spread = Math.min(0.72, 0.13 * Math.max(members.length - 1, 1));
+          const offset = members.length > 1
+            ? -spread / 2 + (index * spread) / (members.length - 1)
+            : 0;
+          const angle = center + offset + rotation * 0.12;
+          const radius = index % 2 ? 405 : 355;
+          positions.set(node.id, {
+            x: 500 + Math.cos(angle) * radius,
+            y: 260 + Math.sin(angle) * radius * 0.51,
+          });
+        });
+      });
+      indicators.filter((node) => !positions.has(node.id)).forEach((node, index) => {
+        const angle = rotation - Math.PI / 2 + (index * Math.PI * 2) / Math.max(indicators.length, 1);
         positions.set(node.id, {
-          x: 500 + Math.cos(angle) * 405 * ring,
-          y: 260 + Math.sin(angle) * 210 * ring,
+          x: 500 + Math.cos(angle) * 390,
+          y: 260 + Math.sin(angle) * 200,
         });
       });
       return positions;
@@ -3080,15 +3130,58 @@
       });
 
       const degree = graph.edges.filter((edge) => edge.source === node.id || edge.target === node.id).length;
+      const relatedNodes = graph.nodes.filter((candidate) => connected.has(candidate.id));
       setText(title, node.label);
       setText(kind, node.kind === 'pivot' ? `${node.pivotKind} pivot` : node.row?.type || 'indicator');
       setText(connections, formatNumber(degree));
-      setText(score, node.kind === 'indicator' ? String(node.score) : '—');
+      setText(score, node.kind === 'indicator' ? String(node.score) : String(node.averageScore));
+      setText(
+        sources,
+        node.kind === 'indicator'
+          ? formatNumber(node.sourceCount)
+          : formatNumber(new Set(relatedNodes.flatMap((candidate) =>
+            candidate.row?.sourceList?.length
+              ? candidate.row.sourceList
+              : [candidate.row?.source].filter(Boolean)
+          )).size)
+      );
+      setText(lastSeen, node.kind === 'indicator' ? node.row?.lastSeenDisplay || 'Unknown' : 'Multiple');
+      setText(tlp, node.kind === 'indicator' ? node.row?.tlp || 'Unmarked' : 'Multiple');
       if (meta) meta.hidden = false;
       if (description) {
         description.textContent = node.kind === 'pivot'
-          ? `${formatNumber(node.totalCount)} indicators in the preview share this ${node.pivotKind}. Select a connected indicator to inspect it.`
-          : `Reported by ${primarySourceLabel(node.row)}${node.row?.tags?.length ? ` · ${node.row.tags.slice(0, 3).join(', ')}` : ''}.`;
+          ? `${formatNumber(node.totalCount)} indicators share this ${node.pivotKind}; ${formatNumber(node.count)} are visible in this graph. Their average risk score is ${node.averageScore}.`
+          : `${node.row?.confidence ? `${node.row.confidence} confidence · ` : ''}Reported by ${primarySourceLabel(node.row)}${node.row?.context ? ` · ${compactText(node.row.context)}` : ''}.`;
+      }
+      const tags = node.kind === 'indicator' && Array.isArray(node.row?.tags)
+        ? node.row.tags.slice(0, 8)
+        : [];
+      if (tagList) {
+        tagList.replaceChildren(...tags.map((value) => {
+          const chip = document.createElement('span');
+          chip.textContent = value;
+          return chip;
+        }));
+      }
+      if (tagBlock) tagBlock.hidden = !tags.length;
+      if (relatedList) {
+        relatedList.replaceChildren(...relatedNodes.slice(0, 10).map((candidate) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'campaign-related-node';
+          button.textContent = candidate.label;
+          button.title = candidate.label;
+          button.addEventListener('click', () => selectNode(candidate));
+          return button;
+        }));
+      }
+      if (relatedHeading) relatedHeading.textContent = node.kind === 'pivot' ? 'Connected indicators' : 'Relationship pivots';
+      if (relatedBlock) relatedBlock.hidden = !relatedNodes.length;
+      const reportUrl = node.kind === 'indicator' ? safeHttpUrl(node.row?.reference) : null;
+      if (reference) {
+        reference.hidden = !reportUrl;
+        if (reportUrl) reference.href = reportUrl;
+        else reference.removeAttribute('href');
       }
       if (queue) {
         queue.disabled = node.kind !== 'indicator';
@@ -3099,25 +3192,38 @@
     };
 
     const render = () => {
+      const selectedId = selected?.id;
       graph = dashboardCore.buildCampaignGraph(entries, {
         mode: mode?.value || 'all',
-        maxPivots: 6,
-        maxIndicators: 24,
+        maxPivots: 8,
+        maxIndicators: Number(density?.value) || 36,
       });
       svg.innerHTML = '';
       selected = null;
+      const nextSelected = graph.nodes.find((node) => node.id === selectedId) || null;
       const hasGraph = graph.nodes.length > 0 && graph.edges.length > 0;
       if (empty) empty.hidden = hasGraph;
       svg.hidden = !hasGraph;
       root.hidden = !entries.length;
+      if (stats) stats.hidden = !hasGraph;
+      setText(high, formatNumber(graph.stats.highScore));
+      setText(corroborated, formatNumber(graph.stats.corroborated));
+      setText(average, formatNumber(graph.stats.averageScore));
+      setText(visible, formatNumber(graph.stats.indicators));
       if (summary) {
         summary.textContent = hasGraph
-          ? `${formatNumber(graph.stats.indicators)} indicators · ${formatNumber(graph.stats.pivots)} pivots · ${formatNumber(graph.stats.relationships)} relationships`
+          ? `${formatNumber(graph.stats.relationships)} relationships across ${formatNumber(graph.stats.tagPivots)} tag and ${formatNumber(graph.stats.sourcePivots)} source pivots. Node size reflects corroboration; color reflects risk score.`
           : 'No repeated tags or sources were found in the current preview.';
       }
       if (title) title.textContent = 'Select a node';
       if (description) description.textContent = 'Choose a pivot to understand its reach, or choose an indicator to add it to your investigation queue.';
       if (meta) meta.hidden = true;
+      if (tagBlock) tagBlock.hidden = true;
+      if (relatedBlock) relatedBlock.hidden = true;
+      if (reference) {
+        reference.hidden = true;
+        reference.removeAttribute('href');
+      }
       if (queue) {
         queue.disabled = true;
         queue.textContent = 'Add indicator to queue';
@@ -3145,8 +3251,11 @@
       const nodeLayer = createSvg('g', { class: 'campaign-nodes' });
       graph.nodes.forEach((node, index) => {
         const position = positions.get(node.id);
+        const riskBand = node.kind === 'indicator'
+          ? node.score >= 80 ? 'critical' : node.score >= 60 ? 'elevated' : node.score >= 40 ? 'moderate' : 'aging'
+          : '';
         const group = createSvg('g', {
-          class: `campaign-node ${node.kind} ${node.pivotKind || ''}`,
+          class: `campaign-node ${node.kind} ${node.pivotKind || ''} ${riskBand}`,
           transform: `translate(${position.x} ${position.y})`,
           role: 'button',
           tabindex: '0',
@@ -3156,8 +3265,17 @@
           'data-graph-node': node.id,
         });
         group.style.setProperty('--node-delay', `${Math.min(index * 30, 480)}ms`);
+        if (node.kind === 'indicator' && node.sourceCount >= 2) {
+          group.appendChild(createSvg('circle', {
+            r: 16 + Math.min(node.sourceCount, 5),
+            class: 'campaign-corroboration-ring',
+          }));
+        }
         const circle = createSvg('circle', {
-          r: node.kind === 'pivot' ? Math.min(31, 20 + Math.sqrt(node.totalCount || 1) * 1.6) : 11,
+          r: node.kind === 'pivot'
+            ? Math.min(33, 20 + Math.sqrt(node.totalCount || 1) * 1.7)
+            : 11 + Math.min(Math.max(node.sourceCount - 1, 0), 4) * 0.8,
+          class: 'campaign-node-core',
         });
         const label = createSvg('text', {
           y: node.kind === 'pivot' ? 4 : 3,
@@ -3166,22 +3284,52 @@
         label.textContent = node.kind === 'pivot'
           ? (node.label.length > 15 ? node.label.slice(0, 14) + '…' : node.label)
           : String(node.score);
+        const subtitle = createSvg('text', {
+          y: node.kind === 'pivot' ? 44 : 28,
+          'text-anchor': 'middle',
+          class: 'campaign-node-subtitle',
+        });
+        subtitle.textContent = node.kind === 'pivot'
+          ? `${node.count}/${node.totalCount} IOCs`
+          : String(node.row?.type || 'IOC').toUpperCase().slice(0, 12);
         const tooltip = createSvg('title');
-        tooltip.textContent = node.label;
-        group.append(circle, label, tooltip);
+        tooltip.textContent = node.kind === 'pivot'
+          ? `${node.label} · ${node.totalCount} indicators · average score ${node.averageScore}`
+          : `${node.label} · ${node.row?.type || 'indicator'} · score ${node.score} · ${node.sourceCount} source${node.sourceCount === 1 ? '' : 's'}${node.row?.lastSeenDisplay ? ` · last seen ${node.row.lastSeenDisplay}` : ''}`;
+        group.append(circle, label, subtitle, tooltip);
         group.addEventListener('click', () => selectNode(node));
         group.addEventListener('keydown', (event) => {
           if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
             selectNode(node);
+            return;
+          }
+          const navigation = {
+            ArrowRight: 1,
+            ArrowDown: 1,
+            ArrowLeft: -1,
+            ArrowUp: -1,
+          };
+          if (event.key in navigation || event.key === 'Home' || event.key === 'End') {
+            event.preventDefault();
+            const elements = qsa('[data-graph-node]', svg);
+            const current = elements.indexOf(group);
+            const target = event.key === 'Home'
+              ? 0
+              : event.key === 'End'
+              ? elements.length - 1
+              : (current + navigation[event.key] + elements.length) % elements.length;
+            elements[target]?.focus();
           }
         });
         nodeLayer.appendChild(group);
       });
       svg.appendChild(nodeLayer);
+      if (nextSelected) selectNode(nextSelected);
     };
 
     mode?.addEventListener('change', render);
+    density?.addEventListener('change', render);
     remix?.addEventListener('click', () => {
       rotation = (rotation + Math.PI / 7) % (Math.PI * 2);
       render();

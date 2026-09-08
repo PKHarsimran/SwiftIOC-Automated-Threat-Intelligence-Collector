@@ -299,6 +299,7 @@
       'aggregated', 'blocklist', 'critical', 'high', 'info', 'ioc', 'low',
       'malicious', 'malware', 'medium', 'threat-intel', 'threat intelligence',
     ]);
+    const ignoredSources = new Set(['', 'n/a', 'none', 'unknown', 'unspecified']);
     const sourceNames = new Set(rows.flatMap((row) => rowSources(row).map(lower)));
     const pivots = new Map();
 
@@ -324,7 +325,9 @@
         });
       }
       if (mode !== 'tags') {
-        rowSources(row).slice(0, 25).forEach((source) => addPivot('source', source, row));
+        rowSources(row).slice(0, 25).forEach((source) => {
+          if (!ignoredSources.has(lower(source))) addPivot('source', source, row);
+        });
       }
     });
 
@@ -356,26 +359,35 @@
       )
       .slice(0, maxIndicators);
     const selectedKeys = new Set(selectedRows.map(investigationKey));
+    const renderedPivots = selectedPivots.filter((pivot) =>
+      Array.from(pivot.rows.keys()).some((key) => selectedKeys.has(key))
+    );
 
     const nodes = [
-      ...selectedPivots.map((pivot) => ({
+      ...renderedPivots.map((pivot) => ({
         id: `pivot:${pivot.key}`,
         kind: 'pivot',
         pivotKind: pivot.kind,
         label: pivot.label,
         count: Array.from(pivot.rows.keys()).filter((key) => selectedKeys.has(key)).length,
         totalCount: pivot.rows.size,
+        averageScore: Math.round(
+          Array.from(pivot.rows.values()).reduce((total, row) => total + effectiveScore(row), 0) /
+            Math.max(pivot.rows.size, 1)
+        ),
       })),
       ...selectedRows.map((row) => ({
         id: `ioc:${investigationKey(row)}`,
         kind: 'indicator',
         label: stringValue(row.indicator),
         score: effectiveScore(row),
+        sourceCount: Number(row.sourceCount) || rowSources(row).length,
+        tagCount: Array.isArray(row.tags) ? row.tags.length : 0,
         row,
       })),
     ];
     const edges = [];
-    selectedPivots.forEach((pivot) => {
+    renderedPivots.forEach((pivot) => {
       pivot.rows.forEach((_row, key) => {
         if (selectedKeys.has(key)) {
           edges.push({
@@ -389,14 +401,24 @@
     edges.sort((a, b) =>
       a.source.localeCompare(b.source) || a.target.localeCompare(b.target)
     );
+    const selectedScores = selectedRows.map(effectiveScore);
     return {
       mode,
       nodes,
       edges,
       stats: {
-        pivots: selectedPivots.length,
+        pivots: renderedPivots.length,
         indicators: selectedRows.length,
         relationships: edges.length,
+        highScore: selectedScores.filter((value) => value >= 80).length,
+        corroborated: selectedRows.filter((row) =>
+          (Number(row.sourceCount) || rowSources(row).length) >= 2
+        ).length,
+        averageScore: selectedScores.length
+          ? Math.round(selectedScores.reduce((total, value) => total + value, 0) / selectedScores.length)
+          : 0,
+        tagPivots: renderedPivots.filter((pivot) => pivot.kind === 'tag').length,
+        sourcePivots: renderedPivots.filter((pivot) => pivot.kind === 'source').length,
       },
     };
   };
