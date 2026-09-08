@@ -106,6 +106,11 @@ from .collect import (
     type_breakdown,
     type_counts,
 )
+from .detections import (
+    DEPLOYABLE_TYPES,
+    DETECTION_NAMESPACE,
+    write_detection_pack,
+)
 from .writers import (
     CSV_HEADER,
     build_stix_bundle,
@@ -173,6 +178,8 @@ __all__ = [
     "write_changelog", "write_dashboard_feed", "build_delta", "write_delta", "build_stix_bundle", "CSV_HEADER",
     "STIX_NAMESPACE", "STIX_IDENTITY_ID", "STIX_TLP_ID", "STIX_HASH_NAMES",
     "MISP_ATTRIBUTE_TYPES", "MISP_CATEGORY_BY_TYPE",
+    # detection pack
+    "DEPLOYABLE_TYPES", "DETECTION_NAMESPACE", "write_detection_pack",
     # logging
     "JsonLineFormatter", "configure_logging",
     "gh_summary_path", "append_gh_summary",

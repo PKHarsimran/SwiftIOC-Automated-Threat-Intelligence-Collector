@@ -33,6 +33,7 @@
   // Per-indicator historical summary (first-publicly-seen, peak score, run
   // count) built from git history by scripts/build_history_index.py. Optional.
   const HISTORY_SUMMARY_URL = resolveIocUrl('history_summary.json');
+  const DETECTION_MANIFEST_URL = resolveIocUrl('detections/manifest.json');
 
   const DATASET_STORAGE_KEY = 'swiftioc-dashboard-cache-v2';
   const DATASET_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
@@ -271,6 +272,20 @@
     return true;
   };
 
+  const downloadDetection = (content, filename, mediaType) => {
+    if (!content) return false;
+    const blob = new Blob([content], { type: `${mediaType};charset=utf-8` });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = filename;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+    return true;
+  };
+
   const INVESTIGATION_STORAGE_KEY = 'swiftioc-investigation-workspace-v1';
   const INVESTIGATION_LIMIT = 50;
   const investigationListeners = new Set();
@@ -396,6 +411,8 @@
     const copy = qs('[data-investigation-copy]', root);
     const csv = qs('[data-investigation-csv]', root);
     const json = qs('[data-investigation-json]', root);
+    const sigma = qs('[data-investigation-sigma]', root);
+    const suricata = qs('[data-investigation-suricata]', root);
     const clear = qs('[data-investigation-clear]', root);
 
     const render = (rows) => {
@@ -447,6 +464,25 @@
     json?.addEventListener('click', () => {
       const rows = investigationWorkspace.getRows();
       if (downloadJsonCollection(rows)) showToast(`Exported ${formatNumber(rows.length)} queued indicators.`);
+    });
+    sigma?.addEventListener('click', () => {
+      const rows = investigationWorkspace.getRows();
+      const content = dashboardCore?.rowsToSigma?.(rows) || '';
+      if (downloadDetection(content, 'swiftioc-investigation.yml', 'application/yaml')) {
+        showToast('Built Sigma detections from deployable IP and domain indicators.');
+      } else {
+        showToast('Sigma export needs at least one valid IP, CIDR, or domain.');
+      }
+    });
+    suricata?.addEventListener('click', () => {
+      const rows = investigationWorkspace.getRows();
+      const deployable = dashboardCore?.detectionRows?.(rows) || [];
+      const content = deployable.length ? dashboardCore?.rowsToSuricata?.(deployable) : '';
+      if (downloadDetection(content, 'swiftioc-investigation.rules', 'text/plain')) {
+        showToast('Built Suricata rules with stable local SIDs.');
+      } else {
+        showToast('Suricata export needs at least one valid IP, CIDR, or domain.');
+      }
     });
     clear?.addEventListener('click', () => {
       investigationWorkspace.clear();
@@ -2632,6 +2668,9 @@
     const apply = ({ sync = true } = {}) => {
       const matches = filteredRows().sort(compare);
       state.matches = matches;
+      window.dispatchEvent(new CustomEvent('swiftioc:preview-filtered', {
+        detail: { rows: matches },
+      }));
       const displayed = matches.slice(0, state.limit);
       render(displayed);
       updateSummary(matches, displayed);
@@ -2784,6 +2823,9 @@
         console.error('Unable to load live preview', error);
         state.rows = [];
         state.matches = [];
+        window.dispatchEvent(new CustomEvent('swiftioc:preview-filtered', {
+          detail: { rows: [] },
+        }));
         render([]);
         updateSummary([], []);
         if (summary.meta) summary.meta.hidden = true;
@@ -2966,6 +3008,216 @@
     span.className = `threat-pill ${cls}`;
     span.textContent = text;
     return span;
+  };
+
+  const initialiseCampaignGraph = () => {
+    const root = qs('[data-campaign-root]');
+    const svg = qs('[data-campaign-graph]', root);
+    if (!root || !svg || !dashboardCore?.buildCampaignGraph) return;
+    const mode = qs('[data-campaign-mode]', root);
+    const remix = qs('[data-campaign-layout]', root);
+    const empty = qs('[data-campaign-empty]', root);
+    const title = qs('[data-campaign-title]', root);
+    const description = qs('[data-campaign-description]', root);
+    const meta = qs('[data-campaign-meta]', root);
+    const kind = qs('[data-campaign-kind]', root);
+    const connections = qs('[data-campaign-connections]', root);
+    const score = qs('[data-campaign-score]', root);
+    const queue = qs('[data-campaign-queue]', root);
+    const summary = qs('[data-campaign-summary]', root);
+    const svgNamespace = 'http://www.w3.org/2000/svg';
+    let entries = [];
+    let graph = null;
+    let selected = null;
+    let rotation = 0;
+
+    const createSvg = (name, attributes = {}) => {
+      const element = document.createElementNS(svgNamespace, name);
+      Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, String(value)));
+      return element;
+    };
+
+    const positionsFor = (nodes) => {
+      const pivots = nodes.filter((node) => node.kind === 'pivot');
+      const indicators = nodes.filter((node) => node.kind === 'indicator');
+      const positions = new Map();
+      pivots.forEach((node, index) => {
+        const angle = rotation - Math.PI / 2 + (index * Math.PI * 2) / Math.max(pivots.length, 1);
+        positions.set(node.id, {
+          x: 500 + Math.cos(angle) * 185,
+          y: 260 + Math.sin(angle) * 105,
+        });
+      });
+      indicators.forEach((node, index) => {
+        const angle = rotation * 0.6 - Math.PI / 2 + (index * Math.PI * 2) / Math.max(indicators.length, 1);
+        const ring = index % 2 ? 1 : 0.88;
+        positions.set(node.id, {
+          x: 500 + Math.cos(angle) * 405 * ring,
+          y: 260 + Math.sin(angle) * 210 * ring,
+        });
+      });
+      return positions;
+    };
+
+    const selectNode = (node) => {
+      selected = node;
+      const connected = new Set();
+      graph.edges.forEach((edge) => {
+        if (edge.source === node.id) connected.add(edge.target);
+        if (edge.target === node.id) connected.add(edge.source);
+      });
+      qsa('[data-graph-node]', svg).forEach((element) => {
+        const active = element.dataset.graphNode === node.id;
+        const related = connected.has(element.dataset.graphNode);
+        element.classList.toggle('is-selected', active);
+        element.classList.toggle('is-connected', related);
+        element.classList.toggle('is-dimmed', !active && !related);
+      });
+      qsa('[data-graph-edge]', svg).forEach((element) => {
+        const related = element.dataset.source === node.id || element.dataset.target === node.id;
+        element.classList.toggle('is-connected', related);
+        element.classList.toggle('is-dimmed', !related);
+      });
+
+      const degree = graph.edges.filter((edge) => edge.source === node.id || edge.target === node.id).length;
+      setText(title, node.label);
+      setText(kind, node.kind === 'pivot' ? `${node.pivotKind} pivot` : node.row?.type || 'indicator');
+      setText(connections, formatNumber(degree));
+      setText(score, node.kind === 'indicator' ? String(node.score) : '—');
+      if (meta) meta.hidden = false;
+      if (description) {
+        description.textContent = node.kind === 'pivot'
+          ? `${formatNumber(node.totalCount)} indicators in the preview share this ${node.pivotKind}. Select a connected indicator to inspect it.`
+          : `Reported by ${primarySourceLabel(node.row)}${node.row?.tags?.length ? ` · ${node.row.tags.slice(0, 3).join(', ')}` : ''}.`;
+      }
+      if (queue) {
+        queue.disabled = node.kind !== 'indicator';
+        queue.textContent = node.kind === 'indicator' && investigationWorkspace.has(node.row)
+          ? 'Remove from queue'
+          : 'Add indicator to queue';
+      }
+    };
+
+    const render = () => {
+      graph = dashboardCore.buildCampaignGraph(entries, {
+        mode: mode?.value || 'all',
+        maxPivots: 6,
+        maxIndicators: 24,
+      });
+      svg.innerHTML = '';
+      selected = null;
+      const hasGraph = graph.nodes.length > 0 && graph.edges.length > 0;
+      if (empty) empty.hidden = hasGraph;
+      svg.hidden = !hasGraph;
+      root.hidden = !entries.length;
+      if (summary) {
+        summary.textContent = hasGraph
+          ? `${formatNumber(graph.stats.indicators)} indicators · ${formatNumber(graph.stats.pivots)} pivots · ${formatNumber(graph.stats.relationships)} relationships`
+          : 'No repeated tags or sources were found in the current preview.';
+      }
+      if (title) title.textContent = 'Select a node';
+      if (description) description.textContent = 'Choose a pivot to understand its reach, or choose an indicator to add it to your investigation queue.';
+      if (meta) meta.hidden = true;
+      if (queue) {
+        queue.disabled = true;
+        queue.textContent = 'Add indicator to queue';
+      }
+      if (!hasGraph) return;
+
+      const positions = positionsFor(graph.nodes);
+      const edgeLayer = createSvg('g', { class: 'campaign-edges' });
+      graph.edges.forEach((edge, index) => {
+        const start = positions.get(edge.source);
+        const end = positions.get(edge.target);
+        if (!start || !end) return;
+        const line = createSvg('line', {
+          x1: start.x, y1: start.y, x2: end.x, y2: end.y,
+          class: `campaign-edge ${edge.kind}`,
+          'data-graph-edge': '',
+          'data-source': edge.source,
+          'data-target': edge.target,
+        });
+        line.style.setProperty('--edge-delay', `${Math.min(index * 24, 420)}ms`);
+        edgeLayer.appendChild(line);
+      });
+      svg.appendChild(edgeLayer);
+
+      const nodeLayer = createSvg('g', { class: 'campaign-nodes' });
+      graph.nodes.forEach((node, index) => {
+        const position = positions.get(node.id);
+        const group = createSvg('g', {
+          class: `campaign-node ${node.kind} ${node.pivotKind || ''}`,
+          transform: `translate(${position.x} ${position.y})`,
+          role: 'button',
+          tabindex: '0',
+          'aria-label': node.kind === 'pivot'
+            ? `${node.pivotKind} pivot ${node.label}, ${node.totalCount} indicators`
+            : `${node.row?.type || 'indicator'} ${node.label}, score ${node.score}`,
+          'data-graph-node': node.id,
+        });
+        group.style.setProperty('--node-delay', `${Math.min(index * 30, 480)}ms`);
+        const circle = createSvg('circle', {
+          r: node.kind === 'pivot' ? Math.min(31, 20 + Math.sqrt(node.totalCount || 1) * 1.6) : 11,
+        });
+        const label = createSvg('text', {
+          y: node.kind === 'pivot' ? 4 : 3,
+          'text-anchor': 'middle',
+        });
+        label.textContent = node.kind === 'pivot'
+          ? (node.label.length > 15 ? node.label.slice(0, 14) + '…' : node.label)
+          : String(node.score);
+        const tooltip = createSvg('title');
+        tooltip.textContent = node.label;
+        group.append(circle, label, tooltip);
+        group.addEventListener('click', () => selectNode(node));
+        group.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            selectNode(node);
+          }
+        });
+        nodeLayer.appendChild(group);
+      });
+      svg.appendChild(nodeLayer);
+    };
+
+    mode?.addEventListener('change', render);
+    remix?.addEventListener('click', () => {
+      rotation = (rotation + Math.PI / 7) % (Math.PI * 2);
+      render();
+    });
+    queue?.addEventListener('click', () => {
+      if (!selected?.row) return;
+      const wasSelected = investigationWorkspace.has(selected.row);
+      if (investigationWorkspace.toggle(selected.row)) {
+        showToast(wasSelected ? 'Removed from the investigation queue.' : 'Added graph finding to the investigation queue.');
+      }
+      selectNode(selected);
+      syncInvestigationButtons();
+    });
+    investigationWorkspace.subscribe(() => {
+      if (selected?.row) selectNode(selected);
+    });
+    window.addEventListener('swiftioc:preview-filtered', (event) => {
+      if (!Array.isArray(event.detail?.rows)) return;
+      entries = event.detail.rows;
+      render();
+    });
+    subscribeToDataset((dataset) => {
+      if (dataset && !isCacheOrigin(dataset.origin)) {
+        entries = dataset.entries || [];
+        render();
+      }
+    });
+    loadDataset({})
+      .then(({ dataset }) => {
+        entries = dataset.entries || [];
+        render();
+      })
+      .catch((error) => {
+        root.hidden = true;
+        console.warn('Campaign graph failed to load', error);
+      });
   };
 
   const makeThreatCard = (row) => {
@@ -3481,6 +3733,32 @@
     });
   };
 
+  const initialiseDetectionDownloads = () => {
+    const optionalLinks = qsa('[data-detection-artifact]');
+    if (!optionalLinks.length) return;
+    fetch(DETECTION_MANIFEST_URL, {
+      cache: 'no-store',
+      headers: { Accept: 'application/json' },
+    })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((manifest) => {
+        const included = manifest?.included;
+        if (!included || typeof included !== 'object') return;
+        const hasNetwork = ['ipv4', 'ipv6', 'ipv4_cidr', 'ipv6_cidr']
+          .some((kind) => Number(included[kind]) > 0);
+        const availability = {
+          'sigma/network-iocs.yml': hasNetwork,
+          'sigma/dns-iocs.yml': Number(included.domain) > 0,
+        };
+        optionalLinks.forEach((link) => {
+          link.hidden = !availability[link.dataset.detectionArtifact];
+        });
+      })
+      .catch((error) => {
+        console.warn('Detection manifest unavailable', error);
+      });
+  };
+
   const initialiseVisualEffects = () => {
     const targets = qsa([
       '.page-header',
@@ -3490,6 +3768,7 @@
       '.metrics-strip',
       '.score-distribution',
       '.delta-strip',
+      '.campaign-graph-section',
       '.dashboard-main > .panel',
       '.top-threats',
       '#exports',
@@ -3551,10 +3830,12 @@
   initialiseTableToggles();
   initialiseInvestigationWorkspace();
   initialiseStatusBanner();
+  initialiseCampaignGraph();
   initialiseTopThreats();
   initialiseIocLookup();
   initialiseTrendSparkline();
   initialiseDownloadFallbacks();
+  initialiseDetectionDownloads();
   loadStats();
   initialisePreview();
 })();

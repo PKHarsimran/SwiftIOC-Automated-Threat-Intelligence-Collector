@@ -5,6 +5,9 @@ public/iocs/latest.json
 public/iocs/latest.tsv
 public/iocs/stix2.json
 public/iocs/taxii2-envelope.json
+# Generated detection packs can be large; Pages and workflow artifacts publish
+# them directly after each collection run.
+public/detections/
 
 # Raw feed captures (only created with --save-raw-dir)
 public/diagnostics/raw/

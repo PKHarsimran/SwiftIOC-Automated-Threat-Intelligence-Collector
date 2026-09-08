@@ -73,6 +73,9 @@ def test_cli_main_end_to_end_writes_expected_outputs(tmp_path, monkeypatch):
         "iocs/delta.json", "iocs/delta.jsonl",
         "iocs/taxii2-envelope.json",
         "changelog/CHANGELOG.md",
+        "detections/manifest.json", "detections/README.md",
+        "detections/sigma/network-iocs.yml",
+        "detections/suricata/swiftioc.rules", "detections/dns/swiftioc.rpz",
     ]:
         assert (out_dir / rel).exists(), f"missing output: {rel}"
 
@@ -85,6 +88,7 @@ def test_cli_main_end_to_end_writes_expected_outputs(tmp_path, monkeypatch):
     assert "score_bands" in diag and "fetch_metrics" in diag
     assert diag["delta_baseline_available"] is False
     assert diag["delta_counts"] == {"added": 0, "updated": 0, "removed": 0}
+    assert diag["detection_pack"]["suricata_rules"] == 4
 
     rows = [json.loads(line) for line in (out_dir / "iocs" / "latest.jsonl").read_text(encoding="utf-8").splitlines()]
     assert {r["indicator"] for r in rows} == {"1[.]1[.]1[.]1", "2[.]2[.]2[.]2", "3[.]3[.]3[.]3"}
