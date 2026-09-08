@@ -275,6 +275,16 @@ test('campaign graph respects source mode and graph-size caps', () => {
   assert.equal(graph.nodes.find((node) => node.kind === 'pivot').pivotKind, 'source');
 });
 
+test('campaign graph does not invent relationships for missing sources', () => {
+  const rows = [
+    { ...row, indicator: 'one.example', source: 'unknown', sourceList: [], sourceCount: 0, tags: [] },
+    { ...row, indicator: 'two.example', source: 'unknown', sourceList: [], sourceCount: 0, tags: [] },
+  ];
+  const graph = core.buildCampaignGraph(rows, { mode: 'sources' });
+  assert.equal(graph.nodes.length, 0);
+  assert.equal(graph.edges.length, 0);
+});
+
 test('dashboard markup keeps IDs and labelled controls consistent', () => {
   const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
   const css = fs.readFileSync(path.join(__dirname, 'styles.css'), 'utf8');
@@ -304,6 +314,7 @@ test('dashboard markup keeps IDs and labelled controls consistent', () => {
   assert.match(html, /data-investigation-sigma/);
   assert.match(html, /data-investigation-suricata/);
   assert.match(html, /data-campaign-graph/);
+  assert.match(html, /data-campaign-graph[\s\S]*?role="group"/);
   assert.match(html, /data-campaign-density/);
   assert.match(html, /data-campaign-related-list/);
   assert.match(html, /data-campaign-reference/);
