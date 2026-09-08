@@ -46,7 +46,7 @@
       });
     </script>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/styles.css?v=14" />
+    <link rel="stylesheet" href="assets/styles.css?v=15" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -91,6 +91,7 @@
         </a>
         <div class="nav-links">
           <a href="#ioc-lookup">Check an IOC</a>
+          <a href="#discovery">Discover</a>
           <a href="#campaign-graph">Campaign graph</a>
           <a href="#live-preview">Browse feed</a>
           <a href="#sources">Sources</a>
@@ -317,6 +318,29 @@
           <a class="button-link primary" href="iocs/delta.json" download>Delta JSON</a>
           <a class="button-link" href="iocs/delta.jsonl" download>Event stream</a>
         </div>
+      </section>
+
+      <section class="discovery-desk" id="discovery" aria-labelledby="discovery-heading" data-discovery-root>
+        <div class="discovery-heading">
+          <div>
+            <p class="eyebrow">The discovery desk</p>
+            <h2 id="discovery-heading">Find your next lead.</h2>
+            <p>Follow the evidence behind the score. Explore corroboration, recent sightings, and uncommon tags in the loaded preview.</p>
+          </div>
+          <a class="button ghost" href="#live-preview">Refine the sample ↓</a>
+        </div>
+        <div class="discovery-toolbar">
+          <div class="discovery-lenses" role="group" aria-label="Discovery lens">
+            <button type="button" data-discovery-mode="corroborated" aria-pressed="true">01 · Cross-source</button>
+            <button type="button" data-discovery-mode="recent" aria-pressed="false">02 · Recent sightings</button>
+            <button type="button" data-discovery-mode="uncommon" aria-pressed="false">03 · Uncommon tags</button>
+          </div>
+          <button type="button" class="button ghost" data-discovery-export disabled>Export evidence brief</button>
+        </div>
+        <p class="discovery-status" data-discovery-status role="status">Loading the discovery sample…</p>
+        <div class="discovery-cards" data-discovery-cards></div>
+        <p class="discovery-empty" data-discovery-empty hidden>No leads match this lens. Try another lens or broaden the preview filters below.</p>
+        <p class="discovery-scope">Derived from the compact preview, not the complete feed. Preview filters apply here. Nothing is uploaded when you explore or export.</p>
       </section>
 
       <section
@@ -916,7 +940,7 @@
     </div>
 
     <div class="toast" data-toast role="status" aria-live="polite" aria-atomic="true" hidden></div>
-    <script defer src="assets/dashboard-core.js?v=14"></script>
-    <script defer src="assets/dashboard.js?v=14"></script>
+    <script defer src="assets/dashboard-core.js?v=15"></script>
+    <script defer src="assets/dashboard.js?v=15"></script>
   </body>
 </html>

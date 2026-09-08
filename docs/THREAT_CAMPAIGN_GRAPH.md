@@ -9,7 +9,7 @@ The graph creates two kinds of pivot:
 - **Tag pivots** connect indicators that share a malware family, behavior, campaign, or other source-supplied tag.
 - **Source pivots** connect indicators reported by the same intelligence provider.
 
-Generic severity and feed-management tags are excluded, as are tags that duplicate a source name. Singleton pivots are omitted because they do not express a relationship. Remaining pivots are ranked by membership, IOC score, and corroboration, then bounded to six pivots and 24 indicators so rendering remains predictable on a phone or workstation.
+Generic severity and feed-management tags are excluded, as are tags that duplicate a source name. Singleton pivots are omitted because they do not express a relationship. Remaining pivots are ranked by membership, IOC score, and corroboration, then bounded to eight pivots and the selected limit of 24, 36, or 48 indicators so rendering remains predictable on a phone or workstation.
 
 These links are investigative hints. A shared tag or source is not proof that two indicators belong to the same campaign or threat actor, and the dashboard states that limitation beside the graph.
 
@@ -29,3 +29,13 @@ Node color communicates risk, node size and the outer ring communicate corrobora
 - Rendering is bounded by the selected detail level and capped at 48 indicators plus eight pivots.
 - Motion uses opacity and stroke animation and respects `prefers-reduced-motion`.
 - Keyboard users can focus each node and select it with Enter or Space.
+
+## Discovery desk
+
+The desk above the graph uses the same filtered preview and offers three lenses:
+
+- **Cross-source:** at least two distinct named reporting sources. Placeholder sources are ignored and names are deduplicated without assuming independence.
+- **Recent sightings:** a valid last-seen timestamp within the past 24 hours; future dates are excluded. A recent sighting is not necessarily new activity.
+- **Uncommon tags:** a nongeneric tag found on at most three distinct indicators in the filtered sample. Feed-name tags are excluded. This does not measure prevalence across the full feed or internet.
+
+Each lens displays up to six ranked leads, with source evidence, context, last-seen time, and queue/copy actions. Export evidence brief saves the visible findings and their reasons as JSON. Filtering and refresh failures update the desk and graph together; failed refreshes clear findings and disable brief exports. No external enrichment service is called.

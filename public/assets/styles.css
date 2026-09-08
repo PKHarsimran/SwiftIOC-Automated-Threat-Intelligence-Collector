@@ -3035,8 +3035,8 @@ input.lookup-input {
 
 .campaign-node {
   cursor: pointer;
-  opacity: 0;
-  animation: campaign-node-in 520ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  opacity: 1;
+  animation: campaign-node-in 520ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
   animation-delay: var(--node-delay, 0ms);
   transition: opacity 180ms ease;
 }
@@ -3682,4 +3682,51 @@ body::before {
     transform: none;
     transition: none !important;
   }
+}
+
+/* Discovery desk: readable evidence first, actions within reach. */
+.discovery-desk {
+  margin-block: 1.5rem;
+  padding: clamp(1rem, 3vw, 2rem);
+  border: 1px solid #33465d;
+  border-radius: 1.2rem;
+  background: radial-gradient(ellipse at 90% 0, #12354b80, transparent 55%), #0a1422;
+}
+.discovery-heading { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; }
+.discovery-heading h2 { font-size: clamp(1.65rem, 3vw, 2.5rem); letter-spacing: -0.04em; margin: 0.25rem 0 0.65rem; }
+.discovery-heading p:not(.eyebrow) { max-width: 44rem; color: #afc1d5; line-height: 1.6; }
+.discovery-heading > a { flex-shrink: 0; text-decoration: none; }
+.discovery-toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; margin-top: 1.3rem; }
+.discovery-lenses { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.discovery-lenses button { padding: 0.7rem 0.9rem; border: 1px solid #3a4a61; border-radius: 0.6rem; color: #b8cce1; background: #0b1728; cursor: pointer; transition: background 160ms ease, color 160ms ease; }
+.discovery-lenses button[aria-pressed='true'] { background: #b2f4e4; border-color: #b2f4e4; color: #08352d; font-weight: 700; }
+.discovery-lenses button:hover { border-color: #b2f4e4; }
+.discovery-lenses button:focus-visible, .discovery-card summary:focus-visible { outline: 2px solid #b2f4e4; outline-offset: 4px; }
+.discovery-status { margin-block: 1rem; color: #92abc4; font-size: 0.78rem; }
+.discovery-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.85rem; align-items: stretch; }
+.discovery-card { display: flex; flex-direction: column; min-width: 0; padding: 1.15rem; border: 1px solid #314359; border-radius: 0.8rem; background: #101d2d; transition: border-color 180ms ease, transform 180ms ease; }
+.discovery-card:hover { border-color: #649f9a; transform: translateY(-2px); }
+.discovery-card-top { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; color: #91a8c0; font-size: 0.7rem; }
+.discovery-score { margin-left: auto; color: #c8e9f0; }
+.discovery-card h3 { margin-block: 1rem; font-family: ui-monospace, monospace; font-size: 0.92rem; line-height: 1.5; overflow-wrap: anywhere; }
+.discovery-reason-label { color: #b2f4e4; font-size: 0.78rem; font-weight: 650; overflow-wrap: anywhere; }
+.discovery-reason { color: #b7c6d8; line-height: 1.6; font-size: 0.78rem; overflow-wrap: anywhere; }
+.discovery-card details { border-top: 1px solid #314359; margin-top: 0.8rem; padding-block: 0.8rem; color: #b7c6d8; font-size: 0.76rem; overflow-wrap: anywhere; }
+.discovery-card details p { margin-top: 0.8rem; line-height: 1.6; }
+.discovery-card summary { cursor: pointer; color: #d4e1ed; padding-block: 0.25rem; }
+.discovery-card-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: auto; }
+.discovery-card-actions button { min-height: 2.5rem; }
+.discovery-empty { padding: 2rem 1rem; border: 1px dashed #4b657b; border-radius: 0.8rem; color: #b7c6d8; line-height: 1.6; }
+.discovery-scope { margin: 1.25rem 0 0; max-width: 65rem; color: #91a8c0; font-size: 0.74rem; line-height: 1.6; }
+@media (max-width: 1050px) { .discovery-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) {
+  .discovery-heading { align-items: start; flex-direction: column; gap: 0.5rem; }
+  .discovery-cards { grid-template-columns: minmax(0, 1fr); }
+  .discovery-lenses { display: grid; width: 100%; grid-template-columns: minmax(0, 1fr); }
+  .discovery-lenses button { text-align: left; }
+  .discovery-toolbar > button { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .discovery-card, .discovery-lenses button, .campaign-node, .campaign-node-core { transition: none !important; }
+  .discovery-card:hover { transform: none; }
 }

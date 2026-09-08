@@ -2673,7 +2673,7 @@
       const matches = filteredRows().sort(compare);
       state.matches = matches;
       window.dispatchEvent(new CustomEvent('swiftioc:preview-filtered', {
-        detail: { rows: matches },
+        detail: { rows: matches, origin: state.origin },
       }));
       const displayed = matches.slice(0, state.limit);
       render(displayed);
@@ -2828,7 +2828,7 @@
         state.rows = [];
         state.matches = [];
         window.dispatchEvent(new CustomEvent('swiftioc:preview-filtered', {
-          detail: { rows: [] },
+          detail: { rows: [], error: true },
         }));
         render([]);
         updateSummary([], []);
@@ -3014,6 +3014,110 @@
     return span;
   };
 
+  const initialiseDiscovery = () => {
+    const root = qs('[data-discovery-root]');
+    if (!root || !dashboardCore?.buildDiscovery) return;
+    const cards = qs('[data-discovery-cards]', root);
+    const status = qs('[data-discovery-status]', root);
+    const empty = qs('[data-discovery-empty]', root);
+    const exportButton = qs('[data-discovery-export]', root);
+    const lenses = qsa('[data-discovery-mode]', root);
+    let rows = [];
+    let mode = 'corroborated';
+    let snapshot = null;
+    let feedFailed = false;
+    let origin = '';
+    const render = () => {
+      snapshot = dashboardCore.buildDiscovery(rows, mode);
+      cards.replaceChildren();
+      lenses.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.discoveryMode === mode)));
+      exportButton.disabled = !snapshot.findings.length;
+      empty.hidden = snapshot.findings.length > 0;
+      empty.textContent = feedFailed
+        ? 'The feed is unavailable. Retry from the live preview below to restore your discovery results.'
+        : 'No leads match this lens. Try another lens or broaden the preview filters below.';
+      status.textContent = feedFailed ? 'Feed unavailable · evidence export paused' :
+        `${snapshot.findings.length} of ${snapshot.total} matching leads · ${snapshot.sampleSize} indicators in the filtered sample${isCacheOrigin(origin) ? ' · cached snapshot' : ''}`;
+      snapshot.findings.forEach((finding, index) => {
+        const row = finding.row;
+        const card = document.createElement('article');
+        card.className = 'discovery-card';
+        const top = document.createElement('div');
+        top.className = 'discovery-card-top';
+        const number = document.createElement('span');
+        number.textContent = String(index + 1).padStart(2, '0');
+        const type = document.createElement('span');
+        type.textContent = row.type || 'Indicator';
+        const score = document.createElement('span');
+        score.className = 'discovery-score';
+        score.textContent = `Score ${dashboardCore.effectiveScore(row)}`;
+        top.append(number, type, score);
+        const title = document.createElement('h3');
+        title.textContent = row.indicator;
+        const label = document.createElement('p');
+        label.className = 'discovery-reason-label';
+        label.textContent = finding.label;
+        const reason = document.createElement('p');
+        reason.className = 'discovery-reason';
+        reason.textContent = finding.reason;
+        const details = document.createElement('details');
+        const summary = document.createElement('summary');
+        summary.textContent = 'Inspect the evidence';
+        const context = document.createElement('p');
+        context.textContent = row.context || 'No additional context supplied by this source.';
+        const seen = document.createElement('p');
+        seen.textContent = `Last seen: ${row.lastSeenDisplay || row.lastSeen || 'Unknown'} · TLP: ${row.tlp || 'Unmarked'}`;
+        details.append(summary, seen, context);
+        const report = safeHttpUrl(row.reference);
+        if (report) {
+          const link = document.createElement('a');
+          link.href = report;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.textContent = 'Open reporting source ↗';
+          details.appendChild(link);
+        }
+        const actions = document.createElement('div');
+        actions.className = 'discovery-card-actions';
+        const copy = document.createElement('button');
+        copy.type = 'button';
+        copy.className = 'button ghost';
+        copy.textContent = 'Copy IOC';
+        copy.addEventListener('click', () => copyOrPrompt(row.indicator, 'Indicator copied.', 'Copy this indicator:'));
+        actions.append(makeInvestigationButton(row), copy);
+        card.append(top, title, label, reason, details, actions);
+        cards.appendChild(card);
+      });
+    };
+    lenses.forEach((button) => button.addEventListener('click', () => {
+      mode = button.dataset.discoveryMode;
+      render();
+    }));
+    exportButton.addEventListener('click', () => {
+      if (!snapshot?.findings.length) return;
+      downloadDetection(JSON.stringify({
+        schema_version: 1,
+        generated_at: new Date().toISOString(),
+        lens: mode,
+        sample_size: snapshot.sampleSize,
+        matching_leads: snapshot.total,
+        scope: 'Six highlighted leads at most, derived from the filtered compact preview. No global rarity or attribution implied.',
+        findings: snapshot.findings.map(({ row, label, reason }) => ({
+          indicator: row.indicator, type: row.type, score: dashboardCore.effectiveScore(row),
+          sources: row.sourceList, last_seen: row.lastSeen, tags: row.tags,
+          reference: row.reference, label, reason,
+        })),
+      }, null, 2), 'swiftioc-evidence-brief.json', 'application/json');
+    });
+    window.addEventListener('swiftioc:preview-filtered', (event) => {
+      if (!Array.isArray(event.detail?.rows)) return;
+      rows = event.detail.rows;
+      feedFailed = Boolean(event.detail.error);
+      origin = event.detail.origin || '';
+      render();
+    });
+  };
+
   const initialiseCampaignGraph = () => {
     const root = qs('[data-campaign-root]');
     const svg = qs('[data-campaign-graph]', root);
@@ -3120,6 +3224,7 @@
         const active = element.dataset.graphNode === node.id;
         const related = connected.has(element.dataset.graphNode);
         element.classList.toggle('is-selected', active);
+        element.setAttribute('aria-pressed', String(active));
         element.classList.toggle('is-connected', related);
         element.classList.toggle('is-dimmed', !active && !related);
       });
@@ -3263,6 +3368,7 @@
             ? `${node.pivotKind} pivot ${node.label}, ${node.totalCount} indicators`
             : `${node.row?.type || 'indicator'} ${node.label}, score ${node.score}`,
           'data-graph-node': node.id,
+          'aria-pressed': 'false',
         });
         group.style.setProperty('--node-delay', `${Math.min(index * 30, 480)}ms`);
         if (node.kind === 'indicator' && node.sourceCount >= 2) {
@@ -3351,21 +3457,7 @@
       entries = event.detail.rows;
       render();
     });
-    subscribeToDataset((dataset) => {
-      if (dataset && !isCacheOrigin(dataset.origin)) {
-        entries = dataset.entries || [];
-        render();
-      }
-    });
-    loadDataset({})
-      .then(({ dataset }) => {
-        entries = dataset.entries || [];
-        render();
-      })
-      .catch((error) => {
-        root.hidden = true;
-        console.warn('Campaign graph failed to load', error);
-      });
+
   };
 
   const makeThreatCard = (row) => {
@@ -3978,6 +4070,7 @@
   initialiseTableToggles();
   initialiseInvestigationWorkspace();
   initialiseStatusBanner();
+  initialiseDiscovery();
   initialiseCampaignGraph();
   initialiseTopThreats();
   initialiseIocLookup();
