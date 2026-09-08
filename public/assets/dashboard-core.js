@@ -365,12 +365,18 @@
         label: pivot.label,
         count: Array.from(pivot.rows.keys()).filter((key) => selectedKeys.has(key)).length,
         totalCount: pivot.rows.size,
+        averageScore: Math.round(
+          Array.from(pivot.rows.values()).reduce((total, row) => total + effectiveScore(row), 0) /
+            Math.max(pivot.rows.size, 1)
+        ),
       })),
       ...selectedRows.map((row) => ({
         id: `ioc:${investigationKey(row)}`,
         kind: 'indicator',
         label: stringValue(row.indicator),
         score: effectiveScore(row),
+        sourceCount: Number(row.sourceCount) || rowSources(row).length,
+        tagCount: Array.isArray(row.tags) ? row.tags.length : 0,
         row,
       })),
     ];
@@ -389,6 +395,7 @@
     edges.sort((a, b) =>
       a.source.localeCompare(b.source) || a.target.localeCompare(b.target)
     );
+    const selectedScores = selectedRows.map(effectiveScore);
     return {
       mode,
       nodes,
@@ -397,6 +404,15 @@
         pivots: selectedPivots.length,
         indicators: selectedRows.length,
         relationships: edges.length,
+        highScore: selectedScores.filter((value) => value >= 80).length,
+        corroborated: selectedRows.filter((row) =>
+          (Number(row.sourceCount) || rowSources(row).length) >= 2
+        ).length,
+        averageScore: selectedScores.length
+          ? Math.round(selectedScores.reduce((total, value) => total + value, 0) / selectedScores.length)
+          : 0,
+        tagPivots: selectedPivots.filter((pivot) => pivot.kind === 'tag').length,
+        sourcePivots: selectedPivots.filter((pivot) => pivot.kind === 'source').length,
       },
     };
   };
