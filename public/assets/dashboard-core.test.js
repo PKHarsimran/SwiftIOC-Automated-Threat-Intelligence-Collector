@@ -194,6 +194,7 @@ test('preserves case-sensitive URL paths in investigation identity', () => {
 
 test('dashboard markup keeps IDs and labelled controls consistent', () => {
   const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+  const css = fs.readFileSync(path.join(__dirname, 'styles.css'), 'utf8');
   const ids = Array.from(html.matchAll(/\sid="([^"]+)"/g), (match) => match[1]);
   assert.equal(new Set(ids).size, ids.length, 'IDs must be unique');
   for (const match of html.matchAll(/<label[^>]+for="([^"]+)"/g)) {
@@ -215,6 +216,7 @@ test('dashboard markup keeps IDs and labelled controls consistent', () => {
   assert.match(html, /data-preview-download-note/);
   assert.match(html, /data-investigation-root/);
   assert.match(html, /data-investigation-list/);
+  assert.match(html, /class="signal-radar"/);
   assert.match(html, /data-delta-root/);
   assert.match(html, /iocs\/delta\.jsonl/);
   assert.match(html, /iocs\/taxii2-envelope\.json/);
@@ -222,5 +224,10 @@ test('dashboard markup keeps IDs and labelled controls consistent', () => {
     (html.match(/<a\b/g) || []).length,
     (html.match(/<\/a>/g) || []).length,
     'Every link must have a complete closing tag'
+  );
+  assert.match(
+    css,
+    /\[hidden\]\s*\{\s*display:\s*none\s*!important;/,
+    'Responsive display rules must not expose hidden detail rows'
   );
 });
