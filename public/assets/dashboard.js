@@ -33,6 +33,7 @@
   // Per-indicator historical summary (first-publicly-seen, peak score, run
   // count) built from git history by scripts/build_history_index.py. Optional.
   const HISTORY_SUMMARY_URL = resolveIocUrl('history_summary.json');
+  const DETECTION_MANIFEST_URL = resolveIocUrl('detections/manifest.json');
 
   const DATASET_STORAGE_KEY = 'swiftioc-dashboard-cache-v2';
   const DATASET_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
@@ -3732,6 +3733,32 @@
     });
   };
 
+  const initialiseDetectionDownloads = () => {
+    const optionalLinks = qsa('[data-detection-artifact]');
+    if (!optionalLinks.length) return;
+    fetch(DETECTION_MANIFEST_URL, {
+      cache: 'no-store',
+      headers: { Accept: 'application/json' },
+    })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((manifest) => {
+        const included = manifest?.included;
+        if (!included || typeof included !== 'object') return;
+        const hasNetwork = ['ipv4', 'ipv6', 'ipv4_cidr', 'ipv6_cidr']
+          .some((kind) => Number(included[kind]) > 0);
+        const availability = {
+          'sigma/network-iocs.yml': hasNetwork,
+          'sigma/dns-iocs.yml': Number(included.domain) > 0,
+        };
+        optionalLinks.forEach((link) => {
+          link.hidden = !availability[link.dataset.detectionArtifact];
+        });
+      })
+      .catch((error) => {
+        console.warn('Detection manifest unavailable', error);
+      });
+  };
+
   const initialiseVisualEffects = () => {
     const targets = qsa([
       '.page-header',
@@ -3808,6 +3835,7 @@
   initialiseIocLookup();
   initialiseTrendSparkline();
   initialiseDownloadFallbacks();
+  initialiseDetectionDownloads();
   loadStats();
   initialisePreview();
 })();
