@@ -136,3 +136,25 @@ def test_invalid_cve_ids_are_not_accepted_or_truncated(cve, monkeypatch):
     assert si.fetch_nvd_recent("https://example.invalid", "ref", "nvd", ws) == []
     assert si.classify(cve) != "cve"
     assert not [r for r in si.extract_indicators_from_text(cve) if r[0] == "cve"]
+
+
+
+def test_vulnerability_export_prioritizes_latest_kev_additions_and_publications(tmp_path):
+    now = si.parse_dt("2026-09-08T12:00:00Z")
+    rows = [
+        indicator("CVE-2026-1001", vulnerability={"cisa_kev": {"date_added": "2021-01-01"}}),
+        indicator("CVE-1900-1002", vulnerability={"cisa_kev": {"date_added": "2026-09-08"}}),
+        indicator("CVE-1900-1003", vulnerability={"nvd": {"published_at": "2026-09-08T10:00:00"}}),
+        indicator("CVE-2026-1004", vulnerability={"nvd": {"published_at": "2020-01-01", "modified_at": "2026-09-08T11:30:00Z"}}),
+        indicator("CVE-2026-1005", vulnerability={"cisa_kev": {"date_added": "2026-09-08"}, "nvd": {"status": "Rejected"}}),
+        indicator("CVE-2026-1006", vulnerability={"nvd": {"published_at": "2030-01-01"}}),
+        indicator("CVE-2026-1007", vulnerability={"nvd": {"published_at": "2026-02-30"}}),
+    ]
+    before = deepcopy(rows)
+    expected = ["CVE-1900-1002", "CVE-2026-1001", "CVE-1900-1003", "CVE-2026-1004", "CVE-2026-1006", "CVE-2026-1007", "CVE-2026-1005"]
+    assert [r["cve_id"] for r in vulnerability_records(rows, now=now)] == expected
+    assert rows == before
+    write_collections(tmp_path, rows, generated_at="2026-09-08T12:00:00Z")
+    doc = json.loads((tmp_path / "vulnerabilities.json").read_text())
+    assert [r["cve_id"] for r in doc["items"]] == expected
+    assert doc["counts"]["vulnerabilities"] == 7  # Rejected entries remain auditable.
