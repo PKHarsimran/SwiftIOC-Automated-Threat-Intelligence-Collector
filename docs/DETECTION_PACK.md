@@ -9,6 +9,7 @@ SwiftIOC turns its curated high-confidence feed into detection-as-code artifacts
 | `detections/sigma/network-iocs.yml` | SIEM and EDR network telemetry | Matches exact IP endpoints and uses Sigma's `cidr` modifier for network ranges. |
 | `detections/sigma/dns-iocs.yml` | Normalized DNS telemetry | Matches an exact domain or a label-boundary subdomain suffix. |
 | `detections/suricata/swiftioc.rules` | IDS/IPS alerting | Emits inbound, outbound, and DNS alerts with deterministic, collision-checked local SIDs. |
+| `detections/suricata/sid-registry.json` | Stable rule identity | Preserves collision resolutions so unchanged rules keep their SIDs as feeds age in and out. |
 | `detections/dns/swiftioc.rpz` | BIND-compatible DNS policy | Returns NXDOMAIN for exact malicious domains and their subdomains. |
 | `detections/manifest.json` | Automation and audit | Reports included types, skipped types, rule counts, generation time, and the review-required policy. |
 
@@ -29,3 +30,5 @@ Browser exports apply the same type allowlist and reject malformed values before
 5. Promote through the organization's normal detection change process.
 
 Generated rules intentionally use an alert or experimental status. SwiftIOC supplies evidence and portable detection logic; each environment owns its field mappings, network variables, exceptions, and enforcement decision.
+
+The RPZ serial uses the generation timestamp and advances past the previous published serial when runs share a timestamp. This ensures DNS secondaries see every new policy revision.
