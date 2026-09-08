@@ -238,7 +238,16 @@ test('builds deterministic campaign pivots and omits singleton relationships', (
     { ...row, indicator: 'three.example', tags: ['singleton'], sourceList: ['feed-b'], score: 70 },
   ];
   const graph = core.buildCampaignGraph(rows, { mode: 'tags' });
-  assert.deepEqual(graph.stats, { pivots: 1, indicators: 2, relationships: 2 });
+  assert.deepEqual(graph.stats, {
+    pivots: 1,
+    indicators: 2,
+    relationships: 2,
+    highScore: 2,
+    corroborated: 2,
+    averageScore: 85,
+    tagPivots: 1,
+    sourcePivots: 0,
+  });
   assert.equal(graph.nodes.find((node) => node.kind === 'pivot').label, 'ransomware');
   assert.equal(graph.nodes.some((node) => node.label === 'singleton'), false);
   assert.equal(graph.edges.every((edge) => edge.kind === 'tag'), true);
@@ -295,6 +304,9 @@ test('dashboard markup keeps IDs and labelled controls consistent', () => {
   assert.match(html, /data-investigation-sigma/);
   assert.match(html, /data-investigation-suricata/);
   assert.match(html, /data-campaign-graph/);
+  assert.match(html, /data-campaign-density/);
+  assert.match(html, /data-campaign-related-list/);
+  assert.match(html, /data-campaign-reference/);
   assert.match(html, /class="signal-radar"/);
   assert.match(html, /data-delta-root/);
   assert.match(html, /iocs\/delta\.jsonl/);
