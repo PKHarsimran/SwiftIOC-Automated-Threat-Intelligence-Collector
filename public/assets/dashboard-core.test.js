@@ -411,3 +411,18 @@ test('vulnerability filters keep exact CVE records and separate severity from ex
   assert.equal(core.filterVulnerabilities(items, 'missing').length, 0);
   assert.equal(JSON.stringify(items), before);
 });
+
+
+test('vulnerability search indexes each provider description independently of the summary', () => {
+  const item = {
+    cve_id: 'CVE-1900-1234', exploitation_status: 'known_exploited',
+    description: 'Combined summary', reports: {
+      cisa_kev: { description: 'CISA-specific remediation context' },
+      nvd: { description: 'NVD-specific technical details' },
+    },
+  };
+  for (const query of ['combined summary', 'CISA-SPECIFIC', 'nvd-specific']) {
+    assert.deepEqual(core.filterVulnerabilities([item], query), [item]);
+  }
+  assert.deepEqual(core.filterVulnerabilities([item], 'CISA-specific', 'not_established'), []);
+});
