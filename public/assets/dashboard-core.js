@@ -144,7 +144,7 @@
   };
 
   const validIpv6 = (value) => {
-    if (!value.includes(':') || !/^[0-9a-f:]+$/i.test(value)) return false;
+    if (!value.includes(':') || !/^[0-9a-f:.]+$/i.test(value)) return false;
     try {
       return new URL(`http://[${value}]/`).hostname.length > 2;
     } catch (error) {
