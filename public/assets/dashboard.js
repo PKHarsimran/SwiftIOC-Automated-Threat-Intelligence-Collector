@@ -3133,7 +3133,7 @@
         if (data.schema_version !== 1 || !Array.isArray(data.items) || typeof data.generated_at !== 'string' || !Number.isFinite(Date.parse(data.generated_at))) throw new Error('Invalid collection');
         const seen = new Set();
         for (const item of data.items) {
-          if (!item || typeof item.cve_id !== 'string' || !/^CVE-\d{4}-\d{4,}$/.test(item.cve_id) || seen.has(item.cve_id)
+          if (!item || typeof item.cve_id !== 'string' || !/^CVE-[0-9]{4}-[0-9]{4,19}$/.test(item.cve_id) || seen.has(item.cve_id)
             || !Object.hasOwn(labels, item.exploitation_status) || !Array.isArray(item.sources)
             || !item.sources.every((source) => typeof source === 'string')
             || !item.reports || typeof item.reports !== 'object' || Array.isArray(item.reports)) throw new Error('Invalid CVE record');
