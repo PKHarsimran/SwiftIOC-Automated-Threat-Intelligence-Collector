@@ -89,6 +89,7 @@ high-fidelity IOCs from authoritative sources. The project emphasises:
   other CI/CD environments.
 
 ## 🚀 Features
+- **Discovery desk** – switch between corroborated reports, sightings from the last 24 hours, and uncommon tags in the filtered preview. Each lead explains its selection, opens source evidence, and can be saved to the investigation queue. Export a JSON evidence brief with the reasons attached. Sample rarity is explicitly distinguished from global rarity.
 - **Analyst-first live dashboard** – search raw or defanged IOCs, combine
   multi-select type/source/tag/score/age filters, inspect score rationale, and
   shortlist findings in a private investigation queue that persists in the
