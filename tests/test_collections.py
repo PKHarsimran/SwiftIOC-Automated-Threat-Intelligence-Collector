@@ -158,3 +158,47 @@ def test_vulnerability_export_prioritizes_latest_kev_additions_and_publications(
     doc = json.loads((tmp_path / "vulnerabilities.json").read_text())
     assert [r["cve_id"] for r in doc["items"]] == expected
     assert doc["counts"]["vulnerabilities"] == 7  # Rejected entries remain auditable.
+
+
+
+def test_retention_reserves_space_for_recently_checked_kev_evidence():
+    now = si.now_utc()
+    high_ioc = indicator("8.8.8.8", "ipv4", score=99)
+    old_kev = indicator("CVE-1900-1001", score=95, vulnerability={"cisa_kev": {
+        "catalog_checked_at": si.iso(now), "date_added": "2020-01-01"}})
+    new_kev = indicator("CVE-1900-1002", score=80, vulnerability={"cisa_kev": {
+        "catalog_checked_at": si.iso(now), "date_added": si.iso(now - timedelta(hours=1))}})
+    before = deepcopy([high_ioc, old_kev, new_kev])
+    kept, aged, pruned = si.apply_retention([high_ioc, old_kev, new_kev], max_store=2, now=now)
+    assert [r.indicator for r in kept] == [new_kev.indicator, old_kev.indicator]
+    assert aged == 0 and pruned == 1
+    one, _, _ = si.apply_retention([old_kev, new_kev], max_store=1, now=now)
+    assert one == [new_kev]
+    assert [high_ioc, old_kev, new_kev] == before
+    cutoff_now = si.parse_dt(si.iso(now))
+    assert cutoff_now is not None
+    old_kev.vulnerability["cisa_kev"]["catalog_checked_at"] = si.iso(cutoff_now - timedelta(hours=24))
+    boundary, _, _ = si.apply_retention([high_ioc, old_kev], max_store=1, now=cutoff_now)
+    assert boundary == [old_kev]
+    old_kev.vulnerability["cisa_kev"]["catalog_checked_at"] = si.iso(cutoff_now - timedelta(hours=24, seconds=1))
+    stale, _, _ = si.apply_retention([high_ioc, old_kev], max_store=1, now=cutoff_now)
+    assert stale == [high_ioc]
+    new_kev.last_seen = si.iso(now - timedelta(days=40))
+    retained, aged, _ = si.apply_retention([high_ioc, new_kev], max_store=1, max_age_days=30, now=now)
+    assert retained == [high_ioc] and aged == 1  # Never bypass configured expiry.
+
+
+@pytest.mark.parametrize(("checked", "status"), [
+    (None, "Analyzed"), ("invalid", "Analyzed"),
+    ("2020-01-01", "Analyzed"), ("2099-01-01", "Analyzed"),
+    ("fresh", "Rejected"),
+])
+def test_retention_does_not_promote_stale_unknown_future_or_rejected_kev(checked, status):
+    now = si.now_utc()
+    row = indicator("CVE-1900-1001", score=50, tags="cve,exploited-in-the-wild", vulnerability={
+        "cisa_kev": {"catalog_checked_at": si.iso(now) if checked == "fresh" else checked, "date_added": "2020-01-01"},
+        "nvd": {"status": status},
+    })
+    high_ioc = indicator("8.8.8.8", "ipv4", score=99)
+    retained, _, _ = si.apply_retention([row, high_ioc], max_store=1, now=now)
+    assert retained == [high_ioc]
