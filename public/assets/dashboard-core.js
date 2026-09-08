@@ -84,6 +84,53 @@
     ].join('\r\n') + '\r\n';
   };
 
+  const investigationKey = (row) => {
+    const indicator = lower(row?.indicator);
+    if (!indicator) return '';
+    return `${lower(row?.type) || 'unknown'}\u0000${indicator}`;
+  };
+
+  // Treat browser storage as untrusted input. Keep only the fields needed by
+  // the analyst workspace, cap collection size, and discard duplicate or
+  // malformed records before anything is rendered or exported.
+  const normaliseInvestigationRows = (value, limit = 50) => {
+    if (!Array.isArray(value)) return [];
+    const rows = [];
+    const seen = new Set();
+    const cap = Math.max(1, Math.min(Number(limit) || 50, 250));
+    for (const candidate of value) {
+      if (!candidate || typeof candidate !== 'object') continue;
+      const indicator = stringValue(candidate.indicator);
+      if (!indicator || indicator.length > 2048) continue;
+      const row = {
+        indicator,
+        type: stringValue(candidate.type) || 'unknown',
+        confidence: stringValue(candidate.confidence),
+        source: stringValue(candidate.source),
+        sourceList: Array.isArray(candidate.sourceList)
+          ? candidate.sourceList.map(stringValue).filter(Boolean).slice(0, 25)
+          : [],
+        firstSeen: stringValue(candidate.firstSeen),
+        lastSeen: stringValue(candidate.lastSeen),
+        tags: Array.isArray(candidate.tags)
+          ? candidate.tags.map(stringValue).filter(Boolean).slice(0, 50)
+          : [],
+        reference: stringValue(candidate.reference),
+        context: stringValue(candidate.context),
+        tlp: stringValue(candidate.tlp),
+      };
+      if (typeof candidate.score === 'number' && Number.isFinite(candidate.score)) {
+        row.score = Math.max(0, Math.min(100, candidate.score));
+      }
+      const key = investigationKey(row);
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      rows.push(row);
+      if (rows.length >= cap) break;
+    }
+    return rows;
+  };
+
   const scoreBand = (row) => {
     const score = effectiveScore(row);
     if (score >= 80) return 'high';
@@ -269,7 +316,9 @@
   return {
     compareRows,
     effectiveScore,
+    investigationKey,
     matchesRow,
+    normaliseInvestigationRows,
     readViewState,
     refang,
     rowsToCsv,
