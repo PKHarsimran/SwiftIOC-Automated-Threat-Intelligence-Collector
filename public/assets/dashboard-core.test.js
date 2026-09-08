@@ -387,3 +387,42 @@ test('uncommon discovery measures distinct indicators and omits generic and sour
   assert.deepEqual(core.buildDiscovery(rows.slice().reverse(), 'uncommon'), result);
   assert.equal(core.buildDiscovery([], 'uncommon').findings.length, 0);
 });
+
+test('CVE provider and generic tags never become observable graph or discovery relationships', () => {
+  const cves = ['CVE-2020-1234', 'CVE-2020-5678'].map((indicator) => ({
+    ...row, type: 'cve', indicator, tags: ['cve', 'nvd'], tagsLower: ['cve', 'nvd'],
+  }));
+  assert.deepEqual(core.buildCampaignGraph([...cves, row]), core.buildCampaignGraph([row]));
+  assert.deepEqual(core.buildDiscovery([...cves, row], 'corroborated'), core.buildDiscovery([row], 'corroborated'));
+});
+
+test('vulnerability filters keep exact CVE records and separate severity from exploitation', () => {
+  const items = [
+    { cve_id: 'CVE-2020-9999', exploitation_status: 'not_established', sources: ['nvd'], reports: { nvd: { severity: 'critical' } } },
+    { cve_id: 'CVE-2020-5678', exploitation_status: 'reported_exploitation', sources: ['rss'], reports: {} },
+    { cve_id: 'CVE-2020-1234', exploitation_status: 'known_exploited', sources: ['kev', 'nvd'], reports: { cisa_kev: { vendor: 'Vendor A', product: 'Router' } } },
+  ];
+  const before = JSON.stringify(items);
+  assert.deepEqual(core.filterVulnerabilities(items).map((r) => r.cve_id), ['CVE-2020-1234', 'CVE-2020-5678', 'CVE-2020-9999']);
+  assert.equal(core.filterVulnerabilities(items, 'cve-2020-9999', 'known_exploited').length, 0);
+  assert.equal(core.filterVulnerabilities(items, 'ROUTER')[0].cve_id, 'CVE-2020-1234');
+  assert.equal(core.filterVulnerabilities(items, 'vendor a')[0].cve_id, 'CVE-2020-1234');
+  assert.equal(core.filterVulnerabilities(items, 'nvd').length, 2);
+  assert.equal(core.filterVulnerabilities(items, 'missing').length, 0);
+  assert.equal(JSON.stringify(items), before);
+});
+
+
+test('vulnerability search indexes each provider description independently of the summary', () => {
+  const item = {
+    cve_id: 'CVE-1900-1234', exploitation_status: 'known_exploited',
+    description: 'Combined summary', reports: {
+      cisa_kev: { description: 'CISA-specific remediation context' },
+      nvd: { description: 'NVD-specific technical details' },
+    },
+  };
+  for (const query of ['combined summary', 'CISA-SPECIFIC', 'nvd-specific']) {
+    assert.deepEqual(core.filterVulnerabilities([item], query), [item]);
+  }
+  assert.deepEqual(core.filterVulnerabilities([item], 'CISA-specific', 'not_established'), []);
+});

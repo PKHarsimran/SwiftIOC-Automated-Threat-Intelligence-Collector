@@ -2,13 +2,14 @@
 from __future__ import annotations
 
 import json
+from copy import deepcopy
 from dataclasses import fields as dataclass_fields, replace
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from .fp import is_false_positive
-from .models import Indicator, classify, merge_conf, now_utc, parse_dt
+from .models import Indicator, classify, merge_conf, normalize_value, now_utc, parse_dt
 
 
 # ---------------- scoring: corroboration + age decay ----------------
@@ -166,6 +167,12 @@ def load_previous_feed(path: Path) -> List[Indicator]:
                 continue
             ind.type = actual_type
             ind.indicator = ind.indicator.strip().lower()
+        if ind.type == "cve":
+            if not isinstance(ind.indicator, str) or classify(ind.indicator.strip()) != "cve":
+                continue
+            ind.indicator = normalize_value("cve", ind.indicator)
+        if not isinstance(ind.vulnerability, dict):
+            ind.vulnerability = {}
         if is_false_positive(ind.type, ind.indicator):
             continue
         out.append(ind)
@@ -192,10 +199,12 @@ def merge_with_previous(current: List[Indicator], previous: List[Indicator]) -> 
             # mutates current rows; sharing this object with ``previous`` made
             # SOC Delta compare the new score with itself and hid decay/band
             # changes. It also corrupted removal payloads with the new score.
-            uniq[k] = replace(prev)
+            uniq[k] = replace(prev, vulnerability=deepcopy(prev.vulnerability))
             carried += 1
             continue
         cur = uniq[k]
+        if cur.type == "cve":
+            cur.vulnerability = deepcopy({**prev.vulnerability, **cur.vulnerability})
         p_first = parse_dt(prev.first_seen)
         c_first = parse_dt(cur.first_seen)
         if p_first and (c_first is None or p_first < c_first):
