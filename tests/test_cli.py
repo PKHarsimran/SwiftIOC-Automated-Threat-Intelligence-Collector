@@ -71,6 +71,7 @@ def test_cli_main_end_to_end_writes_expected_outputs(tmp_path, monkeypatch):
         "iocs/stix2.json", "iocs/high_confidence.csv", "iocs/high_confidence.jsonl",
         "iocs/dashboard.jsonl", "badge.json", "diagnostics/run.json", "diagnostics/REPORT.md",
         "iocs/delta.json", "iocs/delta.jsonl",
+        "collections/observables.jsonl", "collections/vulnerabilities.json",
         "iocs/taxii2-envelope.json",
         "changelog/CHANGELOG.md",
         "detections/manifest.json", "detections/README.md",
@@ -80,6 +81,8 @@ def test_cli_main_end_to_end_writes_expected_outputs(tmp_path, monkeypatch):
         assert (out_dir / rel).exists(), f"missing output: {rel}"
 
     diag = json.loads((out_dir / "diagnostics" / "run.json").read_text(encoding="utf-8"))
+    assert diag["collections"]["observables"] == 3
+    assert diag["collections"]["vulnerabilities"] == 0
     assert diag["total_before_dedup"] == 5
     # 5 raw rows (3 from src_a, 2 from src_b, both overlapping src_a's first
     # two) dedup to 3 unique indicators -> 2 genuine duplicates removed.
