@@ -519,3 +519,28 @@ test('CVE dates treat offset-free NVD timestamps as UTC and reject invalid/futur
   const boundary = new Date((triageNow - 7 * 86400) * 1000).toISOString();
   assert.equal(core.filterVulnerabilities([triageItem('CVE-1900-1234', 'not_established', null, boundary)], '', 'all', { now: triageNow, view: 'published7' }).length, 1);
 });
+
+
+test('exploited and ransomware views require explicit evidence and never fall back to generic CVEs', () => {
+  const confirmed = triageItem('CVE-1900-1234', 'known_exploited', '2026-09-07', '2020-01-01');
+  confirmed.reports.cisa_kev.ransomware_use = 'Known';
+  const unknown = triageItem('CVE-1900-1235', 'known_exploited', '2026-09-06', '2020-01-01');
+  unknown.reports.cisa_kev.ransomware_use = 'Unknown';
+  const generic = triageItem('CVE-1900-1236', 'not_established', null, '2026-09-08');
+  const items = [generic, unknown, confirmed];
+  assert.deepEqual(core.filterVulnerabilities(items, '', 'all', {view: 'exploited', now: triageNow}).map((r) => r.cve_id), [confirmed.cve_id, unknown.cve_id]);
+  assert.deepEqual(core.filterVulnerabilities(items, '', 'all', {view: 'ransomware', now: triageNow}), [confirmed]);
+  assert.equal(core.filterVulnerabilities([generic], '', 'all', {view: 'exploited', now: triageNow}).length, 0);
+  assert.equal(core.filterVulnerabilities(items, '', 'not_established', {view: 'exploited', now: triageNow}).length, 0);
+  for (const value of ['Unknown', 'Not known', '', null]) {
+    confirmed.reports.cisa_kev.ransomware_use = value;
+    assert.equal(core.vulnerabilityFacts(confirmed, triageNow).ransomware, false);
+  }
+});
+
+test('vulnerability release uses coordinated new asset cache keys', () => {
+  const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
+  for (const asset of ['styles.css', 'dashboard-core.js', 'dashboard.js']) {
+    assert.ok(html.includes(`assets/${asset}?v=16`));
+  }
+});
