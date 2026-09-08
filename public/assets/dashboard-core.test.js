@@ -220,6 +220,17 @@ test('builds deterministic Suricata rules and rejects injected values', () => {
   assert.doesNotMatch(first, /sid:1;/);
 });
 
+test('accepts IPv4-embedded IPv6 observables in browser detection exports', () => {
+  const rows = core.detectionRows([
+    { indicator: '::ffff:192.0.2.1', type: 'ipv6' },
+    { indicator: '::ffff:192.0.2.0/120', type: 'ipv6_cidr' },
+  ]);
+  assert.deepEqual(rows.map((row) => row.indicator), [
+    '::ffff:192.0.2.1',
+    '::ffff:192.0.2.0/120',
+  ]);
+});
+
 test('builds deterministic campaign pivots and omits singleton relationships', () => {
   const rows = [
     { ...row, indicator: 'one.example', tags: ['ransomware', 'feed-a', 'critical'], sourceList: ['feed-a'] },
@@ -278,6 +289,8 @@ test('dashboard markup keeps IDs and labelled controls consistent', () => {
   assert.match(html, /data-preview-download/);
   assert.match(html, /data-preview-download-note/);
   assert.match(html, /data-investigation-root/);
+  assert.match(html, /data-detection-artifact="sigma\/network-iocs\.yml"[^>]*hidden/);
+  assert.match(html, /data-detection-artifact="sigma\/dns-iocs\.yml"[^>]*hidden/);
   assert.match(html, /data-investigation-list/);
   assert.match(html, /data-investigation-sigma/);
   assert.match(html, /data-investigation-suricata/);
