@@ -36,11 +36,62 @@ Choose the shortest path for what you are trying to do:
 | --- | --- | --- |
 | A SOC analyst or threat hunter | [Live dashboard](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/) | Search, filters, score explanations, source context, and a private browser-local investigation queue. |
 | Feeding a SIEM, EDR, firewall, or SOAR | [High-confidence JSONL](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/iocs/high_confidence.jsonl) | The strongest current indicators in a stream-friendly format. |
+| Tracking vulnerabilities and patch work | [Vulnerability collection](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/#vulnerabilities) | One record per CVE, separate CISA/NVD reports, product search, and explicit exploitation evidence. |
 | Building continuous automation | [SOC Delta output guide](#-outputs--diagnostics) | Additions, material updates, and removals since the previous validated snapshot. |
 | Using a CTI platform | [Interoperability outputs](#-outputs--diagnostics) or the live [MISP manifest](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/misp/manifest.json) | STIX, TAXII, and MISP objects with stable identifiers for repeatable imports. |
 | Investigating historical activity | [`ioc_timeline.py`](scripts/ioc_timeline.py) | Answer whether an IOC was present, when it appeared, and how its score changed. |
 | Running your own collector | [Quick start](#-quick-start) | A configurable local, container, cron, or GitHub Actions deployment. |
 | Contributing a parser or fix | [Development and testing](#-development--testing) | Setup, test commands, and contribution guidance. |
+
+### Vulnerabilities and observables are separate collections
+
+SwiftIOC deduplicates by `(type, indicator)`: `CVE-2020-1234` and
+`CVE-2020-5678` stay separate even if both appear in NVD or share a generic
+`cve` tag. Reports about **the same CVE** are combined under that CVE ID while
+keeping `reports.cisa_kev` and `reports.nvd` separately. The campaign graph and
+Discovery desk use observables; CVEs have their own searchable, paginated view.
+
+Each collector run writes these additive exports:
+
+| Collection | Contents | Intended use |
+| --- | --- | --- |
+| [`collections/vulnerabilities.json`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/collections/vulnerabilities.json) | Versioned document with `generated_at`, coverage scope, counts, and `items`, one per CVE. | Vulnerability triage and patch investigations. |
+| [`collections/observables.jsonl`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/collections/observables.jsonl) | All retained non-CVE records, using the existing indicator schema. | IOC integrations that need CVEs excluded; apply your own score/type policy. |
+
+The vulnerability export uses three exploitation labels:
+
+- `known_exploited`: structured evidence from the CISA KEV adapter. The
+  [CISA catalog](https://www.cisa.gov/known-exploited-vulnerabilities-catalog)
+  records vulnerabilities known to have been exploited. A catalog entry does
+  not say an attack is happening now or that your own assets are affected.
+- `reported_exploitation`: a source or legacy feed supplied an
+  `exploited-in-the-wild` tag, without structured KEV evidence in this record.
+- `not_established`: this retained record does not establish exploitation.
+  It does **not** mean the vulnerability has never been exploited. NVD severity
+  and SwiftIOC relevance scores alone never promote this label.
+
+CISA reports preserve vendor, product, description, required action, catalog
+addition date, directive due date, ransomware-use value, and catalog check
+time. NVD reports preserve description, publication/modification dates,
+status, and available severity. These dates describe provider records, not
+attack times. CISA due dates concern its directive; they are not universal
+patch deadlines. Review NVD status, including rejected records, before triage.
+
+Both collections cover the **retained feed**, not the entire KEV or NVD
+catalogs. Source windows, per-source caps, request failures, expiry, and
+retention limits can reduce coverage. With `--persist-feed`, a missing provider
+report is retained with its original dates; a fresh report from that provider
+replaces its previous fields. Check the provider dates and run diagnostics
+before treating evidence as fresh. Collection generation time is not a source
+observation time.
+
+No migration or new CLI flag is required. `iocs/latest.*` and high-confidence
+outputs remain combined feeds for compatibility; their JSON records now carry
+an additive `vulnerability` object (empty for observables). CSV columns remain
+unchanged. Existing snapshots load with an empty object and gain structured
+reports on the next successful source fetch. The new collection files are
+regenerated during publishing; a static checkout needs a collector run to
+populate them.
 
 ### Pick the right feed
 
@@ -635,12 +686,22 @@ ruff check .          # lint
 pyright               # static type check
 python -m swiftioc --self-test   # built-in sanity assertions
 pytest -q             # offline unit tests (parsers, STIX, dedup, changelog)
+node --test public/assets/dashboard-core.test.js  # frontend data logic
 ```
 
 The `tests/` suite is fully offline—parsers that would hit the network have
 their HTTP layer monkeypatched—so it is safe to run anywhere and catches feed
 format drift before it reaches production. When `stix2` is installed the suite
 also validates the generated bundle against the reference library.
+
+For the vulnerability view’s browser regression checks, install Playwright
+in your development environment (`npm install --no-save --package-lock=false
+playwright`, then `npx playwright install chromium`). Serve `public/` with
+`python -m http.server 8765 --directory public` and, in a second terminal, run
+`node scripts/test_vulnerability_ui.cjs`. The test injects synthetic CVE data
+and covers filtering, pagination, safe rendering, mobile overflow, refresh
+failure, retry, and empty collections. Set `BASE_URL` for another local port or
+`PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` to use an existing Chromium browser.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add a new feed parser and the
 full contribution workflow.
