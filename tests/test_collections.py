@@ -4,6 +4,8 @@ from copy import deepcopy
 from datetime import timedelta
 from typing import Any, Dict
 
+import pytest
+
 import swiftioc as si
 from swiftioc.collections import vulnerability_records, write_collections
 
@@ -97,3 +99,40 @@ def test_typed_exports_partition_and_replace_empty_collection(tmp_path):
     write_collections(tmp_path, [], generated_at=si.iso(si.now_utc() + timedelta(hours=1)))
     assert json.loads((tmp_path / "vulnerabilities.json").read_text())["items"] == []
     assert (tmp_path / "observables.jsonl").read_text() == ""
+
+
+@pytest.mark.parametrize("digits", [4, 7, 8, 19])
+def test_full_cve_sequence_range_survives_parsers_snapshot_and_collections(digits, monkeypatch, tmp_path):
+    cve = "CVE-1900-" + "1" * digits
+    now = si.iso(si.now_utc())
+    payload = {"vulnerabilities": [{
+        "cveID": cve.lower(), "dateAdded": "2026-09-08",
+        "cve": {"id": cve.lower(), "lastModified": now},
+    }]}
+    monkeypatch.setattr(si, "http_get", lambda *args, **kwargs: json.dumps(payload))
+    ws = si.now_utc() - timedelta(days=1)
+    kev = si.fetch_cisa_kev("https://example.invalid", "ref", "kev", ws)
+    nvd = si.fetch_nvd_recent("https://example.invalid", "ref", "nvd", ws)
+    assert [r.indicator for r in kev] == [cve]
+    assert [r.indicator for r in nvd] == [cve]
+    assert si.classify(cve) == "cve"
+    assert ("cve", cve) in si.extract_indicators_from_text(f"Advisory ({cve}).")
+    path = tmp_path / "latest.jsonl"
+    si.write_jsonl(path, kev + nvd)
+    loaded = si.load_previous_feed(path)
+    assert len(loaded) == 2
+    records = vulnerability_records(loaded)
+    assert len(records) == 1
+    assert records[0]["cve_id"] == cve
+    assert set(records[0]["reports"]) == {"cisa_kev", "nvd"}
+
+
+@pytest.mark.parametrize("cve", ["CVE-1900-123", "CVE-1900-" + "1" * 20, "CVE-1900-１２３４"])
+def test_invalid_cve_ids_are_not_accepted_or_truncated(cve, monkeypatch):
+    payload = {"vulnerabilities": [{"cveID": cve, "cve": {"id": cve}}]}
+    monkeypatch.setattr(si, "http_get", lambda *args, **kwargs: json.dumps(payload))
+    ws = si.now_utc() - timedelta(days=1)
+    assert si.fetch_cisa_kev("https://example.invalid", "ref", "kev", ws) == []
+    assert si.fetch_nvd_recent("https://example.invalid", "ref", "nvd", ws) == []
+    assert si.classify(cve) != "cve"
+    assert not [r for r in si.extract_indicators_from_text(cve) if r[0] == "cve"]
