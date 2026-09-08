@@ -48,7 +48,24 @@ Choose the shortest path for what you are trying to do:
 SwiftIOC deduplicates by `(type, indicator)`: `CVE-2020-1234` and
 `CVE-2020-5678` stay separate even if both appear in NVD or share a generic
 `cve` tag. Reports about **the same CVE** are combined under that CVE ID while
-keeping `reports.cisa_kev` and `reports.nvd` separately. The campaign graph and
+keeping `reports.cisa_kev` and `reports.nvd` separately. The default queue
+puts known-exploited CVEs first, newest KEV additions first; exploitation
+reports follow, then other CVEs, newest NVD publications first within each group. The JSON export uses the same priority ordering, with
+rejected records last. CVE ID year and generic IOC scores do not establish recency.
+
+Use **Added to KEV · 30 days**, **Published · 7 days**, or **Updated · 7 days**
+to focus on recent catalog additions, disclosures, or provider record edits.
+These are different events: an old CVE added to KEV today belongs in the first
+view, and an old CVE edited today belongs in the third, not the newly published
+view. Date windows use UTC provider timestamps and exclude unknown, invalid,
+and future dates. Search and exploitation filters apply within each view.
+
+NVD rejected records are hidden by default, with a count and an opt-in control;
+they remain in exports for auditability. Cards expose provider dates and CISA
+actions. A snapshot older than 24 hours is flagged, and old or missing KEV check
+dates are labeled as historical evidence. Neither a fresh snapshot nor KEV
+membership proves attacks are happening now. These are triage priorities;
+match affected products to your assets before deciding remediation. The campaign graph and
 Discovery desk use observables; CVEs have their own searchable, paginated view.
 
 Each collector run writes these additive exports:
