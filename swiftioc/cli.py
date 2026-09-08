@@ -113,7 +113,7 @@ def main() -> int:
     ap.add_argument("--max-age-days", type=int, default=None,
                     help="Retention: drop indicators whose last_seen is older than N days")
     ap.add_argument("--max-store", type=int, default=None,
-                    help="Retention: keep only the top N indicators by score/recency (KEVIntel-style curation)")
+                    help="Retention: keep at most N; recently checked KEV CVEs first, then score/recency")
     ap.add_argument("--dashboard-rows", type=int, default=1000,
                     help="Rows in the compact dashboard.jsonl the web dashboard downloads (default 1000)")
     ap.add_argument("--site-url", type=str,
