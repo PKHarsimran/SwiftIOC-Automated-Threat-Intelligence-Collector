@@ -426,3 +426,47 @@ test('vulnerability search indexes each provider description independently of th
   }
   assert.deepEqual(core.filterVulnerabilities([item], 'CISA-specific', 'not_established'), []);
 });
+
+
+test('uncommon discovery omits adapter provider aliases while preserving investigative tags', () => {
+  const examples = [
+    ['threatfox_export_json', ' ThreatFox '], ['ci_army_list', 'CINS'],
+    ['feodo_ipblocklist', 'feodo'], ['sslbl_ja3', 'sslbl'],
+    ['spamhaus_drop', 'spamhaus'], ['dshield_block', 'sans-isc'],
+    ['openphish_feed', 'openphish'], ['greensnow_blocklist', 'greensnow'],
+    ['et_compromised', 'emerging-threats'], ['binarydefense_banlist', 'binarydefense'],
+    ['ipsum_level5', 'ipsum'], ['custom-provider-name', 'threatfox'],
+  ];
+  const rows = examples.map(([source, tag], index) => ({
+    ...row, indicator: `provider-${index}.example`, sourceList: [source], tags: [tag],
+  }));
+  assert.equal(core.buildDiscovery(rows, 'uncommon').total, 0);
+  const useful = ['mirai', 'c2', 'phishing', 'scanning', 'tor', 'exit-node'].map((tag, index) => ({
+    ...row, indicator: `lead-${index}.example`, sourceList: ['threatfox_export_json'], tags: ['threatfox', tag],
+  }));
+  const result = core.buildDiscovery([...rows, ...useful], 'uncommon');
+  assert.deepEqual(new Set(result.findings.map(({ label }) => label)), new Set(useful.map((r) => r.tags[1])));
+  assert.equal(result.sampleSize, rows.length + useful.length);
+  assert.match(result.findings[0].reason, /appears on 1 of 18/);
+  assert.deepEqual(core.buildDiscovery([...rows, ...useful].reverse(), 'uncommon'), result);
+  assert.equal(core.buildDiscovery([{ ...row, sourceList: [], source: 'feed-x, feed-y', tags: ['feed-x', 'feed-y'] }], 'uncommon').total, 0);
+});
+
+test('recent discovery accepts equivalent ISO, Unix-number, and numeric-string sightings', () => {
+  const now = 1720003600;
+  const seen = 1720000000;
+  for (const value of [seen, String(seen), ` ${seen} `, seen * 1000, String(seen * 1000), new Date(seen * 1000).toISOString()]) {
+    for (const field of ['lastSeen', 'last_seen']) {
+      const item = { ...row, lastSeen: undefined, last_seen: undefined, [field]: value };
+      const result = core.buildDiscovery([item], 'recent', now);
+      assert.equal(result.total, 1, `${field}=${JSON.stringify(value)}`);
+      assert.equal(result.findings[0].rank, seen);
+    }
+  }
+  for (const value of [null, undefined, '', '  ', 'NaN', 'Infinity', '1e20', 'not a date', String(now + 1), String(now - 86401)]) {
+    // A recent firstSeen/bestTimestamp must never conceal a missing or stale sighting.
+    const item = { ...row, lastSeen: value, firstSeen: now, bestTimestamp: now };
+    assert.equal(core.buildDiscovery([item], 'recent', now).total, 0, String(value));
+  }
+  assert.equal(core.buildDiscovery([{ ...row, lastSeen: String(now - 86400) }], 'recent', now).total, 1);
+});
