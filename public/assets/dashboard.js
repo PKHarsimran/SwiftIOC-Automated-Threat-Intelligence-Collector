@@ -39,6 +39,8 @@
 
   const numberFormatter = new Intl.NumberFormat('en-US');
   const formatNumber = (value) => numberFormatter.format(value ?? 0);
+  const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+  const metricAnimationFrames = new WeakMap();
 
   const relativeTimeFormatter =
     typeof Intl !== 'undefined' &&
@@ -81,9 +83,42 @@
     el.textContent = value ?? '';
   };
 
+  const setMetricText = (el, value) => {
+    const text = String(value ?? '');
+    if (
+      !el?.classList.contains('metric-value') ||
+      reducedMotion?.matches ||
+      !/^[\d,]+$/.test(text)
+    ) {
+      setText(el, value);
+      return;
+    }
+    const target = Number(text.replace(/,/g, ''));
+    const rendered = normaliseString(el.textContent).replace(/,/g, '');
+    const current = /^\d+$/.test(rendered) ? Number(rendered) : 0;
+    const previousFrame = metricAnimationFrames.get(el);
+    if (previousFrame) window.cancelAnimationFrame(previousFrame);
+    if (!Number.isFinite(target) || current === target) {
+      setText(el, value);
+      return;
+    }
+    const started = performance.now();
+    const tick = (now) => {
+      const progress = Math.min(1, (now - started) / 720);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setText(el, formatNumber(Math.round(current + (target - current) * eased)));
+      if (progress < 1) {
+        metricAnimationFrames.set(el, window.requestAnimationFrame(tick));
+      } else {
+        metricAnimationFrames.delete(el);
+      }
+    };
+    metricAnimationFrames.set(el, window.requestAnimationFrame(tick));
+  };
+
   const setStatText = (name, value) => {
     qsa(`[data-stat="${name}"]`).forEach((el) => {
-      setText(el, value);
+      setMetricText(el, value);
     });
   };
 
@@ -1786,7 +1821,7 @@
       );
     }
 
-    SCORE_BAND_META.forEach((meta) => {
+    SCORE_BAND_META.forEach((meta, index) => {
       const count = bands[meta.key] || 0;
       if (!count) return;
       const pct = (count / total) * 100;
@@ -1795,6 +1830,7 @@
         const seg = document.createElement('span');
         seg.className = `score-seg score-seg-${meta.key}`;
         seg.style.width = `${pct}%`;
+        seg.style.setProperty('--segment-delay', `${index * 90}ms`);
         seg.title = `${meta.label}: ${formatNumber(count)} (${pct.toFixed(1)}%)`;
         bar.appendChild(seg);
       }
@@ -2417,10 +2453,11 @@
       rationale.className = 'score-explanation';
       rationale.textContent = explainScore(row);
       details.appendChild(rationale);
-      if (row.reference) {
+      const reportingUrl = safeHttpUrl(row.reference);
+      if (reportingUrl) {
         const reference = document.createElement('a');
         reference.className = 'button ghost';
-        reference.href = row.reference;
+        reference.href = reportingUrl;
         reference.target = '_blank';
         reference.rel = 'noopener noreferrer';
         reference.textContent = 'View reporting source';
@@ -2545,8 +2582,10 @@
         return;
       }
       const fragment = document.createDocumentFragment();
-      rows.forEach((row) => {
+      rows.forEach((row, index) => {
         const [main, detail] = createRow(row);
+        main.classList.add('preview-row-enter');
+        main.style.setProperty('--row-delay', `${Math.min(index * 28, 280)}ms`);
         fragment.append(main, detail);
       });
       tbody.appendChild(fragment);
@@ -3172,10 +3211,11 @@
             await copyOrPrompt(url.toString(), 'Shareable IOC lookup copied.', 'Copy this shareable link:');
           })
         );
-        if (row.reference) {
+        const sourceUrl = safeHttpUrl(row.reference);
+        if (sourceUrl) {
           const reference = document.createElement('a');
           reference.className = 'button ghost';
-          reference.href = row.reference;
+          reference.href = sourceUrl;
           reference.target = '_blank';
           reference.rel = 'noopener noreferrer';
           reference.textContent = 'View source';
@@ -3441,10 +3481,73 @@
     });
   };
 
+  const initialiseVisualEffects = () => {
+    const targets = qsa([
+      '.page-header',
+      '.ioc-lookup',
+      '.investigation-workspace',
+      '.status-banner',
+      '.metrics-strip',
+      '.score-distribution',
+      '.delta-strip',
+      '.dashboard-main > .panel',
+      '.top-threats',
+      '#exports',
+    ].join(','));
+    document.documentElement.classList.add('motion-enhanced');
+    targets.forEach((target, index) => {
+      target.classList.add('reveal-card');
+      target.style.setProperty('--reveal-order', String(index % 4));
+    });
+
+    if (reducedMotion?.matches || typeof IntersectionObserver !== 'function') {
+      targets.forEach((target) => target.classList.add('is-visible'));
+    } else {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        });
+      }, { rootMargin: '0px 0px -7% 0px', threshold: 0.06 });
+      targets.forEach((target) => observer.observe(target));
+    }
+
+    if (
+      reducedMotion?.matches ||
+      !window.matchMedia?.('(hover: hover) and (pointer: fine)').matches
+    ) return;
+    qsa([
+      '.ioc-lookup',
+      '.investigation-workspace',
+      '.metric-card',
+      '.panel',
+      '.score-distribution',
+      '.top-threats',
+    ].join(',')).forEach((target) => {
+      let frame = null;
+      target.classList.add('pointer-reactive');
+      target.addEventListener('pointermove', (event) => {
+        if (frame) return;
+        frame = window.requestAnimationFrame(() => {
+          const rect = target.getBoundingClientRect();
+          target.style.setProperty('--spot-x', `${event.clientX - rect.left}px`);
+          target.style.setProperty('--spot-y', `${event.clientY - rect.top}px`);
+          frame = null;
+        });
+      });
+      target.addEventListener('pointerleave', () => {
+        target.style.removeProperty('--spot-x');
+        target.style.removeProperty('--spot-y');
+      });
+    });
+  };
+
   /* ==========================================================================
    *  BOOTSTRAP
    * ========================================================================= */
 
+  initialiseVisualEffects();
   initialiseTableToggles();
   initialiseInvestigationWorkspace();
   initialiseStatusBanner();
