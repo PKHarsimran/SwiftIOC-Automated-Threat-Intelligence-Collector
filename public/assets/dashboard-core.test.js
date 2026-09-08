@@ -353,3 +353,37 @@ test('dashboard markup keeps IDs and labelled controls consistent', () => {
     'Responsive display rules must not expose hidden detail rows'
   );
 });
+
+test('discovery ranks actual source names, deduplicates IOCs, and explains corroboration', () => {
+  const a = { ...row, indicator: 'a.example', sourceList: ['Feed-A', 'feed-a', 'unknown'], sourceCount: 99 };
+  const b = { ...row, indicator: 'b.example', sourceList: ['Feed-A', 'Feed-B'] };
+  const result = core.buildDiscovery([a, b, b], 'corroborated');
+  assert.equal(result.sampleSize, 2);
+  assert.equal(result.total, 1);
+  assert.equal(result.findings[0].row.indicator, 'b.example');
+  assert.match(result.findings[0].reason, /do not establish source independence/);
+});
+
+test('recent discovery excludes future, invalid, and old sightings', () => {
+  const now = Date.parse('2026-09-08T12:00:00Z') / 1000;
+  const rows = [
+    { ...row, indicator: 'fresh.example', lastSeen: '2026-09-08T11:00:00Z' },
+    { ...row, indicator: 'future.example', lastSeen: '2026-09-09T11:00:00Z' },
+    { ...row, indicator: 'old.example', lastSeen: '2026-09-06T11:00:00Z' },
+    { ...row, indicator: 'invalid.example', lastSeen: 'not a date' },
+  ];
+  const result = core.buildDiscovery(rows, 'recent', now);
+  assert.deepEqual(result.findings.map(({ row }) => row.indicator), ['fresh.example']);
+});
+
+test('uncommon discovery measures distinct indicators and omits generic and source tags', () => {
+  const rows = Array.from({ length: 5 }, (_, i) => ({
+    ...row, indicator: `${i}.example`, tags: ['high', 'feed-a', 'shared', ...(i === 0 ? ['unusual', 'unusual'] : [])],
+  }));
+  const result = core.buildDiscovery(rows, 'uncommon');
+  assert.equal(result.total, 1);
+  assert.equal(result.findings[0].label, 'unusual');
+  assert.match(result.findings[0].reason, /1 of 5/);
+  assert.deepEqual(core.buildDiscovery(rows.slice().reverse(), 'uncommon'), result);
+  assert.equal(core.buildDiscovery([], 'uncommon').findings.length, 0);
+});
