@@ -271,6 +271,20 @@
     return true;
   };
 
+  const downloadDetection = (content, filename, mediaType) => {
+    if (!content) return false;
+    const blob = new Blob([content], { type: `${mediaType};charset=utf-8` });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = filename;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+    return true;
+  };
+
   const INVESTIGATION_STORAGE_KEY = 'swiftioc-investigation-workspace-v1';
   const INVESTIGATION_LIMIT = 50;
   const investigationListeners = new Set();
@@ -396,6 +410,8 @@
     const copy = qs('[data-investigation-copy]', root);
     const csv = qs('[data-investigation-csv]', root);
     const json = qs('[data-investigation-json]', root);
+    const sigma = qs('[data-investigation-sigma]', root);
+    const suricata = qs('[data-investigation-suricata]', root);
     const clear = qs('[data-investigation-clear]', root);
 
     const render = (rows) => {
@@ -447,6 +463,25 @@
     json?.addEventListener('click', () => {
       const rows = investigationWorkspace.getRows();
       if (downloadJsonCollection(rows)) showToast(`Exported ${formatNumber(rows.length)} queued indicators.`);
+    });
+    sigma?.addEventListener('click', () => {
+      const rows = investigationWorkspace.getRows();
+      const content = dashboardCore?.rowsToSigma?.(rows) || '';
+      if (downloadDetection(content, 'swiftioc-investigation.yml', 'application/yaml')) {
+        showToast('Built Sigma detections from deployable IP and domain indicators.');
+      } else {
+        showToast('Sigma export needs at least one valid IP, CIDR, or domain.');
+      }
+    });
+    suricata?.addEventListener('click', () => {
+      const rows = investigationWorkspace.getRows();
+      const deployable = dashboardCore?.detectionRows?.(rows) || [];
+      const content = deployable.length ? dashboardCore?.rowsToSuricata?.(deployable) : '';
+      if (downloadDetection(content, 'swiftioc-investigation.rules', 'text/plain')) {
+        showToast('Built Suricata rules with stable local SIDs.');
+      } else {
+        showToast('Suricata export needs at least one valid IP, CIDR, or domain.');
+      }
     });
     clear?.addEventListener('click', () => {
       investigationWorkspace.clear();
