@@ -7,6 +7,8 @@ on:
       - "swiftioc/**"
       - "scripts/**"
       - "tests/**"
+      - "public/index.html"
+      - "public/assets/**"
       - "sources*.yml"
       - "requirements*.txt"
       - "pyproject.toml"
@@ -36,6 +38,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+
+      - name: Test dashboard JavaScript
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          node --test public/assets/dashboard-core.test.js
+          node --check public/assets/dashboard-core.js
+          node --check public/assets/dashboard.js
 
       - name: Set up Python
         uses: actions/setup-python@v6
