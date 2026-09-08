@@ -285,6 +285,26 @@ test('campaign graph does not invent relationships for missing sources', () => {
   assert.equal(graph.edges.length, 0);
 });
 
+test('campaign graph prunes pivots disconnected by the indicator cap', () => {
+  const rows = ['alpha', 'beta', 'gamma'].flatMap((tag, tagIndex) =>
+    [0, 1].map((index) => ({
+      ...row,
+      indicator: `${tag}-${index}.example`,
+      tags: [tag],
+      score: 100 - tagIndex * 20,
+    }))
+  );
+  const graph = core.buildCampaignGraph(rows, {
+    mode: 'tags',
+    maxPivots: 3,
+    maxIndicators: 2,
+  });
+  assert.equal(graph.stats.pivots, 1);
+  assert.equal(graph.stats.tagPivots, 1);
+  assert.equal(graph.nodes.filter((node) => node.kind === 'pivot').length, 1);
+  assert.equal(graph.edges.length, 2);
+});
+
 test('dashboard markup keeps IDs and labelled controls consistent', () => {
   const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
   const css = fs.readFileSync(path.join(__dirname, 'styles.css'), 'utf8');
