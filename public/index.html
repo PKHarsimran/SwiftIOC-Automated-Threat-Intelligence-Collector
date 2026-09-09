@@ -46,7 +46,7 @@
       });
     </script>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/styles.css?v=18" />
+    <link rel="stylesheet" href="assets/styles.css?v=19" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -433,12 +433,22 @@
               </select>
             </div>
             <button type="button" class="button ghost" data-campaign-layout>
-              Remix layout
+              Reverse indicator order
             </button>
           </div>
         </div>
         <div class="panel-body campaign-graph-body">
           <div class="campaign-stage" data-campaign-stage>
+            <div class="campaign-search-tools">
+              <label for="campaign-search">Find in this graph</label>
+              <input id="campaign-search" type="search" data-campaign-search placeholder="Indicator, provider, tag or feed name" autocomplete="off" aria-describedby="campaign-search-status" />
+              <p id="campaign-search-status" data-campaign-search-status role="status">Search the displayed sample. Use the main filters to change its coverage.</p>
+              <div class="campaign-search-results" data-campaign-search-results hidden></div>
+              <div class="campaign-search-actions">
+                <button type="button" class="button ghost" data-campaign-reset disabled>Clear selection</button>
+                <button type="button" class="button ghost" data-campaign-export disabled>Export graph JSON</button>
+              </div>
+            </div>
             <dl class="campaign-stage-stats" data-campaign-stats hidden>
               <div><dt>High risk</dt><dd data-campaign-high>0</dd></div>
               <div><dt>2+ providers</dt><dd data-campaign-corroborated>0</dd></div>
@@ -1013,7 +1023,7 @@
     </div>
 
     <div class="toast" data-toast role="status" aria-live="polite" aria-atomic="true" hidden></div>
-    <script defer src="assets/dashboard-core.js?v=18"></script>
-    <script defer src="assets/dashboard.js?v=18"></script>
+    <script defer src="assets/dashboard-core.js?v=19"></script>
+    <script defer src="assets/dashboard.js?v=19"></script>
   </body>
 </html>
