@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-09-09T11:27:24Z_
+_Generated 2026-09-09T15:48:40Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-09T11:27:24Z |
+| Generated | 2026-09-09T15:48:40Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 4909 |
+| Duplicates removed | 5030 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-source overlaps | 517 |
+| Multi-source overlaps | 535 |
 | Score (min / avg / max) | 80 / 80.4 / 96 |
 | High-score indicators (≥80) | 10000 |
-| Corroborated (2+ sources) | 517 |
+| Corroborated (2+ sources) | 535 |
 | Earliest first_seen | 2019-07-15T19:15:16Z |
-| Newest first_seen | 2026-09-09T11:25:48Z |
+| Newest first_seen | 2026-09-09T15:40:06Z |
 
 ## Top indicators by score
 
@@ -41,11 +41,11 @@ _Generated 2026-09-09T11:27:24Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5345 |
-| greensnow_blocklist | 4202 |
-| nist_nvd_recent | 3400 |
+| blocklist_de_ssh | 5315 |
+| greensnow_blocklist | 4393 |
 | ipsum_level5 | 3325 |
-| threatfox_export_json | 2487 |
+| nist_nvd_recent | 2800 |
+| threatfox_export_json | 2526 |
 | binarydefense_banlist | 2428 |
 | spamhaus_drop | 1708 |
 | cisa_kev | 1699 |
@@ -55,29 +55,29 @@ _Generated 2026-09-09T11:27:24Z_
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3965 |
-| domain | 1751 |
+| cve | 3924 |
+| domain | 1727 |
 | ipv4_cidr | 1707 |
-| sha256 | 1326 |
-| url | 659 |
-| ipv4 | 321 |
-| sha1 | 229 |
-| md5 | 42 |
+| sha256 | 1337 |
+| url | 690 |
+| ipv4 | 308 |
+| sha1 | 247 |
+| md5 | 60 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| cve | 3965 |
-| threatfox | 2692 |
-| nvd | 2496 |
-| malware | 1902 |
+| cve | 3924 |
+| threatfox | 2683 |
+| nvd | 2455 |
+| malware | 1970 |
 | drop | 1707 |
 | spamhaus | 1707 |
 | exploited-in-the-wild | 1699 |
 | etherhiding | 1161 |
-| high | 1072 |
-| medium | 685 |
+| high | 1062 |
+| medium | 668 |
 
 ## Multi-source overlaps
 
