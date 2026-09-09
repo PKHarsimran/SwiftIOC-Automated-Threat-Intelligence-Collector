@@ -52,6 +52,7 @@ const assert = require('node:assert/strict');
     assert.equal(await rows.count(), 6);
     assert.equal(await page.locator('[data-preview-limit]').inputValue(), '6');
     await page.locator('[data-preview-limit]').selectOption('12');
+    await page.reload({ waitUntil: 'networkidle' });
     assert.equal(await rows.count(), 12);
     await page.locator('[data-preview-limit]').selectOption('6');
     await page.reload({ waitUntil: 'networkidle' });
