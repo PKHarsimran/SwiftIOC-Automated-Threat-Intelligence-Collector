@@ -3646,3 +3646,54 @@ input.lookup-input { border-radius: 0.3rem; background: var(--bg-color); }
 .inventory-results h3 { margin-top: 0; font-size: 1rem; }
 .inventory-results pre { max-height: 20rem; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; font-size: .75rem; }
 .inventory-results summary { cursor: pointer; }
+
+/* Quiet interaction feedback: content remains visible without animation support. */
+.button, .button-link, .hero-download, .nav-links a,
+.discovery-lenses button, .vulnerability-views button {
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+.vulnerability-card, .inventory-results article, .threat-card {
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+.vulnerability-card:focus-within, .inventory-results article:focus-within,
+.threat-card:focus-within {
+  border-color: var(--accent);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+.nav-links a { text-underline-offset: .4em; }
+.nav-links a:hover, .nav-links a:focus-visible { text-decoration: underline; }
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes desk-enter {
+    from { opacity: .35; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes desk-detail-enter {
+    from { opacity: .55; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .page-header-main > div { animation: desk-enter 460ms cubic-bezier(.2,.7,.2,1) both; }
+  .page-header .hero-download { animation: desk-enter 460ms 70ms cubic-bezier(.2,.7,.2,1) both; }
+  .vulnerability-card, .inventory-results article, .threat-card {
+    animation: desk-enter 280ms cubic-bezier(.2,.7,.2,1) both;
+  }
+  .vulnerability-card:nth-child(2), .inventory-results article:nth-child(2), .threat-card:nth-child(2) { animation-delay: 30ms; }
+  .vulnerability-card:nth-child(3), .inventory-results article:nth-child(3), .threat-card:nth-child(3) { animation-delay: 60ms; }
+  .vulnerability-card:nth-child(4), .inventory-results article:nth-child(4), .threat-card:nth-child(4) { animation-delay: 90ms; }
+  .vulnerability-card:nth-child(n+13), .inventory-results article:nth-child(n+13), .threat-card:nth-child(n+13) { animation: none; }
+  .collection-notes[open] > :not(summary), .campaign-feed-evidence[open] > :not(summary),
+  .inventory-results details[open] > :not(summary), .vulnerability-card details[open] > :not(summary) {
+    animation: desk-detail-enter 180ms ease-out both;
+  }
+  .button, .button-link, .hero-download {
+    transition: transform 160ms ease, background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+  }
+  .button:not(:disabled):active, .button-link:active { transform: translateY(1px); }
+  @media (hover: hover) and (pointer: fine) {
+    .button:not(:disabled):hover, .button-link:hover { transform: translateY(-2px); }
+    .vulnerability-card:hover, .inventory-results article:hover, .threat-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 5px 16px rgb(0 0 0 / .12);
+    }
+  }
+}
