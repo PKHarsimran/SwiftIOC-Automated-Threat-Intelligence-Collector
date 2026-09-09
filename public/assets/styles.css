@@ -3626,3 +3626,14 @@ input.lookup-input { border-radius: 0.3rem; background: var(--bg-color); }
 @media (max-width: 640px) { .vulnerability-views select { width: 100%; } }
 .campaign-node.is-dimmed { opacity: 0.5; }
 .campaign-node.is-selected .campaign-node-core { filter: none; }
+
+/* Graph exploration stays separate from the scrollable diagram. */
+.campaign-search-tools { padding: 1rem; border-bottom: 1px solid var(--border-control); }
+.campaign-search-tools > label { display: block; margin-bottom: .4rem; font-weight: 600; }
+.campaign-search-tools input { width: 100%; min-width: 0; padding: .65rem .75rem; border: 1px solid var(--border-control); border-radius: .3rem; background: var(--bg-color); color: var(--text-primary); }
+.campaign-search-tools > p { font-size: .78rem; margin: .5rem 0; color: var(--text-secondary); }
+.campaign-search-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.campaign-search-results { display: grid; gap: .35rem; max-height: 15rem; overflow: auto; margin: .75rem 0; }
+.campaign-search-results[hidden] { display: none; }
+.campaign-related-list { max-height: 18rem; overflow: auto; overscroll-behavior: contain; }
+.campaign-search-results .campaign-related-node { overflow-wrap: anywhere; text-align: left; }
