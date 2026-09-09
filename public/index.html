@@ -46,7 +46,7 @@
       });
     </script>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/styles.css?v=17" />
+    <link rel="stylesheet" href="assets/styles.css?v=18" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -319,13 +319,25 @@
           </div>
           <a class="button ghost" href="collections/vulnerabilities.json" data-vulnerability-download>Collection JSON ↗</a>
         </div>
+        <details class="collection-notes briefing-settings" data-briefing-settings>
+          <summary>Personal briefing · follow vendors &amp; products</summary>
+          <p>Match exact CISA vendor and product fields. NVD-only records without these fields cannot be matched. Watches stay in this browser; a product match does not confirm your installed version is affected.</p>
+          <form class="briefing-form" data-briefing-form>
+            <label>Vendor<input data-briefing-vendor list="briefing-vendors" maxlength="100" required placeholder="e.g. Microsoft" autocomplete="off" /></label>
+            <label>Product (optional)<input data-briefing-product list="briefing-products" maxlength="160" placeholder="All products from this vendor" autocomplete="off" /></label>
+            <button class="button primary" type="submit">Follow</button>
+          </form>
+          <datalist id="briefing-vendors" data-briefing-vendors></datalist>
+          <datalist id="briefing-products" data-briefing-products></datalist>
+          <ul class="briefing-watches" data-briefing-watches></ul>
+          <button class="button ghost" type="button" data-briefing-clear>Clear watches &amp; review history</button>
+        </details>
+        <p class="briefing-note" data-briefing-note role="status"></p>
         <div class="discovery-lenses vulnerability-views" role="group" aria-label="Vulnerability view">
+          <button type="button" data-vulnerability-view="briefing" aria-pressed="false">My briefing</button>
           <button type="button" data-vulnerability-view="exploited" aria-pressed="true">Known exploited</button>
-          <button type="button" data-vulnerability-view="ransomware" aria-pressed="false">Ransomware evidence</button>
           <button type="button" data-vulnerability-view="priority" aria-pressed="false">All CVEs · prioritized</button>
-          <button type="button" data-vulnerability-view="kev30" aria-pressed="false">Added to KEV · 30 days</button>
-          <button type="button" data-vulnerability-view="published7" aria-pressed="false">Published · 7 days</button>
-          <button type="button" data-vulnerability-view="updated7" aria-pressed="false">Updated · 7 days</button>
+          <select data-vulnerability-extra-view aria-label="Additional vulnerability views"><option value="">More views…</option><option value="ransomware">Ransomware evidence</option><option value="kev30">Added to KEV · 30 days</option><option value="published7">Published · 7 days</option><option value="updated7">Updated · 7 days</option></select>
         </div>
         <p class="discovery-scope" data-vulnerability-view-help>Confirmed KEV records only, newest catalog additions first. An empty result means this collection has no matching KEV evidence; other CVEs are available in All CVEs.</p>
         <div class="vulnerability-toolbar">
@@ -341,6 +353,10 @@
             </select>
           </label>
           <button type="button" class="button ghost" data-vulnerability-refresh>Refresh collection</button>
+        </div>
+        <div class="briefing-tools" data-briefing-tools hidden>
+          <label>Review status<select data-briefing-triage><option value="all">All watched</option><option value="new">New evidence</option><option value="investigating">Investigating</option><option value="reviewed">Reviewed</option><option value="unreviewed">Not reviewed</option></select></label>
+          <button type="button" class="button ghost" data-briefing-export disabled>Export personal briefing</button>
         </div>
         <label class="vulnerability-rejected-control"><input type="checkbox" data-vulnerability-include-rejected /> Include NVD rejected records</label>
         <p class="vulnerability-freshness" data-vulnerability-freshness role="status" hidden></p>
@@ -393,20 +409,19 @@
       >
         <div class="panel-header campaign-graph-header">
           <div>
-            <p class="eyebrow">Campaign lens · inferred relationships</p>
-            <h2 id="campaign-graph-heading" class="panel-title">Threat Campaign Graph</h2>
+            <p class="eyebrow">Reporting map · provider coverage</p>
+            <h2 id="campaign-graph-heading" class="panel-title">Reporting &amp; relationship graph</h2>
             <p class="panel-subtitle">
-              Explore shared tags and reporting sources for observables. CVEs have their own collection above. These are investigation pivots,
-              not claims of common threat-actor ownership.
+              Compare reporting providers and shared behavior tags in the filtered sample. Known adapter aliases are grouped; raw feed names remain in the evidence panel. Shared reporting does not establish a campaign or independent verification. On small screens, scroll the diagram sideways to inspect each indicator.
             </p>
           </div>
           <div class="campaign-controls" aria-label="Campaign graph controls">
             <div class="campaign-control-field">
               <label for="campaign-mode">Connect through</label>
               <select id="campaign-mode" data-campaign-mode>
-                <option value="all">Tags + sources</option>
-                <option value="tags">Tags only</option>
-                <option value="sources">Sources only</option>
+                <option value="all">Providers + tags</option>
+                <option value="tags">Behavior tags</option>
+                <option value="sources" selected>Reporting providers</option>
               </select>
             </div>
             <div class="campaign-control-field">
@@ -426,7 +441,7 @@
           <div class="campaign-stage" data-campaign-stage>
             <dl class="campaign-stage-stats" data-campaign-stats hidden>
               <div><dt>High risk</dt><dd data-campaign-high>0</dd></div>
-              <div><dt>Corroborated</dt><dd data-campaign-corroborated>0</dd></div>
+              <div><dt>2+ providers</dt><dd data-campaign-corroborated>0</dd></div>
               <div><dt>Avg score</dt><dd data-campaign-average>0</dd></div>
               <div><dt>Visible IOCs</dt><dd data-campaign-visible>0</dd></div>
             </dl>
@@ -441,8 +456,8 @@
               <span>Try tags and sources together, or wait for the next feed refresh.</span>
             </div>
             <div class="campaign-legend" aria-label="Graph legend">
-              <span><i class="legend-node tag"></i>Tag pivot</span>
-              <span><i class="legend-node source"></i>Source pivot</span>
+              <span><i class="legend-node tag"></i>Behavior tag</span>
+              <span><i class="legend-node source"></i>Reporting provider</span>
               <span><i class="legend-node indicator"></i>Indicator</span>
             </div>
           </div>
@@ -452,11 +467,12 @@
             <p data-campaign-description>
               Choose a pivot to understand its reach, or choose an indicator to add it to your investigation queue.
             </p>
+            <details class="campaign-feed-evidence" hidden><summary>Reporting feed evidence</summary><p data-campaign-feed-evidence></p></details>
             <dl class="campaign-node-meta" data-campaign-meta hidden>
               <div><dt>Kind</dt><dd data-campaign-kind>—</dd></div>
               <div><dt>Connections</dt><dd data-campaign-connections>—</dd></div>
               <div><dt>Score</dt><dd data-campaign-score>—</dd></div>
-              <div><dt>Sources</dt><dd data-campaign-sources>—</dd></div>
+              <div><dt>Providers</dt><dd data-campaign-sources>—</dd></div>
               <div><dt>Last seen</dt><dd data-campaign-last-seen>—</dd></div>
               <div><dt>TLP</dt><dd data-campaign-tlp>—</dd></div>
             </dl>
@@ -997,7 +1013,7 @@
     </div>
 
     <div class="toast" data-toast role="status" aria-live="polite" aria-atomic="true" hidden></div>
-    <script defer src="assets/dashboard-core.js?v=17"></script>
-    <script defer src="assets/dashboard.js?v=17"></script>
+    <script defer src="assets/dashboard-core.js?v=18"></script>
+    <script defer src="assets/dashboard.js?v=18"></script>
   </body>
 </html>
