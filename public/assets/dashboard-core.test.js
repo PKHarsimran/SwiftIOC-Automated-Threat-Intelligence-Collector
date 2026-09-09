@@ -553,4 +553,8 @@ test('compact preview honors mobile defaults and explicit shared row counts', ()
   const compact = core.readViewState('?rows=6');
   const url = core.writeViewUrl('https://example.test/', compact);
   assert.equal(core.readViewState(url.search, url.hash).limit, 6);
+  const mobileTwelve = core.writeViewUrl('https://example.test/', defaults, false, 6);
+  assert.equal(core.readViewState(mobileTwelve.search, '', 6).limit, 12);
+  const sharedDesktop = core.writeViewUrl('https://example.test/', defaults, true);
+  assert.equal(core.readViewState(sharedDesktop.search, sharedDesktop.hash, 6).limit, 12);
 });
