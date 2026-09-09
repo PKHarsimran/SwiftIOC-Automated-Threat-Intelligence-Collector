@@ -61,7 +61,7 @@ Two reports about the **same CVE** become one CVE record with separate provider 
 | Search and filters | Narrow indicators by type, source, age, score, and other available context. |
 | Discovery lenses | Surface recent sightings and uncommon investigative tags, excluding known feed-name tags. |
 | Investigation workspace | Keep selected indicators in a browser-local queue and export a working set. |
-| Provider and tag graph | Explore shared reporting and tags, with original feed identifiers available for inspection. |
+| Provider and tag graph | Search displayed nodes by indicator, provider, tag, or raw feed name; inspect every connected node and export the graph or a selected neighborhood as evidence JSON. |
 | CVE briefing | Match watched products and distinguish newly encountered records from changed evidence. |
 | Diagnostics | Explain missing data, source failures, retention, and the latest collection results. |
 
