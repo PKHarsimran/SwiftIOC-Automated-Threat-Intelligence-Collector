@@ -43,14 +43,10 @@
     if (!version) return null;
     let constrained = false;
     if (cpeVersion !== '*') {
-      if (cpeVersion === '-' || /[?\\]/.test(cpeVersion)) return null;
+      if (cpeVersion === '-' || /[*?\\]/.test(cpeVersion)) return null;
       constrained = true;
-      // Exact vendor versions can be checked without ordering them.
-      if (version !== cpeVersion) {
-        const order = compareVersions(version, cpeVersion);
-        if (order === null) return null;
-        if (order !== 0) return false;
-      }
+      // Exact CPE attributes are literal vendor versions, not numeric ranges.
+      if (version !== cpeVersion) return false;
     }
     let outside = false;
     for (const [field, direction, inclusive] of [
@@ -65,10 +61,9 @@
     }
     return constrained ? !outside : null;
   };
-  const evidenceFor = (asset, item) => {
-    const kev = item.reports?.cisa_kev;
-    const vendorMatch = kev && same(asset.vendor, kev.vendor) && same(asset.product, kev.product);
-    const candidates = [];
+  const productKey = (...parts) => JSON.stringify(parts.map((part) => text(part).toLowerCase()));
+  const prepareRecord = (item) => {
+    const rules = new Map();
     let complex = false;
     let visited = 0;
     const walk = (node, depth) => {
@@ -77,17 +72,28 @@
       if (Array.isArray(node.cpeMatch)) for (const rule of node.cpeMatch) {
         if (rule?.vulnerable !== true || typeof rule.criteria !== 'string') continue;
         const parts = rule.criteria.split(':');
-        // Escaped CPEs and environment-specific qualifiers need a full CPE engine.
         if (parts.length !== 13 || parts[0] !== 'cpe' || parts[1] !== '2.3') continue;
-        if (parts[2] !== (asset.cpe_part || 'a') || !asset.cpe_vendor || !same(asset.cpe_vendor, parts[3]) || !same(asset.cpe_product, parts[4])) continue;
-        const supported = !rule.criteria.includes('\\') && parts.slice(6).every((part) => part === '*');
-        candidates.push({ criteria: rule.criteria, range: Object.fromEntries(Object.entries(rule).filter(([key]) => key.startsWith('version'))),
-          match: supported ? versionMatch(asset.version, rule, parts[5]) : null });
+        const key = productKey(parts[2], parts[3], parts[4]);
+        if (!rules.has(key)) rules.set(key, []);
+        rules.get(key).push({ criteria: rule.criteria,
+          range: Object.fromEntries(Object.entries(rule).filter(([field]) => field.startsWith('version'))),
+          supported: !rule.criteria.includes('\\') && parts.slice(6).every((part) => part === '*'),
+          version: parts[5] });
       }
       for (const field of ['nodes', 'children']) if (Array.isArray(node[field])) node[field].forEach((child) => walk(child, depth + 1));
     };
     const configs = item.reports?.nvd?.configurations;
     if (Array.isArray(configs)) configs.forEach((config) => walk(config, 0));
+    const kev = item.reports?.cisa_kev;
+    return { item, rules, complex, cisaKey: kev && text(kev.vendor) && text(kev.product) ? productKey(kev.vendor, kev.product) : null };
+  };
+  const evidenceFor = (asset, record) => {
+    const { item, rules, complex, cisaKey } = record;
+    const vendorMatch = cisaKey === productKey(asset.vendor, asset.product);
+    const candidates = (asset.cpe_vendor && asset.cpe_product
+      ? rules.get(productKey(asset.cpe_part || 'a', asset.cpe_vendor, asset.cpe_product)) || [] : [])
+      .map((rule) => ({ criteria: rule.criteria, range: rule.range,
+        match: rule.supported ? versionMatch(asset.version, rule.range, rule.version) : null }));
     if (!vendorMatch && !candidates.length) return null;
     let status = 'needs-verification';
     let reason = 'Exact CISA vendor/product match; affected-version evidence is unavailable or cannot be evaluated.';
@@ -105,15 +111,35 @@
   const buildReport = (assets, items, generatedAt) => {
     const findings = [];
     const matched = new Set();
+    // Parse each snapshot record once, and retain separate product namespaces
+    // so display names cannot collide with explicitly mapped CPE identifiers.
+    const records = assets.length ? items.map(prepareRecord) : [];
+    const cisaIndex = new Map(), cpeIndex = new Map();
+    const index = (map, key, position) => {
+      if (!map.has(key)) map.set(key, []);
+      map.get(key).push(position);
+    };
+    records.forEach((record, position) => {
+      if (record.cisaKey) index(cisaIndex, record.cisaKey, position);
+      for (const key of record.rules.keys()) index(cpeIndex, key, position);
+    });
     let truncated = false;
-    outer: for (const asset of assets) for (const item of items) {
-      const evidence = evidenceFor(asset, item);
-      if (!evidence) continue;
-      if (findings.length >= 10000) { truncated = true; break outer; }
-      matched.add(asset.id);
-      findings.push({ asset, cve_id: item.cve_id, exploitation_status: item.exploitation_status,
-        ...evidence, required_action: item.reports?.cisa_kev?.required_action || 'Consult the vendor advisory.',
-        reports: item.reports });
+    outer: for (const asset of assets) {
+      const candidates = new Set(cisaIndex.get(productKey(asset.vendor, asset.product)) || []);
+      if (asset.cpe_vendor && asset.cpe_product) {
+        for (const position of cpeIndex.get(productKey(asset.cpe_part || 'a', asset.cpe_vendor, asset.cpe_product)) || []) candidates.add(position);
+      }
+      // Preserve snapshot order and avoid duplicate findings when both sources match.
+      for (const position of [...candidates].sort((a, b) => a - b)) {
+        const record = records[position], item = record.item;
+        const evidence = evidenceFor(asset, record);
+        if (!evidence) continue;
+        if (findings.length >= 10000) { truncated = true; break outer; }
+        matched.add(asset.id);
+        findings.push({ asset, cve_id: item.cve_id, exploitation_status: item.exploitation_status,
+          ...evidence, required_action: item.reports?.cisa_kev?.required_action || 'Consult the vendor advisory.',
+          reports: item.reports });
+      }
     }
     const exploitation = { known_exploited: 0, reported_exploitation: 1, not_established: 2 };
     findings.sort((a, b) => Number(a.status === 'outside-reported-range') - Number(b.status === 'outside-reported-range')
