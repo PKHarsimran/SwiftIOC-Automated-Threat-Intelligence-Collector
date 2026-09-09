@@ -199,7 +199,9 @@ def _rpz_zone(domains: Sequence[str], serial: int) -> str:
         "@ IN NS localhost.",
     ]
     for domain in domains:
-        lines.extend((f"{domain}. CNAME .", f"*.{domain}. CNAME ."))
+        # QNAME triggers are relative to the configured RPZ origin. An
+        # absolute owner (trailing dot) is outside that policy zone.
+        lines.extend((f"{domain} CNAME .", f"*.{domain} CNAME ."))
     return "\n".join(lines) + "\n"
 
 
