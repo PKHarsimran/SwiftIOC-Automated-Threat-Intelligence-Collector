@@ -2,16 +2,16 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-09-09T18:08:45Z_
+_Generated 2026-09-09T19:03:43Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-09T18:08:45Z |
+| Generated | 2026-09-09T19:03:43Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 5049 |
+| Duplicates removed | 5063 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-source overlaps | 535 |
@@ -19,7 +19,7 @@ _Generated 2026-09-09T18:08:45Z_
 | High-score indicators (≥80) | 10000 |
 | Corroborated (2+ sources) | 535 |
 | Earliest first_seen | 2019-07-15T19:15:16Z |
-| Newest first_seen | 2026-09-09T18:07:24Z |
+| Newest first_seen | 2026-09-09T18:53:24Z |
 
 ## Top indicators by score
 
@@ -41,11 +41,11 @@ _Generated 2026-09-09T18:08:45Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5192 |
-| greensnow_blocklist | 4412 |
-| nist_nvd_recent | 3600 |
+| blocklist_de_ssh | 5190 |
+| nist_nvd_recent | 4494 |
+| greensnow_blocklist | 4435 |
 | ipsum_level5 | 3325 |
-| threatfox_export_json | 2527 |
+| threatfox_export_json | 2505 |
 | binarydefense_banlist | 2428 |
 | spamhaus_drop | 1709 |
 | cisa_kev | 1699 |
@@ -55,12 +55,12 @@ _Generated 2026-09-09T18:08:45Z_
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3917 |
-| domain | 1749 |
+| cve | 4071 |
+| domain | 1718 |
 | ipv4_cidr | 1708 |
-| sha256 | 1373 |
-| url | 634 |
-| ipv4 | 312 |
+| sha256 | 1214 |
+| url | 668 |
+| ipv4 | 314 |
 | sha1 | 247 |
 | md5 | 60 |
 
@@ -68,16 +68,16 @@ _Generated 2026-09-09T18:08:45Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| cve | 3917 |
-| threatfox | 2711 |
-| nvd | 2448 |
-| malware | 1948 |
+| cve | 4071 |
+| threatfox | 2685 |
+| nvd | 2602 |
+| malware | 1820 |
 | drop | 1708 |
 | spamhaus | 1708 |
 | exploited-in-the-wild | 1699 |
 | etherhiding | 1161 |
-| high | 1066 |
-| medium | 663 |
+| high | 1160 |
+| medium | 777 |
 
 ## Multi-source overlaps
 
