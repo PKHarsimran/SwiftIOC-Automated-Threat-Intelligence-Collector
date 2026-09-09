@@ -32,9 +32,9 @@ const path = require('node:path');
       return route.fulfill({ contentType: 'application/json', body: JSON.stringify({ schema_version: 1,
         generated_at: mode === 'older' ? '2026-09-07T00:00:00Z' : mode === 'initial' ? '2026-09-08T00:00:00Z' : '2026-09-09T00:00:00Z', items }) });
     });
-    const feed = Array.from({ length: 40 }, (_, index) => JSON.stringify({ indicator: `192.0.2.${index + 1}`, type: 'ipv4',
+    const feed = Array.from({ length: 40 }, (_, index) => JSON.stringify({ indicator: index === 0 ? 'hxxps://fixture[.]example/Payload?key=ABC' : `192[.]0[.]2[.]${index + 1}`, type: index === 0 ? 'url' : 'ipv4',
       source: index < 30 ? 'threatfox_export_json,urlhaus_recent_urls' : index < 35 ? 'ci_army_list' : 'dshield_block',
-      tags: index < 30 ? 'threatfox,urlhaus,scanner' : 'scanner', score: index < 30 ? 99 : 70,
+      tags: index < 30 ? 'threatfox,urlhaus,scanner' : 'scanner', score: index === 0 ? 100 : index < 30 ? 99 : 70,
       last_seen: '2026-09-09T00:00:00Z', confidence: 'high',
     })).join('\n');
     await context.route('**/iocs/dashboard.jsonl', (route) => route.fulfill({ contentType: 'application/x-ndjson', body: feed }));
@@ -129,6 +129,14 @@ const path = require('node:path');
       const ids = new Set(exported.nodes.map((node) => node.id));
       assert.ok(exported.edges.every((edge) => ids.has(edge.source) && ids.has(edge.target)));
     } finally { await fs.rm(graphTemp, { recursive: true }); }
+    await page.locator('[data-campaign-search]').fill('192.0.2.31');
+    assert.equal(await page.locator('[data-campaign-search-results] button').count(), 1);
+    await page.locator('[data-campaign-search-results] button').click();
+    assert.equal(await page.locator('[data-campaign-title]').innerText(), '192[.]0[.]2[.]31');
+    await page.locator('[data-campaign-search]').fill('https://fixture.example/Payload?key=ABC');
+    assert.equal(await page.locator('[data-campaign-search-results] button').count(), 1);
+    await page.locator('[data-campaign-search-results] button').click();
+    assert.equal(await page.locator('[data-campaign-title]').innerText(), 'hxxps://fixture[.]example/Payload?key=ABC');
     await page.locator('[data-campaign-search]').fill('ci_army_list');
     assert.equal(await page.locator('[data-campaign-search-results] button').count(), 6);
     await page.locator('[data-campaign-search-results] button').filter({ hasText: 'CINS Army' }).click();

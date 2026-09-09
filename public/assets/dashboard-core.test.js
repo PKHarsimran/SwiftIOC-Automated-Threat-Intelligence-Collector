@@ -542,7 +542,7 @@ test('exploited and ransomware views require explicit evidence and never fall ba
 test('vulnerability release uses coordinated new asset cache keys', () => {
   const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
   for (const asset of ['styles.css', 'dashboard-core.js', 'dashboard.js']) {
-    assert.ok(html.includes(`assets/${asset}?v=19`));
+    assert.ok(html.includes(`assets/${asset}?v=20`));
   }
 });
 
@@ -657,4 +657,35 @@ test('malformed, incompatible, oversized, and future saved briefings cannot enab
     { ...state, watches: Array(21).fill(state.watches[0]) }, { ...state, snapshotAt: null }]) {
     assert.equal(core.normaliseBriefing(bad), null);
   }
+});
+
+
+test('graph search matches ordinary and defanged IOCs in either direction', () => {
+  for (const [ordinary, defanged] of [
+    ['77.239.124.108', '77[.]239[.]124[.]108'],
+    ['https://example.test/Payload?key=ABC', 'hxxps://example[.]test/Payload?key=ABC'],
+    ['http://example.test/path', 'hxxp://example[.]test/path'],
+    ['example.test', 'example[.]test'],
+  ]) {
+    assert.equal(core.graphNodeMatches({ kind: 'indicator', label: defanged }, ordinary), true);
+    assert.equal(core.graphNodeMatches({ kind: 'indicator', label: ordinary }, defanged), true);
+  }
+  assert.equal(core.graphNodeMatches({ kind: 'indicator', label: '77[.]239[.]124[.]108' }, '239.124'), true);
+  assert.equal(core.graphNodeMatches({ kind: 'indicator', label: '77[.]239[.]124[.]108' }, '77.239.124.109'), false);
+  assert.equal(core.graphNodeMatches(null, 'test'), false);
+  assert.equal(core.graphNodeMatches({ kind: 'indicator', label: 'test' }, '  '), false);
+});
+
+test('graph search keeps provider, feed, and tag matching literal', () => {
+  const pivot = { kind: 'pivot', label: 'Research[.]Team', feeds: ['hxxps://feed'] };
+  assert.equal(core.graphNodeMatches(pivot, 'research[.]team'), true);
+  assert.equal(core.graphNodeMatches(pivot, 'research.team'), false);
+  assert.equal(core.graphNodeMatches(pivot, 'https://feed'), false);
+  const indicator = { kind: 'indicator', label: '1[.]2[.]3[.]4',
+    row: { type: 'ipv4', tags: ['family[.]variant'] },
+    providers: [{ label: 'CINS Army', feeds: ['ci_army_list'] }] };
+  assert.equal(core.graphNodeMatches(indicator, 'ci_army_list'), true);
+  assert.equal(core.graphNodeMatches(indicator, 'CINS ARMY'), true);
+  assert.equal(core.graphNodeMatches(indicator, 'family[.]variant'), true);
+  assert.equal(core.graphNodeMatches(indicator, 'family.variant'), false);
 });

@@ -65,8 +65,8 @@ def test_detection_pack_writes_valid_type_aware_artifacts(tmp_path):
     assert len(re.findall(r"\bsid:\d+;", rules)) == 5
 
     rpz = (tmp_path / "dns" / "swiftioc.rpz").read_text()
-    assert "evil.example. CNAME ." in rpz
-    assert "*.evil.example. CNAME ." in rpz
+    assert "evil.example CNAME ." in rpz
+    assert "*.evil.example CNAME ." in rpz
     assert json.loads((tmp_path / "manifest.json").read_text()) == manifest
 
 
@@ -143,3 +143,18 @@ def test_rpz_serial_advances_when_two_revisions_share_a_timestamp(tmp_path):
 
     assert second["rpz_serial"] == first["rpz_serial"] + 1
     assert f"({second['rpz_serial']} " in (tmp_path / "dns" / "swiftioc.rpz").read_text()
+
+
+def test_rpz_triggers_remain_relative_to_the_policy_zone(tmp_path):
+    si.write_detection_pack(
+        tmp_path, [_indicator("Evil[.]Example.", "domain")],
+        generated_at="2026-09-08T02:00:00Z",
+    )
+    zone = (tmp_path / "dns" / "swiftioc.rpz").read_text()
+    triggers = [line.split() for line in zone.splitlines() if " CNAME " in line]
+    assert len(triggers) == 2
+    for owner, record_type, target in triggers:
+        assert not owner.endswith("."), "Absolute triggers escape the RPZ origin"
+        assert record_type == "CNAME"
+        assert target == ".", "NXDOMAIN action must remain an absolute root target"
+    assert {owner for owner, *_ in triggers} == {"evil.example", "*.evil.example"}

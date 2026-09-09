@@ -3639,11 +3639,7 @@
     const updateSearch = () => {
       if (!searchResults || !search) return;
       const query = normaliseLower(search.value);
-      const matches = query ? (graph?.nodes || []).filter((node) => normaliseLower([
-        node.label, node.row?.type, ...(node.feeds || []),
-        ...(node.providers || []).flatMap((provider) => [provider.label, ...provider.feeds]),
-        ...(node.row?.tags || []),
-      ].join(' ')).includes(query)) : [];
+      const matches = query ? (graph?.nodes || []).filter((node) => dashboardCore.graphNodeMatches(node, query)) : [];
       searchResults.hidden = !matches.length;
       searchResults.replaceChildren(...matches.map((node) => {
         const button = document.createElement('button');

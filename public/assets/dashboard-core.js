@@ -327,6 +327,19 @@
   };
   const graphProviderCount = (row) => sourceProviders(row).filter((provider) => provider.role === 'reporting').length;
 
+  const graphNodeMatches = (node, value) => {
+    const query = lower(value);
+    if (!query || !node) return false;
+    const literal = [node.label, node.row?.type, ...(node.feeds || []),
+      ...(node.providers || []).flatMap((provider) => [provider.label, ...provider.feeds]),
+      ...(node.row?.tags || []),
+    ].map(lower);
+    if (literal.some((field) => field.includes(query))) return true;
+    // Refang only IOC values. Provider and tag text must retain its literal
+    // meaning even when it happens to contain defanging-like punctuation.
+    return node.kind === 'indicator' && lower(refang(node.label)).includes(lower(refang(query)));
+  };
+
   const buildCampaignGraph = (value, options = {}) => {
     const rows = Array.isArray(value) ? value.filter((row) => row?.indicator && lower(row.type) !== 'cve') : [];
     const mode = ['all', 'tags', 'sources'].includes(options.mode) ? options.mode : 'all';
@@ -863,6 +876,7 @@
     vulnerabilityFacts,
     compareRows,
     buildCampaignGraph,
+    graphNodeMatches,
     sourceProviders,
     buildDiscovery,
     effectiveScore,
