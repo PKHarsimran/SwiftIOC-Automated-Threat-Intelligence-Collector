@@ -1,0 +1,4 @@
+| inputlookup swiftioc_iocs.csv
+| stats count AS indicators min(sf_score) AS minimum_score max(sf_score) AS maximum_score max(sf_prepared_at) AS prepared_at BY sf_type
+| eval hours_since_preparation=round((now()-prepared_at)/3600, 1)
+| convert ctime(prepared_at)
