@@ -166,7 +166,7 @@ high-fidelity IOCs from authoritative sources. The project emphasises:
   shortlist findings in a private investigation queue that persists in the
   browser. Queue contents can be copied or exported as CSV/JSON without being
   sent to a server. The interface includes responsive threat visualisations and
-  motion that automatically disables when reduced motion is requested.
+  collapsible tools, with reduced-motion support for interactions.
 - **YAML-driven feeds** – feed metadata lives in `sources.yml` so collections can
   be changed without touching Python code. The example file includes adapters for
   CISA KEV, NVD, URLhaus, MalwareBazaar, ThreatFox, Feodo Tracker, SSLBL JA3,
@@ -614,12 +614,14 @@ sources), or new (last 48h) indicators. Analysts can add table or lookup results
 to a private browser-local investigation queue and export that shortlist without
 uploading it anywhere.
 
-The interface includes an animated feed radar, progressive metrics, score-band
-motion, and responsive threat cards. Animations use transform/opacity paths and
-are disabled when the browser reports `prefers-reduced-motion: reduce`. Mobile
-breakpoints convert the preview into card-style rows, collapsed details remain
-hidden until requested, and human-facing IOC metadata stays defanged to reduce
-accidental activation.
+The dashboard uses a restrained graphite-and-olive theme with a compact header
+and responsive evidence cards. Collection statistics, the relationship graph,
+source tables, and downloads open on demand; existing section bookmarks open
+the relevant tool automatically. On small screens the IOC preview starts with
+six rows, with larger row counts available from the Rows control and preserved
+in shared links. Keyboard-accessible disclosures work without JavaScript.
+Reduced-motion preferences are respected, and human-facing IOC metadata stays
+defanged to reduce accidental activation.
 
 ## ⚙️ Running in GitHub Actions
 SwiftIOC runs cleanly inside GitHub Actions and emits artifacts that can be
