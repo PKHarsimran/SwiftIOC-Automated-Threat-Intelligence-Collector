@@ -2169,6 +2169,7 @@
       relative: qs('[data-preview-relative]', container),
     };
 
+    const defaultPreviewLimit = window.matchMedia?.('(max-width: 640px)').matches ? 6 : DEFAULT_PREVIEW_LIMIT;
     const state = {
       rows: [],
       types: [],
@@ -2183,7 +2184,7 @@
       minScore: 0,
       age: 'all',
       search: '',
-      limit: window.matchMedia?.('(max-width: 640px)').matches ? 6 : DEFAULT_PREVIEW_LIMIT,
+      limit: defaultPreviewLimit,
       sort: 'score',
       direction: 'desc',
       expanded: new Set(),
@@ -2237,7 +2238,8 @@
         const url = dashboardCore.writeViewUrl(
           window.location.href,
           state,
-          includeSearch
+          includeSearch,
+          defaultPreviewLimit
         );
         window.history.replaceState(null, '', url);
         return url;
@@ -2250,7 +2252,7 @@
       if (state.signal !== 'all') url.searchParams.set('signal', state.signal);
       if (state.minScore) url.searchParams.set('score', String(state.minScore));
       if (state.age !== 'all') url.searchParams.set('age', state.age);
-      if (state.limit !== DEFAULT_PREVIEW_LIMIT) {
+      if (includeSearch || state.limit !== defaultPreviewLimit) {
         url.searchParams.set('rows', String(state.limit));
       }
       if (state.sort !== 'score') url.searchParams.set('sort', state.sort);
