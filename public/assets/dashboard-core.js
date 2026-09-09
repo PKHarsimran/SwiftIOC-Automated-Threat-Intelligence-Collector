@@ -296,6 +296,37 @@
     return rules.join('\n') + '\n';
   };
 
+  // Explicit aliases from the shipped adapters. Unknown/custom feeds keep
+  // their identity; similar spelling is not evidence of a common publisher.
+  const providerGroups = [
+    ['abuse.ch', 'abuse.ch', ['threatfox_export_json', 'threatfox_recent', 'threatfox', 'urlhaus_recent_urls', 'urlhaus', 'malwarebazaar_recent', 'malwarebazaar', 'feodo_ipblocklist', 'feodo', 'sslbl_ja3', 'sslbl']],
+    ['cins', 'CINS Army', ['ci_army_list', 'cins']],
+    ['spamhaus', 'Spamhaus', ['spamhaus_drop', 'spamhaus_drop_v6', 'spamhaus']],
+    ['dshield', 'SANS ISC / DShield', ['dshield_block', 'dshield', 'sans-isc']],
+    ['blocklist.de', 'blocklist.de', ['blocklist_de_ssh', 'blocklist_de_all']],
+    ['greensnow', 'GreenSnow', ['greensnow_blocklist', 'greensnow']],
+    ['openphish', 'OpenPhish', ['openphish_feed', 'openphish']],
+    ['emerging-threats', 'Emerging Threats', ['et_compromised', 'emerging-threats']],
+    ['binarydefense', 'Binary Defense', ['binarydefense_banlist', 'binarydefense']],
+    ['ipsum', 'IPsum (aggregate)', ['ipsum_level5', 'ipsum'], 'aggregate'],
+    ['tor', 'Tor exit directory', ['tor_exit_nodes'], 'context'],
+  ];
+  const providerAliases = new Map(providerGroups.flatMap(([id, label, aliases, role = 'reporting']) =>
+    aliases.map((alias) => [alias, { id, label, role }])));
+  const sourceProviders = (row) => {
+    const providers = new Map();
+    rowSources(row).flatMap((value) => stringValue(value).split(',')).forEach((value) => {
+      const raw = stringValue(value);
+      if (['', 'n/a', 'none', 'unknown', 'unspecified'].includes(lower(raw))) return;
+      const identity = providerAliases.get(lower(raw)) || { id: lower(raw), label: raw, role: 'unmapped' };
+      const provider = providers.get(identity.id) || { ...identity, feeds: [] };
+      if (!provider.feeds.some((feed) => lower(feed) === lower(raw))) provider.feeds.push(raw);
+      providers.set(identity.id, provider);
+    });
+    return [...providers.values()];
+  };
+  const graphProviderCount = (row) => sourceProviders(row).filter((provider) => provider.role === 'reporting').length;
+
   const buildCampaignGraph = (value, options = {}) => {
     const rows = Array.isArray(value) ? value.filter((row) => row?.indicator && lower(row.type) !== 'cve') : [];
     const mode = ['all', 'tags', 'sources'].includes(options.mode) ? options.mode : 'all';
@@ -304,20 +335,21 @@
     const ignoredTags = new Set([
       'aggregated', 'blocklist', 'critical', 'high', 'info', 'ioc', 'low',
       'malicious', 'malware', 'medium', 'threat-intel', 'threat intelligence',
+      'json', 'csv', 'txt', 'export', 'export_json', 'multi-list',
     ]);
-    const ignoredSources = new Set(['', 'n/a', 'none', 'unknown', 'unspecified']);
-    const sourceNames = new Set(rows.flatMap((row) => rowSources(row).map(lower)));
+    const sourceNames = new Set([...providerAliases.keys(), ...providerGroups.map(([id]) => id), ...rows.flatMap((row) => rowSources(row).flatMap((value) => stringValue(value).split(',')).map(lower))]);
     const pivots = new Map();
 
-    const addPivot = (kind, label, row) => {
-      const clean = stringValue(label).slice(0, 80);
+    const addPivot = (kind, label, row, provider = null) => {
+      const clean = stringValue(label);
       if (!clean) return;
-      const key = `${kind}:${clean.toLowerCase()}`;
-      const pivot = pivots.get(key) || { key, kind, label: clean, rows: new Map(), score: 0 };
+      const key = `${kind}:${provider?.id || clean.toLowerCase()}`;
+      const pivot = pivots.get(key) || { key, kind, label: clean, role: provider?.role, rows: new Map(), feeds: new Set(), score: 0 };
+      provider?.feeds.forEach((feed) => pivot.feeds.add(feed));
       const rowKey = investigationKey(row);
       if (!rowKey || pivot.rows.has(rowKey)) return;
       pivot.rows.set(rowKey, row);
-      pivot.score += effectiveScore(row) + Math.min(Number(row.sourceCount) || rowSources(row).length, 5) * 5;
+      pivot.score += effectiveScore(row) + Math.min(graphProviderCount(row), 5) * 5;
       pivots.set(key, pivot);
     };
 
@@ -331,39 +363,49 @@
         });
       }
       if (mode !== 'tags') {
-        rowSources(row).slice(0, 25).forEach((source) => {
-          if (!ignoredSources.has(lower(source))) addPivot('source', source, row);
+        sourceProviders(row).slice(0, 25).forEach((provider) => {
+          if (provider.role !== 'context') addPivot('source', provider.label, row, provider);
         });
       }
     });
 
-    const selectedPivots = Array.from(pivots.values())
+    const rankedPivots = Array.from(pivots.values())
       .filter((pivot) => pivot.rows.size >= 2)
       .sort((a, b) =>
         (b.rows.size * 100 + b.score / b.rows.size) -
           (a.rows.size * 100 + a.score / a.rows.size) ||
         a.key.localeCompare(b.key)
       )
-      .slice(0, maxPivots);
+;
+    const selectedPivots = [];
+    if (mode === 'all') {
+      const providers = rankedPivots.filter((pivot) => pivot.kind === 'source');
+      const tags = rankedPivots.filter((pivot) => pivot.kind === 'tag');
+      for (let i = 0; selectedPivots.length < maxPivots && i < rankedPivots.length; i += 1) {
+        for (const pivot of [providers[i], tags[i]]) {
+          if (pivot && selectedPivots.length < maxPivots) selectedPivots.push(pivot);
+        }
+      }
+    } else selectedPivots.push(...rankedPivots.slice(0, maxPivots));
 
-    const candidateRows = new Map();
-    selectedPivots.forEach((pivot) => {
-      Array.from(pivot.rows.values())
-        .sort((a, b) =>
-          effectiveScore(b) - effectiveScore(a) ||
-          (Number(b.sourceCount) || rowSources(b).length) -
-            (Number(a.sourceCount) || rowSources(a).length) ||
-          stringValue(a.indicator).localeCompare(stringValue(b.indicator))
-        )
-        .slice(0, 12)
-        .forEach((row) => candidateRows.set(investigationKey(row), row));
-    });
-    const selectedRows = Array.from(candidateRows.values())
-      .sort((a, b) =>
-        effectiveScore(b) - effectiveScore(a) ||
-        stringValue(a.indicator).localeCompare(stringValue(b.indicator))
-      )
-      .slice(0, maxIndicators);
+    // Round-robin selection gives smaller providers a place in a bounded graph.
+    // It never creates providers or links absent from the loaded sample.
+    const selectedByKey = new Map();
+    const candidates = selectedPivots.map((pivot) => Array.from(pivot.rows.values()).sort((a, b) =>
+      effectiveScore(b) - effectiveScore(a) || graphProviderCount(b) - graphProviderCount(a) ||
+      stringValue(a.indicator).localeCompare(stringValue(b.indicator))));
+    while (selectedByKey.size < maxIndicators) {
+      let added = false;
+      for (const list of candidates) {
+        const row = list.find((candidate) => !selectedByKey.has(investigationKey(candidate)));
+        if (row && selectedByKey.size < maxIndicators) {
+          selectedByKey.set(investigationKey(row), row);
+          added = true;
+        }
+      }
+      if (!added) break;
+    }
+    const selectedRows = [...selectedByKey.values()];
     const selectedKeys = new Set(selectedRows.map(investigationKey));
     const renderedPivots = selectedPivots.filter((pivot) =>
       Array.from(pivot.rows.keys()).some((key) => selectedKeys.has(key))
@@ -375,6 +417,8 @@
         kind: 'pivot',
         pivotKind: pivot.kind,
         label: pivot.label,
+        role: pivot.role,
+        feeds: [...pivot.feeds].sort(),
         count: Array.from(pivot.rows.keys()).filter((key) => selectedKeys.has(key)).length,
         totalCount: pivot.rows.size,
         averageScore: Math.round(
@@ -387,7 +431,8 @@
         kind: 'indicator',
         label: stringValue(row.indicator),
         score: effectiveScore(row),
-        sourceCount: Number(row.sourceCount) || rowSources(row).length,
+        sourceCount: graphProviderCount(row),
+        providers: sourceProviders(row),
         tagCount: Array.isArray(row.tags) ? row.tags.length : 0,
         row,
       })),
@@ -418,13 +463,17 @@
         relationships: edges.length,
         highScore: selectedScores.filter((value) => value >= 80).length,
         corroborated: selectedRows.filter((row) =>
-          (Number(row.sourceCount) || rowSources(row).length) >= 2
+          graphProviderCount(row) >= 2
         ).length,
         averageScore: selectedScores.length
           ? Math.round(selectedScores.reduce((total, value) => total + value, 0) / selectedScores.length)
           : 0,
         tagPivots: renderedPivots.filter((pivot) => pivot.kind === 'tag').length,
         sourcePivots: renderedPivots.filter((pivot) => pivot.kind === 'source').length,
+        availableProviders: rankedPivots.filter((pivot) => pivot.kind === 'source').length,
+        mappedProviders: renderedPivots.filter((pivot) => pivot.role === 'reporting').length,
+        aggregates: renderedPivots.filter((pivot) => pivot.role === 'aggregate').length,
+        unmappedFeeds: renderedPivots.filter((pivot) => pivot.role === 'unmapped').length,
       },
     };
   };
@@ -720,11 +769,101 @@
       || a.item.cve_id.localeCompare(b.item.cve_id)).map(({ item }) => item);
   };
 
+  const watchKey = (watch) => JSON.stringify([lower(watch.vendor).trim(), lower(watch.product).trim()]);
+  const matchesWatch = (item, watch) => {
+    const kev = item.reports?.cisa_kev;
+    return typeof kev?.vendor === 'string' && lower(kev.vendor).trim() === lower(watch.vendor).trim()
+      && (!watch.product || (typeof kev.product === 'string' && lower(kev.product).trim() === lower(watch.product).trim()));
+  };
+  const briefingEvidence = (item) => ({
+    exploitation: item.exploitation_status,
+    ransomware: vulnerabilityFacts(item).ransomware,
+    action: typeof item.reports?.cisa_kev?.required_action === 'string' ? item.reports.cisa_kev.required_action : '',
+    due: typeof item.reports?.cisa_kev?.due_date === 'string' ? item.reports.cisa_kev.due_date : '',
+    rejected: lower(item.reports?.nvd?.status) === 'rejected',
+    severity: typeof item.reports?.nvd?.severity === 'string' ? lower(item.reports.nvd.severity) : '',
+  });
+  const emptyBriefing = () => ({ version: 1, watches: [], records: {}, snapshotAt: null });
+  const normaliseBriefing = (value, now = Date.now() / 1000) => {
+    if (!value || value.version !== 1 || !Array.isArray(value.watches) || value.watches.length > 20
+      || !value.records || typeof value.records !== 'object' || Array.isArray(value.records)
+      || Object.keys(value.records).length > 5000
+      || (value.snapshotAt !== null && (typeof value.snapshotAt !== 'number' || !Number.isFinite(value.snapshotAt)
+        || value.snapshotAt < 0 || value.snapshotAt > now + 300))) return null;
+    const watches = [];
+    for (const watch of value.watches) {
+      if (!watch || typeof watch.vendor !== 'string' || !watch.vendor.trim() || watch.vendor.length > 100
+        || typeof watch.product !== 'string' || watch.product.length > 160) return null;
+      const clean = { vendor: watch.vendor.trim(), product: watch.product.trim(), ready: watch.ready === true };
+      if (!watches.some((entry) => watchKey(entry) === watchKey(clean))) watches.push(clean);
+    }
+    const records = {};
+    for (const [id, record] of Object.entries(value.records)) {
+      const evidence = record?.evidence;
+      if (evidence === null && /^CVE-[0-9]{4}-[0-9]{4,19}$/.test(id) && ['unreviewed', 'investigating'].includes(record.triage)) {
+        records[id] = { evidence: null, triage: record.triage };
+        continue;
+      }
+      if (!/^CVE-[0-9]{4}-[0-9]{4,19}$/.test(id) || !evidence
+        || !['known_exploited', 'reported_exploitation', 'not_established'].includes(evidence.exploitation)
+        || typeof evidence.ransomware !== 'boolean' || typeof evidence.rejected !== 'boolean'
+        || !['action', 'due', 'severity'].every((key) => typeof evidence[key] === 'string' && evidence[key].length <= 20000)
+        || !['unreviewed', 'investigating', 'reviewed'].includes(record.triage)) return null;
+      records[id] = { evidence: { exploitation: evidence.exploitation, ransomware: evidence.ransomware,
+        action: evidence.action, due: evidence.due, rejected: evidence.rejected, severity: evidence.severity }, triage: record.triage };
+    }
+    if (value.snapshotAt === null && Object.keys(records).length) return null;
+    return { version: 1, watches, records, snapshotAt: value.snapshotAt };
+  };
+  const briefingChanges = (previous, current) => {
+    if (!previous) return ['New to your watched collection'];
+    const changes = [];
+    if (previous.exploitation !== current.exploitation) changes.push(current.exploitation === 'known_exploited'
+      ? 'Added CISA KEV evidence' : 'Exploitation classification changed');
+    if (previous.ransomware !== current.ransomware) changes.push(current.ransomware ? 'Added ransomware evidence' : 'Ransomware evidence changed');
+    if (previous.action !== current.action) changes.push('Remediation changed');
+    if (previous.due !== current.due) changes.push('CISA due date changed');
+    if (previous.rejected !== current.rejected) changes.push(current.rejected ? 'NVD record rejected' : 'NVD rejection status changed');
+    if (previous.severity !== current.severity) changes.push('Severity changed');
+    return changes;
+  };
+  const seedBriefing = (items, state, snapshotAt) => {
+    const pending = state.watches.filter((watch) => !watch.ready);
+    const records = { ...state.records };
+    const readyWatches = state.watches.filter((watch) => watch.ready);
+    let seeded = false;
+    const watches = state.watches.map((watch) => {
+      if (watch.ready || !items.some((item) => matchesWatch(item, watch))) return watch;
+      seeded = true;
+      return { ...watch, ready: true };
+    });
+    for (const item of items) {
+      if (pending.some((watch) => matchesWatch(item, watch)) && !readyWatches.some((watch) => matchesWatch(item, watch))) {
+        records[item.cve_id] = { evidence: briefingEvidence(item), triage: 'unreviewed' };
+      }
+    }
+    return { ...state, watches, records, snapshotAt: seeded ? snapshotAt : state.snapshotAt };
+  };
+  const buildBriefing = (items, state, snapshotAt) => {
+    const comparable = state.snapshotAt !== null && snapshotAt >= state.snapshotAt;
+    return items.filter((item) => state.watches.some((watch) => matchesWatch(item, watch))).map((item) => {
+      const previous = state.records[item.cve_id];
+      const changes = comparable ? briefingChanges(previous?.evidence, briefingEvidence(item)) : [];
+      return { item, changes, triage: previous?.triage === 'investigating' ? 'investigating'
+        : changes.length ? 'new' : previous?.triage || 'unreviewed' };
+    }).sort((a, b) => Number(b.changes.length > 0) - Number(a.changes.length > 0)
+      || Number(b.item.exploitation_status === 'known_exploited') - Number(a.item.exploitation_status === 'known_exploited')
+      || (vulnerabilityFacts(b.item).added ?? 0) - (vulnerabilityFacts(a.item).added ?? 0)
+      || a.item.cve_id.localeCompare(b.item.cve_id));
+  };
+
   return {
+    emptyBriefing, normaliseBriefing, matchesWatch, watchKey, briefingEvidence, briefingChanges, seedBriefing, buildBriefing,
     filterVulnerabilities,
     vulnerabilityFacts,
     compareRows,
     buildCampaignGraph,
+    sourceProviders,
     buildDiscovery,
     effectiveScore,
     investigationKey,
