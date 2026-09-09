@@ -112,7 +112,48 @@ const path = require('node:path');
     assert.match(await page.locator('[data-campaign-feed-evidence]').innerText(), /ci_army_list/);
     assert.equal(await graph.locator('[data-graph-node][aria-label*="abuse.ch"]').count(), 1);
     assert.equal(await graph.locator('[data-graph-node][aria-label*="SANS ISC"]').count(), 1);
-    if (process.env.SCREENSHOT_DIR) await page.screenshot({ path: `${process.env.SCREENSHOT_DIR}/provider-graph.png` });
+    // Search raw feed aliases, inspect all connections, and export only real edges.
+    await graph.locator('[data-graph-node][aria-label*="abuse.ch"]').click();
+    const relatedCount = Number((await page.locator('[data-campaign-related-heading]').innerText()).match(/\d+/)[0]);
+    assert.ok(relatedCount > 10);
+    assert.equal(await page.locator('[data-campaign-related-list] button').count(), relatedCount);
+    const [graphDownload] = await Promise.all([page.waitForEvent('download'), page.locator('[data-campaign-export]').click()]);
+    const graphTemp = await fs.mkdtemp(path.join(os.tmpdir(), 'swiftioc-graph-'));
+    try {
+      const dest = path.join(graphTemp, 'graph.json'); await graphDownload.saveAs(dest);
+      const exported = JSON.parse(await fs.readFile(dest, 'utf8'));
+      assert.equal(exported.scope, 'selected-neighborhood');
+      assert.equal(exported.counts.indicators, relatedCount);
+      assert.equal(exported.edges.length, relatedCount);
+      assert.ok(exported.edges.every((edge) => edge.source === exported.selected_node));
+      const ids = new Set(exported.nodes.map((node) => node.id));
+      assert.ok(exported.edges.every((edge) => ids.has(edge.source) && ids.has(edge.target)));
+    } finally { await fs.rm(graphTemp, { recursive: true }); }
+    await page.locator('[data-campaign-search]').fill('ci_army_list');
+    assert.equal(await page.locator('[data-campaign-search-results] button').count(), 6);
+    await page.locator('[data-campaign-search-results] button').filter({ hasText: 'CINS Army' }).click();
+    assert.equal(await page.locator('[data-campaign-title]').innerText(), 'CINS Army');
+    await page.keyboard.press('Escape');
+    assert.equal(await page.locator('[data-campaign-reset]').isDisabled(), true);
+    assert.equal(await graph.locator('.is-dimmed').count(), 0);
+    await page.locator('[data-campaign-search]').fill('no-such-fixture');
+    assert.match(await page.locator('[data-campaign-search-status]').innerText(), /0 matching nodes/);
+    assert.equal(await page.locator('[data-campaign-search-results] button').count(), 0);
+    await cins.click();
+    await page.locator('[data-campaign-reset]').click();
+    assert.equal(await page.locator('[data-campaign-search]').inputValue(), '');
+    assert.equal(await page.locator('[data-campaign-export]').innerText(), 'Export graph JSON');
+    await page.setViewportSize({ width: 390, height: 844 });
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    if (process.env.SCREENSHOT_DIR) {
+      await page.locator('#campaign-graph').scrollIntoViewIfNeeded();
+      await page.screenshot({ path: `${process.env.SCREENSHOT_DIR}/provider-graph.png` });
+    }
+    await page.evaluate(() => window.dispatchEvent(new CustomEvent('swiftioc:preview-filtered', { detail: { rows: [] } })));
+    assert.equal(await page.locator('[data-campaign-export]').isDisabled(), true);
+    assert.equal(await page.locator('[data-campaign-related]').isVisible(), false);
+
     assert.deepEqual(errors, []);
     // Malformed saved state cannot turn every historical CVE into a change.
     await page.evaluate((key) => localStorage.setItem(key, '{broken'), key);

@@ -3470,6 +3470,11 @@
     const mode = qs('[data-campaign-mode]', root);
     const density = qs('[data-campaign-density]', root);
     const remix = qs('[data-campaign-layout]', root);
+    const search = qs('[data-campaign-search]', root);
+    const searchResults = qs('[data-campaign-search-results]', root);
+    const searchStatus = qs('[data-campaign-search-status]', root);
+    const reset = qs('[data-campaign-reset]', root);
+    const exportGraph = qs('[data-campaign-export]', root);
     const empty = qs('[data-campaign-empty]', root);
     const title = qs('[data-campaign-title]', root);
     const description = qs('[data-campaign-description]', root);
@@ -3519,19 +3524,22 @@
       const positions = new Map();
       const grouped = new Map(pivots.map((pivot) => [pivot.id, []]));
       indicators.forEach((node) => {
-        const first = graph.edges.find((edge) => edge.target === node.id);
-        if (first) grouped.get(first.source)?.push(node);
+        // Balance shared indicators between their actual pivots instead of
+        // assigning every overlap to whichever edge sorts first.
+        const owners = pivots.filter((pivot) => graph.edges.some((edge) => edge.source === pivot.id && edge.target === node.id));
+        owners.sort((a, b) => grouped.get(a.id).length - grouped.get(b.id).length);
+        if (owners.length) grouped.get(owners[0].id).push(node);
       });
       let top = 25;
       const reverse = Math.round(rotation / (Math.PI / 7)) % 2 === 1;
       pivots.forEach((pivot) => {
         const members = grouped.get(pivot.id);
         if (reverse) members.reverse();
-        const height = Math.max(95, Math.ceil(members.length / 6) * 75 + 20);
+        const height = Math.max(95, Math.ceil(members.length / 5) * 75 + 20);
         positions.set(pivot.id, { x: 145, y: top + height / 2 });
         members.forEach((node, index) => positions.set(node.id, {
-          x: 350 + (index % 6) * 115,
-          y: top + 30 + Math.floor(index / 6) * 75,
+          x: 350 + (index % 5) * 140,
+          y: top + 30 + Math.floor(index / 5) * 75,
         }));
         top += height;
       });
@@ -3541,6 +3549,8 @@
 
     const selectNode = (node) => {
       selected = node;
+      if (reset) reset.disabled = false;
+      if (exportGraph) exportGraph.textContent = 'Export selected relationships';
       const connected = new Set();
       graph.edges.forEach((edge) => {
         if (edge.source === node.id) connected.add(edge.target);
@@ -3579,7 +3589,7 @@
       if (meta) meta.hidden = false;
       if (description) {
         description.textContent = node.kind === 'pivot'
-          ? `${formatNumber(node.totalCount)} indicators share this ${node.pivotKind}; ${formatNumber(node.count)} are visible in this graph. Their average risk score is ${node.averageScore}.`
+          ? `${formatNumber(node.totalCount)} indicators in the filtered sample share this ${node.pivotKind}; ${formatNumber(node.count)} are displayed. Average collector score across all ${formatNumber(node.totalCount)} matching indicators: ${node.averageScore}.`
           : `${node.row?.confidence ? `${node.row.confidence} confidence · ` : ''}Reported by ${node.providers.map((provider) => provider.label).join(', ') || 'unspecified sources'}${node.row?.context ? ` · ${compactText(node.row.context)}` : ''}.`;
       }
       const feedEvidence = qs('[data-campaign-feed-evidence]', root);
@@ -3600,7 +3610,7 @@
       }
       if (tagBlock) tagBlock.hidden = !tags.length;
       if (relatedList) {
-        relatedList.replaceChildren(...relatedNodes.slice(0, 10).map((candidate) => {
+        relatedList.replaceChildren(...relatedNodes.map((candidate) => {
           const button = document.createElement('button');
           button.type = 'button';
           button.className = 'campaign-related-node';
@@ -3610,7 +3620,7 @@
           return button;
         }));
       }
-      if (relatedHeading) relatedHeading.textContent = node.kind === 'pivot' ? 'Connected indicators' : 'Relationship pivots';
+      if (relatedHeading) relatedHeading.textContent = `${node.kind === 'pivot' ? 'Connected indicators' : 'Relationship pivots'} (${relatedNodes.length})`;
       if (relatedBlock) relatedBlock.hidden = !relatedNodes.length;
       const reportUrl = node.kind === 'indicator' ? safeHttpUrl(node.row?.reference) : null;
       if (reference) {
@@ -3624,6 +3634,33 @@
           ? 'Remove from queue'
           : 'Add indicator to queue';
       }
+    };
+
+    const updateSearch = () => {
+      if (!searchResults || !search) return;
+      const query = normaliseLower(search.value);
+      const matches = query ? (graph?.nodes || []).filter((node) => normaliseLower([
+        node.label, node.row?.type, ...(node.feeds || []),
+        ...(node.providers || []).flatMap((provider) => [provider.label, ...provider.feeds]),
+        ...(node.row?.tags || []),
+      ].join(' ')).includes(query)) : [];
+      searchResults.hidden = !matches.length;
+      searchResults.replaceChildren(...matches.map((node) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'campaign-related-node';
+        button.textContent = `${node.label} · ${node.kind === 'pivot' ? `${node.count} displayed IOCs` : `${node.row?.type || 'indicator'} · score ${node.score}`}`;
+        button.addEventListener('click', () => {
+          selectNode(node);
+          const element = qsa('[data-graph-node]', svg).find((item) => item.dataset.graphNode === node.id);
+          element?.focus({ preventScroll: true });
+          element?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'instant' });
+        });
+        return button;
+      }));
+      setText(searchStatus, query
+        ? `${matches.length} matching nodes in the displayed graph. Main filters control the sample; this search does not expand it.`
+        : 'Search the displayed sample. Use the main filters to change its coverage.');
     };
 
     const render = () => {
@@ -3641,6 +3678,12 @@
       svg.hidden = !hasGraph;
       root.hidden = !entries.length;
       if (stats) stats.hidden = !hasGraph;
+      if (reset) reset.disabled = true;
+      if (exportGraph) {
+        exportGraph.disabled = !hasGraph;
+        exportGraph.textContent = 'Export graph JSON';
+      }
+      updateSearch();
       setText(high, formatNumber(graph.stats.highScore));
       setText(corroborated, formatNumber(graph.stats.corroborated));
       setText(average, formatNumber(graph.stats.averageScore));
@@ -3673,8 +3716,9 @@
         const start = positions.get(edge.source);
         const end = positions.get(edge.target);
         if (!start || !end) return;
-        const line = createSvg('line', {
-          x1: start.x, y1: start.y, x2: end.x, y2: end.y,
+        const line = createSvg('path', {
+          d: `M ${start.x + 120} ${start.y} C ${start.x + 175} ${start.y}, ${end.x - 55} ${end.y}, ${end.x - 17} ${end.y}`,
+          fill: 'none',
           class: `campaign-edge ${edge.kind}`,
           'data-graph-edge': '',
           'data-source': edge.source,
@@ -3763,6 +3807,37 @@
       if (nextSelected) selectNode(nextSelected);
     };
 
+    search?.addEventListener('input', updateSearch);
+    reset?.addEventListener('click', () => {
+      selected = null;
+      if (search) search.value = '';
+      render();
+    });
+    root.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && selected) {
+        selected = null;
+        render();
+        search?.focus();
+      }
+    });
+    exportGraph?.addEventListener('click', () => {
+      if (!graph?.edges.length) return;
+      const edges = selected ? graph.edges.filter((edge) => edge.source === selected.id || edge.target === selected.id) : graph.edges;
+      const ids = new Set(edges.flatMap((edge) => [edge.source, edge.target]));
+      const nodes = graph.nodes.filter((node) => ids.has(node.id));
+      downloadDetection(JSON.stringify({
+        schema_version: 1,
+        exported_at: new Date().toISOString(),
+        scope: selected ? 'selected-neighborhood' : 'displayed-graph',
+        selected_node: selected?.id || null,
+        mode: graph.mode,
+        sample_indicator_count: entries.filter((row) => normaliseLower(row.type) !== 'cve').length,
+        limits: { indicators: Number(density?.value) || 36, pivots: 8 },
+        counts: { nodes: nodes.length, indicators: nodes.filter((node) => node.kind === 'indicator').length, relationships: edges.length },
+        caveat: 'Relationships describe shared reporting or tags in a bounded sample, not campaign attribution or independent verification. Pivot totals describe the filtered sample; edges describe this export.',
+        nodes, edges,
+      }, null, 2) + '\n', 'swiftioc-graph-evidence.json', 'application/json');
+    });
     mode?.addEventListener('change', render);
     density?.addEventListener('change', render);
     remix?.addEventListener('click', () => {
