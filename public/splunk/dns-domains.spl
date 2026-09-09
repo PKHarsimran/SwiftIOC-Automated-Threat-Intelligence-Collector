@@ -1,0 +1,9 @@
+index=YOUR_DNS_INDEX earliest=-24h latest=now
+| fields _time host src_ip query
+| fields - sf_*
+| eval sf_type="domain", sf_value=lower(rtrim(trim(query), "."))
+| lookup swiftioc_iocs.csv sf_type sf_value OUTPUT sf_value AS sf_match sf_score sf_sources sf_tags sf_last_seen sf_references
+| where isnotnull(sf_match)
+| stats count AS events min(_time) AS first_event max(_time) AS last_event values(src_ip) AS clients values(host) AS reporting_hosts values(sf_score) AS score values(sf_sources) AS sources values(sf_last_seen) AS feed_last_seen values(sf_references) AS references BY sf_match
+| convert ctime(first_event) ctime(last_event)
+| sort 0 - events

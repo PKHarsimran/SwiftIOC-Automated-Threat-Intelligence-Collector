@@ -221,6 +221,8 @@ The `high_confidence` feed includes records at or above the threshold (default 8
 
 ## Feeds and integrations
 
+**[Splunk hunt library](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/splunk/)** — copy-ready SPL for source/destination IPs, exact DNS domains, SHA-256 hashes, and exact URLs, with lookup preparation and field-mapping instructions.
+
 Paths below are relative to the published site or your `--out-dir`.
 
 | Output | Contents and intended use |

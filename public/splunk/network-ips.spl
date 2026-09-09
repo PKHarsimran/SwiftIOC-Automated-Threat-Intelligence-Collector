@@ -1,0 +1,10 @@
+index=YOUR_NETWORK_INDEX earliest=-24h latest=now
+| fields _time host src_ip dest_ip action
+| fields - sf_*
+| eval sf_src=lower(trim(src_ip)), sf_dest=lower(trim(dest_ip))
+| eval sf_src_type=if(match(sf_src, ":"), "ipv6", "ipv4"), sf_dest_type=if(match(sf_dest, ":"), "ipv6", "ipv4")
+| lookup swiftioc_iocs.csv sf_type AS sf_src_type sf_value AS sf_src OUTPUT sf_value AS sf_src_match sf_score AS sf_src_score sf_sources AS sf_src_sources sf_last_seen AS sf_src_last_seen
+| lookup swiftioc_iocs.csv sf_type AS sf_dest_type sf_value AS sf_dest OUTPUT sf_value AS sf_dest_match sf_score AS sf_dest_score sf_sources AS sf_dest_sources sf_last_seen AS sf_dest_last_seen
+| where isnotnull(sf_src_match) OR isnotnull(sf_dest_match)
+| eval sf_direction=case(isnotnull(sf_src_match) AND isnotnull(sf_dest_match), "both endpoints", isnotnull(sf_src_match), "source", true(), "destination")
+| table _time host src_ip dest_ip action sf_direction sf_src_match sf_src_score sf_src_sources sf_src_last_seen sf_dest_match sf_dest_score sf_dest_sources sf_dest_last_seen
