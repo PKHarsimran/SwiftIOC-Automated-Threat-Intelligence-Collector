@@ -338,7 +338,7 @@ test('dashboard markup keeps IDs and labelled controls consistent', () => {
   assert.match(html, /data-campaign-density/);
   assert.match(html, /data-campaign-related-list/);
   assert.match(html, /data-campaign-reference/);
-  assert.match(html, /class="signal-radar"/);
+  assert.match(html, /data-tool-disclosure/);
   assert.match(html, /data-delta-root/);
   assert.match(html, /iocs\/delta\.jsonl/);
   assert.match(html, /iocs\/taxii2-envelope\.json/);
@@ -541,6 +541,16 @@ test('exploited and ransomware views require explicit evidence and never fall ba
 test('vulnerability release uses coordinated new asset cache keys', () => {
   const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
   for (const asset of ['styles.css', 'dashboard-core.js', 'dashboard.js']) {
-    assert.ok(html.includes(`assets/${asset}?v=16`));
+    assert.ok(html.includes(`assets/${asset}?v=17`));
   }
+});
+
+test('compact preview honors mobile defaults and explicit shared row counts', () => {
+  assert.equal(core.readViewState('', '', 6).limit, 6);
+  assert.equal(core.readViewState('?rows=12', '', 6).limit, 12);
+  assert.equal(core.readViewState('?rows=999', '', 6).limit, 6);
+  assert.equal(core.readViewState('', '', -1).limit, 12);
+  const compact = core.readViewState('?rows=6');
+  const url = core.writeViewUrl('https://example.test/', compact);
+  assert.equal(core.readViewState(url.search, url.hash).limit, 6);
 });
