@@ -2169,6 +2169,7 @@
       relative: qs('[data-preview-relative]', container),
     };
 
+    const defaultPreviewLimit = window.matchMedia?.('(max-width: 640px)').matches ? 6 : DEFAULT_PREVIEW_LIMIT;
     const state = {
       rows: [],
       types: [],
@@ -2183,7 +2184,7 @@
       minScore: 0,
       age: 'all',
       search: '',
-      limit: DEFAULT_PREVIEW_LIMIT,
+      limit: defaultPreviewLimit,
       sort: 'score',
       direction: 'desc',
       expanded: new Set(),
@@ -2202,7 +2203,8 @@
           state,
           dashboardCore.readViewState(
             window.location.search,
-            window.location.hash
+            window.location.hash,
+            state.limit
           )
         );
         return;
@@ -2215,7 +2217,7 @@
       state.minScore = Number(params.get('score')) || 0;
       state.age = params.get('age') || 'all';
       const limit = Number(params.get('rows'));
-      if ([12, 25, 50, 100].includes(limit)) state.limit = limit;
+      if ([6, 12, 25, 50, 100].includes(limit)) state.limit = limit;
       const sort = params.get('sort');
       if (['indicator', 'type', 'score', 'sources', 'lastSeen'].includes(sort)) {
         state.sort = sort;
@@ -2236,7 +2238,8 @@
         const url = dashboardCore.writeViewUrl(
           window.location.href,
           state,
-          includeSearch
+          includeSearch,
+          defaultPreviewLimit
         );
         window.history.replaceState(null, '', url);
         return url;
@@ -2249,7 +2252,7 @@
       if (state.signal !== 'all') url.searchParams.set('signal', state.signal);
       if (state.minScore) url.searchParams.set('score', String(state.minScore));
       if (state.age !== 'all') url.searchParams.set('age', state.age);
-      if (state.limit !== DEFAULT_PREVIEW_LIMIT) {
+      if (includeSearch || state.limit !== defaultPreviewLimit) {
         url.searchParams.set('rows', String(state.limit));
       }
       if (state.sort !== 'score') url.searchParams.set('sort', state.sort);
@@ -2889,7 +2892,7 @@
 
     limitSelect?.addEventListener('change', () => {
       const limit = Number(limitSelect.value);
-      if ([12, 25, 50, 100].includes(limit)) {
+      if ([6, 12, 25, 50, 100].includes(limit)) {
         state.limit = limit;
         apply();
       }
@@ -4194,74 +4197,42 @@
       });
   };
 
-  const initialiseVisualEffects = () => {
-    const targets = qsa([
-      '.page-header',
-      '.ioc-lookup',
-      '.investigation-workspace',
-      '.status-banner',
-      '.metrics-strip',
-      '.score-distribution',
-      '.delta-strip',
-      '.campaign-graph-section',
-      '.dashboard-main > .panel',
-      '.top-threats',
-      '#exports',
-    ].join(','));
-    document.documentElement.classList.add('motion-enhanced');
-    targets.forEach((target, index) => {
-      target.classList.add('reveal-card');
-      target.style.setProperty('--reveal-order', String(index % 4));
+  // Open collapsed tools for existing section bookmarks and in-page links.
+  // Fragment lookup uses IDs, not CSS selectors: malformed/shared IOC fragments
+  // cannot throw or accidentally select another element.
+  const initialiseSectionNavigation = () => {
+    const reveal = () => {
+      let id;
+      try { id = decodeURIComponent(window.location.hash.slice(1)); }
+      catch { return; }
+      if (!id || id.startsWith('ioc=') || id.startsWith('view=')) return;
+      const target = document.getElementById(id);
+      if (!target) return;
+      let parent = target.parentElement;
+      let opened = false;
+      while (parent) {
+        if (parent.matches('details') && !parent.open) {
+          parent.open = true;
+          opened = true;
+        }
+        parent = parent.parentElement;
+      }
+      if (opened) window.requestAnimationFrame(() => target.scrollIntoView({ block: 'start' }));
+    };
+    window.addEventListener('hashchange', reveal);
+    // Clicking the same hash again must also reopen a manually closed tool.
+    document.addEventListener('click', (event) => {
+      const link = event.target.closest('a[href^="#"]');
+      if (link && link.hash === window.location.hash) reveal();
     });
-
-    if (reducedMotion?.matches || typeof IntersectionObserver !== 'function') {
-      targets.forEach((target) => target.classList.add('is-visible'));
-    } else {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          entry.target.classList.add('is-visible');
-          observer.unobserve(entry.target);
-        });
-      }, { rootMargin: '0px 0px -7% 0px', threshold: 0.06 });
-      targets.forEach((target) => observer.observe(target));
-    }
-
-    if (
-      reducedMotion?.matches ||
-      !window.matchMedia?.('(hover: hover) and (pointer: fine)').matches
-    ) return;
-    qsa([
-      '.ioc-lookup',
-      '.investigation-workspace',
-      '.metric-card',
-      '.panel',
-      '.score-distribution',
-      '.top-threats',
-    ].join(',')).forEach((target) => {
-      let frame = null;
-      target.classList.add('pointer-reactive');
-      target.addEventListener('pointermove', (event) => {
-        if (frame) return;
-        frame = window.requestAnimationFrame(() => {
-          const rect = target.getBoundingClientRect();
-          target.style.setProperty('--spot-x', `${event.clientX - rect.left}px`);
-          target.style.setProperty('--spot-y', `${event.clientY - rect.top}px`);
-          frame = null;
-        });
-      });
-      target.addEventListener('pointerleave', () => {
-        target.style.removeProperty('--spot-x');
-        target.style.removeProperty('--spot-y');
-      });
-    });
+    reveal();
   };
 
   /* ==========================================================================
    *  BOOTSTRAP
    * ========================================================================= */
 
-  initialiseVisualEffects();
+  initialiseSectionNavigation();
   initialiseTableToggles();
   initialiseInvestigationWorkspace();
   initialiseStatusBanner();

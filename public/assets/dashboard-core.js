@@ -597,7 +597,7 @@
     return sourceDifference || lower(a.indicator).localeCompare(lower(b.indicator));
   };
 
-  const readViewState = (search = '', hash = '') => {
+  const readViewState = (search = '', hash = '', defaultLimit = 12) => {
     const params = new URLSearchParams(search);
     const signal = lower(params.get('signal'));
     const score = Number(params.get('score')) || 0;
@@ -620,9 +620,9 @@
         : 'all',
       minScore: [0, 40, 60, 80].includes(score) ? score : 0,
       age: ['all', '24', '48', '168', '720'].includes(age) ? age : 'all',
-      limit: [12, 25, 50, 100].includes(Number(params.get('rows')))
+      limit: [6, 12, 25, 50, 100].includes(Number(params.get('rows')))
         ? Number(params.get('rows'))
-        : 12,
+        : ([6, 12].includes(defaultLimit) ? defaultLimit : 12),
       sort: ['indicator', 'type', 'score', 'sources', 'lastSeen'].includes(
         params.get('sort')
       ) ? params.get('sort') : 'score',
@@ -640,7 +640,7 @@
     return state;
   };
 
-  const writeViewUrl = (currentUrl, state, includeSearch = false) => {
+  const writeViewUrl = (currentUrl, state, includeSearch = false, defaultLimit = 12) => {
     const url = new URL(currentUrl);
     ['type', 'source', 'tag', 'score_band', 'age_band', 'signal', 'score', 'age', 'rows', 'sort', 'dir']
       .forEach((key) => url.searchParams.delete(key));
@@ -662,7 +662,7 @@
     if (state.signal !== 'all') url.searchParams.set('signal', state.signal);
     if (state.minScore) url.searchParams.set('score', String(state.minScore));
     if (state.age !== 'all') url.searchParams.set('age', state.age);
-    if (state.limit !== 12) url.searchParams.set('rows', String(state.limit));
+    if (includeSearch || state.limit !== defaultLimit) url.searchParams.set('rows', String(state.limit));
     if (state.sort !== 'score') url.searchParams.set('sort', state.sort);
     if (state.direction !== 'desc') url.searchParams.set('dir', state.direction);
     if (includeSearch && state.search) {
