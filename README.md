@@ -50,7 +50,7 @@ SwiftIOC deduplicates by `(type, indicator)`: `CVE-2020-1234` and
 `cve` tag. Reports about **the same CVE** are combined under that CVE ID while
 keeping `reports.cisa_kev` and `reports.nvd` separately. The site opens on
 **Known exploited**, showing only confirmed KEV entries, newest additions first.
-It never fills an empty watchlist with unconfirmed CVEs. **Ransomware evidence**
+The Known exploited view never fills empty results with unconfirmed CVEs. **Ransomware evidence**
 requires CISA's explicit `Known` ransomware-use value; `Unknown` does not qualify.
 **All CVEs · prioritized** includes exploitation reports and other CVEs, newest
 NVD publications first within each group. The JSON export uses that full priority ordering, with
@@ -158,6 +158,54 @@ high-fidelity IOCs from authoritative sources. The project emphasises:
 - **Consistent IOC enrichment** ready for SIEM, SOAR, IDS, and DFIR tooling.
 - **Git-friendly artefacts** tailored for GitHub Pages, GitHub Actions, and
   other CI/CD environments.
+
+### Your personal CVE briefing
+
+Open **Personal briefing · follow vendors & products** in the vulnerability
+section. Follow an exact CISA vendor name, optionally with an exact product
+name; suggestions come from the loaded collection. **My briefing** becomes the
+default on return visits after you add a watch. Matches mean potential relevance,
+not proof that an installed version is affected. NVD-only records without
+structured CISA vendor/product fields cannot match these watches.
+
+The first matching valid snapshot establishes a baseline without marking old
+CVEs as newly changed. A watch with no matches waits for its first matching
+snapshot. Later briefings highlight changes to exploitation classification,
+ransomware evidence, required action, CISA due dates, severity, and rejection
+status. Routine catalog checks and NVD modification timestamps do not generate
+alerts. A CVE first appearing in the watched collection is labeled that way; this
+does not imply it was newly disclosed or newly exploited. Its KEV addition date
+and provider evidence remain visible on the card.
+
+Choose **Investigating** to keep a change pending or **Reviewed** to acknowledge
+its current evidence. Search and review-status filters apply to the downloadable
+JSON briefing. Rejected watched CVEs stay visible so their status changes can be
+reviewed. Missing records do not imply remediation or withdrawal of exploitation
+evidence. Failed, malformed, future, or older-than-baseline snapshots cannot
+advance your review state. Watches and baselines stay in browser storage (up to
+20 watches and 5,000 baseline records); storage failures show a tab-only notice.
+Clear watches and review history from the settings disclosure when finished.
+There are no background notifications or cross-device synchronization.
+
+### A graph of reporting evidence
+
+The graph opens on **Reporting providers**. Known adapter aliases are grouped:
+ThreatFox, URLhaus, MalwareBazaar, Feodo, and SSLBL share the **abuse.ch** provider
+node, while CINS Army and SANS ISC / DShield retain their own identities. Expand
+**Reporting feed evidence** in the inspector to see the original feed names.
+Unknown custom feeds remain separate and explicitly unmapped; names alone do
+not establish their publishers. IPsum is labeled as an aggregate, and Tor exit
+directory membership is context, not a malicious-activity report. Aggregates,
+unmapped feeds, and directory context do not increase the graph's mapped
+provider count. Collector scores and exported raw source identities are unchanged.
+
+Provider rows keep larger clusters readable, and round-robin sampling gives
+smaller reporting groups a place within the indicator cap. Only relationships
+actually present in the filtered preview are drawn; a group needs at least two
+sample indicators to qualify, and caps can still omit groups. If the sample has
+only one provider, the graph shows one. Provider-name tags are excluded from
+behavior pivots. Shared reporting does not establish a common campaign or prove
+independent verification. Scroll the diagram horizontally on smaller screens.
 
 ## 🚀 Features
 - **Discovery desk** – switch between corroborated reports, sightings from the last 24 hours, and uncommon tags in the filtered preview. Each lead explains its selection, opens source evidence, and can be saved to the investigation queue. Export a JSON evidence brief with the reasons attached. Sample rarity is explicitly distinguished from global rarity.
@@ -743,3 +791,7 @@ full contribution workflow.
 ---
 
 For security disclosures, please see [SECURITY.md](SECURITY.md).
+
+The personal briefing and provider graph have an additional synthetic browser
+regression suite: `node scripts/test_personal_briefing.cjs`, using the same
+local server and Playwright setup as the vulnerability UI tests.
