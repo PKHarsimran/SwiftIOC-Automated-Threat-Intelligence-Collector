@@ -3637,3 +3637,12 @@ input.lookup-input { border-radius: 0.3rem; background: var(--bg-color); }
 .campaign-search-results[hidden] { display: none; }
 .campaign-related-list { max-height: 18rem; overflow: auto; overscroll-behavior: contain; }
 .campaign-search-results .campaign-related-node { overflow-wrap: anywhere; text-align: left; }
+
+.inventory-actions { display: flex; flex-wrap: wrap; align-items: end; gap: .75rem; margin: 1rem 0; }
+.inventory-actions label { display: grid; gap: .4rem; min-width: 0; max-width: 100%; }
+.inventory-actions input { max-width: 100%; }
+.inventory-results { display: grid; gap: .75rem; }
+.inventory-results article { padding: 1rem; border: 1px solid var(--border-control); border-radius: .3rem; overflow-wrap: anywhere; }
+.inventory-results h3 { margin-top: 0; font-size: 1rem; }
+.inventory-results pre { max-height: 20rem; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; font-size: .75rem; }
+.inventory-results summary { cursor: pointer; }
