@@ -640,7 +640,7 @@
     return state;
   };
 
-  const writeViewUrl = (currentUrl, state, includeSearch = false) => {
+  const writeViewUrl = (currentUrl, state, includeSearch = false, defaultLimit = 12) => {
     const url = new URL(currentUrl);
     ['type', 'source', 'tag', 'score_band', 'age_band', 'signal', 'score', 'age', 'rows', 'sort', 'dir']
       .forEach((key) => url.searchParams.delete(key));
@@ -662,7 +662,7 @@
     if (state.signal !== 'all') url.searchParams.set('signal', state.signal);
     if (state.minScore) url.searchParams.set('score', String(state.minScore));
     if (state.age !== 'all') url.searchParams.set('age', state.age);
-    if (state.limit !== 12) url.searchParams.set('rows', String(state.limit));
+    if (includeSearch || state.limit !== defaultLimit) url.searchParams.set('rows', String(state.limit));
     if (state.sort !== 'score') url.searchParams.set('sort', state.sort);
     if (state.direction !== 'desc') url.searchParams.set('dir', state.direction);
     if (includeSearch && state.search) {
