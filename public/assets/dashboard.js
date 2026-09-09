@@ -3019,7 +3019,7 @@
 
   const initialiseVulnerabilities = () => {
     const root = qs('[data-vulnerability-root]');
-    if (!root || !dashboardCore?.filterVulnerabilities || !dashboardCore?.vulnerabilityFacts) return;
+    if (!root || !dashboardCore?.filterVulnerabilities || !dashboardCore?.vulnerabilityFacts || !dashboardCore?.buildBriefing) return;
     const cards = qs('[data-vulnerability-cards]', root);
     const status = qs('[data-vulnerability-status]', root);
     const search = qs('[data-vulnerability-search]', root);
@@ -3027,11 +3027,13 @@
     const refresh = qs('[data-vulnerability-refresh]', root);
     const views = qsa('[data-vulnerability-view]', root);
     const includeRejected = qs('[data-vulnerability-include-rejected]', root);
+    const extraView = qs('[data-vulnerability-extra-view]', root);
     const help = qs('[data-vulnerability-view-help]', root);
     const freshness = qs('[data-vulnerability-freshness]', root);
     // Old HTML may remain in an intermediary cache during a deployment.
-    if (!includeRejected || !help || !freshness || !views.length) return;
+    if (!extraView || !includeRejected || !help || !freshness || !views.length || !qs('[data-briefing-form]', root)) return;
     const viewHelp = {
+      briefing: 'Your watched products, with material evidence changes first. Rejected records remain visible for review. Routine timestamp updates do not create alerts.',
       exploited: 'Confirmed KEV records only, newest catalog additions first. An empty result means this collection has no matching KEV evidence; other CVEs are available in All CVEs.',
       ransomware: 'CISA KEV records explicitly marked Known for ransomware campaign use. Unknown and unreported values do not qualify.',
       priority: 'Known exploited first (newest KEV additions), then exploitation reports, then other CVEs. Publication dates order each remaining group.',
@@ -3081,15 +3083,99 @@
       }
       card.appendChild(details);
     };
+    const briefingKey = 'swiftioc-cve-briefing-v1';
+    let briefing = dashboardCore.emptyBriefing();
+    let briefingNotice = '';
+    let lastBriefingResults = [];
+    try {
+      const saved = window.localStorage.getItem(briefingKey);
+      if (saved) {
+        const valid = dashboardCore.normaliseBriefing(JSON.parse(saved));
+        if (valid) briefing = valid;
+        else briefingNotice = 'Saved briefing was incompatible. Set up a fresh watchlist; no change alerts were inferred.';
+      }
+    } catch {
+      briefingNotice = 'Saved briefing could not be read. A fresh baseline is required; preferences may only last for this tab.';
+    }
+    if (briefing.watches.length) view = 'briefing';
+    const briefingSettings = qs('[data-briefing-settings]', root);
+    const briefingForm = qs('[data-briefing-form]', root);
+    const briefingVendor = qs('[data-briefing-vendor]', root);
+    const briefingProduct = qs('[data-briefing-product]', root);
+    const briefingWatches = qs('[data-briefing-watches]', root);
+    const briefingNote = qs('[data-briefing-note]', root);
+    const briefingTools = qs('[data-briefing-tools]', root);
+    const briefingTriage = qs('[data-briefing-triage]', root);
+    const briefingExport = qs('[data-briefing-export]', root);
+    const canAcknowledge = () => !loading && !failed && snapshotTime !== null
+      && snapshotTime <= Date.now() / 1000 && (briefing.snapshotAt === null || snapshotTime >= briefing.snapshotAt);
+    const saveBriefing = (next) => {
+      const valid = dashboardCore.normaliseBriefing(next);
+      if (!valid) {
+        briefingNotice = 'This watchlist exceeds the 5,000-record baseline limit. Narrow the vendors or products you follow.';
+        return false;
+      }
+      briefing = valid;
+      try {
+        window.localStorage.setItem(briefingKey, JSON.stringify(briefing));
+        briefingNotice = '';
+      } catch {
+        briefingNotice = 'Browser storage is unavailable or full. Changes are kept for this tab only; export your briefing before leaving.';
+      }
+      return true;
+    };
+    const updateBriefingControls = () => {
+      const ready = canAcknowledge();
+      briefingTools.hidden = view !== 'briefing';
+      briefingExport.disabled = !ready || !lastBriefingResults.length;
+      briefingTriage.disabled = loading || failed;
+      briefingForm.querySelector('button').disabled = !ready || briefing.watches.length >= 20;
+      briefingVendor.disabled = briefingProduct.disabled = !ready;
+      const note = briefingNotice || (loading ? 'Loading evidence before establishing a baseline…' : failed
+        ? 'Collection unavailable. Your saved watches and review baseline are unchanged.'
+        : !ready ? 'This snapshot is older than your baseline or dated in the future. Review and export are paused.'
+        : !briefing.watches.length ? 'Follow a vendor or product to start. The first valid snapshot establishes a baseline without historical change alerts.'
+        : briefing.snapshotAt === null ? 'No matching structured records yet. The first matching snapshot will establish a baseline without historical alerts.'
+        : `Latest baseline/review snapshot ${new Date(briefing.snapshotAt * 1000).toLocaleString()}. Each CVE keeps its last acknowledged evidence. Product matches indicate potential relevance, not confirmed exposure.`);
+      briefingNote.textContent = note;
+      briefingWatches.replaceChildren(...briefing.watches.map((watch) => {
+        const li = document.createElement('li');
+        const label = document.createElement('span');
+        label.textContent = watch.vendor + (watch.product ? ` / ${watch.product}` : ' / all products');
+        const remove = document.createElement('button');
+        remove.type = 'button'; remove.className = 'button ghost';
+        remove.textContent = 'Remove'; remove.setAttribute('aria-label', `Remove watch: ${label.textContent}`);
+        remove.disabled = !ready;
+        remove.addEventListener('click', () => {
+          const watches = briefing.watches.filter((entry) => dashboardCore.watchKey(entry) !== dashboardCore.watchKey(watch));
+          saveBriefing(dashboardCore.seedBriefing(items, { ...briefing, watches }, snapshotTime));
+          page = 0; render();
+        });
+        li.append(label, remove); return li;
+      }));
+      const vendors = [...new Set(items.map((item) => item.reports?.cisa_kev?.vendor).filter((value) => typeof value === 'string'))].sort();
+      qs('[data-briefing-vendors]', root).replaceChildren(...vendors.map((vendor) => {
+        const option = document.createElement('option'); option.value = vendor; return option;
+      }));
+    };
     const render = () => {
       const now = Date.now() / 1000;
-      const matches = dashboardCore.filterVulnerabilities(items, search.value, filter.value, { view, includeRejected: includeRejected.checked, now });
+      const briefingEntries = dashboardCore.buildBriefing(items, briefing, snapshotTime);
+      const briefById = new Map(briefingEntries.map((entry) => [entry.item.cve_id, entry]));
+      const eligible = dashboardCore.filterVulnerabilities(items, search.value, filter.value, { view, includeRejected: view === 'briefing' || includeRejected.checked, now });
+      const eligibleIds = new Set(eligible.map((item) => item.cve_id));
+      lastBriefingResults = !loading && !failed ? briefingEntries.filter((entry) => eligibleIds.has(entry.item.cve_id) && (briefingTriage.value === 'all' || (briefingTriage.value === 'new' ? entry.changes.length > 0 : briefingTriage.value === 'unreviewed' ? ['unreviewed', 'new'].includes(entry.triage) : entry.triage === briefingTriage.value))) : [];
+      const matches = view === 'briefing' ? lastBriefingResults.map((entry) => entry.item) : eligible;
+      updateBriefingControls();
       const rejectedCount = items.filter((item) => dashboardCore.vulnerabilityFacts(item, now).rejected).length;
       views.forEach((button) => {
         button.setAttribute('aria-pressed', String(button.dataset.vulnerabilityView === view));
         button.disabled = loading;
       });
       help.textContent = viewHelp[view];
+      extraView.value = ['ransomware', 'kev30', 'published7', 'updated7'].includes(view) ? view : '';
+      extraView.disabled = loading;
+      includeRejected.closest('label').hidden = view === 'briefing';
       includeRejected.disabled = loading;
       freshness.hidden = loading || failed || snapshotTime == null || (now - snapshotTime >= 0 && now - snapshotTime <= 86400);
       freshness.textContent = snapshotTime > now ? 'Snapshot timestamp is in the future. Check the collector clock before treating this data as current.'
@@ -3105,6 +3191,7 @@
       status.textContent = loading ? 'Loading the vulnerability collection…' : failed
         ? 'Collection unavailable. Refresh to retry; no previous results are displayed.'
         : `${matches.length} of ${items.length} CVEs · ${matches.filter((item) => item.exploitation_status === 'known_exploited').length} matching with CISA KEV evidence${!includeRejected.checked && rejectedCount ? ` · ${rejectedCount} rejected records hidden` : ''} · Snapshot ${generatedAt}${!matches.length ? ' · No matching vulnerabilities.' : ''}`;
+      if (view === 'briefing' && !loading && !failed) status.textContent = `${matches.length} watched CVEs in this view · ${lastBriefingResults.filter((entry) => entry.changes.length).length} with new evidence · Snapshot ${generatedAt}${!matches.length ? ' · No matches. Check your watches and filters.' : ''}`;
       if (loading || failed) return;
       matches.slice(page * pageSize, (page + 1) * pageSize).forEach((item) => {
         const card = document.createElement('article');
@@ -3112,6 +3199,29 @@
         card.dataset.exploitation = item.exploitation_status;
         addText(card, 'p', labels[item.exploitation_status], 'vulnerability-evidence');
         addText(card, 'h3', item.cve_id);
+        if (view === 'briefing') {
+          const entry = briefById.get(item.cve_id);
+          addText(card, 'p', 'Potentially relevant to your watchlist', 'briefing-match');
+          addText(card, 'p', entry.changes.length ? entry.changes.join(' · ') : 'No material changes since your baseline or last review.', entry.changes.length ? 'vulnerability-caution' : 'vulnerability-meta');
+          const triageLabel = document.createElement('label');
+          triageLabel.className = 'briefing-triage-label'; triageLabel.textContent = 'Review status';
+          const triageSelect = document.createElement('select');
+          triageSelect.setAttribute('aria-label', `Review status for ${item.cve_id}`);
+          for (const [value, label] of [['unreviewed', 'Not reviewed'], ['investigating', 'Investigating'], ['reviewed', 'Reviewed']]) {
+            const option = document.createElement('option'); option.value = value; option.textContent = label; triageSelect.appendChild(option);
+          }
+          triageSelect.value = entry.triage === 'new' ? 'unreviewed' : entry.triage;
+          triageSelect.disabled = !canAcknowledge();
+          triageSelect.addEventListener('change', () => {
+            if (!canAcknowledge()) return;
+            const prior = briefing.records[item.cve_id];
+            saveBriefing({ ...briefing, snapshotAt: snapshotTime, records: { ...briefing.records,
+              [item.cve_id]: { evidence: triageSelect.value === 'reviewed' ? dashboardCore.briefingEvidence(item) : prior?.evidence || null, triage: triageSelect.value },
+            } });
+            render();
+          });
+          triageLabel.appendChild(triageSelect); card.appendChild(triageLabel);
+        }
         if (item.title && item.title !== item.cve_id) addText(card, 'p', item.title, 'vulnerability-title');
         const kev = item.reports?.cisa_kev;
         const nvd = item.reports?.nvd;
@@ -3187,6 +3297,7 @@
         items = data.items;
         snapshotTime = Date.parse(data.generated_at) / 1000;
         generatedAt = new Date(data.generated_at).toLocaleString();
+        if (briefing.watches.some((watch) => !watch.ready) && snapshotTime <= Date.now() / 1000 && (briefing.snapshotAt === null || snapshotTime >= briefing.snapshotAt)) saveBriefing(dashboardCore.seedBriefing(items, briefing, snapshotTime));
       } catch (error) {
         items = [];
         failed = true;
@@ -3196,11 +3307,47 @@
         render();
       }
     };
+    briefingForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (!canAcknowledge() || briefing.watches.length >= 20) return;
+      const watch = { vendor: briefingVendor.value.trim(), product: briefingProduct.value.trim() };
+      if (!watch.vendor) return;
+      if (briefing.watches.some((entry) => dashboardCore.watchKey(entry) === dashboardCore.watchKey(watch))) {
+        briefingNotice = 'That vendor/product is already followed.'; updateBriefingControls(); return;
+      }
+      const next = dashboardCore.seedBriefing(items, { ...briefing, watches: [...briefing.watches, watch] }, snapshotTime);
+      if (saveBriefing(next)) { view = 'briefing'; page = 0; briefingProduct.value = ''; }
+      render();
+    });
+    qs('[data-briefing-clear]', root).addEventListener('click', () => {
+      saveBriefing(dashboardCore.emptyBriefing()); page = 0; render();
+    });
+    briefingTriage.addEventListener('change', () => { page = 0; render(); });
+    briefingVendor.addEventListener('input', () => {
+      const products = [...new Set(items.filter((item) =>
+        dashboardCore.matchesWatch(item, { vendor: briefingVendor.value.trim(), product: '' }))
+        .map((item) => item.reports.cisa_kev.product).filter((value) => typeof value === 'string'))].sort();
+      qs('[data-briefing-products]', root).replaceChildren(...products.map((product) => {
+        const option = document.createElement('option'); option.value = product; return option;
+      }));
+    });
+    briefingExport.addEventListener('click', () => {
+      if (!canAcknowledge() || !lastBriefingResults.length) return;
+      downloadDetection(JSON.stringify({ schema_version: 1, snapshot_at: new Date(snapshotTime * 1000).toISOString(),
+        baseline_at: briefing.snapshotAt, scope: 'Current filtered watchlist; potential relevance, not confirmed exposure.',
+        watches: briefing.watches, items: lastBriefingResults.map(({ item, changes, triage }) => ({
+          cve_id: item.cve_id, title: item.title, exploitation_status: item.exploitation_status,
+          changes, triage, reports: item.reports,
+        })),
+      }, null, 2), 'swiftioc-personal-cve-briefing.json', 'application/json');
+    });
     views.forEach((button) => button.addEventListener('click', () => {
       view = button.dataset.vulnerabilityView;
+      if (view === 'briefing' && !briefing.watches.length) briefingSettings.open = true;
       page = 0;
       render();
     }));
+    extraView.addEventListener('change', () => { if (extraView.value) { view = extraView.value; page = 0; render(); } });
     includeRejected.addEventListener('change', () => { page = 0; render(); });
     // Re-evaluate rolling windows and freshness when an analyst returns to an
     // open tab, without resetting focus or collapsing evidence every minute.
@@ -3319,7 +3466,7 @@
   const initialiseCampaignGraph = () => {
     const root = qs('[data-campaign-root]');
     const svg = qs('[data-campaign-graph]', root);
-    if (!root || !svg || !dashboardCore?.buildCampaignGraph) return;
+    if (!root || !svg || !dashboardCore?.buildCampaignGraph || !dashboardCore?.sourceProviders) return;
     const mode = qs('[data-campaign-mode]', root);
     const density = qs('[data-campaign-density]', root);
     const remix = qs('[data-campaign-layout]', root);
@@ -3370,44 +3517,25 @@
       const pivots = nodes.filter((node) => node.kind === 'pivot');
       const indicators = nodes.filter((node) => node.kind === 'indicator');
       const positions = new Map();
-      const pivotAngles = new Map();
-      pivots.forEach((node, index) => {
-        const angle = rotation - Math.PI / 2 + (index * Math.PI * 2) / Math.max(pivots.length, 1);
-        pivotAngles.set(node.id, angle);
-        positions.set(node.id, {
-          x: 500 + Math.cos(angle) * 185,
-          y: 260 + Math.sin(angle) * 105,
-        });
-      });
-
       const grouped = new Map(pivots.map((pivot) => [pivot.id, []]));
       indicators.forEach((node) => {
-        const primaryEdge = graph.edges.find((edge) => edge.target === node.id);
-        const pivotId = primaryEdge?.source || pivots[0]?.id;
-        if (pivotId) grouped.get(pivotId)?.push(node);
+        const first = graph.edges.find((edge) => edge.target === node.id);
+        if (first) grouped.get(first.source)?.push(node);
       });
-      grouped.forEach((members, pivotId) => {
-        const center = pivotAngles.get(pivotId) ?? -Math.PI / 2;
-        members.forEach((node, index) => {
-          const spread = Math.min(0.72, 0.13 * Math.max(members.length - 1, 1));
-          const offset = members.length > 1
-            ? -spread / 2 + (index * spread) / (members.length - 1)
-            : 0;
-          const angle = center + offset + rotation * 0.12;
-          const radius = index % 2 ? 405 : 355;
-          positions.set(node.id, {
-            x: 500 + Math.cos(angle) * radius,
-            y: 260 + Math.sin(angle) * radius * 0.51,
-          });
-        });
+      let top = 25;
+      const reverse = Math.round(rotation / (Math.PI / 7)) % 2 === 1;
+      pivots.forEach((pivot) => {
+        const members = grouped.get(pivot.id);
+        if (reverse) members.reverse();
+        const height = Math.max(95, Math.ceil(members.length / 6) * 75 + 20);
+        positions.set(pivot.id, { x: 145, y: top + height / 2 });
+        members.forEach((node, index) => positions.set(node.id, {
+          x: 350 + (index % 6) * 115,
+          y: top + 30 + Math.floor(index / 6) * 75,
+        }));
+        top += height;
       });
-      indicators.filter((node) => !positions.has(node.id)).forEach((node, index) => {
-        const angle = rotation - Math.PI / 2 + (index * Math.PI * 2) / Math.max(indicators.length, 1);
-        positions.set(node.id, {
-          x: 500 + Math.cos(angle) * 390,
-          y: 260 + Math.sin(angle) * 200,
-        });
-      });
+      svg.setAttribute('viewBox', `0 0 1000 ${Math.max(260, top + 25)}`);
       return positions;
     };
 
@@ -3435,7 +3563,7 @@
       const degree = graph.edges.filter((edge) => edge.source === node.id || edge.target === node.id).length;
       const relatedNodes = graph.nodes.filter((candidate) => connected.has(candidate.id));
       setText(title, node.label);
-      setText(kind, node.kind === 'pivot' ? `${node.pivotKind} pivot` : node.row?.type || 'indicator');
+      setText(kind, node.kind === 'pivot' ? (node.pivotKind === 'source' ? `${node.role === 'aggregate' ? 'Aggregate' : node.role === 'unmapped' ? 'Unmapped feed' : 'Provider'} pivot` : 'Behavior tag') : node.row?.type || 'indicator');
       setText(connections, formatNumber(degree));
       setText(score, node.kind === 'indicator' ? String(node.score) : String(node.averageScore));
       setText(
@@ -3443,9 +3571,7 @@
         node.kind === 'indicator'
           ? formatNumber(node.sourceCount)
           : formatNumber(new Set(relatedNodes.flatMap((candidate) =>
-            candidate.row?.sourceList?.length
-              ? candidate.row.sourceList
-              : [candidate.row?.source].filter(Boolean)
+            dashboardCore.sourceProviders(candidate.row).filter((provider) => provider.role === 'reporting').map((provider) => provider.id)
           )).size)
       );
       setText(lastSeen, node.kind === 'indicator' ? node.row?.lastSeenDisplay || 'Unknown' : 'Multiple');
@@ -3454,7 +3580,13 @@
       if (description) {
         description.textContent = node.kind === 'pivot'
           ? `${formatNumber(node.totalCount)} indicators share this ${node.pivotKind}; ${formatNumber(node.count)} are visible in this graph. Their average risk score is ${node.averageScore}.`
-          : `${node.row?.confidence ? `${node.row.confidence} confidence · ` : ''}Reported by ${primarySourceLabel(node.row)}${node.row?.context ? ` · ${compactText(node.row.context)}` : ''}.`;
+          : `${node.row?.confidence ? `${node.row.confidence} confidence · ` : ''}Reported by ${node.providers.map((provider) => provider.label).join(', ') || 'unspecified sources'}${node.row?.context ? ` · ${compactText(node.row.context)}` : ''}.`;
+      }
+      const feedEvidence = qs('[data-campaign-feed-evidence]', root);
+      if (feedEvidence) {
+        const providers = node.kind === 'indicator' ? node.providers : node.pivotKind === 'source' ? [{ label: node.label, role: node.role, feeds: node.feeds }] : [];
+        feedEvidence.textContent = providers.map((provider) => `${provider.label}: ${provider.feeds.join(', ')}${provider.role === 'aggregate' ? ' — republished blocklists; not additional independent verification' : provider.role === 'context' ? ' — directory context, not a malicious-activity report' : provider.role === 'unmapped' ? ' — custom feed; publisher not mapped' : ''}`).join('\n');
+        feedEvidence.parentElement.hidden = !providers.length;
       }
       const tags = node.kind === 'indicator' && Array.isArray(node.row?.tags)
         ? node.row.tags.slice(0, 8)
@@ -3515,9 +3647,11 @@
       setText(visible, formatNumber(graph.stats.indicators));
       if (summary) {
         summary.textContent = hasGraph
-          ? `${formatNumber(graph.stats.relationships)} relationships across ${formatNumber(graph.stats.tagPivots)} tag and ${formatNumber(graph.stats.sourcePivots)} source pivots. Node size reflects corroboration; color reflects risk score.`
+          ? `${formatNumber(graph.stats.relationships)} relationships across ${formatNumber(graph.stats.tagPivots)} tag and ${formatNumber(graph.stats.sourcePivots)} reporting groups (${graph.stats.mappedProviders} mapped providers, ${graph.stats.aggregates} aggregates, ${graph.stats.unmappedFeeds} unmapped feeds; ${graph.stats.availableProviders} eligible groups in the sample). Node size reflects mapped provider coverage; color reflects the collector score. Aggregates and unmapped feeds do not increase provider coverage. Shared reporting does not prove independent verification.`
           : 'No repeated tags or sources were found in the current preview.';
       }
+      const evidenceBlock = qs('[data-campaign-feed-evidence]', root);
+      if (evidenceBlock) evidenceBlock.parentElement.hidden = true;
       if (title) title.textContent = 'Select a node';
       if (description) description.textContent = 'Choose a pivot to understand its reach, or choose an indicator to add it to your investigation queue.';
       if (meta) meta.hidden = true;
@@ -3575,31 +3709,28 @@
             class: 'campaign-corroboration-ring',
           }));
         }
-        const circle = createSvg('circle', {
-          r: node.kind === 'pivot'
-            ? Math.min(33, 20 + Math.sqrt(node.totalCount || 1) * 1.7)
-            : 11 + Math.min(Math.max(node.sourceCount - 1, 0), 4) * 0.8,
-          class: 'campaign-node-core',
-        });
+        const circle = node.kind === 'pivot'
+          ? createSvg('rect', { x: -120, y: -27, width: 240, height: 54, rx: 6, class: 'campaign-node-core' })
+          : createSvg('circle', { r: 14 + Math.min(Math.max(node.sourceCount - 1, 0), 4) * 0.8, class: 'campaign-node-core' });
         const label = createSvg('text', {
-          y: node.kind === 'pivot' ? 4 : 3,
+          y: node.kind === 'pivot' ? -3 : 3,
           'text-anchor': 'middle',
         });
         label.textContent = node.kind === 'pivot'
-          ? (node.label.length > 15 ? node.label.slice(0, 14) + '…' : node.label)
+          ? (node.label.length > 32 ? node.label.slice(0, 31) + '…' : node.label)
           : String(node.score);
         const subtitle = createSvg('text', {
-          y: node.kind === 'pivot' ? 44 : 28,
+          y: node.kind === 'pivot' ? 17 : 31,
           'text-anchor': 'middle',
           class: 'campaign-node-subtitle',
         });
         subtitle.textContent = node.kind === 'pivot'
           ? `${node.count}/${node.totalCount} IOCs`
-          : String(node.row?.type || 'IOC').toUpperCase().slice(0, 12);
+          : (node.label.length > 20 ? node.label.slice(0, 19) + '…' : node.label);
         const tooltip = createSvg('title');
         tooltip.textContent = node.kind === 'pivot'
           ? `${node.label} · ${node.totalCount} indicators · average score ${node.averageScore}`
-          : `${node.label} · ${node.row?.type || 'indicator'} · score ${node.score} · ${node.sourceCount} source${node.sourceCount === 1 ? '' : 's'}${node.row?.lastSeenDisplay ? ` · last seen ${node.row.lastSeenDisplay}` : ''}`;
+          : `${node.label} · ${node.row?.type || 'indicator'} · score ${node.score} · ${node.sourceCount} mapped provider${node.sourceCount === 1 ? '' : 's'}${node.row?.lastSeenDisplay ? ` · last seen ${node.row.lastSeenDisplay}` : ''}`;
         group.append(circle, label, subtitle, tooltip);
         group.addEventListener('click', () => selectNode(node));
         group.addEventListener('keydown', (event) => {
