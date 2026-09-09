@@ -267,6 +267,7 @@ def fetch_nvd_recent(url: str, ref_url: str, source: str, ws: datetime, *, api_k
                     "published_at": cve.get("published"), "modified_at": cve.get("lastModified"),
                     "status": cve.get("vulnStatus"), "severity": severity,
                     "description": description,
+                    "configurations": cve.get("configurations", []),
                 }},
             )
         )

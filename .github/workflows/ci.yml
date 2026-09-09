@@ -43,9 +43,11 @@ jobs:
         shell: bash
         run: |
           set -Eeuo pipefail
-          node --test public/assets/dashboard-core.test.js
+          node --test public/assets/dashboard-core.test.js public/assets/inventory-core.test.js
           node --check public/assets/dashboard-core.js
           node --check public/assets/dashboard.js
+          node --check public/assets/inventory.js
+          node --check public/assets/inventory-core.js
 
       - name: Set up Python
         uses: actions/setup-python@v6

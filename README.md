@@ -82,6 +82,37 @@ A routine poll timestamp does not create a new evidence alert. Rejected records 
 
 Watchlists and review state stay in this browser's local storage. There is no account sync or automatic notification service; blocked storage limits persistence to the current tab. Product matching uses available CISA vendor/product fields, so an NVD-only record without those fields cannot match a watch. Coverage is limited to the retained collection, not an asset inventory or a complete vulnerability assessment.
 
+## Local exposure report
+
+Open **Exposure report** in the CVE section, download the sample JSON, replace
+its example values, and import your inventory. Up to 200 assets and 500 KB are
+accepted. Inventory stays in memory in the current tab: it is not uploaded,
+saved to local storage, or shared with other users. Export the report before
+closing the tab if you need to retain it.
+
+Each asset needs a unique `id`, `vendor`, and `product`. Supply `version` for
+version checks, `exposure` (`internet`, `internal`, or `unknown`), and
+`importance` (`critical` or `standard`) for prioritization. These are your
+assertions, not scan results. Optional `cpe_vendor` and `cpe_product` must use
+explicit NVD CPE identifiers; `cpe_part` defaults to `a` (application), with
+`o` (operating system) and `h` (hardware) also supported. Display names are not
+automatically translated into CPE identities.
+
+The report distinguishes **version match**, **needs verification**, and
+**outside reported range**. Simple NVD applicability rules support exact
+versions and dotted-numeric inclusive/exclusive boundaries. Complex platform
+conditions, missing evidence, and unsupported version ordering remain uncertain.
+CISA-only product matches cannot confirm affected versions. Older snapshots
+without NVD configurations still support product-level review; a new collection
+run supplies applicability evidence when NVD provides it.
+
+Reports include provider evidence, matching reasons, remediation, the snapshot
+timestamp, and assets without a retained match. No match is not a safety verdict.
+The display paginates findings; exports include the whole calculated report,
+up to a disclosed 10,000-finding limit. Failed, future, or out-of-order snapshot
+refreshes disable the report until usable evidence returns. This first version
+is an on-demand assessment, not a scanner, SBOM parser, or change-alert service.
+
 ## Quick start
 
 Requires **Python 3.10+** and Git. Run these commands from a terminal.
@@ -307,7 +338,7 @@ ruff check .
 pyright
 python -m swiftioc --self-test
 pytest -q
-node --test public/assets/dashboard-core.test.js
+node --test public/assets/dashboard-core.test.js public/assets/inventory-core.test.js
 ```
 
 Python tests mock network calls. The frontend core suite checks data logic with Node.js. For browser regressions, install Playwright and serve the site:
@@ -324,6 +355,7 @@ In a second terminal:
 node scripts/test_vulnerability_ui.cjs
 node scripts/test_dashboard_layout.cjs
 node scripts/test_personal_briefing.cjs
+node scripts/test_inventory_ui.cjs
 ```
 
 These suites use synthetic fixtures to exercise filtering, refresh failures, mobile layout, personal briefing state, and provider graph behavior. Set `BASE_URL` for a different local server or `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` for an existing Chromium browser.

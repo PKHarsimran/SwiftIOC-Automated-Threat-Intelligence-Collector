@@ -3277,6 +3277,7 @@
       failed = false;
       items = [];
       snapshotTime = null;
+      window.dispatchEvent(new CustomEvent('swiftioc:vulnerability-snapshot', { detail: null }));
       page = 0;
       render();
       const controller = new AbortController();
@@ -3304,6 +3305,9 @@
       } finally {
         window.clearTimeout(timer);
         loading = false;
+        window.dispatchEvent(new CustomEvent('swiftioc:vulnerability-snapshot', {
+          detail: !failed && snapshotTime <= Date.now() / 1000 ? { items, generated_at: new Date(snapshotTime * 1000).toISOString() } : null,
+        }));
         render();
       }
     };

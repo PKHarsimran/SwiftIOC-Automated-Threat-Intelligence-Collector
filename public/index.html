@@ -46,7 +46,7 @@
       });
     </script>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/styles.css?v=20" />
+    <link rel="stylesheet" href="assets/styles.css?v=21" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -319,6 +319,20 @@
           </div>
           <a class="button ghost" href="collections/vulnerabilities.json" data-vulnerability-download>Collection JSON ↗</a>
         </div>
+        <details class="collection-notes inventory-desk" data-inventory-root>
+          <summary>Exposure report · match your software inventory</summary>
+          <p>Import up to 200 assets as JSON. Your inventory stays in this tab and is never uploaded or saved to browser storage. Explicit CPE mapping enables conservative version checks; product-only matches need verification.</p>
+          <div class="inventory-actions">
+            <label>Inventory JSON <input type="file" accept=".json,application/json" data-inventory-file /></label>
+            <button type="button" class="button ghost" data-inventory-sample>Download sample</button>
+            <button type="button" class="button ghost" data-inventory-export disabled>Export report</button>
+            <button type="button" class="button ghost" data-inventory-clear disabled>Clear inventory</button>
+          </div>
+          <p data-inventory-status role="status">Import an inventory to begin. No match does not mean safe.</p>
+          <p>Order: findings needing review first, known exploitation, internet exposure, then critical assets. Outside-range findings come last. Exposure and importance are supplied by you.</p>
+          <div data-inventory-results class="inventory-results"></div>
+          <button type="button" class="button ghost" data-inventory-more hidden>Show more findings</button>
+        </details>
         <details class="collection-notes briefing-settings" data-briefing-settings>
           <summary>Personal briefing · follow vendors &amp; products</summary>
           <p>Match exact CISA vendor and product fields. NVD-only records without these fields cannot be matched. Watches stay in this browser; a product match does not confirm your installed version is affected.</p>
@@ -1023,7 +1037,9 @@
     </div>
 
     <div class="toast" data-toast role="status" aria-live="polite" aria-atomic="true" hidden></div>
-    <script defer src="assets/dashboard-core.js?v=20"></script>
-    <script defer src="assets/dashboard.js?v=20"></script>
+    <script defer src="assets/dashboard-core.js?v=21"></script>
+    <script defer src="assets/inventory-core.js?v=21"></script>
+    <script defer src="assets/inventory.js?v=21"></script>
+    <script defer src="assets/dashboard.js?v=21"></script>
   </body>
 </html>
