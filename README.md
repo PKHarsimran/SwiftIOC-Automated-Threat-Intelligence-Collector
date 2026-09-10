@@ -219,6 +219,10 @@ For example, a high-confidence IP from two source identifiers starts at 88 and d
 
 The `high_confidence` feed includes records at or above the threshold (default 80) **or with at least two source identifiers**. Review provenance, age, and local context before using any feed for blocking. Use the observable collection when an integration must exclude CVE IDs.
 
+## Investigation queue SPL
+
+Adding observables to the investigation queue automatically builds a copyable Splunk hunt for those selected values. The query updates on removal and supports IPs/CIDRs, exact DNS domains, full URLs, and MD5/SHA-1/SHA-256. Unsupported entries are listed explicitly; an empty supported selection disables export. Replace `YOUR_INDEX` and map the documented event fields before use. Results retain all matching queued IOC identities. This is a bounded triage query; use the lookup-based Splunk library for full-feed matching. Validate execution in your own Splunk deployment.
+
 ## Feeds and integrations
 
 **[Splunk hunt library](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/splunk/)** — copy-ready SPL for source/destination IPs, exact DNS domains, SHA-256 hashes, and exact URLs, with lookup preparation and field-mapping instructions.
