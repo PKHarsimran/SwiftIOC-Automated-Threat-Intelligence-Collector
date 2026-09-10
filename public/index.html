@@ -46,7 +46,7 @@
       });
     </script>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/styles.css?v=25" />
+    <link rel="stylesheet" href="assets/styles.css?v=26" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -194,11 +194,22 @@
             </button>
           </div>
         </div>
+        <div class="investigation-workbench">
         <ul class="investigation-list" data-investigation-list aria-label="Queued indicators"></ul>
         <div class="investigation-spl" data-investigation-spl>
-          <h3>Hunt this queue in Splunk</h3>
+          <div class="hunt-heading"><div><p class="eyebrow">Live hunt builder</p><h3>Hunt this queue in Splunk</h3></div><span class="hunt-local">Settings stay in this tab</span></div>
+          <div class="hunt-toolbar">
+            <label>Splunk index<input data-spl-index value="YOUR_INDEX" maxlength="100" autocomplete="off" spellcheck="false" aria-describedby="hunt-settings-help" /></label>
+            <label>Time range<select data-spl-time><option value="-15m">Last 15 minutes</option><option value="-1h">Last hour</option><option value="-24h" selected>Last 24 hours</option><option value="-7d">Last 7 days</option><option value="-30d">Last 30 days</option></select></label>
+          </div>
+          <details class="hunt-mappings">
+            <summary>Map event fields</summary>
+            <p id="hunt-settings-help">Use extracted, single-valued event fields. Dotted names such as <code>source.ip</code> are supported. Query text updates as you type.</p>
+            <div class="hunt-field-grid"><label>Source IP<input data-spl-field="src_ip" value="src_ip" maxlength="100" autocomplete="off" spellcheck="false" /></label><label>Destination IP<input data-spl-field="dest_ip" value="dest_ip" maxlength="100" autocomplete="off" spellcheck="false" /></label><label>DNS question<input data-spl-field="query" value="query" maxlength="100" autocomplete="off" spellcheck="false" /></label><label>Full URL<input data-spl-field="url" value="url" maxlength="100" autocomplete="off" spellcheck="false" /></label><label>MD5<input data-spl-field="md5" value="md5" maxlength="100" autocomplete="off" spellcheck="false" /></label><label>SHA-1<input data-spl-field="sha1" value="sha1" maxlength="100" autocomplete="off" spellcheck="false" /></label><label>SHA-256<input data-spl-field="sha256" value="sha256" maxlength="100" autocomplete="off" spellcheck="false" /></label></div>
+            <button type="button" class="button ghost" data-spl-reset>Reset hunt settings</button>
+          </details>
           <p data-investigation-spl-status role="status"></p>
-          <p>Replace <code>YOUR_INDEX</code> and map these single-valued event fields: <code>src_ip</code>, <code>dest_ip</code>, DNS <code>query</code>, full <code>url</code>, <code>md5</code>, <code>sha1</code>, <code>sha256</code>. Each result lists every matching queued IOC.</p>
+          <p>Choose your index and map event fields before running. Each result lists every matching queued IOC.</p>
           <div class="investigation-actions">
             <button type="button" class="button ghost" data-investigation-spl-copy disabled>Copy selected-IOC SPL</button>
             <button type="button" class="button ghost" data-investigation-spl-download disabled>Download .spl</button>
@@ -206,6 +217,7 @@
           </div>
           <pre><code data-investigation-spl-code></code></pre>
           <p>IP/CIDR matching checks both endpoints. Domains match exact DNS names; URL paths and queries retain case and require exact event values. No match does not mean safe. Validate field mappings in Splunk before scheduling.</p>
+        </div>
         </div>
       </section>
 
@@ -1050,9 +1062,9 @@
     </div>
 
     <div class="toast" data-toast role="status" aria-live="polite" aria-atomic="true" hidden></div>
-    <script defer src="assets/dashboard-core.js?v=25"></script>
-    <script defer src="assets/inventory-core.js?v=25"></script>
-    <script defer src="assets/inventory.js?v=25"></script>
-    <script defer src="assets/dashboard.js?v=25"></script>
+    <script defer src="assets/dashboard-core.js?v=26"></script>
+    <script defer src="assets/inventory-core.js?v=26"></script>
+    <script defer src="assets/inventory.js?v=26"></script>
+    <script defer src="assets/dashboard.js?v=26"></script>
   </body>
 </html>

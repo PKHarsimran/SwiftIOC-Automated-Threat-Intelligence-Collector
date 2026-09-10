@@ -542,7 +542,7 @@ test('exploited and ransomware views require explicit evidence and never fall ba
 test('vulnerability release uses coordinated new asset cache keys', () => {
   const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
   for (const asset of ['styles.css', 'dashboard-core.js', 'dashboard.js']) {
-    assert.ok(html.includes(`assets/${asset}?v=25`));
+    assert.ok(html.includes(`assets/${asset}?v=26`));
   }
 });
 
@@ -698,9 +698,9 @@ test('selected-IOC SPL includes exact typed evidence and never emits an empty br
     { type: 'sha256', indicator: 'A'.repeat(64) }, { type: 'cve', indicator: 'CVE-2026-1234' },
   ]);
   assert.equal(hunt.included, 5); assert.equal(hunt.skipped.length, 1);
-  assert.ok(hunt.spl.includes('cidrmatch("1.2.3.4/32", src_ip) OR cidrmatch("1.2.3.4/32", dest_ip)'));
+  assert.ok(hunt.spl.includes(`cidrmatch("1.2.3.4/32", 'src_ip') OR cidrmatch("1.2.3.4/32", 'dest_ip')`));
   assert.ok(hunt.spl.includes('2001:db8::1/128'));
-  assert.ok(hunt.spl.includes('lower(rtrim(trim(query), "."))="example.test"'));
+  assert.ok(hunt.spl.includes(`lower(rtrim(trim('query'), "."))="example.test"`));
   assert.ok(hunt.spl.includes('| where mvcount(swiftioc_matches)>0'));
 });
 
@@ -708,8 +708,32 @@ test('selected URL SPL preserves case and escapes values as eval literals', () =
   const indicator = 'hxxps://example[.]test/Payload?q="x"|makeresults';
   const hunt = core.rowsToSpl([{ type: 'url', indicator }, { type: 'url', indicator: 'https://example.test/payload' }]);
   assert.equal(hunt.included, 2);
-  assert.ok(hunt.spl.includes('url=' + JSON.stringify(core.refang(indicator))));
+  assert.ok(hunt.spl.includes("'url'=" + JSON.stringify(core.refang(indicator))));
   assert.ok(!hunt.spl.includes('lower(url)'));
   assert.equal(core.rowsToSpl([{ type: 'url', indicator: 'https://x.test/\n|makeresults' }]).spl, '');
   assert.equal(core.rowsToSpl([{ type: 'ipv4', indicator: '999.1.1.1' }]).skipped.length, 1);
+});
+
+
+test('hunt settings scope searches and quote mapped event fields', () => {
+  const hunt = core.rowsToSpl([{ type: 'ipv4', indicator: '1.2.3.4' }], {
+    index: 'security-prod', earliest: '-1h', fields: { src_ip: 'source.ip', dest_ip: 'destination.ip' },
+  });
+  assert.ok(hunt.spl.startsWith('index=security-prod earliest=-1h latest=now'));
+  assert.ok(hunt.spl.includes(`cidrmatch("1.2.3.4/32", 'source.ip')`));
+  assert.ok(hunt.spl.includes('"source.ip" "destination.ip"'));
+  assert.ok(!hunt.spl.includes("'src_ip'"));
+});
+
+test('invalid settings cannot leave an executable or injected hunt', () => {
+  const rows = [{ type: 'ipv4', indicator: '1.2.3.4' }];
+  for (const options of [
+    { index: '' }, { index: '* OR index=*' }, { index: 'main|delete' },
+    { earliest: '-1h | delete' }, { fields: { src_ip: "x') OR true()" } },
+    { fields: { src_ip: '' } }, { fields: { src_ip: 'swiftioc_matches' } },
+    { fields: { query: 'wild*' } },
+  ]) {
+    const hunt = core.rowsToSpl(rows, options);
+    assert.equal(hunt.spl, ''); assert.ok(hunt.error);
+  }
 });
