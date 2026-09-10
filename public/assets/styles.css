@@ -3697,3 +3697,46 @@ input.lookup-input { border-radius: 0.3rem; background: var(--bg-color); }
     }
   }
 }
+
+/* Instrument-panel detail, confined to navigation and the graph. */
+.page-header { position: relative; isolation: isolate; overflow: hidden; padding-block: 1.5rem; border-block: 1px solid var(--border-control); }
+.page-header::before {
+  content: ''; position: absolute; z-index: -1; inset: 0 0 0 52%; pointer-events: none;
+  background-image: linear-gradient(rgb(167 196 124 / .12) 1px, transparent 1px), linear-gradient(90deg, rgb(167 196 124 / .12) 1px, transparent 1px);
+  background-size: 24px 24px;
+  mask-image: linear-gradient(90deg, transparent, #000);
+}
+.campaign-inspector { border-top: 2px solid var(--accent); }
+.campaign-node.is-selected .campaign-node-core { stroke: #dcf3b0; stroke-width: 3; }
+.campaign-node.is-connected .campaign-node-core { stroke: #c5d5af; }
+.hero-download { position: relative; overflow: hidden; }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes desk-grid-scan {
+    from { transform: translateX(-160%); opacity: 0; }
+    15%, 75% { opacity: .5; }
+    to { transform: translateX(280%); opacity: 0; }
+  }
+  @keyframes desk-link-trace { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
+  @keyframes desk-node-lock {
+    from { stroke-width: 5; stroke-opacity: .45; }
+    to { stroke-width: 3; stroke-opacity: 1; }
+  }
+  @keyframes desk-control-sheen {
+    from { transform: translateX(-180%) skewX(-20deg); }
+    to { transform: translateX(380%) skewX(-20deg); }
+  }
+  .page-header::after {
+    content: ''; position: absolute; z-index: -1; inset: 0 0 0 65%; pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgb(167 196 124 / .14), transparent);
+    animation: desk-grid-scan 2400ms ease-in-out 2 both;
+  }
+  .campaign-edge.is-connected { stroke-dasharray: 5 7; animation: desk-link-trace 1200ms linear 3; }
+  .campaign-node.is-selected .campaign-node-core { animation: desk-node-lock 320ms ease-out; }
+  .hero-download::after {
+    content: ''; position: absolute; inset: 0; width: 35%; pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgb(220 243 176 / .2), transparent);
+    transform: translateX(-180%) skewX(-20deg);
+  }
+  .hero-download:hover::after, .hero-download:focus-visible::after { animation: desk-control-sheen 600ms ease-out; }
+}
+@media (max-width: 640px) { .page-header::before { inset-inline-start: 72%; opacity: .5; } }
