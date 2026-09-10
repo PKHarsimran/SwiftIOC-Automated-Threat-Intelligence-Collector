@@ -542,7 +542,7 @@ test('exploited and ransomware views require explicit evidence and never fall ba
 test('vulnerability release uses coordinated new asset cache keys', () => {
   const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
   for (const asset of ['styles.css', 'dashboard-core.js', 'dashboard.js']) {
-    assert.ok(html.includes(`assets/${asset}?v=24`));
+    assert.ok(html.includes(`assets/${asset}?v=25`));
   }
 });
 
@@ -688,4 +688,28 @@ test('graph search keeps provider, feed, and tag matching literal', () => {
   assert.equal(core.graphNodeMatches(indicator, 'CINS ARMY'), true);
   assert.equal(core.graphNodeMatches(indicator, 'family[.]variant'), true);
   assert.equal(core.graphNodeMatches(indicator, 'family.variant'), false);
+});
+
+test('selected-IOC SPL includes exact typed evidence and never emits an empty broad hunt', () => {
+  assert.equal(core.rowsToSpl([]).spl, '');
+  const hunt = core.rowsToSpl([
+    { type: 'ipv4', indicator: '1[.]2[.]3[.]4' }, { type: 'ipv6', indicator: '2001:db8::1' },
+    { type: 'ipv4_cidr', indicator: '10.0.0.0/8' }, { type: 'domain', indicator: 'Example[.]TEST' },
+    { type: 'sha256', indicator: 'A'.repeat(64) }, { type: 'cve', indicator: 'CVE-2026-1234' },
+  ]);
+  assert.equal(hunt.included, 5); assert.equal(hunt.skipped.length, 1);
+  assert.ok(hunt.spl.includes('cidrmatch("1.2.3.4/32", src_ip) OR cidrmatch("1.2.3.4/32", dest_ip)'));
+  assert.ok(hunt.spl.includes('2001:db8::1/128'));
+  assert.ok(hunt.spl.includes('lower(rtrim(trim(query), "."))="example.test"'));
+  assert.ok(hunt.spl.includes('| where mvcount(swiftioc_matches)>0'));
+});
+
+test('selected URL SPL preserves case and escapes values as eval literals', () => {
+  const indicator = 'hxxps://example[.]test/Payload?q="x"|makeresults';
+  const hunt = core.rowsToSpl([{ type: 'url', indicator }, { type: 'url', indicator: 'https://example.test/payload' }]);
+  assert.equal(hunt.included, 2);
+  assert.ok(hunt.spl.includes('url=' + JSON.stringify(core.refang(indicator))));
+  assert.ok(!hunt.spl.includes('lower(url)'));
+  assert.equal(core.rowsToSpl([{ type: 'url', indicator: 'https://x.test/\n|makeresults' }]).spl, '');
+  assert.equal(core.rowsToSpl([{ type: 'ipv4', indicator: '999.1.1.1' }]).skipped.length, 1);
 });

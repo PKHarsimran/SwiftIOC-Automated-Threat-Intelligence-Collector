@@ -3698,6 +3698,11 @@ input.lookup-input { border-radius: 0.3rem; background: var(--bg-color); }
   }
 }
 
+.investigation-spl { margin-top: 1.25rem; border-top: 1px solid var(--border-control); padding-top: 1rem; min-width: 0; }
+.investigation-spl p { font-size: .8rem; overflow-wrap: anywhere; }
+.investigation-spl pre { max-width: 100%; max-height: 22rem; overflow: auto; padding: 1rem; background: var(--bg-color); border: 1px solid var(--border-control); border-radius: .3rem; font-size: .78rem; }
+@media (prefers-reduced-motion: no-preference) { .investigation-spl { animation: desk-detail-enter 180ms ease-out; } }
+
 /* Instrument-panel detail, confined to navigation and the graph. */
 .page-header { position: relative; isolation: isolate; overflow: hidden; padding-block: 1.5rem; border-block: 1px solid var(--border-control); }
 .page-header::before {

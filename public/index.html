@@ -46,7 +46,7 @@
       });
     </script>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/styles.css?v=24" />
+    <link rel="stylesheet" href="assets/styles.css?v=25" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -195,6 +195,18 @@
           </div>
         </div>
         <ul class="investigation-list" data-investigation-list aria-label="Queued indicators"></ul>
+        <div class="investigation-spl" data-investigation-spl>
+          <h3>Hunt this queue in Splunk</h3>
+          <p data-investigation-spl-status role="status"></p>
+          <p>Replace <code>YOUR_INDEX</code> and map these single-valued event fields: <code>src_ip</code>, <code>dest_ip</code>, DNS <code>query</code>, full <code>url</code>, <code>md5</code>, <code>sha1</code>, <code>sha256</code>. Each result lists every matching queued IOC.</p>
+          <div class="investigation-actions">
+            <button type="button" class="button ghost" data-investigation-spl-copy disabled>Copy selected-IOC SPL</button>
+            <button type="button" class="button ghost" data-investigation-spl-download disabled>Download .spl</button>
+            <a class="button ghost" href="splunk/">Splunk setup &amp; full-feed hunts</a>
+          </div>
+          <pre><code data-investigation-spl-code></code></pre>
+          <p>IP/CIDR matching checks both endpoints. Domains match exact DNS names; URL paths and queries retain case and require exact event values. No match does not mean safe. Validate field mappings in Splunk before scheduling.</p>
+        </div>
       </section>
 
       <section
@@ -1038,9 +1050,9 @@
     </div>
 
     <div class="toast" data-toast role="status" aria-live="polite" aria-atomic="true" hidden></div>
-    <script defer src="assets/dashboard-core.js?v=24"></script>
-    <script defer src="assets/inventory-core.js?v=24"></script>
-    <script defer src="assets/inventory.js?v=24"></script>
-    <script defer src="assets/dashboard.js?v=24"></script>
+    <script defer src="assets/dashboard-core.js?v=25"></script>
+    <script defer src="assets/inventory-core.js?v=25"></script>
+    <script defer src="assets/inventory.js?v=25"></script>
+    <script defer src="assets/dashboard.js?v=25"></script>
   </body>
 </html>
