@@ -1,1151 +1,1151 @@
 # Changelog
 
-## 2026-07-27T02:29:15Z
+## 2026-08-31T23:34:27Z
 
 Total indicators: **10000**
 
 ### By source
-- binarydefense_banlist: 771
-- blocklist_de_ssh: 4578
+- binarydefense_banlist: 1558
+- blocklist_de_ssh: 6910
 - ci_army_list: 15000
-- cisa_kev: 1653
+- cisa_kev: 1687
 - dshield_block: 20
-- et_compromised: 583
+- et_compromised: 532
 - feodo_ipblocklist: 5
-- greensnow_blocklist: 3414
-- ipsum_level5: 990
-- malwarebazaar_recent: 932
+- greensnow_blocklist: 4958
+- ipsum_level5: 2885
+- malwarebazaar_recent: 728
 - nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1664
+- openphish_feed: 297
+- spamhaus_drop: 1708
 - sslbl_ja3: 97
-- threatfox_export_json: 1883
-- tor_exit_nodes: 1381
-- urlhaus_recent_urls: 497
-
-## 2026-07-27T06:58:05Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 771
-- blocklist_de_ssh: 4580
-- ci_army_list: 15000
-- cisa_kev: 1653
-- dshield_block: 20
-- et_compromised: 583
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3505
-- ipsum_level5: 990
-- malwarebazaar_recent: 974
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1664
-- sslbl_ja3: 97
-- threatfox_export_json: 2806
-- tor_exit_nodes: 1378
-- urlhaus_recent_urls: 432
-
-## 2026-07-27T11:14:45Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 771
-- blocklist_de_ssh: 4594
-- ci_army_list: 15000
-- cisa_kev: 1653
-- dshield_block: 20
-- et_compromised: 583
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3028
-- ipsum_level5: 990
-- malwarebazaar_recent: 905
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1664
-- sslbl_ja3: 97
-- threatfox_export_json: 2860
-- tor_exit_nodes: 1380
-- urlhaus_recent_urls: 544
-
-## 2026-07-27T14:22:28Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 771
-- blocklist_de_ssh: 4660
-- ci_army_list: 15000
-- cisa_kev: 1653
-- dshield_block: 20
-- et_compromised: 583
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3133
-- ipsum_level5: 990
-- malwarebazaar_recent: 974
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1664
-- sslbl_ja3: 97
-- threatfox_export_json: 3142
-- tor_exit_nodes: 1386
-- urlhaus_recent_urls: 569
-
-## 2026-07-27T17:39:30Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 771
-- blocklist_de_ssh: 4715
-- ci_army_list: 15000
-- cisa_kev: 1654
-- dshield_block: 20
-- et_compromised: 583
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3149
-- ipsum_level5: 990
-- malwarebazaar_recent: 968
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1664
-- sslbl_ja3: 97
-- threatfox_export_json: 3058
-- tor_exit_nodes: 1386
-- urlhaus_recent_urls: 610
-
-## 2026-07-27T21:06:28Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 771
-- blocklist_de_ssh: 4775
-- ci_army_list: 15000
-- cisa_kev: 1655
-- dshield_block: 20
-- et_compromised: 589
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3206
-- ipsum_level5: 990
-- malwarebazaar_recent: 999
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1664
-- sslbl_ja3: 97
-- threatfox_export_json: 2862
-- tor_exit_nodes: 1383
-- urlhaus_recent_urls: 560
-
-## 2026-07-28T02:05:32Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 1106
-- blocklist_de_ssh: 4731
-- ci_army_list: 15000
-- cisa_kev: 1655
-- dshield_block: 20
-- et_compromised: 589
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3656
-- ipsum_level5: 1219
-- malwarebazaar_recent: 982
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1664
-- sslbl_ja3: 97
-- threatfox_export_json: 3012
-- tor_exit_nodes: 1388
-- urlhaus_recent_urls: 561
-
-## 2026-07-28T06:21:56Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 1106
-- blocklist_de_ssh: 4816
-- ci_army_list: 15000
-- cisa_kev: 1655
-- dshield_block: 20
-- et_compromised: 589
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3641
-- ipsum_level5: 1219
-- malwarebazaar_recent: 1015
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1664
-- sslbl_ja3: 97
-- threatfox_export_json: 3464
-- tor_exit_nodes: 1387
-- urlhaus_recent_urls: 593
-
-## 2026-07-28T10:30:56Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 1106
-- blocklist_de_ssh: 4837
-- ci_army_list: 15000
-- cisa_kev: 1655
-- dshield_block: 20
-- et_compromised: 589
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 2387
-- ipsum_level5: 1219
-- malwarebazaar_recent: 1148
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1666
-- sslbl_ja3: 97
-- threatfox_export_json: 3542
-- tor_exit_nodes: 1385
-- urlhaus_recent_urls: 589
-
-## 2026-07-28T13:54:07Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 1106
-- blocklist_de_ssh: 4851
-- ci_army_list: 15000
-- cisa_kev: 1655
-- dshield_block: 20
-- et_compromised: 589
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3185
-- ipsum_level5: 1219
-- malwarebazaar_recent: 1019
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1667
-- sslbl_ja3: 97
-- threatfox_export_json: 3293
-- tor_exit_nodes: 1384
-- urlhaus_recent_urls: 428
-
-## 2026-07-28T17:22:42Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 1106
-- blocklist_de_ssh: 4831
-- ci_army_list: 15000
-- cisa_kev: 1655
-- dshield_block: 20
-- et_compromised: 590
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3188
-- ipsum_level5: 1219
-- malwarebazaar_recent: 1083
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1667
-- sslbl_ja3: 97
-- threatfox_export_json: 2752
-- tor_exit_nodes: 1382
-- urlhaus_recent_urls: 441
-
-## 2026-07-28T21:02:49Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 1106
-- blocklist_de_ssh: 4784
-- ci_army_list: 15000
-- cisa_kev: 1655
-- dshield_block: 20
-- et_compromised: 590
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3077
-- ipsum_level5: 1219
-- malwarebazaar_recent: 1061
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1667
-- sslbl_ja3: 97
-- threatfox_export_json: 2153
-- tor_exit_nodes: 1380
-- urlhaus_recent_urls: 418
-
-## 2026-07-29T02:08:32Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 1410
-- blocklist_de_ssh: 4768
-- ci_army_list: 15000
-- cisa_kev: 1655
-- dshield_block: 20
-- et_compromised: 590
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3670
-- ipsum_level5: 1277
-- malwarebazaar_recent: 1020
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1667
-- sslbl_ja3: 97
-- threatfox_export_json: 2378
-- tor_exit_nodes: 1380
-- urlhaus_recent_urls: 472
-
-## 2026-07-29T06:30:18Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 1410
-- blocklist_de_ssh: 4786
-- ci_army_list: 15000
-- cisa_kev: 1655
-- dshield_block: 20
-- et_compromised: 590
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3648
-- ipsum_level5: 1277
-- malwarebazaar_recent: 944
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1667
-- sslbl_ja3: 97
-- threatfox_export_json: 2141
-- tor_exit_nodes: 1379
-- urlhaus_recent_urls: 481
-
-## 2026-07-29T10:34:47Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 1410
-- blocklist_de_ssh: 9567
-- ci_army_list: 15000
-- cisa_kev: 1655
-- dshield_block: 20
-- et_compromised: 590
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 2456
-- ipsum_level5: 1277
-- malwarebazaar_recent: 972
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1667
-- sslbl_ja3: 97
-- threatfox_export_json: 3236
-- tor_exit_nodes: 1376
-- urlhaus_recent_urls: 479
-
-## 2026-07-29T14:00:03Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 1410
-- blocklist_de_ssh: 9555
-- ci_army_list: 15000
-- cisa_kev: 1655
-- dshield_block: 20
-- et_compromised: 590
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3153
-- ipsum_level5: 1277
-- malwarebazaar_recent: 970
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1667
-- sslbl_ja3: 97
-- threatfox_export_json: 2866
-- tor_exit_nodes: 1374
-- urlhaus_recent_urls: 780
-
-## 2026-07-29T17:10:38Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 1410
-- blocklist_de_ssh: 9502
-- ci_army_list: 15000
-- cisa_kev: 1655
-- dshield_block: 20
-- et_compromised: 590
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3181
-- ipsum_level5: 1277
-- malwarebazaar_recent: 971
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1667
-- sslbl_ja3: 97
-- threatfox_export_json: 2774
-- tor_exit_nodes: 1373
-- urlhaus_recent_urls: 783
-
-## 2026-07-29T20:50:32Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 1410
-- blocklist_de_ssh: 9483
-- ci_army_list: 15000
-- cisa_kev: 1656
-- dshield_block: 20
-- et_compromised: 580
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3184
-- ipsum_level5: 1277
-- malwarebazaar_recent: 1018
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1667
-- sslbl_ja3: 97
-- threatfox_export_json: 2426
-- tor_exit_nodes: 1368
-- urlhaus_recent_urls: 602
-
-## 2026-07-30T01:57:40Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 1512
-- blocklist_de_ssh: 9455
-- ci_army_list: 15000
-- cisa_kev: 1656
-- dshield_block: 20
-- et_compromised: 580
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3675
-- ipsum_level5: 1275
-- malwarebazaar_recent: 1015
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1667
-- sslbl_ja3: 97
-- threatfox_export_json: 2484
-- tor_exit_nodes: 1375
-- urlhaus_recent_urls: 614
-
-## 2026-07-30T06:22:37Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 1512
-- blocklist_de_ssh: 9460
-- ci_army_list: 15000
-- cisa_kev: 1656
-- dshield_block: 20
-- et_compromised: 580
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3680
-- ipsum_level5: 1275
-- malwarebazaar_recent: 986
-- nist_nvd_recent: 172
-- openphish_feed: 300
-- spamhaus_drop: 1667
-- sslbl_ja3: 97
-- threatfox_export_json: 2472
-- tor_exit_nodes: 1376
-- urlhaus_recent_urls: 597
-
-## 2026-07-30T10:21:03Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 1512
-- blocklist_de_ssh: 9419
-- ci_army_list: 15000
-- cisa_kev: 1656
-- dshield_block: 20
-- et_compromised: 580
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 2393
-- ipsum_level5: 1275
-- malwarebazaar_recent: 857
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1667
-- sslbl_ja3: 97
-- threatfox_export_json: 3177
-- tor_exit_nodes: 1376
-- urlhaus_recent_urls: 564
-
-## 2026-07-30T13:47:32Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 1512
-- blocklist_de_ssh: 9378
-- ci_army_list: 15000
-- cisa_kev: 1656
-- dshield_block: 20
-- et_compromised: 580
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3218
-- ipsum_level5: 1275
-- malwarebazaar_recent: 827
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1667
-- sslbl_ja3: 97
-- threatfox_export_json: 3292
-- tor_exit_nodes: 1375
-- urlhaus_recent_urls: 672
-
-## 2026-07-30T17:20:55Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 1512
-- blocklist_de_ssh: 9396
-- ci_army_list: 15000
-- cisa_kev: 1656
-- dshield_block: 20
-- et_compromised: 580
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3196
-- ipsum_level5: 1275
-- malwarebazaar_recent: 802
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1667
-- sslbl_ja3: 97
-- threatfox_export_json: 3170
-- tor_exit_nodes: 1375
-- urlhaus_recent_urls: 598
-
-## 2026-07-30T21:02:38Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 1512
-- blocklist_de_ssh: 9349
-- ci_army_list: 15000
-- cisa_kev: 1656
-- dshield_block: 20
-- et_compromised: 586
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3185
-- ipsum_level5: 1275
-- malwarebazaar_recent: 831
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1667
-- sslbl_ja3: 97
-- threatfox_export_json: 3214
-- tor_exit_nodes: 1373
-- urlhaus_recent_urls: 541
-
-## 2026-07-31T02:22:05Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 1758
-- blocklist_de_ssh: 9388
-- ci_army_list: 15000
-- cisa_kev: 1656
-- dshield_block: 20
-- et_compromised: 586
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3760
-- ipsum_level5: 1780
-- malwarebazaar_recent: 847
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1667
-- sslbl_ja3: 97
-- threatfox_export_json: 2988
-- tor_exit_nodes: 1371
-- urlhaus_recent_urls: 514
-
-## 2026-07-31T06:39:46Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 1758
-- blocklist_de_ssh: 6936
-- ci_army_list: 15000
-- cisa_kev: 1656
-- dshield_block: 20
-- et_compromised: 586
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3665
-- ipsum_level5: 1780
-- malwarebazaar_recent: 812
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1666
-- sslbl_ja3: 97
-- threatfox_export_json: 2643
-- tor_exit_nodes: 1365
-- urlhaus_recent_urls: 540
-
-## 2026-07-31T10:33:43Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 1758
-- blocklist_de_ssh: 4506
-- ci_army_list: 15000
-- cisa_kev: 1656
-- dshield_block: 20
-- et_compromised: 586
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 2416
-- ipsum_level5: 1780
-- malwarebazaar_recent: 788
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1666
-- sslbl_ja3: 97
-- threatfox_export_json: 2670
-- tor_exit_nodes: 1365
-- urlhaus_recent_urls: 532
-
-## 2026-07-31T13:52:27Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 1758
-- blocklist_de_ssh: 4478
-- ci_army_list: 15000
-- cisa_kev: 1656
-- dshield_block: 20
-- et_compromised: 586
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3093
-- ipsum_level5: 1780
-- malwarebazaar_recent: 731
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1666
-- sslbl_ja3: 97
-- threatfox_export_json: 2860
-- tor_exit_nodes: 1365
-- urlhaus_recent_urls: 544
-
-## 2026-07-31T17:25:01Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 1758
-- blocklist_de_ssh: 4448
-- ci_army_list: 15000
-- cisa_kev: 1656
-- dshield_block: 20
-- et_compromised: 586
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3130
-- ipsum_level5: 1780
-- malwarebazaar_recent: 711
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1666
-- sslbl_ja3: 97
-- threatfox_export_json: 2835
-- tor_exit_nodes: 1363
-- urlhaus_recent_urls: 514
-
-## 2026-07-31T20:59:21Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 1758
-- blocklist_de_ssh: 4352
-- ci_army_list: 15000
-- cisa_kev: 1656
-- dshield_block: 20
-- et_compromised: 586
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3131
-- ipsum_level5: 1780
-- malwarebazaar_recent: 664
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1666
-- sslbl_ja3: 97
-- threatfox_export_json: 2764
-- tor_exit_nodes: 1369
-- urlhaus_recent_urls: 423
-
-## 2026-08-01T02:23:10Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 2030
-- blocklist_de_ssh: 4436
-- ci_army_list: 15000
-- cisa_kev: 1656
-- dshield_block: 20
-- et_compromised: 586
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3642
-- ipsum_level5: 2078
-- malwarebazaar_recent: 710
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1666
-- sslbl_ja3: 97
-- threatfox_export_json: 2584
-- tor_exit_nodes: 1374
-- urlhaus_recent_urls: 402
-
-## 2026-08-01T06:23:58Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 2030
-- blocklist_de_ssh: 4450
-- ci_army_list: 15000
-- cisa_kev: 1656
-- dshield_block: 20
-- et_compromised: 586
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3642
-- ipsum_level5: 2078
-- malwarebazaar_recent: 723
-- nist_nvd_recent: 197
-- openphish_feed: 300
-- spamhaus_drop: 1666
-- sslbl_ja3: 97
-- threatfox_export_json: 2559
-- tor_exit_nodes: 1388
+- threatfox_export_json: 843
+- tor_exit_nodes: 1429
 - urlhaus_recent_urls: 416
 
-## 2026-08-01T09:53:45Z
+## 2026-09-01T03:15:40Z
 
 Total indicators: **10000**
 
 ### By source
-- binarydefense_banlist: 2030
-- blocklist_de_ssh: 4463
+- binarydefense_banlist: 1852
+- blocklist_de_ssh: 6895
 - ci_army_list: 15000
-- cisa_kev: 1656
+- cisa_kev: 1687
 - dshield_block: 20
-- et_compromised: 586
+- et_compromised: 532
 - feodo_ipblocklist: 5
-- greensnow_blocklist: 3620
-- ipsum_level5: 2078
+- greensnow_blocklist: 5033
+- ipsum_level5: 1591
 - malwarebazaar_recent: 702
 - nist_nvd_recent: 200
 - openphish_feed: 300
-- spamhaus_drop: 1665
+- spamhaus_drop: 1708
 - sslbl_ja3: 97
-- threatfox_export_json: 1917
-- tor_exit_nodes: 1386
-- urlhaus_recent_urls: 369
+- threatfox_export_json: 962
+- tor_exit_nodes: 1419
+- urlhaus_recent_urls: 420
 
-## 2026-08-01T13:07:50Z
+## 2026-09-01T09:06:02Z
 
 Total indicators: **10000**
 
 ### By source
-- binarydefense_banlist: 2030
-- blocklist_de_ssh: 4468
+- binarydefense_banlist: 1852
+- blocklist_de_ssh: 12456
 - ci_army_list: 15000
-- cisa_kev: 1656
+- cisa_kev: 1687
 - dshield_block: 20
-- et_compromised: 586
+- et_compromised: 532
 - feodo_ipblocklist: 5
-- greensnow_blocklist: 3037
-- ipsum_level5: 2078
-- malwarebazaar_recent: 679
+- greensnow_blocklist: 5156
+- ipsum_level5: 1591
+- malwarebazaar_recent: 710
 - nist_nvd_recent: 200
 - openphish_feed: 300
-- spamhaus_drop: 1665
+- spamhaus_drop: 1708
 - sslbl_ja3: 97
-- threatfox_export_json: 1782
-- tor_exit_nodes: 1386
-- urlhaus_recent_urls: 450
-
-## 2026-08-01T16:54:41Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 2030
-- blocklist_de_ssh: 4414
-- ci_army_list: 15000
-- cisa_kev: 1656
-- dshield_block: 20
-- et_compromised: 586
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3046
-- ipsum_level5: 2078
-- malwarebazaar_recent: 638
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1665
-- sslbl_ja3: 97
-- threatfox_export_json: 1974
-- tor_exit_nodes: 1386
-- urlhaus_recent_urls: 422
-
-## 2026-08-01T20:43:48Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 2030
-- blocklist_de_ssh: 4387
-- ci_army_list: 15000
-- cisa_kev: 1656
-- dshield_block: 20
-- et_compromised: 586
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 2959
-- ipsum_level5: 2078
-- malwarebazaar_recent: 604
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1665
-- sslbl_ja3: 97
-- threatfox_export_json: 1928
-- tor_exit_nodes: 1385
-- urlhaus_recent_urls: 374
-
-## 2026-08-02T02:18:38Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 448
-- blocklist_de_ssh: 4406
-- ci_army_list: 15000
-- cisa_kev: 1656
-- dshield_block: 20
-- et_compromised: 586
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3453
-- ipsum_level5: 1732
-- malwarebazaar_recent: 615
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1665
-- sslbl_ja3: 97
-- threatfox_export_json: 1933
-- tor_exit_nodes: 1407
-- urlhaus_recent_urls: 337
-
-## 2026-08-02T06:28:51Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 448
-- blocklist_de_ssh: 4423
-- ci_army_list: 15000
-- cisa_kev: 1656
-- dshield_block: 20
-- et_compromised: 586
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3433
-- ipsum_level5: 1732
-- malwarebazaar_recent: 590
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1665
-- sslbl_ja3: 97
-- threatfox_export_json: 1906
-- tor_exit_nodes: 1407
-- urlhaus_recent_urls: 335
-
-## 2026-08-02T09:51:45Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 448
-- blocklist_de_ssh: 4441
-- ci_army_list: 15000
-- cisa_kev: 1656
-- dshield_block: 20
-- et_compromised: 586
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3374
-- ipsum_level5: 1732
-- malwarebazaar_recent: 617
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1665
-- sslbl_ja3: 97
-- threatfox_export_json: 1201
-- tor_exit_nodes: 1407
-- urlhaus_recent_urls: 289
-
-## 2026-08-02T13:09:44Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 448
-- blocklist_de_ssh: 4451
-- ci_army_list: 15000
-- cisa_kev: 1656
-- dshield_block: 20
-- et_compromised: 586
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 2769
-- ipsum_level5: 1732
-- malwarebazaar_recent: 557
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1665
-- sslbl_ja3: 97
-- threatfox_export_json: 997
-- tor_exit_nodes: 1405
-- urlhaus_recent_urls: 402
-
-## 2026-08-02T16:53:32Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 448
-- blocklist_de_ssh: 4441
-- ci_army_list: 15000
-- cisa_kev: 1656
-- dshield_block: 20
-- et_compromised: 586
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 2762
-- ipsum_level5: 1732
-- malwarebazaar_recent: 563
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1665
-- sslbl_ja3: 97
-- threatfox_export_json: 1168
-- tor_exit_nodes: 1406
+- threatfox_export_json: 1006
+- tor_exit_nodes: 1419
 - urlhaus_recent_urls: 414
 
-## 2026-08-02T20:48:40Z
+## 2026-09-01T15:58:28Z
 
 Total indicators: **10000**
 
 ### By source
-- binarydefense_banlist: 448
-- blocklist_de_ssh: 4425
+- binarydefense_banlist: 1852
+- blocklist_de_ssh: 13234
 - ci_army_list: 15000
-- cisa_kev: 1656
+- cisa_kev: 1687
 - dshield_block: 20
-- et_compromised: 586
+- et_compromised: 532
 - feodo_ipblocklist: 5
-- greensnow_blocklist: 2696
-- ipsum_level5: 1732
-- malwarebazaar_recent: 513
+- greensnow_blocklist: 4440
+- ipsum_level5: 1591
+- malwarebazaar_recent: 700
 - nist_nvd_recent: 200
 - openphish_feed: 300
-- spamhaus_drop: 1665
+- spamhaus_drop: 1708
 - sslbl_ja3: 97
-- threatfox_export_json: 1146
-- tor_exit_nodes: 1405
-- urlhaus_recent_urls: 349
+- threatfox_export_json: 1092
+- tor_exit_nodes: 1416
+- urlhaus_recent_urls: 480
 
-## 2026-08-03T02:22:42Z
+## 2026-09-01T19:16:50Z
 
 Total indicators: **10000**
 
 ### By source
-- binarydefense_banlist: 825
-- blocklist_de_ssh: 4404
+- binarydefense_banlist: 1852
+- blocklist_de_ssh: 13305
 - ci_army_list: 15000
-- cisa_kev: 1656
+- cisa_kev: 1687
 - dshield_block: 20
-- et_compromised: 586
+- et_compromised: 532
 - feodo_ipblocklist: 5
-- greensnow_blocklist: 3207
-- ipsum_level5: 1622
-- malwarebazaar_recent: 462
+- greensnow_blocklist: 4540
+- ipsum_level5: 1591
+- malwarebazaar_recent: 710
 - nist_nvd_recent: 200
 - openphish_feed: 300
-- spamhaus_drop: 1665
+- spamhaus_drop: 1710
 - sslbl_ja3: 97
-- threatfox_export_json: 1057
-- tor_exit_nodes: 1403
-- urlhaus_recent_urls: 377
+- threatfox_export_json: 1083
+- tor_exit_nodes: 1417
+- urlhaus_recent_urls: 595
 
-## 2026-08-03T06:55:12Z
+## 2026-09-01T22:19:33Z
 
 Total indicators: **10000**
 
 ### By source
-- binarydefense_banlist: 825
-- blocklist_de_ssh: 4400
+- binarydefense_banlist: 1852
+- blocklist_de_ssh: 13343
 - ci_army_list: 15000
-- cisa_kev: 1656
+- cisa_kev: 1687
 - dshield_block: 20
-- et_compromised: 586
+- et_compromised: 533
 - feodo_ipblocklist: 5
-- greensnow_blocklist: 3287
-- ipsum_level5: 1622
-- malwarebazaar_recent: 497
+- greensnow_blocklist: 4515
+- ipsum_level5: 1591
+- malwarebazaar_recent: 682
 - nist_nvd_recent: 200
 - openphish_feed: 300
-- spamhaus_drop: 1665
+- spamhaus_drop: 1710
 - sslbl_ja3: 97
-- threatfox_export_json: 1049
-- tor_exit_nodes: 1396
-- urlhaus_recent_urls: 366
+- threatfox_export_json: 1087
+- tor_exit_nodes: 1423
+- urlhaus_recent_urls: 555
 
-## 2026-08-03T11:17:19Z
+## 2026-09-02T02:32:52Z
 
 Total indicators: **10000**
 
 ### By source
-- binarydefense_banlist: 825
-- blocklist_de_ssh: 4353
+- binarydefense_banlist: 250
+- blocklist_de_ssh: 13076
 - ci_army_list: 15000
-- cisa_kev: 1656
+- cisa_kev: 1687
 - dshield_block: 20
-- et_compromised: 586
+- et_compromised: 533
 - feodo_ipblocklist: 5
-- greensnow_blocklist: 2775
-- ipsum_level5: 1622
-- malwarebazaar_recent: 2393
+- greensnow_blocklist: 5298
+- ipsum_level5: 2738
+- malwarebazaar_recent: 681
 - nist_nvd_recent: 200
 - openphish_feed: 300
-- spamhaus_drop: 1665
+- spamhaus_drop: 1710
 - sslbl_ja3: 97
-- threatfox_export_json: 1149
-- tor_exit_nodes: 1398
-- urlhaus_recent_urls: 703
+- threatfox_export_json: 1195
+- tor_exit_nodes: 1420
+- urlhaus_recent_urls: 560
 
-## 2026-08-03T14:30:15Z
+## 2026-09-02T08:19:31Z
 
 Total indicators: **10000**
 
 ### By source
-- binarydefense_banlist: 825
-- blocklist_de_ssh: 4338
+- binarydefense_banlist: 250
+- blocklist_de_ssh: 11796
 - ci_army_list: 15000
-- cisa_kev: 1656
+- cisa_kev: 1687
 - dshield_block: 20
-- et_compromised: 586
+- et_compromised: 533
 - feodo_ipblocklist: 5
-- greensnow_blocklist: 2874
-- ipsum_level5: 1622
-- malwarebazaar_recent: 5339
+- greensnow_blocklist: 5293
+- ipsum_level5: 2738
+- malwarebazaar_recent: 680
 - nist_nvd_recent: 200
 - openphish_feed: 300
-- spamhaus_drop: 1665
+- spamhaus_drop: 1710
 - sslbl_ja3: 97
-- threatfox_export_json: 1171
-- tor_exit_nodes: 1398
-- urlhaus_recent_urls: 440
+- threatfox_export_json: 1339
+- tor_exit_nodes: 1419
+- urlhaus_recent_urls: 527
 
-## 2026-08-03T17:46:23Z
+## 2026-09-02T15:51:24Z
 
 Total indicators: **10000**
 
 ### By source
-- binarydefense_banlist: 825
-- blocklist_de_ssh: 4348
+- binarydefense_banlist: 250
+- blocklist_de_ssh: 11713
 - ci_army_list: 15000
-- cisa_kev: 1656
+- cisa_kev: 1687
 - dshield_block: 20
-- et_compromised: 586
+- et_compromised: 533
 - feodo_ipblocklist: 5
-- greensnow_blocklist: 2912
-- ipsum_level5: 1622
-- malwarebazaar_recent: 577
+- greensnow_blocklist: 4469
+- ipsum_level5: 2738
+- malwarebazaar_recent: 651
 - nist_nvd_recent: 200
 - openphish_feed: 300
-- spamhaus_drop: 1665
+- spamhaus_drop: 1710
 - sslbl_ja3: 97
-- threatfox_export_json: 993
+- threatfox_export_json: 1301
+- tor_exit_nodes: 1419
+- urlhaus_recent_urls: 588
+
+## 2026-09-02T19:10:03Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 250
+- blocklist_de_ssh: 11632
+- ci_army_list: 15000
+- cisa_kev: 1694
+- dshield_block: 20
+- et_compromised: 533
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 4477
+- ipsum_level5: 2738
+- malwarebazaar_recent: 731
+- nist_nvd_recent: 200
+- openphish_feed: 300
+- spamhaus_drop: 1707
+- sslbl_ja3: 97
+- threatfox_export_json: 1274
+- tor_exit_nodes: 1413
+- urlhaus_recent_urls: 805
+
+## 2026-09-02T22:16:51Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 250
+- blocklist_de_ssh: 11617
+- ci_army_list: 15000
+- cisa_kev: 1694
+- dshield_block: 20
+- et_compromised: 538
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 4474
+- ipsum_level5: 2738
+- malwarebazaar_recent: 777
+- nist_nvd_recent: 200
+- openphish_feed: 300
+- spamhaus_drop: 1707
+- sslbl_ja3: 97
+- threatfox_export_json: 1253
+- tor_exit_nodes: 1413
+- urlhaus_recent_urls: 751
+
+## 2026-09-03T02:40:28Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 715
+- blocklist_de_ssh: 11627
+- ci_army_list: 15000
+- cisa_kev: 1694
+- dshield_block: 20
+- et_compromised: 538
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 5254
+- ipsum_level5: 3111
+- malwarebazaar_recent: 798
+- nist_nvd_recent: 200
+- openphish_feed: 300
+- spamhaus_drop: 1707
+- sslbl_ja3: 97
+- threatfox_export_json: 1076
+- tor_exit_nodes: 1413
+- urlhaus_recent_urls: 761
+
+## 2026-09-03T08:30:12Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 715
+- blocklist_de_ssh: 11580
+- ci_army_list: 15000
+- cisa_kev: 1694
+- dshield_block: 20
+- et_compromised: 538
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 5266
+- ipsum_level5: 3111
+- malwarebazaar_recent: 763
+- nist_nvd_recent: 200
+- openphish_feed: 300
+- spamhaus_drop: 1707
+- sslbl_ja3: 97
+- threatfox_export_json: 1323
+- tor_exit_nodes: 1397
+- urlhaus_recent_urls: 725
+
+## 2026-09-03T15:40:56Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 715
+- blocklist_de_ssh: 11456
+- ci_army_list: 15000
+- cisa_kev: 1694
+- dshield_block: 20
+- et_compromised: 538
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 4463
+- ipsum_level5: 3111
+- malwarebazaar_recent: 760
+- nist_nvd_recent: 200
+- openphish_feed: 300
+- spamhaus_drop: 1710
+- sslbl_ja3: 97
+- threatfox_export_json: 1326
+- tor_exit_nodes: 1402
+- urlhaus_recent_urls: 736
+
+## 2026-09-03T19:02:43Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 715
+- blocklist_de_ssh: 11304
+- ci_army_list: 15000
+- cisa_kev: 1694
+- dshield_block: 20
+- et_compromised: 538
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 4552
+- ipsum_level5: 3111
+- malwarebazaar_recent: 699
+- nist_nvd_recent: 200
+- openphish_feed: 300
+- spamhaus_drop: 1710
+- sslbl_ja3: 97
+- threatfox_export_json: 1322
 - tor_exit_nodes: 1400
-- urlhaus_recent_urls: 427
+- urlhaus_recent_urls: 573
 
-## 2026-08-03T20:58:54Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 825
-- blocklist_de_ssh: 4371
-- ci_army_list: 15000
-- cisa_kev: 1657
-- dshield_block: 20
-- et_compromised: 559
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 2931
-- ipsum_level5: 1622
-- malwarebazaar_recent: 595
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1665
-- sslbl_ja3: 97
-- threatfox_export_json: 996
-- tor_exit_nodes: 1398
-- urlhaus_recent_urls: 400
-
-## 2026-08-04T02:04:26Z
+## 2026-09-03T22:10:31Z
 
 Total indicators: **10000**
 
 ### By source
-- binarydefense_banlist: 1198
-- blocklist_de_ssh: 4650
+- binarydefense_banlist: 715
+- blocklist_de_ssh: 11291
 - ci_army_list: 15000
-- cisa_kev: 1657
+- cisa_kev: 1694
 - dshield_block: 20
-- et_compromised: 559
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 3385
-- ipsum_level5: 1772
-- malwarebazaar_recent: 558
-- nist_nvd_recent: 200
-- openphish_feed: 300
-- spamhaus_drop: 1665
-- sslbl_ja3: 97
-- threatfox_export_json: 903
-- tor_exit_nodes: 1398
-- urlhaus_recent_urls: 412
-
-## 2026-08-04T06:24:21Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 1198
-- blocklist_de_ssh: 4638
-- ci_army_list: 15000
-- cisa_kev: 1657
-- dshield_block: 20
-- et_compromised: 559
+- et_compromised: 544
 - feodo_ipblocklist: 5
 - greensnow_blocklist: 0
-- ipsum_level5: 1772
-- malwarebazaar_recent: 655
+- ipsum_level5: 3111
+- malwarebazaar_recent: 691
 - nist_nvd_recent: 200
 - openphish_feed: 300
-- spamhaus_drop: 1665
+- spamhaus_drop: 1710
 - sslbl_ja3: 97
-- threatfox_export_json: 948
+- threatfox_export_json: 1351
+- tor_exit_nodes: 1400
+- urlhaus_recent_urls: 514
+
+## 2026-09-04T02:36:42Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 1038
+- blocklist_de_ssh: 11254
+- ci_army_list: 15000
+- cisa_kev: 1694
+- dshield_block: 20
+- et_compromised: 544
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 5269
+- ipsum_level5: 2667
+- malwarebazaar_recent: 692
+- nist_nvd_recent: 200
+- openphish_feed: 300
+- spamhaus_drop: 1710
+- sslbl_ja3: 97
+- threatfox_export_json: 1311
 - tor_exit_nodes: 1396
-- urlhaus_recent_urls: 482
+- urlhaus_recent_urls: 548
+
+## 2026-09-04T08:25:09Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 1038
+- blocklist_de_ssh: 11213
+- ci_army_list: 15000
+- cisa_kev: 1694
+- dshield_block: 20
+- et_compromised: 544
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 5295
+- ipsum_level5: 2667
+- malwarebazaar_recent: 701
+- nist_nvd_recent: 200
+- openphish_feed: 300
+- spamhaus_drop: 1710
+- sslbl_ja3: 97
+- threatfox_export_json: 1170
+- tor_exit_nodes: 1393
+- urlhaus_recent_urls: 557
+
+## 2026-09-04T15:39:18Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 1038
+- blocklist_de_ssh: 11099
+- ci_army_list: 15000
+- cisa_kev: 1694
+- dshield_block: 20
+- et_compromised: 544
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 4499
+- ipsum_level5: 2667
+- malwarebazaar_recent: 754
+- nist_nvd_recent: 200
+- openphish_feed: 300
+- spamhaus_drop: 1709
+- sslbl_ja3: 97
+- threatfox_export_json: 1127
+- tor_exit_nodes: 1341
+- urlhaus_recent_urls: 632
+
+## 2026-09-04T18:46:10Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 1038
+- blocklist_de_ssh: 11081
+- ci_army_list: 15000
+- cisa_kev: 1695
+- dshield_block: 20
+- et_compromised: 564
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 4529
+- ipsum_level5: 2667
+- malwarebazaar_recent: 605
+- nist_nvd_recent: 200
+- openphish_feed: 300
+- spamhaus_drop: 1709
+- sslbl_ja3: 97
+- threatfox_export_json: 928
+- tor_exit_nodes: 1340
+- urlhaus_recent_urls: 422
+
+## 2026-09-04T22:02:20Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 1038
+- blocklist_de_ssh: 11116
+- ci_army_list: 15000
+- cisa_kev: 1695
+- dshield_block: 20
+- et_compromised: 564
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 4472
+- ipsum_level5: 2667
+- malwarebazaar_recent: 763
+- nist_nvd_recent: 200
+- openphish_feed: 300
+- spamhaus_drop: 1709
+- sslbl_ja3: 97
+- threatfox_export_json: 908
+- tor_exit_nodes: 1339
+- urlhaus_recent_urls: 378
+
+## 2026-09-05T02:37:01Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 1325
+- blocklist_de_ssh: 11094
+- ci_army_list: 15000
+- cisa_kev: 1695
+- dshield_block: 20
+- et_compromised: 564
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 5295
+- ipsum_level5: 3353
+- malwarebazaar_recent: 745
+- nist_nvd_recent: 200
+- openphish_feed: 300
+- spamhaus_drop: 1709
+- sslbl_ja3: 97
+- threatfox_export_json: 922
+- tor_exit_nodes: 1339
+- urlhaus_recent_urls: 364
+
+## 2026-09-05T07:59:41Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 1325
+- blocklist_de_ssh: 11062
+- ci_army_list: 15000
+- cisa_kev: 1695
+- dshield_block: 20
+- et_compromised: 564
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 5309
+- ipsum_level5: 3353
+- malwarebazaar_recent: 749
+- nist_nvd_recent: 200
+- openphish_feed: 300
+- spamhaus_drop: 1709
+- sslbl_ja3: 97
+- threatfox_export_json: 856
+- tor_exit_nodes: 1339
+- urlhaus_recent_urls: 379
+
+## 2026-09-05T11:46:36Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 1325
+- blocklist_de_ssh: 11244
+- ci_army_list: 15000
+- cisa_kev: 1695
+- dshield_block: 20
+- et_compromised: 564
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 4296
+- ipsum_level5: 3353
+- malwarebazaar_recent: 741
+- nist_nvd_recent: 200
+- openphish_feed: 300
+- spamhaus_drop: 1709
+- sslbl_ja3: 97
+- threatfox_export_json: 909
+- tor_exit_nodes: 1341
+- urlhaus_recent_urls: 420
+
+## 2026-09-05T14:26:24Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 1325
+- blocklist_de_ssh: 11306
+- ci_army_list: 15000
+- cisa_kev: 1695
+- dshield_block: 20
+- et_compromised: 564
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 4390
+- ipsum_level5: 3353
+- malwarebazaar_recent: 733
+- nist_nvd_recent: 200
+- openphish_feed: 300
+- spamhaus_drop: 1709
+- sslbl_ja3: 97
+- threatfox_export_json: 914
+- tor_exit_nodes: 1341
+- urlhaus_recent_urls: 391
+
+## 2026-09-05T17:52:29Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 1325
+- blocklist_de_ssh: 11289
+- ci_army_list: 15000
+- cisa_kev: 1695
+- dshield_block: 20
+- et_compromised: 564
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 4412
+- ipsum_level5: 3353
+- malwarebazaar_recent: 737
+- nist_nvd_recent: 200
+- openphish_feed: 300
+- spamhaus_drop: 1709
+- sslbl_ja3: 97
+- threatfox_export_json: 910
+- tor_exit_nodes: 1342
+- urlhaus_recent_urls: 356
+
+## 2026-09-05T21:51:10Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 1325
+- blocklist_de_ssh: 11373
+- ci_army_list: 15000
+- cisa_kev: 1695
+- dshield_block: 20
+- et_compromised: 564
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 4415
+- ipsum_level5: 3353
+- malwarebazaar_recent: 718
+- nist_nvd_recent: 200
+- openphish_feed: 300
+- spamhaus_drop: 1709
+- sslbl_ja3: 97
+- threatfox_export_json: 1052
+- tor_exit_nodes: 1340
+- urlhaus_recent_urls: 290
+
+## 2026-09-06T02:34:28Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 1617
+- blocklist_de_ssh: 11359
+- ci_army_list: 15000
+- cisa_kev: 1695
+- dshield_block: 20
+- et_compromised: 564
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 5142
+- ipsum_level5: 3210
+- malwarebazaar_recent: 730
+- nist_nvd_recent: 200
+- openphish_feed: 300
+- spamhaus_drop: 1709
+- sslbl_ja3: 97
+- threatfox_export_json: 1113
+- tor_exit_nodes: 1340
+- urlhaus_recent_urls: 269
+
+## 2026-09-06T08:18:04Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 1617
+- blocklist_de_ssh: 5381
+- ci_army_list: 15000
+- cisa_kev: 1695
+- dshield_block: 20
+- et_compromised: 564
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 5077
+- ipsum_level5: 3210
+- malwarebazaar_recent: 703
+- nist_nvd_recent: 200
+- openphish_feed: 300
+- spamhaus_drop: 1709
+- sslbl_ja3: 97
+- threatfox_export_json: 1217
+- tor_exit_nodes: 1339
+- urlhaus_recent_urls: 274
+
+## 2026-09-06T14:48:28Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 1617
+- blocklist_de_ssh: 5514
+- ci_army_list: 15000
+- cisa_kev: 1695
+- dshield_block: 20
+- et_compromised: 564
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 4153
+- ipsum_level5: 3365
+- malwarebazaar_recent: 616
+- nist_nvd_recent: 200
+- openphish_feed: 300
+- spamhaus_drop: 1709
+- sslbl_ja3: 97
+- threatfox_export_json: 1242
+- tor_exit_nodes: 1340
+- urlhaus_recent_urls: 208
+
+## 2026-09-06T17:57:49Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 1617
+- blocklist_de_ssh: 5514
+- ci_army_list: 15000
+- cisa_kev: 1695
+- dshield_block: 20
+- et_compromised: 564
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 4123
+- ipsum_level5: 3365
+- malwarebazaar_recent: 610
+- nist_nvd_recent: 200
+- openphish_feed: 300
+- spamhaus_drop: 1709
+- sslbl_ja3: 97
+- threatfox_export_json: 1897
+- tor_exit_nodes: 1340
+- urlhaus_recent_urls: 241
+
+## 2026-09-06T21:54:28Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 1617
+- blocklist_de_ssh: 5640
+- ci_army_list: 15000
+- cisa_kev: 1695
+- dshield_block: 20
+- et_compromised: 564
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 4134
+- ipsum_level5: 3365
+- malwarebazaar_recent: 560
+- nist_nvd_recent: 200
+- openphish_feed: 300
+- spamhaus_drop: 1709
+- sslbl_ja3: 97
+- threatfox_export_json: 1917
+- tor_exit_nodes: 1340
+- urlhaus_recent_urls: 310
+
+## 2026-09-07T02:31:53Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 1877
+- blocklist_de_ssh: 5617
+- ci_army_list: 15000
+- cisa_kev: 1695
+- dshield_block: 20
+- et_compromised: 564
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 4982
+- ipsum_level5: 3200
+- malwarebazaar_recent: 564
+- nist_nvd_recent: 200
+- openphish_feed: 300
+- spamhaus_drop: 1709
+- sslbl_ja3: 97
+- threatfox_export_json: 1953
+- tor_exit_nodes: 1340
+- urlhaus_recent_urls: 296
+
+## 2026-09-07T08:51:15Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 1877
+- blocklist_de_ssh: 5621
+- ci_army_list: 15000
+- cisa_kev: 1695
+- dshield_block: 20
+- et_compromised: 580
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 5069
+- ipsum_level5: 3200
+- malwarebazaar_recent: 671
+- nist_nvd_recent: 200
+- openphish_feed: 300
+- spamhaus_drop: 1709
+- sslbl_ja3: 97
+- threatfox_export_json: 2293
+- tor_exit_nodes: 1340
+- urlhaus_recent_urls: 359
+
+## 2026-09-07T17:06:52Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 1877
+- blocklist_de_ssh: 5758
+- ci_army_list: 15000
+- cisa_kev: 1695
+- dshield_block: 20
+- et_compromised: 580
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 4349
+- ipsum_level5: 3200
+- malwarebazaar_recent: 666
+- nist_nvd_recent: 606
+- openphish_feed: 300
+- spamhaus_drop: 1708
+- sslbl_ja3: 97
+- threatfox_export_json: 2301
+- tor_exit_nodes: 1341
+- urlhaus_recent_urls: 401
+
+## 2026-09-07T22:28:25Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 1877
+- blocklist_de_ssh: 5626
+- ci_army_list: 15000
+- cisa_kev: 1695
+- dshield_block: 20
+- et_compromised: 580
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 4384
+- ipsum_level5: 3200
+- malwarebazaar_recent: 825
+- nist_nvd_recent: 637
+- openphish_feed: 300
+- spamhaus_drop: 1708
+- sslbl_ja3: 97
+- threatfox_export_json: 2211
+- tor_exit_nodes: 1341
+- urlhaus_recent_urls: 505
+
+## 2026-09-08T02:45:11Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 2145
+- blocklist_de_ssh: 5574
+- ci_army_list: 15000
+- cisa_kev: 1695
+- dshield_block: 20
+- et_compromised: 580
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 5052
+- ipsum_level5: 3666
+- malwarebazaar_recent: 881
+- nist_nvd_recent: 692
+- openphish_feed: 300
+- spamhaus_drop: 1709
+- sslbl_ja3: 97
+- threatfox_export_json: 2113
+- tor_exit_nodes: 1340
+- urlhaus_recent_urls: 518
+
+## 2026-09-08T08:31:45Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 2145
+- blocklist_de_ssh: 5525
+- ci_army_list: 15000
+- cisa_kev: 1695
+- dshield_block: 20
+- et_compromised: 580
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 5143
+- ipsum_level5: 3666
+- malwarebazaar_recent: 870
+- nist_nvd_recent: 713
+- openphish_feed: 300
+- spamhaus_drop: 1709
+- sslbl_ja3: 97
+- threatfox_export_json: 3279
+- tor_exit_nodes: 1343
+- urlhaus_recent_urls: 420
+
+## 2026-09-08T14:01:10Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 2145
+- blocklist_de_ssh: 5548
+- ci_army_list: 15000
+- cisa_kev: 1695
+- dshield_block: 20
+- et_compromised: 580
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 4250
+- ipsum_level5: 3666
+- malwarebazaar_recent: 900
+- nist_nvd_recent: 860
+- openphish_feed: 300
+- spamhaus_drop: 1707
+- sslbl_ja3: 97
+- threatfox_export_json: 3281
+- tor_exit_nodes: 1344
+- urlhaus_recent_urls: 525
+
+## 2026-09-08T15:53:18Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 2145
+- blocklist_de_ssh: 5558
+- ci_army_list: 15000
+- cisa_kev: 1695
+- dshield_block: 20
+- et_compromised: 580
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 4277
+- ipsum_level5: 3666
+- malwarebazaar_recent: 883
+- nist_nvd_recent: 1161
+- openphish_feed: 300
+- spamhaus_drop: 1707
+- sslbl_ja3: 97
+- threatfox_export_json: 3259
+- tor_exit_nodes: 1344
+- urlhaus_recent_urls: 483
+
+## 2026-09-08T17:51:59Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 2145
+- blocklist_de_ssh: 5431
+- ci_army_list: 15000
+- cisa_kev: 1695
+- dshield_block: 20
+- et_compromised: 580
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 4354
+- ipsum_level5: 3666
+- malwarebazaar_recent: 415
+- nist_nvd_recent: 1046
+- openphish_feed: 300
+- spamhaus_drop: 1707
+- sslbl_ja3: 97
+- threatfox_export_json: 1721
+- tor_exit_nodes: 1347
+- urlhaus_recent_urls: 527
+
+## 2026-09-08T19:13:02Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 2145
+- blocklist_de_ssh: 5413
+- ci_army_list: 15000
+- cisa_kev: 1699
+- dshield_block: 20
+- et_compromised: 580
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 4339
+- ipsum_level5: 3666
+- malwarebazaar_recent: 854
+- nist_nvd_recent: 2370
+- openphish_feed: 300
+- spamhaus_drop: 1707
+- sslbl_ja3: 97
+- threatfox_export_json: 2560
+- tor_exit_nodes: 1346
+- urlhaus_recent_urls: 350
+
+## 2026-09-08T22:18:56Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 2145
+- blocklist_de_ssh: 5414
+- ci_army_list: 15000
+- cisa_kev: 1699
+- dshield_block: 20
+- et_compromised: 573
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 4311
+- ipsum_level5: 3666
+- malwarebazaar_recent: 826
+- nist_nvd_recent: 3400
+- openphish_feed: 300
+- spamhaus_drop: 1707
+- sslbl_ja3: 97
+- threatfox_export_json: 2558
+- tor_exit_nodes: 1339
+- urlhaus_recent_urls: 337
+
+## 2026-09-09T02:45:58Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 2428
+- blocklist_de_ssh: 5393
+- ci_army_list: 15000
+- cisa_kev: 1699
+- dshield_block: 20
+- et_compromised: 573
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 5142
+- ipsum_level5: 3325
+- malwarebazaar_recent: 846
+- nist_nvd_recent: 3200
+- openphish_feed: 300
+- spamhaus_drop: 1707
+- sslbl_ja3: 97
+- threatfox_export_json: 2570
+- tor_exit_nodes: 1341
+- urlhaus_recent_urls: 335
+
+## 2026-09-09T08:36:35Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 2428
+- blocklist_de_ssh: 5395
+- ci_army_list: 15000
+- cisa_kev: 1699
+- dshield_block: 20
+- et_compromised: 573
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 5153
+- ipsum_level5: 3325
+- malwarebazaar_recent: 752
+- nist_nvd_recent: 4108
+- openphish_feed: 300
+- spamhaus_drop: 1707
+- sslbl_ja3: 97
+- threatfox_export_json: 2478
+- tor_exit_nodes: 1341
+- urlhaus_recent_urls: 318
+
+## 2026-09-09T11:27:26Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 2428
+- blocklist_de_ssh: 5345
+- ci_army_list: 15000
+- cisa_kev: 1699
+- dshield_block: 20
+- et_compromised: 573
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 4202
+- ipsum_level5: 3325
+- malwarebazaar_recent: 777
+- nist_nvd_recent: 3400
+- openphish_feed: 300
+- spamhaus_drop: 1708
+- sslbl_ja3: 97
+- threatfox_export_json: 2487
+- tor_exit_nodes: 1340
+- urlhaus_recent_urls: 371
+
+## 2026-09-09T15:48:41Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 2428
+- blocklist_de_ssh: 5315
+- ci_army_list: 15000
+- cisa_kev: 1699
+- dshield_block: 20
+- et_compromised: 573
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 4393
+- ipsum_level5: 3325
+- malwarebazaar_recent: 846
+- nist_nvd_recent: 2800
+- openphish_feed: 300
+- spamhaus_drop: 1708
+- sslbl_ja3: 97
+- threatfox_export_json: 2526
+- tor_exit_nodes: 1340
+- urlhaus_recent_urls: 428
+
+## 2026-09-09T18:08:47Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 2428
+- blocklist_de_ssh: 5192
+- ci_army_list: 15000
+- cisa_kev: 1699
+- dshield_block: 20
+- et_compromised: 573
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 4412
+- ipsum_level5: 3325
+- malwarebazaar_recent: 849
+- nist_nvd_recent: 3600
+- openphish_feed: 300
+- spamhaus_drop: 1709
+- sslbl_ja3: 97
+- threatfox_export_json: 2527
+- tor_exit_nodes: 1341
+- urlhaus_recent_urls: 370
+
+## 2026-09-09T19:03:45Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 2428
+- blocklist_de_ssh: 5190
+- ci_army_list: 15000
+- cisa_kev: 1699
+- dshield_block: 20
+- et_compromised: 573
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 4435
+- ipsum_level5: 3325
+- malwarebazaar_recent: 926
+- nist_nvd_recent: 4494
+- openphish_feed: 300
+- spamhaus_drop: 1709
+- sslbl_ja3: 97
+- threatfox_export_json: 2505
+- tor_exit_nodes: 1341
+- urlhaus_recent_urls: 397
+
+## 2026-09-09T22:11:27Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 2428
+- blocklist_de_ssh: 5140
+- ci_army_list: 15000
+- cisa_kev: 1703
+- dshield_block: 20
+- et_compromised: 570
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 4473
+- ipsum_level5: 3325
+- malwarebazaar_recent: 792
+- nist_nvd_recent: 2400
+- openphish_feed: 300
+- spamhaus_drop: 1709
+- sslbl_ja3: 97
+- threatfox_export_json: 2713
+- tor_exit_nodes: 1337
+- urlhaus_recent_urls: 349

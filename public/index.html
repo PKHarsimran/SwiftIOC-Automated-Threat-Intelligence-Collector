@@ -9,7 +9,7 @@
       content="Free, open-source threat intelligence feed of the latest malicious IPs, domains, URLs, and file hashes — scored, cross-source corroborated, and refreshed automatically. Download CSV, JSON, JSONL, or STIX 2.1."
     />
     <meta name="keywords" content="threat intelligence feed, malicious IP list, IOC feed, indicators of compromise, C2 IP blocklist, open source threat intel, STIX feed, free IOC download" />
-    <meta name="theme-color" content="#0f172a" />
+    <meta name="theme-color" content="#191c19" />
     <link rel="canonical" href="https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="SwiftIOC — Free Live IOC Feed" />
@@ -46,7 +46,7 @@
       });
     </script>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/styles.css?v=8" />
+    <link rel="stylesheet" href="assets/styles.css?v=25" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -90,12 +90,11 @@
           <span class="brand-tagline">Threat Intelligence</span>
         </a>
         <div class="nav-links">
-          <a href="#ioc-lookup">Check an IOC</a>
-          <a href="#live-preview">Browse feed</a>
-          <a href="#sources">Sources</a>
-          <a href="#indicator-types">Types</a>
-          <a href="#tags">Tags</a>
-          <a href="diagnostics/summary.html">Run diagnostics</a>
+          <a href="#ioc-lookup">Lookup</a>
+          <a href="#vulnerabilities">CVEs</a>
+          <a href="#live-preview">IOC feed</a>
+          <a href="#discovery">Discover</a>
+          <a href="#exports">Downloads</a>
         </div>
       </nav>
 
@@ -103,11 +102,11 @@
       <header class="page-header">
         <div class="page-header-main">
           <div>
-            <p class="eyebrow">Open-source · refreshed every four hours</p>
-            <h1 class="section-title">Threat intelligence you can act on</h1>
+            <p class="eyebrow">Independent feeds. Open-source intelligence.</p>
+            <h1 class="section-title">The threat intelligence desk.</h1>
             <p class="page-header-subtitle">
-              Search, investigate, and export scored indicators from independent
-              threat feeds. Freshness and corroboration are built into every score.
+              Look up an indicator, review exploited vulnerabilities, or follow the evidence.
+              Collected every four hours, with sources attached.
             </p>
           </div>
           <a
@@ -118,8 +117,8 @@
             data-fallback-caption="CSV · current snapshot"
             download
           >
-            <span>Download block-ready feed</span>
-            <small>High-confidence CSV</small>
+            <span>Download high-confidence CSV</span>
+            <small>Current snapshot ↗</small>
           </a>
         </div>
       </header>
@@ -127,7 +126,6 @@
       <section id="ioc-lookup" class="ioc-lookup" aria-labelledby="ioc-lookup-heading">
         <div class="lookup-heading">
           <div>
-            <p class="eyebrow">Instant IOC lookup</p>
             <h2 id="ioc-lookup-heading">Check an indicator</h2>
           </div>
           <p id="ioc-lookup-help">Raw and defanged IPs, domains, URLs, hashes, and CVEs are supported.</p>
@@ -157,6 +155,58 @@
           aria-atomic="true"
           hidden
         ></div>
+      </section>
+
+      <section
+        id="investigation-workspace"
+        class="investigation-workspace"
+        data-investigation-root
+        aria-labelledby="investigation-heading"
+        hidden
+      >
+        <div class="investigation-heading">
+          <div>
+            <p class="eyebrow">Private analyst workspace</p>
+            <h2 id="investigation-heading">
+              Investigation queue
+              <span class="investigation-count" data-investigation-count>0</span>
+            </h2>
+            <p>Shortlist indicators while you triage. This queue stays in this browser.</p>
+          </div>
+          <div class="investigation-actions">
+            <button type="button" class="button ghost" data-investigation-copy>
+              Copy indicators
+            </button>
+            <button type="button" class="button ghost" data-investigation-csv>
+              Export CSV
+            </button>
+            <button type="button" class="button ghost" data-investigation-json>
+              Export JSON
+            </button>
+            <button type="button" class="button ghost detection-export" data-investigation-sigma>
+              Build Sigma
+            </button>
+            <button type="button" class="button ghost detection-export" data-investigation-suricata>
+              Build Suricata
+            </button>
+            <button type="button" class="button ghost danger" data-investigation-clear>
+              Clear queue
+            </button>
+          </div>
+        </div>
+        <ul class="investigation-list" data-investigation-list aria-label="Queued indicators"></ul>
+        <div class="investigation-spl" data-investigation-spl>
+          <h3>Hunt this queue in Splunk</h3>
+          <p data-investigation-spl-status role="status"></p>
+          <p>Replace <code>YOUR_INDEX</code> and map these single-valued event fields: <code>src_ip</code>, <code>dest_ip</code>, DNS <code>query</code>, full <code>url</code>, <code>md5</code>, <code>sha1</code>, <code>sha256</code>. Each result lists every matching queued IOC.</p>
+          <div class="investigation-actions">
+            <button type="button" class="button ghost" data-investigation-spl-copy disabled>Copy selected-IOC SPL</button>
+            <button type="button" class="button ghost" data-investigation-spl-download disabled>Download .spl</button>
+            <a class="button ghost" href="splunk/">Splunk setup &amp; full-feed hunts</a>
+          </div>
+          <pre><code data-investigation-spl-code></code></pre>
+          <p>IP/CIDR matching checks both endpoints. Domains match exact DNS names; URL paths and queries retain case and require exact event values. No match does not mean safe. Validate field mappings in Splunk before scheduling.</p>
+        </div>
       </section>
 
       <section
@@ -237,6 +287,8 @@
         </article>
       </section>
 
+      <details class="tool-disclosure collection-overview" data-tool-disclosure>
+        <summary><span><strong>Collection overview</strong><small>Score distribution and changes since the previous run</small></span><span class="disclosure-symbol" aria-hidden="true">+</span></summary>
       <section
         class="score-distribution"
         data-score-distribution
@@ -250,6 +302,234 @@
         <div class="score-bar" data-score-bar role="img"
           aria-label="Proportion of indicators by score band"></div>
       </section>
+
+      <section class="delta-strip" data-delta-root hidden aria-labelledby="delta-heading">
+        <div class="delta-copy">
+          <p class="eyebrow">SOC Delta · since the previous collection</p>
+          <h2 id="delta-heading">What changed</h2>
+          <p>Poll the small event stream for additions, material updates, and removals from the published feed.</p>
+        </div>
+        <dl class="delta-counts">
+          <div><dt>Added</dt><dd data-stat="delta-added">0</dd></div>
+          <div><dt>Updated</dt><dd data-stat="delta-updated">0</dd></div>
+          <div><dt>Removed</dt><dd data-stat="delta-removed">0</dd></div>
+        </dl>
+        <div class="delta-actions">
+          <a class="button-link primary" href="iocs/delta.json" download>Delta JSON</a>
+          <a class="button-link" href="iocs/delta.jsonl" download>Event stream</a>
+        </div>
+      </section>
+
+      </details>
+
+      <section class="discovery-desk vulnerability-desk" id="vulnerabilities" aria-labelledby="vulnerability-heading" data-vulnerability-root>
+        <div class="discovery-heading">
+          <div>
+            <p class="eyebrow">01 / Vulnerabilities</p>
+            <h2 id="vulnerability-heading">Vulnerabilities to watch</h2>
+            <p>Known exploitation first, newest KEV additions at the top. Each CVE keeps its own evidence.</p>
+          </div>
+          <a class="button ghost" href="collections/vulnerabilities.json" data-vulnerability-download>Collection JSON ↗</a>
+        </div>
+        <details class="collection-notes inventory-desk" data-inventory-root>
+          <summary>Exposure report · match your software inventory</summary>
+          <p>Import up to 200 assets as JSON. Your inventory stays in this tab and is never uploaded or saved to browser storage. Explicit CPE mapping enables conservative version checks; product-only matches need verification.</p>
+          <div class="inventory-actions">
+            <label>Inventory JSON <input type="file" accept=".json,application/json" data-inventory-file /></label>
+            <button type="button" class="button ghost" data-inventory-sample>Download sample</button>
+            <button type="button" class="button ghost" data-inventory-export disabled>Export report</button>
+            <button type="button" class="button ghost" data-inventory-clear disabled>Clear inventory</button>
+          </div>
+          <p data-inventory-status role="status">Import an inventory to begin. No match does not mean safe.</p>
+          <p>Order: findings needing review first, known exploitation, internet exposure, then critical assets. Outside-range findings come last. Exposure and importance are supplied by you.</p>
+          <div data-inventory-results class="inventory-results"></div>
+          <button type="button" class="button ghost" data-inventory-more hidden>Show more findings</button>
+        </details>
+        <details class="collection-notes briefing-settings" data-briefing-settings>
+          <summary>Personal briefing · follow vendors &amp; products</summary>
+          <p>Match exact CISA vendor and product fields. NVD-only records without these fields cannot be matched. Watches stay in this browser; a product match does not confirm your installed version is affected.</p>
+          <form class="briefing-form" data-briefing-form>
+            <label>Vendor<input data-briefing-vendor list="briefing-vendors" maxlength="100" required placeholder="e.g. Microsoft" autocomplete="off" /></label>
+            <label>Product (optional)<input data-briefing-product list="briefing-products" maxlength="160" placeholder="All products from this vendor" autocomplete="off" /></label>
+            <button class="button primary" type="submit">Follow</button>
+          </form>
+          <datalist id="briefing-vendors" data-briefing-vendors></datalist>
+          <datalist id="briefing-products" data-briefing-products></datalist>
+          <ul class="briefing-watches" data-briefing-watches></ul>
+          <button class="button ghost" type="button" data-briefing-clear>Clear watches &amp; review history</button>
+        </details>
+        <p class="briefing-note" data-briefing-note role="status"></p>
+        <div class="discovery-lenses vulnerability-views" role="group" aria-label="Vulnerability view">
+          <button type="button" data-vulnerability-view="briefing" aria-pressed="false">My briefing</button>
+          <button type="button" data-vulnerability-view="exploited" aria-pressed="true">Known exploited</button>
+          <button type="button" data-vulnerability-view="priority" aria-pressed="false">All CVEs · prioritized</button>
+          <select data-vulnerability-extra-view aria-label="Additional vulnerability views"><option value="">More views…</option><option value="ransomware">Ransomware evidence</option><option value="kev30">Added to KEV · 30 days</option><option value="published7">Published · 7 days</option><option value="updated7">Updated · 7 days</option></select>
+        </div>
+        <p class="discovery-scope" data-vulnerability-view-help>Confirmed KEV records only, newest catalog additions first. An empty result means this collection has no matching KEV evidence; other CVEs are available in All CVEs.</p>
+        <div class="vulnerability-toolbar">
+          <label>Find a vulnerability
+            <input type="search" data-vulnerability-search placeholder="CVE, vendor, product, or description" autocomplete="off" />
+          </label>
+          <label>Exploitation evidence
+            <select data-vulnerability-status-filter>
+              <option value="all">All vulnerabilities</option>
+              <option value="known_exploited">CISA KEV · known exploited</option>
+              <option value="reported_exploitation">Reported · without structured KEV evidence</option>
+              <option value="not_established">Not established by this feed</option>
+            </select>
+          </label>
+          <button type="button" class="button ghost" data-vulnerability-refresh>Refresh collection</button>
+        </div>
+        <div class="briefing-tools" data-briefing-tools hidden>
+          <label>Review status<select data-briefing-triage><option value="all">All watched</option><option value="new">New evidence</option><option value="investigating">Investigating</option><option value="reviewed">Reviewed</option><option value="unreviewed">Not reviewed</option></select></label>
+          <button type="button" class="button ghost" data-briefing-export disabled>Export personal briefing</button>
+        </div>
+        <label class="vulnerability-rejected-control"><input type="checkbox" data-vulnerability-include-rejected /> Include NVD rejected records</label>
+        <p class="vulnerability-freshness" data-vulnerability-freshness role="status" hidden></p>
+        <p class="discovery-status" data-vulnerability-status role="status">Loading the vulnerability collection…</p>
+        <div class="discovery-cards vulnerability-cards" data-vulnerability-cards></div>
+        <div class="vulnerability-pagination">
+          <button type="button" class="button ghost" data-vulnerability-prev disabled>Previous</button>
+          <span data-vulnerability-page>Page 0 of 0</span>
+          <button type="button" class="button ghost" data-vulnerability-next disabled>Next</button>
+        </div>
+        <p class="discovery-scope">KEV records known exploitation; it does not confirm an attack is happening now.</p>
+        <details class="collection-notes">
+          <summary>Coverage, evidence &amp; integration notes</summary>
+        <p class="discovery-scope">This collection covers the retained feed, not the complete KEV or NVD catalogs. Source windows, outages, and retention affect coverage. KEV membership records known exploitation; it does not date an attack or confirm one is happening now. Severity alone does not establish exploitation. These filters are independent of the IOC preview.</p>
+        <p class="discovery-scope">Building an IOC integration? <a href="collections/observables.jsonl" data-observables-download>Download the observable-only collection</a>. Existing combined exports remain available.</p>
+        </details>
+      </section>
+
+      <section class="discovery-desk" id="discovery" aria-labelledby="discovery-heading" data-discovery-root>
+        <div class="discovery-heading">
+          <div>
+            <p class="eyebrow">02 / Discovery</p>
+            <h2 id="discovery-heading">Follow the evidence</h2>
+            <p>Follow the evidence behind the score. Explore corroboration, recent sightings, and uncommon tags in the loaded preview.</p>
+          </div>
+          <a class="button ghost" href="#live-preview">Refine the sample ↓</a>
+        </div>
+        <div class="discovery-toolbar">
+          <div class="discovery-lenses" role="group" aria-label="Discovery lens">
+            <button type="button" data-discovery-mode="corroborated" aria-pressed="true">Cross-source</button>
+            <button type="button" data-discovery-mode="recent" aria-pressed="false">Recent sightings</button>
+            <button type="button" data-discovery-mode="uncommon" aria-pressed="false">Uncommon tags</button>
+          </div>
+          <button type="button" class="button ghost" data-discovery-export disabled>Export evidence brief</button>
+        </div>
+        <p class="discovery-status" data-discovery-status role="status">Loading the discovery sample…</p>
+        <div class="discovery-cards" data-discovery-cards></div>
+        <p class="discovery-empty" data-discovery-empty hidden>No leads match this lens. Try another lens or broaden the preview filters below.</p>
+        <p class="discovery-scope">Observables from the compact preview, not the complete feed. CVEs are listed in the vulnerability collection above. Preview filters apply here. Nothing is uploaded when you explore or export.</p>
+      </section>
+
+      <details class="tool-disclosure" data-tool-disclosure>
+        <summary><span><strong>Relationship graph</strong><small>Explore shared tags and reporting sources</small></span><span class="disclosure-symbol" aria-hidden="true">+</span></summary>
+        <section
+        id="campaign-graph"
+        class="panel campaign-graph-section"
+        data-campaign-root
+        aria-labelledby="campaign-graph-heading"
+        hidden
+      >
+        <div class="panel-header campaign-graph-header">
+          <div>
+            <p class="eyebrow">Reporting map · provider coverage</p>
+            <h2 id="campaign-graph-heading" class="panel-title">Reporting &amp; relationship graph</h2>
+            <p class="panel-subtitle">
+              Compare reporting providers and shared behavior tags in the filtered sample. Known adapter aliases are grouped; raw feed names remain in the evidence panel. Shared reporting does not establish a campaign or independent verification. On small screens, scroll the diagram sideways to inspect each indicator.
+            </p>
+          </div>
+          <div class="campaign-controls" aria-label="Campaign graph controls">
+            <div class="campaign-control-field">
+              <label for="campaign-mode">Connect through</label>
+              <select id="campaign-mode" data-campaign-mode>
+                <option value="all">Providers + tags</option>
+                <option value="tags">Behavior tags</option>
+                <option value="sources" selected>Reporting providers</option>
+              </select>
+            </div>
+            <div class="campaign-control-field">
+              <label for="campaign-density">Detail level</label>
+              <select id="campaign-density" data-campaign-density>
+                <option value="24">Focused · 24 IOCs</option>
+                <option value="36" selected>Expanded · 36 IOCs</option>
+                <option value="48">Maximum · 48 IOCs</option>
+              </select>
+            </div>
+            <button type="button" class="button ghost" data-campaign-layout>
+              Reverse indicator order
+            </button>
+          </div>
+        </div>
+        <div class="panel-body campaign-graph-body">
+          <div class="campaign-stage" data-campaign-stage>
+            <div class="campaign-search-tools">
+              <label for="campaign-search">Find in this graph</label>
+              <input id="campaign-search" type="search" data-campaign-search placeholder="Indicator, provider, tag or feed name" autocomplete="off" aria-describedby="campaign-search-status" />
+              <p id="campaign-search-status" data-campaign-search-status role="status">Search the displayed sample. Use the main filters to change its coverage.</p>
+              <div class="campaign-search-results" data-campaign-search-results hidden></div>
+              <div class="campaign-search-actions">
+                <button type="button" class="button ghost" data-campaign-reset disabled>Clear selection</button>
+                <button type="button" class="button ghost" data-campaign-export disabled>Export graph JSON</button>
+              </div>
+            </div>
+            <dl class="campaign-stage-stats" data-campaign-stats hidden>
+              <div><dt>High risk</dt><dd data-campaign-high>0</dd></div>
+              <div><dt>2+ providers</dt><dd data-campaign-corroborated>0</dd></div>
+              <div><dt>Avg score</dt><dd data-campaign-average>0</dd></div>
+              <div><dt>Visible IOCs</dt><dd data-campaign-visible>0</dd></div>
+            </dl>
+            <svg
+              data-campaign-graph
+              viewBox="0 0 1000 520"
+              role="group"
+              aria-label="Interactive relationship graph of indicators, tags, and reporting sources"
+            ></svg>
+            <div class="campaign-empty" data-campaign-empty hidden>
+              <strong>No shared pivots in this preview</strong>
+              <span>Try tags and sources together, or wait for the next feed refresh.</span>
+            </div>
+            <div class="campaign-legend" aria-label="Graph legend">
+              <span><i class="legend-node tag"></i>Behavior tag</span>
+              <span><i class="legend-node source"></i>Reporting provider</span>
+              <span><i class="legend-node indicator"></i>Indicator</span>
+            </div>
+          </div>
+          <aside class="campaign-inspector" data-campaign-inspector aria-live="polite">
+            <p class="eyebrow">Selected node</p>
+            <h3 data-campaign-title>Select a node</h3>
+            <p data-campaign-description>
+              Choose a pivot to understand its reach, or choose an indicator to add it to your investigation queue.
+            </p>
+            <details class="campaign-feed-evidence" hidden><summary>Reporting feed evidence</summary><p data-campaign-feed-evidence></p></details>
+            <dl class="campaign-node-meta" data-campaign-meta hidden>
+              <div><dt>Kind</dt><dd data-campaign-kind>—</dd></div>
+              <div><dt>Connections</dt><dd data-campaign-connections>—</dd></div>
+              <div><dt>Score</dt><dd data-campaign-score>—</dd></div>
+              <div><dt>Providers</dt><dd data-campaign-sources>—</dd></div>
+              <div><dt>Last seen</dt><dd data-campaign-last-seen>—</dd></div>
+              <div><dt>TLP</dt><dd data-campaign-tlp>—</dd></div>
+            </dl>
+            <div class="campaign-detail-block" data-campaign-tags hidden>
+              <h4>Intelligence tags</h4>
+              <div class="campaign-tag-list" data-campaign-tag-list></div>
+            </div>
+            <div class="campaign-detail-block" data-campaign-related hidden>
+              <h4 data-campaign-related-heading>Connected nodes</h4>
+              <div class="campaign-related-list" data-campaign-related-list></div>
+            </div>
+            <a class="button ghost campaign-reference" data-campaign-reference
+              target="_blank" rel="noopener noreferrer" hidden>Open source report</a>
+            <button type="button" class="button detection-export" data-campaign-queue disabled>
+              Add indicator to queue
+            </button>
+            <p class="campaign-summary" data-campaign-summary>Building graph…</p>
+          </aside>
+        </div>
+      </section>
+      </details>
 
       <div class="dashboard-main">
         <section
@@ -372,7 +652,8 @@
                 <label class="toolbar-group" for="preview-limit">
                   <span>Rows</span>
                   <select id="preview-limit" data-preview-limit>
-                    <option value="12">12</option>
+                    <option value="6">6</option>
+                    <option value="12" selected>12</option>
                     <option value="25">25</option>
                     <option value="50">50</option>
                     <option value="100">100</option>
@@ -403,6 +684,18 @@
                 >
                   Share view
                 </button>
+                <button
+                  type="button"
+                  class="button ghost"
+                  data-preview-download
+                  disabled
+                  title="Download every matching indicator currently loaded in the dashboard preview"
+                >
+                  Download matching CSV
+                </button>
+                <span class="toolbar-export-note" data-preview-download-note>
+                  Exports matching indicators currently loaded in the preview.
+                </span>
               </div>
             </div>
 
@@ -504,6 +797,8 @@
           </div>
         </section>
 
+        <details class="tool-disclosure" data-tool-disclosure>
+        <summary><span><strong>Sources &amp; feed composition</strong><small>Source contributions, indicator types, and tags</small></span><span class="disclosure-symbol" aria-hidden="true">+</span></summary>
         <section
           class="panel"
           id="sources"
@@ -624,8 +919,11 @@
             </div>
           </div>
         </section>
+      </details>
       </div>
 
+      <details class="tool-disclosure" data-tool-disclosure>
+        <summary><span><strong>Highest-scoring indicators</strong><small>A quick shortlist from the current collection</small></span><span class="disclosure-symbol" aria-hidden="true">+</span></summary>
       <section
         class="top-threats"
         data-top-threats-section
@@ -641,7 +939,11 @@
         <div class="top-threats-grid" data-top-threats></div>
       </section>
 
-      <section
+      </details>
+
+      <details class="tool-disclosure" data-tool-disclosure>
+        <summary><span><strong>Downloads &amp; integrations</strong><small>CSV, JSON, STIX, and detection rules</small></span><span class="disclosure-symbol" aria-hidden="true">+</span></summary>
+        <section
         id="exports"
         class="panel"
         aria-labelledby="exports-heading"
@@ -665,9 +967,8 @@
               data-fallback-label="Complete CSV"
               rel="nofollow"
               download
-              title="Only score ≥80 or indicators confirmed by 2+ sources — block-ready"
-              >★ High-confidence CSV</a
-            >
+              title="Only score ≥80 or indicators confirmed by 2+ sources"
+              >★ High-confidence CSV</a>
             <a
               class="button-link exports-highlight"
               href="iocs/high_confidence.jsonl"
@@ -675,58 +976,83 @@
               data-fallback-label="Complete JSONL"
               rel="nofollow"
               download
-              title="Only score ≥80 or indicators confirmed by 2+ sources — block-ready"
-              >★ High-confidence JSONL</a
-            >
+              title="Only score ≥80 or indicators confirmed by 2+ sources"
+              >★ High-confidence JSONL</a>
             <a
               class="button-link"
               href="iocs/latest.csv"
               rel="nofollow"
               download
-              >CSV</a
-            >
+              >CSV</a>
             <a
               class="button-link"
               href="iocs/latest.tsv"
               rel="nofollow"
               download
-              >TSV</a
-            >
+              >TSV</a>
             <a
               class="button-link"
               href="iocs/latest.json"
               rel="nofollow"
               download
-              >JSON</a
-            >
+              >JSON</a>
             <a
               class="button-link"
               href="iocs/latest.jsonl"
               rel="nofollow"
               download
-              >JSONL</a
-            >
+              >JSONL</a>
             <a
               class="button-link"
               href="iocs/stix2.json"
               rel="nofollow"
               download
-              >STIX 2.1 bundle</a
-            >
+              >STIX 2.1 bundle</a>
+            <a
+              class="button-link"
+              href="iocs/taxii2-envelope.json"
+              rel="nofollow"
+              download
+              >TAXII 2.1 envelope</a>
+            <a class="button-link" href="splunk/">Splunk IOC hunts · copy SPL →</a>
+            <a class="button-link detection-download" href="detections/sigma/network-iocs.yml"
+              data-detection-artifact="sigma/network-iocs.yml" download hidden>
+              Sigma network rules
+            </a>
+            <a class="button-link detection-download" href="detections/sigma/dns-iocs.yml"
+              data-detection-artifact="sigma/dns-iocs.yml" download hidden>
+              Sigma DNS rules
+            </a>
+            <a class="button-link detection-download" href="detections/suricata/swiftioc.rules" download>
+              Suricata rules
+            </a>
+            <a class="button-link detection-download" href="detections/dns/swiftioc.rpz" download>
+              DNS RPZ
+            </a>
+            <a class="button-link" href="detections/manifest.json">
+              Detection manifest
+            </a>
           </div>
           <p class="panel-footnote">
             The ★ high-confidence feeds contain only indicators scoring ≥80 or
-            confirmed by 2+ independent sources — block-ready with minimal false
-            positives. All files come from the same SwiftIOC collector run that
+            confirmed by 2+ independent sources. Review indicators against your
+            environment before applying blocking rules. All files come from the same SwiftIOC collector run that
             powers the live dashboard above.
           </p>
         </div>
       </section>
+      </details>
+      <footer class="site-footer">
+        <span>SwiftIOC / Open-source threat intelligence</span>
+        <div><a href="diagnostics/summary.html">Collection diagnostics</a><a href="https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector">Source code ↗</a></div>
+      </footer>
       </main>
     </div>
 
     <div class="toast" data-toast role="status" aria-live="polite" aria-atomic="true" hidden></div>
-    <script defer src="assets/dashboard-core.js?v=8"></script>
-    <script defer src="assets/dashboard.js?v=8"></script>
+    <script defer src="assets/dashboard-core.js?v=25"></script>
+    <script defer src="assets/inventory-core.js?v=25"></script>
+    <script defer src="assets/inventory.js?v=25"></script>
+    <script defer src="assets/dashboard.js?v=25"></script>
   </body>
 </html>

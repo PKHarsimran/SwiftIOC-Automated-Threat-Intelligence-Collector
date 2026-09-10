@@ -33,12 +33,15 @@
   // Per-indicator historical summary (first-publicly-seen, peak score, run
   // count) built from git history by scripts/build_history_index.py. Optional.
   const HISTORY_SUMMARY_URL = resolveIocUrl('history_summary.json');
+  const DETECTION_MANIFEST_URL = resolveIocUrl('detections/manifest.json');
 
   const DATASET_STORAGE_KEY = 'swiftioc-dashboard-cache-v2';
   const DATASET_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
   const numberFormatter = new Intl.NumberFormat('en-US');
   const formatNumber = (value) => numberFormatter.format(value ?? 0);
+  const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+  const metricAnimationFrames = new WeakMap();
 
   const relativeTimeFormatter =
     typeof Intl !== 'undefined' &&
@@ -81,9 +84,42 @@
     el.textContent = value ?? '';
   };
 
+  const setMetricText = (el, value) => {
+    const text = String(value ?? '');
+    if (
+      !el?.classList.contains('metric-value') ||
+      reducedMotion?.matches ||
+      !/^[\d,]+$/.test(text)
+    ) {
+      setText(el, value);
+      return;
+    }
+    const target = Number(text.replace(/,/g, ''));
+    const rendered = normaliseString(el.textContent).replace(/,/g, '');
+    const current = /^\d+$/.test(rendered) ? Number(rendered) : 0;
+    const previousFrame = metricAnimationFrames.get(el);
+    if (previousFrame) window.cancelAnimationFrame(previousFrame);
+    if (!Number.isFinite(target) || current === target) {
+      setText(el, value);
+      return;
+    }
+    const started = performance.now();
+    const tick = (now) => {
+      const progress = Math.min(1, (now - started) / 720);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setText(el, formatNumber(Math.round(current + (target - current) * eased)));
+      if (progress < 1) {
+        metricAnimationFrames.set(el, window.requestAnimationFrame(tick));
+      } else {
+        metricAnimationFrames.delete(el);
+      }
+    };
+    metricAnimationFrames.set(el, window.requestAnimationFrame(tick));
+  };
+
   const setStatText = (name, value) => {
     qsa(`[data-stat="${name}"]`).forEach((el) => {
-      setText(el, value);
+      setMetricText(el, value);
     });
   };
 
@@ -202,6 +238,276 @@
     anchor.click();
     anchor.remove();
     URL.revokeObjectURL(url);
+  };
+
+  const downloadCsv = (rows) => {
+    if (!dashboardCore?.rowsToCsv || !rows.length) return false;
+    const blob = new Blob([dashboardCore.rowsToCsv(rows)], {
+      type: 'text/csv;charset=utf-8',
+    });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'swiftioc-matching-indicators.csv';
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+    return true;
+  };
+
+  const downloadJsonCollection = (rows) => {
+    if (!rows.length) return false;
+    const blob = new Blob([JSON.stringify(rows, null, 2) + '\n'], {
+      type: 'application/json;charset=utf-8',
+    });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'swiftioc-investigation-workspace.json';
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+    return true;
+  };
+
+  const downloadDetection = (content, filename, mediaType) => {
+    if (!content) return false;
+    const blob = new Blob([content], { type: `${mediaType};charset=utf-8` });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = filename;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+    return true;
+  };
+
+  const INVESTIGATION_STORAGE_KEY = 'swiftioc-investigation-workspace-v1';
+  const INVESTIGATION_LIMIT = 50;
+  const investigationListeners = new Set();
+  const investigationKey = (row) => {
+    if (dashboardCore) return dashboardCore.investigationKey(row);
+    const type = normaliseLower(row?.type) || 'unknown';
+    const rawIndicator = normaliseString(row?.indicator);
+    const indicator = type === 'url' ? rawIndicator : rawIndicator.toLowerCase();
+    return rawIndicator ? `${type}\u0000${indicator}` : '';
+  };
+  const cleanInvestigationRows = (value) => dashboardCore?.normaliseInvestigationRows(
+    value,
+    INVESTIGATION_LIMIT
+  ) || (Array.isArray(value) ? value.filter((row) => row?.indicator).slice(0, INVESTIGATION_LIMIT) : []);
+
+  let investigationRows = [];
+  try {
+    investigationRows = cleanInvestigationRows(
+      JSON.parse(window.localStorage.getItem(INVESTIGATION_STORAGE_KEY) || '[]')
+    );
+  } catch (error) {
+    investigationRows = [];
+  }
+
+  const notifyInvestigationListeners = () => {
+    const snapshot = investigationRows.slice();
+    investigationListeners.forEach((listener) => listener(snapshot));
+  };
+
+  const saveInvestigationRows = () => {
+    try {
+      window.localStorage.setItem(
+        INVESTIGATION_STORAGE_KEY,
+        JSON.stringify(investigationRows)
+      );
+    } catch (error) {
+      console.warn('Investigation workspace could not be saved', error);
+    }
+    notifyInvestigationListeners();
+  };
+
+  const investigationWorkspace = {
+    getRows: () => investigationRows.slice(),
+    has: (row) => investigationRows.some(
+      (candidate) => investigationKey(candidate) === investigationKey(row)
+    ),
+    add: (row) => {
+      if (!row?.indicator || investigationWorkspace.has(row)) return false;
+      if (investigationRows.length >= INVESTIGATION_LIMIT) {
+        showToast(`The workspace holds up to ${INVESTIGATION_LIMIT} indicators.`);
+        return false;
+      }
+      investigationRows = cleanInvestigationRows([...investigationRows, row]);
+      saveInvestigationRows();
+      return true;
+    },
+    remove: (row) => {
+      const key = investigationKey(row);
+      const next = investigationRows.filter(
+        (candidate) => investigationKey(candidate) !== key
+      );
+      if (next.length === investigationRows.length) return false;
+      investigationRows = next;
+      saveInvestigationRows();
+      return true;
+    },
+    toggle: (row) => investigationWorkspace.has(row)
+      ? investigationWorkspace.remove(row)
+      : investigationWorkspace.add(row),
+    clear: () => {
+      if (!investigationRows.length) return;
+      investigationRows = [];
+      saveInvestigationRows();
+    },
+    subscribe: (listener) => {
+      investigationListeners.add(listener);
+      return () => investigationListeners.delete(listener);
+    },
+  };
+
+  const syncInvestigationButtons = () => {
+    qsa('[data-investigation-toggle]').forEach((button) => {
+      const row = button._investigationRow;
+      if (!row) return;
+      const selected = investigationWorkspace.has(row);
+      button.setAttribute('aria-pressed', String(selected));
+      button.textContent = selected ? 'Queued' : 'Add to queue';
+      button.title = selected
+        ? 'Remove this indicator from the investigation queue'
+        : 'Keep this indicator in the browser-local investigation queue';
+    });
+  };
+
+  const makeInvestigationButton = (row) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'button ghost row-action queue-action';
+    button.dataset.investigationToggle = '';
+    button._investigationRow = row;
+    button.addEventListener('click', () => {
+      const wasSelected = investigationWorkspace.has(row);
+      if (investigationWorkspace.toggle(row)) {
+        showToast(wasSelected
+          ? 'Removed from the investigation queue.'
+          : 'Added to the investigation queue.');
+      }
+      syncInvestigationButtons();
+    });
+    const selected = investigationWorkspace.has(row);
+    button.setAttribute('aria-pressed', String(selected));
+    button.textContent = selected ? 'Queued' : 'Add to queue';
+    button.title = selected
+      ? 'Remove this indicator from the investigation queue'
+      : 'Keep this indicator in the browser-local investigation queue';
+    return button;
+  };
+
+  const initialiseInvestigationWorkspace = () => {
+    const root = qs('[data-investigation-root]');
+    if (!root) return;
+    const list = qs('[data-investigation-list]', root);
+    const count = qs('[data-investigation-count]', root);
+    const copy = qs('[data-investigation-copy]', root);
+    const csv = qs('[data-investigation-csv]', root);
+    const json = qs('[data-investigation-json]', root);
+    const sigma = qs('[data-investigation-sigma]', root);
+    const suricata = qs('[data-investigation-suricata]', root);
+    const clear = qs('[data-investigation-clear]', root);
+    const splCode = qs('[data-investigation-spl-code]', root);
+    const splStatus = qs('[data-investigation-spl-status]', root);
+    const splCopy = qs('[data-investigation-spl-copy]', root);
+    const splDownload = qs('[data-investigation-spl-download]', root);
+    let currentSpl = '';
+    splCopy?.addEventListener('click', () => {
+      if (currentSpl) copyOrPrompt(currentSpl, 'Selected-IOC SPL copied. Map your event fields before running.');
+    });
+    splDownload?.addEventListener('click', () => {
+      if (currentSpl) downloadDetection(currentSpl, 'swiftioc-selected-iocs.spl', 'text/plain');
+    });
+
+    const render = (rows) => {
+      root.hidden = !rows.length;
+      const hunt = dashboardCore.rowsToSpl(rows);
+      currentSpl = hunt.spl;
+      setText(splCode, currentSpl || 'Add a supported observable to generate SPL.');
+      setText(splStatus, `${hunt.included} queued IOCs included. ${hunt.skipped.length} unsupported or invalid entries skipped${hunt.skipped.length ? ': ' + hunt.skipped.map((row) => `${row.type || 'unknown'} ${row.indicator || ''}`).join('; ') : ''}. Updates automatically with your queue.`);
+      if (splCopy) splCopy.disabled = !currentSpl;
+      if (splDownload) splDownload.disabled = !currentSpl;
+      setText(count, formatNumber(rows.length));
+      if (!list) return;
+      list.innerHTML = '';
+      rows.forEach((row) => {
+        const item = document.createElement('li');
+        const identity = document.createElement('div');
+        identity.className = 'investigation-identity';
+        const indicator = document.createElement('code');
+        indicator.textContent = row.indicator;
+        const meta = document.createElement('span');
+        meta.textContent = [
+          row.type || 'unknown',
+          typeof row.score === 'number' ? `score ${row.score}` : row.confidence,
+          primarySourceLabel(row),
+        ].filter(Boolean).join(' · ');
+        identity.append(indicator, meta);
+
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'button ghost row-action';
+        remove.textContent = 'Remove';
+        remove.setAttribute('aria-label', `Remove ${row.indicator} from investigation queue`);
+        remove.addEventListener('click', () => {
+          investigationWorkspace.remove(row);
+          showToast('Removed from the investigation queue.');
+        });
+        item.append(identity, remove);
+        list.appendChild(item);
+      });
+      syncInvestigationButtons();
+    };
+
+    copy?.addEventListener('click', async () => {
+      const rows = investigationWorkspace.getRows();
+      await copyOrPrompt(
+        rows.map((row) => row.indicator).join('\n'),
+        `Copied ${formatNumber(rows.length)} queued indicators.`,
+        'Copy these queued indicators:'
+      );
+    });
+    csv?.addEventListener('click', () => {
+      const rows = investigationWorkspace.getRows();
+      if (downloadCsv(rows)) showToast(`Exported ${formatNumber(rows.length)} queued indicators.`);
+    });
+    json?.addEventListener('click', () => {
+      const rows = investigationWorkspace.getRows();
+      if (downloadJsonCollection(rows)) showToast(`Exported ${formatNumber(rows.length)} queued indicators.`);
+    });
+    sigma?.addEventListener('click', () => {
+      const rows = investigationWorkspace.getRows();
+      const content = dashboardCore?.rowsToSigma?.(rows) || '';
+      if (downloadDetection(content, 'swiftioc-investigation.yml', 'application/yaml')) {
+        showToast('Built Sigma detections from deployable IP and domain indicators.');
+      } else {
+        showToast('Sigma export needs at least one valid IP, CIDR, or domain.');
+      }
+    });
+    suricata?.addEventListener('click', () => {
+      const rows = investigationWorkspace.getRows();
+      const deployable = dashboardCore?.detectionRows?.(rows) || [];
+      const content = deployable.length ? dashboardCore?.rowsToSuricata?.(deployable) : '';
+      if (downloadDetection(content, 'swiftioc-investigation.rules', 'text/plain')) {
+        showToast('Built Suricata rules with stable local SIDs.');
+      } else {
+        showToast('Suricata export needs at least one valid IP, CIDR, or domain.');
+      }
+    });
+    clear?.addEventListener('click', () => {
+      investigationWorkspace.clear();
+      showToast('Investigation queue cleared.');
+    });
+
+    investigationWorkspace.subscribe(render);
+    render(investigationWorkspace.getRows());
   };
 
   // Compact label for a possibly multi-source row: "feodo +2".
@@ -425,6 +731,16 @@
   };
 
   const explainScore = (row) => {
+    const factors = row?.scoreFactors;
+    if (factors && typeof factors.confidence_base === 'number') {
+      const age = typeof factors.age_hours === 'number'
+        ? Math.round(factors.age_hours) + 'h old'
+        : 'unknown age';
+      return 'Score ' + factors.score + ' = confidence base ' +
+        factors.confidence_base + ' + corroboration ' +
+        factors.corroboration_bonus + ', adjusted for ' + age +
+        ' using a ' + Math.round(factors.half_life_hours / 24) + '-day half-life.';
+    }
     const sourceText = (row?.sourceCount || 0) >= 2
       ? 'confirmed by ' + row.sourceCount + ' independent sources'
       : 'reported by one source';
@@ -1096,6 +1412,10 @@
       reference,
       context,
       tlp,
+      scoreFactors:
+        row.score_factors && typeof row.score_factors === 'object'
+          ? row.score_factors
+          : null,
       isDuplicate: Boolean(row.is_duplicate || row.duplicate),
       raw: row,
     };
@@ -1554,7 +1874,7 @@
       );
     }
 
-    SCORE_BAND_META.forEach((meta) => {
+    SCORE_BAND_META.forEach((meta, index) => {
       const count = bands[meta.key] || 0;
       if (!count) return;
       const pct = (count / total) * 100;
@@ -1563,6 +1883,7 @@
         const seg = document.createElement('span');
         seg.className = `score-seg score-seg-${meta.key}`;
         seg.style.width = `${pct}%`;
+        seg.style.setProperty('--segment-delay', `${index * 90}ms`);
         seg.title = `${meta.label}: ${formatNumber(count)} (${pct.toFixed(1)}%)`;
         bar.appendChild(seg);
       }
@@ -1606,6 +1927,15 @@
     setStatText('high-confidence', formatNumber(stats.highConfidence ?? 0));
     setStatText('corroborated', formatNumber(stats.corroborated ?? 0));
     setStatText('avg-score', stats.avgScore != null ? String(stats.avgScore) : '—');
+    const deltaRoot = qs('[data-delta-root]');
+    const delta = dataset?.diag?.delta_counts;
+    const hasDeltaBaseline = dataset?.diag?.delta_baseline_available === true;
+    if (deltaRoot) deltaRoot.hidden = !hasDeltaBaseline;
+    if (hasDeltaBaseline && delta) {
+      setStatText('delta-added', formatNumber(delta.added));
+      setStatText('delta-updated', formatNumber(delta.updated));
+      setStatText('delta-removed', formatNumber(delta.removed));
+    }
     const hcPct =
       stats.total > 0 ? ((stats.highConfidence ?? 0) / stats.total) * 100 : 0;
     setStatText('high-confidence-caption', `${hcPct.toFixed(1)}% of the feed`);
@@ -1834,6 +2164,8 @@
     const searchInput = qs('[data-preview-search]', container);
     const clearButton = qs('[data-preview-clear]', container);
     const shareButton = qs('[data-preview-share]', container);
+    const downloadButton = qs('[data-preview-download]', container);
+    const downloadNote = qs('[data-preview-download-note]', container);
     const filterCount = qs('[data-preview-filter-count]', container);
     const refreshButton = qs('[data-preview-refresh]');
     const sortButtons = qsa('[data-preview-sort]', table);
@@ -1854,6 +2186,7 @@
       relative: qs('[data-preview-relative]', container),
     };
 
+    const defaultPreviewLimit = window.matchMedia?.('(max-width: 640px)').matches ? 6 : DEFAULT_PREVIEW_LIMIT;
     const state = {
       rows: [],
       types: [],
@@ -1868,7 +2201,7 @@
       minScore: 0,
       age: 'all',
       search: '',
-      limit: DEFAULT_PREVIEW_LIMIT,
+      limit: defaultPreviewLimit,
       sort: 'score',
       direction: 'desc',
       expanded: new Set(),
@@ -1877,6 +2210,7 @@
       stats: null,
       sourcePool: 0,
       loading: false,
+      matches: [],
     };
 
     const urlKeys = ['type', 'source', 'tag', 'signal', 'score', 'age', 'rows', 'sort', 'dir'];
@@ -1886,7 +2220,8 @@
           state,
           dashboardCore.readViewState(
             window.location.search,
-            window.location.hash
+            window.location.hash,
+            state.limit
           )
         );
         return;
@@ -1899,7 +2234,7 @@
       state.minScore = Number(params.get('score')) || 0;
       state.age = params.get('age') || 'all';
       const limit = Number(params.get('rows'));
-      if ([12, 25, 50, 100].includes(limit)) state.limit = limit;
+      if ([6, 12, 25, 50, 100].includes(limit)) state.limit = limit;
       const sort = params.get('sort');
       if (['indicator', 'type', 'score', 'sources', 'lastSeen'].includes(sort)) {
         state.sort = sort;
@@ -1920,7 +2255,8 @@
         const url = dashboardCore.writeViewUrl(
           window.location.href,
           state,
-          includeSearch
+          includeSearch,
+          defaultPreviewLimit
         );
         window.history.replaceState(null, '', url);
         return url;
@@ -1933,7 +2269,7 @@
       if (state.signal !== 'all') url.searchParams.set('signal', state.signal);
       if (state.minScore) url.searchParams.set('score', String(state.minScore));
       if (state.age !== 'all') url.searchParams.set('age', state.age);
-      if (state.limit !== DEFAULT_PREVIEW_LIMIT) {
+      if (includeSearch || state.limit !== defaultPreviewLimit) {
         url.searchParams.set('rows', String(state.limit));
       }
       if (state.sort !== 'score') url.searchParams.set('sort', state.sort);
@@ -1969,8 +2305,12 @@
       return [0, 40, 60, 80][confidenceRankForRow(row)] || 0;
     };
 
-    const rowKey = (row) =>
-      normaliseLower(row.type) + '\u0000' + normaliseLower(row.indicator);
+    const rowKey = (row) => {
+      if (dashboardCore?.investigationKey) return dashboardCore.investigationKey(row);
+      const type = normaliseLower(row.type) || 'unknown';
+      const indicator = normaliseString(row.indicator);
+      return type + '\u0000' + (type === 'url' ? indicator : indicator.toLowerCase());
+    };
 
     const sourceCount = (rows) => {
       const sources = new Set();
@@ -2139,7 +2479,9 @@
         downloadJson(row);
         showToast('Indicator JSON downloaded.');
       });
-      actions.append(copy, toggle, download);
+      const queue = makeInvestigationButton(row);
+      actions.append(queue, copy, toggle, download);
+      syncInvestigationButtons();
       actionsCell.appendChild(actions);
       tr.appendChild(actionsCell);
 
@@ -2171,10 +2513,11 @@
       rationale.className = 'score-explanation';
       rationale.textContent = explainScore(row);
       details.appendChild(rationale);
-      if (row.reference) {
+      const reportingUrl = safeHttpUrl(row.reference);
+      if (reportingUrl) {
         const reference = document.createElement('a');
         reference.className = 'button ghost';
-        reference.href = row.reference;
+        reference.href = reportingUrl;
         reference.target = '_blank';
         reference.rel = 'noopener noreferrer';
         reference.textContent = 'View reporting source';
@@ -2299,8 +2642,10 @@
         return;
       }
       const fragment = document.createDocumentFragment();
-      rows.forEach((row) => {
+      rows.forEach((row, index) => {
         const [main, detail] = createRow(row);
+        main.classList.add('preview-row-enter');
+        main.style.setProperty('--row-delay', `${Math.min(index * 28, 280)}ms`);
         fragment.append(main, detail);
       });
       tbody.appendChild(fragment);
@@ -2325,10 +2670,31 @@
         filterCount.textContent = String(count);
       }
       if (shareButton) shareButton.disabled = !state.rows.length;
+      if (downloadButton) {
+        downloadButton.disabled = !state.rows.length || !state.matches.length;
+        downloadButton.setAttribute(
+          'aria-label',
+          state.matches.length
+            ? 'Download ' + formatNumber(state.matches.length) + ' matching indicators as CSV'
+            : 'Download matching indicators as CSV'
+        );
+      }
+      if (downloadNote) {
+        downloadNote.hidden = !state.rows.length;
+        downloadNote.textContent = state.matches.length
+          ? formatNumber(state.matches.length) + ' matching indicator' +
+            (state.matches.length === 1 ? '' : 's') +
+            ' currently loaded in the preview.'
+          : 'No matching indicators currently loaded in the preview.';
+      }
     };
 
     const apply = ({ sync = true } = {}) => {
       const matches = filteredRows().sort(compare);
+      state.matches = matches;
+      window.dispatchEvent(new CustomEvent('swiftioc:preview-filtered', {
+        detail: { rows: matches, origin: state.origin },
+      }));
       const displayed = matches.slice(0, state.limit);
       render(displayed);
       updateSummary(matches, displayed);
@@ -2446,6 +2812,7 @@
         refreshButton,
         clearButton,
         shareButton,
+        downloadButton,
       ].forEach((control) => {
         if (control) control.disabled = disabled;
       });
@@ -2479,6 +2846,10 @@
       } catch (error) {
         console.error('Unable to load live preview', error);
         state.rows = [];
+        state.matches = [];
+        window.dispatchEvent(new CustomEvent('swiftioc:preview-filtered', {
+          detail: { rows: [], error: true },
+        }));
         render([]);
         updateSummary([], []);
         if (summary.meta) summary.meta.hidden = true;
@@ -2492,7 +2863,7 @@
         Object.values(facetRoots).forEach((root) => {
           root.disabled = !hasRows;
         });
-        [signalSelect, sortSelect, searchInput, shareButton]
+        [signalSelect, sortSelect, searchInput, shareButton, downloadButton]
           .forEach((control) => {
             if (control) control.disabled = !hasRows;
           });
@@ -2538,7 +2909,7 @@
 
     limitSelect?.addEventListener('change', () => {
       const limit = Number(limitSelect.value);
-      if ([12, 25, 50, 100].includes(limit)) {
+      if ([6, 12, 25, 50, 100].includes(limit)) {
         state.limit = limit;
         apply();
       }
@@ -2578,6 +2949,19 @@
         apply();
       }
     });
+    document.addEventListener('keydown', (event) => {
+      const target = event.target;
+      const isTyping = target instanceof HTMLElement && (
+        target.matches('input, select, textarea, [contenteditable="true"]')
+      );
+      if (event.key === '/' && !isTyping && !event.metaKey && !event.ctrlKey && !event.altKey) {
+        event.preventDefault();
+        searchInput?.focus();
+      }
+      if (event.key === 'Escape' && !isTyping) {
+        facetMenus.forEach((menu) => { menu.open = false; });
+      }
+    });
     clearButton?.addEventListener('click', () => {
       Object.assign(state, {
         types: [],
@@ -2602,11 +2986,22 @@
       const url = writeUrl({ includeSearch: true });
       await copyOrPrompt(url.toString(), 'Shareable dashboard view copied.', 'Copy this shareable link:');
     });
+    downloadButton?.addEventListener('click', () => {
+      if (downloadCsv(state.matches)) {
+        showToast(
+          'Downloaded ' + formatNumber(state.matches.length) +
+            ' matching indicator' + (state.matches.length === 1 ? '' : 's') + '.'
+        );
+      }
+    });
     refreshButton?.addEventListener('click', () => load({ forceRefresh: true }));
     retryButton?.addEventListener('click', () => load({ forceRefresh: true }));
 
     subscribeToDataset((dataset) => {
       if (!state.loading && dataset?.entries?.length) useDataset(dataset);
+    });
+    investigationWorkspace.subscribe(() => {
+      if (state.rows.length) syncInvestigationButtons();
     });
     window.addEventListener('popstate', () => {
       readUrl();
@@ -2637,6 +3032,853 @@
     span.className = `threat-pill ${cls}`;
     span.textContent = text;
     return span;
+  };
+
+  const initialiseVulnerabilities = () => {
+    const root = qs('[data-vulnerability-root]');
+    if (!root || !dashboardCore?.filterVulnerabilities || !dashboardCore?.vulnerabilityFacts || !dashboardCore?.buildBriefing) return;
+    const cards = qs('[data-vulnerability-cards]', root);
+    const status = qs('[data-vulnerability-status]', root);
+    const search = qs('[data-vulnerability-search]', root);
+    const filter = qs('[data-vulnerability-status-filter]', root);
+    const refresh = qs('[data-vulnerability-refresh]', root);
+    const views = qsa('[data-vulnerability-view]', root);
+    const includeRejected = qs('[data-vulnerability-include-rejected]', root);
+    const extraView = qs('[data-vulnerability-extra-view]', root);
+    const help = qs('[data-vulnerability-view-help]', root);
+    const freshness = qs('[data-vulnerability-freshness]', root);
+    // Old HTML may remain in an intermediary cache during a deployment.
+    if (!extraView || !includeRejected || !help || !freshness || !views.length || !qs('[data-briefing-form]', root)) return;
+    const viewHelp = {
+      briefing: 'Your watched products, with material evidence changes first. Rejected records remain visible for review. Routine timestamp updates do not create alerts.',
+      exploited: 'Confirmed KEV records only, newest catalog additions first. An empty result means this collection has no matching KEV evidence; other CVEs are available in All CVEs.',
+      ransomware: 'CISA KEV records explicitly marked Known for ransomware campaign use. Unknown and unreported values do not qualify.',
+      priority: 'Known exploited first (newest KEV additions), then exploitation reports, then other CVEs. Publication dates order each remaining group.',
+      kev30: 'Added to CISA KEV in the past 30 days, newest first. Catalog addition is not the date an attack occurred.',
+      published7: 'NVD publication dates in the past 7 days, newest first. A newly published CVE is not necessarily exploited.',
+      updated7: 'NVD record modifications in the past 7 days, newest first. An edit does not establish a new vulnerability or new exploitation.',
+    };
+    let view = 'exploited';
+    let snapshotTime = null;
+    const previous = qs('[data-vulnerability-prev]', root);
+    const next = qs('[data-vulnerability-next]', root);
+    const pageLabel = qs('[data-vulnerability-page]', root);
+    const download = qs('[data-vulnerability-download]', root);
+    download.href = resolveIocUrl('collections/vulnerabilities.json');
+    qs('[data-observables-download]', root).href = resolveIocUrl('collections/observables.jsonl');
+    const labels = {
+      known_exploited: 'CISA KEV · known exploited',
+      reported_exploitation: 'Exploitation reported · KEV evidence unavailable',
+      not_established: 'Exploitation not established by this feed',
+    };
+    let items = [];
+    let generatedAt = '';
+    let page = 0;
+    let loading = false;
+    let failed = false;
+    const pageSize = 6;
+    const addText = (parent, tag, value, className = '') => {
+      const element = document.createElement(tag);
+      element.textContent = value;
+      element.className = className;
+      parent.appendChild(element);
+      return element;
+    };
+    const addReport = (card, title, report, fields) => {
+      if (!report || typeof report !== 'object' || Array.isArray(report)) return;
+      const details = document.createElement('details');
+      addText(details, 'summary', title);
+      fields.forEach(([key, label]) => {
+        if (report[key] != null && report[key] !== '') addText(details, 'p', `${label}: ${report[key]}`);
+      });
+      const reference = safeHttpUrl(report.reference);
+      if (reference) {
+        const link = addText(details, 'a', 'Open provider record ↗');
+        link.href = reference;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+      }
+      card.appendChild(details);
+    };
+    const briefingKey = 'swiftioc-cve-briefing-v1';
+    let briefing = dashboardCore.emptyBriefing();
+    let briefingNotice = '';
+    let lastBriefingResults = [];
+    try {
+      const saved = window.localStorage.getItem(briefingKey);
+      if (saved) {
+        const valid = dashboardCore.normaliseBriefing(JSON.parse(saved));
+        if (valid) briefing = valid;
+        else briefingNotice = 'Saved briefing was incompatible. Set up a fresh watchlist; no change alerts were inferred.';
+      }
+    } catch {
+      briefingNotice = 'Saved briefing could not be read. A fresh baseline is required; preferences may only last for this tab.';
+    }
+    if (briefing.watches.length) view = 'briefing';
+    const briefingSettings = qs('[data-briefing-settings]', root);
+    const briefingForm = qs('[data-briefing-form]', root);
+    const briefingVendor = qs('[data-briefing-vendor]', root);
+    const briefingProduct = qs('[data-briefing-product]', root);
+    const briefingWatches = qs('[data-briefing-watches]', root);
+    const briefingNote = qs('[data-briefing-note]', root);
+    const briefingTools = qs('[data-briefing-tools]', root);
+    const briefingTriage = qs('[data-briefing-triage]', root);
+    const briefingExport = qs('[data-briefing-export]', root);
+    const canAcknowledge = () => !loading && !failed && snapshotTime !== null
+      && snapshotTime <= Date.now() / 1000 && (briefing.snapshotAt === null || snapshotTime >= briefing.snapshotAt);
+    const saveBriefing = (next) => {
+      const valid = dashboardCore.normaliseBriefing(next);
+      if (!valid) {
+        briefingNotice = 'This watchlist exceeds the 5,000-record baseline limit. Narrow the vendors or products you follow.';
+        return false;
+      }
+      briefing = valid;
+      try {
+        window.localStorage.setItem(briefingKey, JSON.stringify(briefing));
+        briefingNotice = '';
+      } catch {
+        briefingNotice = 'Browser storage is unavailable or full. Changes are kept for this tab only; export your briefing before leaving.';
+      }
+      return true;
+    };
+    const updateBriefingControls = () => {
+      const ready = canAcknowledge();
+      briefingTools.hidden = view !== 'briefing';
+      briefingExport.disabled = !ready || !lastBriefingResults.length;
+      briefingTriage.disabled = loading || failed;
+      briefingForm.querySelector('button').disabled = !ready || briefing.watches.length >= 20;
+      briefingVendor.disabled = briefingProduct.disabled = !ready;
+      const note = briefingNotice || (loading ? 'Loading evidence before establishing a baseline…' : failed
+        ? 'Collection unavailable. Your saved watches and review baseline are unchanged.'
+        : !ready ? 'This snapshot is older than your baseline or dated in the future. Review and export are paused.'
+        : !briefing.watches.length ? 'Follow a vendor or product to start. The first valid snapshot establishes a baseline without historical change alerts.'
+        : briefing.snapshotAt === null ? 'No matching structured records yet. The first matching snapshot will establish a baseline without historical alerts.'
+        : `Latest baseline/review snapshot ${new Date(briefing.snapshotAt * 1000).toLocaleString()}. Each CVE keeps its last acknowledged evidence. Product matches indicate potential relevance, not confirmed exposure.`);
+      briefingNote.textContent = note;
+      briefingWatches.replaceChildren(...briefing.watches.map((watch) => {
+        const li = document.createElement('li');
+        const label = document.createElement('span');
+        label.textContent = watch.vendor + (watch.product ? ` / ${watch.product}` : ' / all products');
+        const remove = document.createElement('button');
+        remove.type = 'button'; remove.className = 'button ghost';
+        remove.textContent = 'Remove'; remove.setAttribute('aria-label', `Remove watch: ${label.textContent}`);
+        remove.disabled = !ready;
+        remove.addEventListener('click', () => {
+          const watches = briefing.watches.filter((entry) => dashboardCore.watchKey(entry) !== dashboardCore.watchKey(watch));
+          saveBriefing(dashboardCore.seedBriefing(items, { ...briefing, watches }, snapshotTime));
+          page = 0; render();
+        });
+        li.append(label, remove); return li;
+      }));
+      const vendors = [...new Set(items.map((item) => item.reports?.cisa_kev?.vendor).filter((value) => typeof value === 'string'))].sort();
+      qs('[data-briefing-vendors]', root).replaceChildren(...vendors.map((vendor) => {
+        const option = document.createElement('option'); option.value = vendor; return option;
+      }));
+    };
+    const render = () => {
+      const now = Date.now() / 1000;
+      const briefingEntries = dashboardCore.buildBriefing(items, briefing, snapshotTime);
+      const briefById = new Map(briefingEntries.map((entry) => [entry.item.cve_id, entry]));
+      const eligible = dashboardCore.filterVulnerabilities(items, search.value, filter.value, { view, includeRejected: view === 'briefing' || includeRejected.checked, now });
+      const eligibleIds = new Set(eligible.map((item) => item.cve_id));
+      lastBriefingResults = !loading && !failed ? briefingEntries.filter((entry) => eligibleIds.has(entry.item.cve_id) && (briefingTriage.value === 'all' || (briefingTriage.value === 'new' ? entry.changes.length > 0 : briefingTriage.value === 'unreviewed' ? ['unreviewed', 'new'].includes(entry.triage) : entry.triage === briefingTriage.value))) : [];
+      const matches = view === 'briefing' ? lastBriefingResults.map((entry) => entry.item) : eligible;
+      updateBriefingControls();
+      const rejectedCount = items.filter((item) => dashboardCore.vulnerabilityFacts(item, now).rejected).length;
+      views.forEach((button) => {
+        button.setAttribute('aria-pressed', String(button.dataset.vulnerabilityView === view));
+        button.disabled = loading;
+      });
+      help.textContent = viewHelp[view];
+      extraView.value = ['ransomware', 'kev30', 'published7', 'updated7'].includes(view) ? view : '';
+      extraView.disabled = loading;
+      includeRejected.closest('label').hidden = view === 'briefing';
+      includeRejected.disabled = loading;
+      freshness.hidden = loading || failed || snapshotTime == null || (now - snapshotTime >= 0 && now - snapshotTime <= 86400);
+      freshness.textContent = snapshotTime > now ? 'Snapshot timestamp is in the future. Check the collector clock before treating this data as current.'
+        : 'Snapshot is over 24 hours old. Recent views may be incomplete; refresh and check run diagnostics. Provider dates below describe their own records.';
+      const pages = Math.ceil(matches.length / pageSize);
+      page = Math.min(page, Math.max(0, pages - 1));
+      cards.replaceChildren();
+      previous.disabled = loading || page === 0;
+      next.disabled = loading || page + 1 >= pages;
+      pageLabel.textContent = `Page ${pages ? page + 1 : 0} of ${pages}`;
+      refresh.disabled = loading;
+      search.disabled = filter.disabled = loading;
+      status.textContent = loading ? 'Loading the vulnerability collection…' : failed
+        ? 'Collection unavailable. Refresh to retry; no previous results are displayed.'
+        : `${matches.length} of ${items.length} CVEs · ${matches.filter((item) => item.exploitation_status === 'known_exploited').length} matching with CISA KEV evidence${!includeRejected.checked && rejectedCount ? ` · ${rejectedCount} rejected records hidden` : ''} · Snapshot ${generatedAt}${!matches.length ? ' · No matching vulnerabilities.' : ''}`;
+      if (view === 'briefing' && !loading && !failed) status.textContent = `${matches.length} watched CVEs in this view · ${lastBriefingResults.filter((entry) => entry.changes.length).length} with new evidence · Snapshot ${generatedAt}${!matches.length ? ' · No matches. Check your watches and filters.' : ''}`;
+      if (loading || failed) return;
+      matches.slice(page * pageSize, (page + 1) * pageSize).forEach((item) => {
+        const card = document.createElement('article');
+        card.className = 'discovery-card vulnerability-card';
+        card.dataset.exploitation = item.exploitation_status;
+        addText(card, 'p', labels[item.exploitation_status], 'vulnerability-evidence');
+        addText(card, 'h3', item.cve_id);
+        if (view === 'briefing') {
+          const entry = briefById.get(item.cve_id);
+          addText(card, 'p', 'Potentially relevant to your watchlist', 'briefing-match');
+          addText(card, 'p', entry.changes.length ? entry.changes.join(' · ') : 'No material changes since your baseline or last review.', entry.changes.length ? 'vulnerability-caution' : 'vulnerability-meta');
+          const triageLabel = document.createElement('label');
+          triageLabel.className = 'briefing-triage-label'; triageLabel.textContent = 'Review status';
+          const triageSelect = document.createElement('select');
+          triageSelect.setAttribute('aria-label', `Review status for ${item.cve_id}`);
+          for (const [value, label] of [['unreviewed', 'Not reviewed'], ['investigating', 'Investigating'], ['reviewed', 'Reviewed']]) {
+            const option = document.createElement('option'); option.value = value; option.textContent = label; triageSelect.appendChild(option);
+          }
+          triageSelect.value = entry.triage === 'new' ? 'unreviewed' : entry.triage;
+          triageSelect.disabled = !canAcknowledge();
+          triageSelect.addEventListener('change', () => {
+            if (!canAcknowledge()) return;
+            const prior = briefing.records[item.cve_id];
+            saveBriefing({ ...briefing, snapshotAt: snapshotTime, records: { ...briefing.records,
+              [item.cve_id]: { evidence: triageSelect.value === 'reviewed' ? dashboardCore.briefingEvidence(item) : prior?.evidence || null, triage: triageSelect.value },
+            } });
+            render();
+          });
+          triageLabel.appendChild(triageSelect); card.appendChild(triageLabel);
+        }
+        if (item.title && item.title !== item.cve_id) addText(card, 'p', item.title, 'vulnerability-title');
+        const kev = item.reports?.cisa_kev;
+        const nvd = item.reports?.nvd;
+        const facts = dashboardCore.vulnerabilityFacts(item, now);
+        const day = (time) => time == null ? 'Unknown / invalid' : new Date(time * 1000).toISOString().slice(0, 10);
+        const timeline = document.createElement('div');
+        timeline.className = 'vulnerability-dates';
+        if (kev) addText(timeline, 'p', `Added to KEV: ${day(facts.added)}`);
+        addText(timeline, 'p', `NVD published: ${day(facts.published)}`);
+        if (facts.modified != null) addText(timeline, 'p', `NVD updated: ${day(facts.modified)}`);
+        card.appendChild(timeline);
+        if (facts.ransomware) addText(card, 'p', 'CISA: known ransomware campaign use', 'vulnerability-caution');
+        if (facts.rejected) addText(card, 'p', 'Rejected by NVD · review the provider record before acting.', 'vulnerability-caution');
+        if (item.exploitation_status === 'known_exploited' && (facts.checked == null || now - facts.checked > 86400)) {
+          addText(card, 'p', `Historical KEV evidence · catalog check ${facts.checked == null ? 'unknown' : day(facts.checked)}. Refresh to verify current coverage.`, 'vulnerability-caution');
+        }
+        if (kev?.required_action) addText(card, 'p', `CISA action: ${kev.required_action}`, 'vulnerability-action');
+        addText(card, 'p', `Severity: ${nvd?.severity || 'Not supplied'} · ${kev?.product || 'Product not supplied'}${nvd?.status ? ` · NVD: ${nvd.status}` : ''}`, 'vulnerability-meta');
+        // Keep long provider descriptions available without making cards unbounded.
+        const summary = document.createElement('details');
+        addText(summary, 'summary', 'Read description');
+        addText(summary, 'p', item.description || 'No description supplied.');
+        card.appendChild(summary);
+        addReport(card, 'CISA KEV evidence & action', kev, [
+          ['vendor', 'Vendor'], ['product', 'Product'], ['description', 'CISA description'],
+          ['date_added', 'Added to catalog'], ['catalog_checked_at', 'Catalog checked'],
+          ['required_action', 'Required action'], ['due_date', 'CISA due date (federal directive)'],
+          ['ransomware_use', 'Known ransomware campaign use'], ['notes', 'Notes'],
+        ]);
+        addReport(card, 'NVD publication & severity', nvd, [
+          ['published_at', 'Published'], ['modified_at', 'Modified'], ['status', 'NVD status'],
+          ['severity', 'Severity'], ['description', 'NVD description'],
+        ]);
+        addText(card, 'p', `Reporting sources: ${item.sources.join(', ') || 'Not supplied'}`, 'vulnerability-meta');
+        if (!kev && !nvd) {
+          const reference = safeHttpUrl(item.reference);
+          if (reference) {
+            const link = addText(card, 'a', 'Open reporting source ↗', 'vulnerability-meta');
+            link.href = reference;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+          }
+        }
+        const copy = addText(card, 'button', 'Copy CVE', 'button ghost');
+        copy.type = 'button';
+        copy.addEventListener('click', () => copyOrPrompt(item.cve_id, 'CVE copied.', 'Copy this CVE:'));
+        card.appendChild(copy);
+        cards.appendChild(card);
+      });
+    };
+    const load = async () => {
+      loading = true;
+      failed = false;
+      items = [];
+      snapshotTime = null;
+      window.dispatchEvent(new CustomEvent('swiftioc:vulnerability-snapshot', { detail: null }));
+      page = 0;
+      render();
+      const controller = new AbortController();
+      const timer = window.setTimeout(() => controller.abort(), 20000);
+      try {
+        const response = await fetch(resolveIocUrl('collections/vulnerabilities.json'), { cache: 'no-cache', signal: controller.signal });
+        if (!response.ok) throw new Error('Collection unavailable');
+        const data = await response.json();
+        if (data.schema_version !== 1 || !Array.isArray(data.items) || typeof data.generated_at !== 'string' || !Number.isFinite(Date.parse(data.generated_at))) throw new Error('Invalid collection');
+        const seen = new Set();
+        for (const item of data.items) {
+          if (!item || typeof item.cve_id !== 'string' || !/^CVE-[0-9]{4}-[0-9]{4,19}$/.test(item.cve_id) || seen.has(item.cve_id)
+            || !Object.hasOwn(labels, item.exploitation_status) || !Array.isArray(item.sources)
+            || !item.sources.every((source) => typeof source === 'string')
+            || !item.reports || typeof item.reports !== 'object' || Array.isArray(item.reports)) throw new Error('Invalid CVE record');
+          seen.add(item.cve_id);
+        }
+        items = data.items;
+        snapshotTime = Date.parse(data.generated_at) / 1000;
+        generatedAt = new Date(data.generated_at).toLocaleString();
+        if (briefing.watches.some((watch) => !watch.ready) && snapshotTime <= Date.now() / 1000 && (briefing.snapshotAt === null || snapshotTime >= briefing.snapshotAt)) saveBriefing(dashboardCore.seedBriefing(items, briefing, snapshotTime));
+      } catch (error) {
+        items = [];
+        failed = true;
+      } finally {
+        window.clearTimeout(timer);
+        loading = false;
+        window.dispatchEvent(new CustomEvent('swiftioc:vulnerability-snapshot', {
+          detail: !failed && snapshotTime <= Date.now() / 1000 ? { items, generated_at: new Date(snapshotTime * 1000).toISOString() } : null,
+        }));
+        render();
+      }
+    };
+    briefingForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (!canAcknowledge() || briefing.watches.length >= 20) return;
+      const watch = { vendor: briefingVendor.value.trim(), product: briefingProduct.value.trim() };
+      if (!watch.vendor) return;
+      if (briefing.watches.some((entry) => dashboardCore.watchKey(entry) === dashboardCore.watchKey(watch))) {
+        briefingNotice = 'That vendor/product is already followed.'; updateBriefingControls(); return;
+      }
+      const next = dashboardCore.seedBriefing(items, { ...briefing, watches: [...briefing.watches, watch] }, snapshotTime);
+      if (saveBriefing(next)) { view = 'briefing'; page = 0; briefingProduct.value = ''; }
+      render();
+    });
+    qs('[data-briefing-clear]', root).addEventListener('click', () => {
+      saveBriefing(dashboardCore.emptyBriefing()); page = 0; render();
+    });
+    briefingTriage.addEventListener('change', () => { page = 0; render(); });
+    briefingVendor.addEventListener('input', () => {
+      const products = [...new Set(items.filter((item) =>
+        dashboardCore.matchesWatch(item, { vendor: briefingVendor.value.trim(), product: '' }))
+        .map((item) => item.reports.cisa_kev.product).filter((value) => typeof value === 'string'))].sort();
+      qs('[data-briefing-products]', root).replaceChildren(...products.map((product) => {
+        const option = document.createElement('option'); option.value = product; return option;
+      }));
+    });
+    briefingExport.addEventListener('click', () => {
+      if (!canAcknowledge() || !lastBriefingResults.length) return;
+      downloadDetection(JSON.stringify({ schema_version: 1, snapshot_at: new Date(snapshotTime * 1000).toISOString(),
+        baseline_at: briefing.snapshotAt, scope: 'Current filtered watchlist; potential relevance, not confirmed exposure.',
+        watches: briefing.watches, items: lastBriefingResults.map(({ item, changes, triage }) => ({
+          cve_id: item.cve_id, title: item.title, exploitation_status: item.exploitation_status,
+          changes, triage, reports: item.reports,
+        })),
+      }, null, 2), 'swiftioc-personal-cve-briefing.json', 'application/json');
+    });
+    views.forEach((button) => button.addEventListener('click', () => {
+      view = button.dataset.vulnerabilityView;
+      if (view === 'briefing' && !briefing.watches.length) briefingSettings.open = true;
+      page = 0;
+      render();
+    }));
+    extraView.addEventListener('change', () => { if (extraView.value) { view = extraView.value; page = 0; render(); } });
+    includeRejected.addEventListener('change', () => { page = 0; render(); });
+    // Re-evaluate rolling windows and freshness when an analyst returns to an
+    // open tab, without resetting focus or collapsing evidence every minute.
+    document.addEventListener('visibilitychange', () => { if (!document.hidden && !loading) render(); });
+    [search, filter].forEach((control) => control.addEventListener(control === search ? 'input' : 'change', () => { page = 0; render(); }));
+    previous.addEventListener('click', () => { page -= 1; render(); });
+    next.addEventListener('click', () => { page += 1; render(); });
+    refresh.addEventListener('click', load);
+    load();
+  };
+
+  const initialiseDiscovery = () => {
+    const root = qs('[data-discovery-root]');
+    if (!root || !dashboardCore?.buildDiscovery) return;
+    const cards = qs('[data-discovery-cards]', root);
+    const status = qs('[data-discovery-status]', root);
+    const empty = qs('[data-discovery-empty]', root);
+    const exportButton = qs('[data-discovery-export]', root);
+    const lenses = qsa('[data-discovery-mode]', root);
+    let rows = [];
+    let mode = 'corroborated';
+    let snapshot = null;
+    let feedFailed = false;
+    let origin = '';
+    const render = () => {
+      snapshot = dashboardCore.buildDiscovery(rows, mode);
+      cards.replaceChildren();
+      lenses.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.discoveryMode === mode)));
+      exportButton.disabled = !snapshot.findings.length;
+      empty.hidden = snapshot.findings.length > 0;
+      empty.textContent = feedFailed
+        ? 'The feed is unavailable. Retry from the live preview below to restore your discovery results.'
+        : 'No leads match this lens. Try another lens or broaden the preview filters below.';
+      status.textContent = feedFailed ? 'Feed unavailable · evidence export paused' :
+        `${snapshot.findings.length} of ${snapshot.total} matching leads · ${snapshot.sampleSize} indicators in the filtered sample${isCacheOrigin(origin) ? ' · cached snapshot' : ''}`;
+      snapshot.findings.forEach((finding, index) => {
+        const row = finding.row;
+        const card = document.createElement('article');
+        card.className = 'discovery-card';
+        const top = document.createElement('div');
+        top.className = 'discovery-card-top';
+        const number = document.createElement('span');
+        number.textContent = String(index + 1).padStart(2, '0');
+        const type = document.createElement('span');
+        type.textContent = row.type || 'Indicator';
+        const score = document.createElement('span');
+        score.className = 'discovery-score';
+        score.textContent = `Score ${dashboardCore.effectiveScore(row)}`;
+        top.append(number, type, score);
+        const title = document.createElement('h3');
+        title.textContent = row.indicator;
+        const label = document.createElement('p');
+        label.className = 'discovery-reason-label';
+        label.textContent = finding.label;
+        const reason = document.createElement('p');
+        reason.className = 'discovery-reason';
+        reason.textContent = finding.reason;
+        const details = document.createElement('details');
+        const summary = document.createElement('summary');
+        summary.textContent = 'Inspect the evidence';
+        const context = document.createElement('p');
+        context.textContent = row.context || 'No additional context supplied by this source.';
+        const seen = document.createElement('p');
+        seen.textContent = `Last seen: ${row.lastSeenDisplay || row.lastSeen || 'Unknown'} · TLP: ${row.tlp || 'Unmarked'}`;
+        details.append(summary, seen, context);
+        const report = safeHttpUrl(row.reference);
+        if (report) {
+          const link = document.createElement('a');
+          link.href = report;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.textContent = 'Open reporting source ↗';
+          details.appendChild(link);
+        }
+        const actions = document.createElement('div');
+        actions.className = 'discovery-card-actions';
+        const copy = document.createElement('button');
+        copy.type = 'button';
+        copy.className = 'button ghost';
+        copy.textContent = 'Copy IOC';
+        copy.addEventListener('click', () => copyOrPrompt(row.indicator, 'Indicator copied.', 'Copy this indicator:'));
+        actions.append(makeInvestigationButton(row), copy);
+        card.append(top, title, label, reason, details, actions);
+        cards.appendChild(card);
+      });
+    };
+    lenses.forEach((button) => button.addEventListener('click', () => {
+      mode = button.dataset.discoveryMode;
+      render();
+    }));
+    exportButton.addEventListener('click', () => {
+      if (!snapshot?.findings.length) return;
+      downloadDetection(JSON.stringify({
+        schema_version: 1,
+        generated_at: new Date().toISOString(),
+        lens: mode,
+        sample_size: snapshot.sampleSize,
+        matching_leads: snapshot.total,
+        scope: 'Six highlighted leads at most, derived from the filtered compact preview. No global rarity or attribution implied.',
+        findings: snapshot.findings.map(({ row, label, reason }) => ({
+          indicator: row.indicator, type: row.type, score: dashboardCore.effectiveScore(row),
+          sources: row.sourceList, last_seen: row.lastSeen, tags: row.tags,
+          reference: row.reference, label, reason,
+        })),
+      }, null, 2), 'swiftioc-evidence-brief.json', 'application/json');
+    });
+    window.addEventListener('swiftioc:preview-filtered', (event) => {
+      if (!Array.isArray(event.detail?.rows)) return;
+      rows = event.detail.rows;
+      feedFailed = Boolean(event.detail.error);
+      origin = event.detail.origin || '';
+      render();
+    });
+  };
+
+  const initialiseCampaignGraph = () => {
+    const root = qs('[data-campaign-root]');
+    const svg = qs('[data-campaign-graph]', root);
+    if (!root || !svg || !dashboardCore?.buildCampaignGraph || !dashboardCore?.sourceProviders) return;
+    const mode = qs('[data-campaign-mode]', root);
+    const density = qs('[data-campaign-density]', root);
+    const remix = qs('[data-campaign-layout]', root);
+    const search = qs('[data-campaign-search]', root);
+    const searchResults = qs('[data-campaign-search-results]', root);
+    const searchStatus = qs('[data-campaign-search-status]', root);
+    const reset = qs('[data-campaign-reset]', root);
+    const exportGraph = qs('[data-campaign-export]', root);
+    const empty = qs('[data-campaign-empty]', root);
+    const title = qs('[data-campaign-title]', root);
+    const description = qs('[data-campaign-description]', root);
+    const meta = qs('[data-campaign-meta]', root);
+    const kind = qs('[data-campaign-kind]', root);
+    const connections = qs('[data-campaign-connections]', root);
+    const score = qs('[data-campaign-score]', root);
+    const sources = qs('[data-campaign-sources]', root);
+    const lastSeen = qs('[data-campaign-last-seen]', root);
+    const tlp = qs('[data-campaign-tlp]', root);
+    const stats = qs('[data-campaign-stats]', root);
+    const high = qs('[data-campaign-high]', root);
+    const corroborated = qs('[data-campaign-corroborated]', root);
+    const average = qs('[data-campaign-average]', root);
+    const visible = qs('[data-campaign-visible]', root);
+    const tagBlock = qs('[data-campaign-tags]', root);
+    const tagList = qs('[data-campaign-tag-list]', root);
+    const relatedBlock = qs('[data-campaign-related]', root);
+    const relatedHeading = qs('[data-campaign-related-heading]', root);
+    const relatedList = qs('[data-campaign-related-list]', root);
+    const reference = qs('[data-campaign-reference]', root);
+    const queue = qs('[data-campaign-queue]', root);
+    const summary = qs('[data-campaign-summary]', root);
+    const svgNamespace = 'http://www.w3.org/2000/svg';
+    let entries = [];
+    let graph = null;
+    let selected = null;
+    let rotation = 0;
+    if (density && window.matchMedia?.('(max-width: 540px)').matches) {
+      density.value = '24';
+    }
+
+    const compactText = (value, limit = 220) => {
+      const text = normaliseString(value);
+      return text.length > limit ? text.slice(0, limit - 1).trimEnd() + '…' : text;
+    };
+
+    const createSvg = (name, attributes = {}) => {
+      const element = document.createElementNS(svgNamespace, name);
+      Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, String(value)));
+      return element;
+    };
+
+    const positionsFor = (nodes) => {
+      const pivots = nodes.filter((node) => node.kind === 'pivot');
+      const indicators = nodes.filter((node) => node.kind === 'indicator');
+      const positions = new Map();
+      const grouped = new Map(pivots.map((pivot) => [pivot.id, []]));
+      indicators.forEach((node) => {
+        // Balance shared indicators between their actual pivots instead of
+        // assigning every overlap to whichever edge sorts first.
+        const owners = pivots.filter((pivot) => graph.edges.some((edge) => edge.source === pivot.id && edge.target === node.id));
+        owners.sort((a, b) => grouped.get(a.id).length - grouped.get(b.id).length);
+        if (owners.length) grouped.get(owners[0].id).push(node);
+      });
+      let top = 25;
+      const reverse = Math.round(rotation / (Math.PI / 7)) % 2 === 1;
+      pivots.forEach((pivot) => {
+        const members = grouped.get(pivot.id);
+        if (reverse) members.reverse();
+        const height = Math.max(95, Math.ceil(members.length / 5) * 75 + 20);
+        positions.set(pivot.id, { x: 145, y: top + height / 2 });
+        members.forEach((node, index) => positions.set(node.id, {
+          x: 350 + (index % 5) * 140,
+          y: top + 30 + Math.floor(index / 5) * 75,
+        }));
+        top += height;
+      });
+      svg.setAttribute('viewBox', `0 0 1000 ${Math.max(260, top + 25)}`);
+      return positions;
+    };
+
+    const selectNode = (node) => {
+      selected = node;
+      if (reset) reset.disabled = false;
+      if (exportGraph) exportGraph.textContent = 'Export selected relationships';
+      const connected = new Set();
+      graph.edges.forEach((edge) => {
+        if (edge.source === node.id) connected.add(edge.target);
+        if (edge.target === node.id) connected.add(edge.source);
+      });
+      qsa('[data-graph-node]', svg).forEach((element) => {
+        const active = element.dataset.graphNode === node.id;
+        const related = connected.has(element.dataset.graphNode);
+        element.classList.toggle('is-selected', active);
+        element.setAttribute('aria-pressed', String(active));
+        element.classList.toggle('is-connected', related);
+        element.classList.toggle('is-dimmed', !active && !related);
+      });
+      qsa('[data-graph-edge]', svg).forEach((element) => {
+        const related = element.dataset.source === node.id || element.dataset.target === node.id;
+        element.classList.toggle('is-connected', related);
+        element.classList.toggle('is-dimmed', !related);
+      });
+
+      const degree = graph.edges.filter((edge) => edge.source === node.id || edge.target === node.id).length;
+      const relatedNodes = graph.nodes.filter((candidate) => connected.has(candidate.id));
+      setText(title, node.label);
+      setText(kind, node.kind === 'pivot' ? (node.pivotKind === 'source' ? `${node.role === 'aggregate' ? 'Aggregate' : node.role === 'unmapped' ? 'Unmapped feed' : 'Provider'} pivot` : 'Behavior tag') : node.row?.type || 'indicator');
+      setText(connections, formatNumber(degree));
+      setText(score, node.kind === 'indicator' ? String(node.score) : String(node.averageScore));
+      setText(
+        sources,
+        node.kind === 'indicator'
+          ? formatNumber(node.sourceCount)
+          : formatNumber(new Set(relatedNodes.flatMap((candidate) =>
+            dashboardCore.sourceProviders(candidate.row).filter((provider) => provider.role === 'reporting').map((provider) => provider.id)
+          )).size)
+      );
+      setText(lastSeen, node.kind === 'indicator' ? node.row?.lastSeenDisplay || 'Unknown' : 'Multiple');
+      setText(tlp, node.kind === 'indicator' ? node.row?.tlp || 'Unmarked' : 'Multiple');
+      if (meta) meta.hidden = false;
+      if (description) {
+        description.textContent = node.kind === 'pivot'
+          ? `${formatNumber(node.totalCount)} indicators in the filtered sample share this ${node.pivotKind}; ${formatNumber(node.count)} are displayed. Average collector score across all ${formatNumber(node.totalCount)} matching indicators: ${node.averageScore}.`
+          : `${node.row?.confidence ? `${node.row.confidence} confidence · ` : ''}Reported by ${node.providers.map((provider) => provider.label).join(', ') || 'unspecified sources'}${node.row?.context ? ` · ${compactText(node.row.context)}` : ''}.`;
+      }
+      const feedEvidence = qs('[data-campaign-feed-evidence]', root);
+      if (feedEvidence) {
+        const providers = node.kind === 'indicator' ? node.providers : node.pivotKind === 'source' ? [{ label: node.label, role: node.role, feeds: node.feeds }] : [];
+        feedEvidence.textContent = providers.map((provider) => `${provider.label}: ${provider.feeds.join(', ')}${provider.role === 'aggregate' ? ' — republished blocklists; not additional independent verification' : provider.role === 'context' ? ' — directory context, not a malicious-activity report' : provider.role === 'unmapped' ? ' — custom feed; publisher not mapped' : ''}`).join('\n');
+        feedEvidence.parentElement.hidden = !providers.length;
+      }
+      const tags = node.kind === 'indicator' && Array.isArray(node.row?.tags)
+        ? node.row.tags.slice(0, 8)
+        : [];
+      if (tagList) {
+        tagList.replaceChildren(...tags.map((value) => {
+          const chip = document.createElement('span');
+          chip.textContent = value;
+          return chip;
+        }));
+      }
+      if (tagBlock) tagBlock.hidden = !tags.length;
+      if (relatedList) {
+        relatedList.replaceChildren(...relatedNodes.map((candidate) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'campaign-related-node';
+          button.textContent = candidate.label;
+          button.title = candidate.label;
+          button.addEventListener('click', () => selectNode(candidate));
+          return button;
+        }));
+      }
+      if (relatedHeading) relatedHeading.textContent = `${node.kind === 'pivot' ? 'Connected indicators' : 'Relationship pivots'} (${relatedNodes.length})`;
+      if (relatedBlock) relatedBlock.hidden = !relatedNodes.length;
+      const reportUrl = node.kind === 'indicator' ? safeHttpUrl(node.row?.reference) : null;
+      if (reference) {
+        reference.hidden = !reportUrl;
+        if (reportUrl) reference.href = reportUrl;
+        else reference.removeAttribute('href');
+      }
+      if (queue) {
+        queue.disabled = node.kind !== 'indicator';
+        queue.textContent = node.kind === 'indicator' && investigationWorkspace.has(node.row)
+          ? 'Remove from queue'
+          : 'Add indicator to queue';
+      }
+    };
+
+    const updateSearch = () => {
+      if (!searchResults || !search) return;
+      const query = normaliseLower(search.value);
+      const matches = query ? (graph?.nodes || []).filter((node) => dashboardCore.graphNodeMatches(node, query)) : [];
+      searchResults.hidden = !matches.length;
+      searchResults.replaceChildren(...matches.map((node) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'campaign-related-node';
+        button.textContent = `${node.label} · ${node.kind === 'pivot' ? `${node.count} displayed IOCs` : `${node.row?.type || 'indicator'} · score ${node.score}`}`;
+        button.addEventListener('click', () => {
+          selectNode(node);
+          const element = qsa('[data-graph-node]', svg).find((item) => item.dataset.graphNode === node.id);
+          element?.focus({ preventScroll: true });
+          element?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'instant' });
+        });
+        return button;
+      }));
+      setText(searchStatus, query
+        ? `${matches.length} matching nodes in the displayed graph. Main filters control the sample; this search does not expand it.`
+        : 'Search the displayed sample. Use the main filters to change its coverage.');
+    };
+
+    const render = () => {
+      const selectedId = selected?.id;
+      graph = dashboardCore.buildCampaignGraph(entries, {
+        mode: mode?.value || 'all',
+        maxPivots: 8,
+        maxIndicators: Number(density?.value) || 36,
+      });
+      svg.innerHTML = '';
+      selected = null;
+      const nextSelected = graph.nodes.find((node) => node.id === selectedId) || null;
+      const hasGraph = graph.nodes.length > 0 && graph.edges.length > 0;
+      if (empty) empty.hidden = hasGraph;
+      svg.hidden = !hasGraph;
+      root.hidden = !entries.length;
+      if (stats) stats.hidden = !hasGraph;
+      if (reset) reset.disabled = true;
+      if (exportGraph) {
+        exportGraph.disabled = !hasGraph;
+        exportGraph.textContent = 'Export graph JSON';
+      }
+      updateSearch();
+      setText(high, formatNumber(graph.stats.highScore));
+      setText(corroborated, formatNumber(graph.stats.corroborated));
+      setText(average, formatNumber(graph.stats.averageScore));
+      setText(visible, formatNumber(graph.stats.indicators));
+      if (summary) {
+        summary.textContent = hasGraph
+          ? `${formatNumber(graph.stats.relationships)} relationships across ${formatNumber(graph.stats.tagPivots)} tag and ${formatNumber(graph.stats.sourcePivots)} reporting groups (${graph.stats.mappedProviders} mapped providers, ${graph.stats.aggregates} aggregates, ${graph.stats.unmappedFeeds} unmapped feeds; ${graph.stats.availableProviders} eligible groups in the sample). Node size reflects mapped provider coverage; color reflects the collector score. Aggregates and unmapped feeds do not increase provider coverage. Shared reporting does not prove independent verification.`
+          : 'No repeated tags or sources were found in the current preview.';
+      }
+      const evidenceBlock = qs('[data-campaign-feed-evidence]', root);
+      if (evidenceBlock) evidenceBlock.parentElement.hidden = true;
+      if (title) title.textContent = 'Select a node';
+      if (description) description.textContent = 'Choose a pivot to understand its reach, or choose an indicator to add it to your investigation queue.';
+      if (meta) meta.hidden = true;
+      if (tagBlock) tagBlock.hidden = true;
+      if (relatedBlock) relatedBlock.hidden = true;
+      if (reference) {
+        reference.hidden = true;
+        reference.removeAttribute('href');
+      }
+      if (queue) {
+        queue.disabled = true;
+        queue.textContent = 'Add indicator to queue';
+      }
+      if (!hasGraph) return;
+
+      const positions = positionsFor(graph.nodes);
+      const edgeLayer = createSvg('g', { class: 'campaign-edges' });
+      graph.edges.forEach((edge, index) => {
+        const start = positions.get(edge.source);
+        const end = positions.get(edge.target);
+        if (!start || !end) return;
+        const line = createSvg('path', {
+          d: `M ${start.x + 120} ${start.y} C ${start.x + 175} ${start.y}, ${end.x - 55} ${end.y}, ${end.x - 17} ${end.y}`,
+          fill: 'none',
+          class: `campaign-edge ${edge.kind}`,
+          'data-graph-edge': '',
+          'data-source': edge.source,
+          'data-target': edge.target,
+        });
+        line.style.setProperty('--edge-delay', `${Math.min(index * 24, 420)}ms`);
+        edgeLayer.appendChild(line);
+      });
+      svg.appendChild(edgeLayer);
+
+      const nodeLayer = createSvg('g', { class: 'campaign-nodes' });
+      graph.nodes.forEach((node, index) => {
+        const position = positions.get(node.id);
+        const riskBand = node.kind === 'indicator'
+          ? node.score >= 80 ? 'critical' : node.score >= 60 ? 'elevated' : node.score >= 40 ? 'moderate' : 'aging'
+          : '';
+        const group = createSvg('g', {
+          class: `campaign-node ${node.kind} ${node.pivotKind || ''} ${riskBand}`,
+          transform: `translate(${position.x} ${position.y})`,
+          role: 'button',
+          tabindex: '0',
+          'aria-label': node.kind === 'pivot'
+            ? `${node.pivotKind} pivot ${node.label}, ${node.totalCount} indicators`
+            : `${node.row?.type || 'indicator'} ${node.label}, score ${node.score}`,
+          'data-graph-node': node.id,
+          'aria-pressed': 'false',
+        });
+        group.style.setProperty('--node-delay', `${Math.min(index * 30, 480)}ms`);
+        if (node.kind === 'indicator' && node.sourceCount >= 2) {
+          group.appendChild(createSvg('circle', {
+            r: 16 + Math.min(node.sourceCount, 5),
+            class: 'campaign-corroboration-ring',
+          }));
+        }
+        const circle = node.kind === 'pivot'
+          ? createSvg('rect', { x: -120, y: -27, width: 240, height: 54, rx: 6, class: 'campaign-node-core' })
+          : createSvg('circle', { r: 14 + Math.min(Math.max(node.sourceCount - 1, 0), 4) * 0.8, class: 'campaign-node-core' });
+        const label = createSvg('text', {
+          y: node.kind === 'pivot' ? -3 : 3,
+          'text-anchor': 'middle',
+        });
+        label.textContent = node.kind === 'pivot'
+          ? (node.label.length > 32 ? node.label.slice(0, 31) + '…' : node.label)
+          : String(node.score);
+        const subtitle = createSvg('text', {
+          y: node.kind === 'pivot' ? 17 : 31,
+          'text-anchor': 'middle',
+          class: 'campaign-node-subtitle',
+        });
+        subtitle.textContent = node.kind === 'pivot'
+          ? `${node.count}/${node.totalCount} IOCs`
+          : (node.label.length > 20 ? node.label.slice(0, 19) + '…' : node.label);
+        const tooltip = createSvg('title');
+        tooltip.textContent = node.kind === 'pivot'
+          ? `${node.label} · ${node.totalCount} indicators · average score ${node.averageScore}`
+          : `${node.label} · ${node.row?.type || 'indicator'} · score ${node.score} · ${node.sourceCount} mapped provider${node.sourceCount === 1 ? '' : 's'}${node.row?.lastSeenDisplay ? ` · last seen ${node.row.lastSeenDisplay}` : ''}`;
+        group.append(circle, label, subtitle, tooltip);
+        group.addEventListener('click', () => selectNode(node));
+        group.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            selectNode(node);
+            return;
+          }
+          const navigation = {
+            ArrowRight: 1,
+            ArrowDown: 1,
+            ArrowLeft: -1,
+            ArrowUp: -1,
+          };
+          if (event.key in navigation || event.key === 'Home' || event.key === 'End') {
+            event.preventDefault();
+            const elements = qsa('[data-graph-node]', svg);
+            const current = elements.indexOf(group);
+            const target = event.key === 'Home'
+              ? 0
+              : event.key === 'End'
+              ? elements.length - 1
+              : (current + navigation[event.key] + elements.length) % elements.length;
+            elements[target]?.focus();
+          }
+        });
+        nodeLayer.appendChild(group);
+      });
+      svg.appendChild(nodeLayer);
+      if (nextSelected) selectNode(nextSelected);
+    };
+
+    search?.addEventListener('input', updateSearch);
+    reset?.addEventListener('click', () => {
+      selected = null;
+      if (search) search.value = '';
+      render();
+    });
+    root.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && selected) {
+        selected = null;
+        render();
+        search?.focus();
+      }
+    });
+    exportGraph?.addEventListener('click', () => {
+      if (!graph?.edges.length) return;
+      const edges = selected ? graph.edges.filter((edge) => edge.source === selected.id || edge.target === selected.id) : graph.edges;
+      const ids = new Set(edges.flatMap((edge) => [edge.source, edge.target]));
+      const nodes = graph.nodes.filter((node) => ids.has(node.id));
+      downloadDetection(JSON.stringify({
+        schema_version: 1,
+        exported_at: new Date().toISOString(),
+        scope: selected ? 'selected-neighborhood' : 'displayed-graph',
+        selected_node: selected?.id || null,
+        mode: graph.mode,
+        sample_indicator_count: entries.filter((row) => normaliseLower(row.type) !== 'cve').length,
+        limits: { indicators: Number(density?.value) || 36, pivots: 8 },
+        counts: { nodes: nodes.length, indicators: nodes.filter((node) => node.kind === 'indicator').length, relationships: edges.length },
+        caveat: 'Relationships describe shared reporting or tags in a bounded sample, not campaign attribution or independent verification. Pivot totals describe the filtered sample; edges describe this export.',
+        nodes, edges,
+      }, null, 2) + '\n', 'swiftioc-graph-evidence.json', 'application/json');
+    });
+    mode?.addEventListener('change', render);
+    density?.addEventListener('change', render);
+    remix?.addEventListener('click', () => {
+      rotation = (rotation + Math.PI / 7) % (Math.PI * 2);
+      render();
+    });
+    queue?.addEventListener('click', () => {
+      if (!selected?.row) return;
+      const wasSelected = investigationWorkspace.has(selected.row);
+      if (investigationWorkspace.toggle(selected.row)) {
+        showToast(wasSelected ? 'Removed from the investigation queue.' : 'Added graph finding to the investigation queue.');
+      }
+      selectNode(selected);
+      syncInvestigationButtons();
+    });
+    investigationWorkspace.subscribe(() => {
+      if (selected?.row) selectNode(selected);
+    });
+    window.addEventListener('swiftioc:preview-filtered', (event) => {
+      if (!Array.isArray(event.detail?.rows)) return;
+      entries = event.detail.rows;
+      render();
+    });
+
   };
 
   const makeThreatCard = (row) => {
@@ -2869,6 +4111,8 @@
             await copyOrPrompt(row.indicator, 'Indicator copied to clipboard.', 'Copy this indicator:');
           })
         );
+        actions.appendChild(makeInvestigationButton(row));
+        syncInvestigationButtons();
         actions.appendChild(
           makeAction('Download JSON', () => downloadJson(row))
         );
@@ -2880,10 +4124,11 @@
             await copyOrPrompt(url.toString(), 'Shareable IOC lookup copied.', 'Copy this shareable link:');
           })
         );
-        if (row.reference) {
+        const sourceUrl = safeHttpUrl(row.reference);
+        if (sourceUrl) {
           const reference = document.createElement('a');
           reference.className = 'button ghost';
-          reference.href = row.reference;
+          reference.href = sourceUrl;
           reference.target = '_blank';
           reference.rel = 'noopener noreferrer';
           reference.textContent = 'View source';
@@ -3149,16 +4394,79 @@
     });
   };
 
+  const initialiseDetectionDownloads = () => {
+    const optionalLinks = qsa('[data-detection-artifact]');
+    if (!optionalLinks.length) return;
+    fetch(DETECTION_MANIFEST_URL, {
+      cache: 'no-store',
+      headers: { Accept: 'application/json' },
+    })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((manifest) => {
+        const included = manifest?.included;
+        if (!included || typeof included !== 'object') return;
+        const hasNetwork = ['ipv4', 'ipv6', 'ipv4_cidr', 'ipv6_cidr']
+          .some((kind) => Number(included[kind]) > 0);
+        const availability = {
+          'sigma/network-iocs.yml': hasNetwork,
+          'sigma/dns-iocs.yml': Number(included.domain) > 0,
+        };
+        optionalLinks.forEach((link) => {
+          link.hidden = !availability[link.dataset.detectionArtifact];
+        });
+      })
+      .catch((error) => {
+        console.warn('Detection manifest unavailable', error);
+      });
+  };
+
+  // Open collapsed tools for existing section bookmarks and in-page links.
+  // Fragment lookup uses IDs, not CSS selectors: malformed/shared IOC fragments
+  // cannot throw or accidentally select another element.
+  const initialiseSectionNavigation = () => {
+    const reveal = () => {
+      let id;
+      try { id = decodeURIComponent(window.location.hash.slice(1)); }
+      catch { return; }
+      if (!id || id.startsWith('ioc=') || id.startsWith('view=')) return;
+      const target = document.getElementById(id);
+      if (!target) return;
+      let parent = target.parentElement;
+      let opened = false;
+      while (parent) {
+        if (parent.matches('details') && !parent.open) {
+          parent.open = true;
+          opened = true;
+        }
+        parent = parent.parentElement;
+      }
+      if (opened) window.requestAnimationFrame(() => target.scrollIntoView({ block: 'start' }));
+    };
+    window.addEventListener('hashchange', reveal);
+    // Clicking the same hash again must also reopen a manually closed tool.
+    document.addEventListener('click', (event) => {
+      const link = event.target.closest('a[href^="#"]');
+      if (link && link.hash === window.location.hash) reveal();
+    });
+    reveal();
+  };
+
   /* ==========================================================================
    *  BOOTSTRAP
    * ========================================================================= */
 
+  initialiseSectionNavigation();
   initialiseTableToggles();
+  initialiseInvestigationWorkspace();
   initialiseStatusBanner();
+  initialiseVulnerabilities();
+  initialiseDiscovery();
+  initialiseCampaignGraph();
   initialiseTopThreats();
   initialiseIocLookup();
   initialiseTrendSparkline();
   initialiseDownloadFallbacks();
+  initialiseDetectionDownloads();
   loadStats();
   initialisePreview();
 })();

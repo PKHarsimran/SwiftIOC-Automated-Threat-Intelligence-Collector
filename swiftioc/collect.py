@@ -222,6 +222,11 @@ def collect_from_yaml(
             uniq[k] = i
             continue
         prev = uniq[k]
+        if i.type == "cve":
+            prev.vulnerability = {**prev.vulnerability, **i.vulnerability}
+        old_first, new_first = parse_dt(prev.first_seen), parse_dt(i.first_seen)
+        if new_first and (old_first is None or new_first < old_first):
+            prev.first_seen = i.first_seen
         # last_seen
         try:
             p = parse_dt(prev.last_seen) or now_utc()

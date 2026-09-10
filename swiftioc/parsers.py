@@ -18,6 +18,7 @@ from __future__ import annotations
 import csv
 import io
 import json
+import os
 import re
 from datetime import datetime, timedelta
 from importlib import import_module
@@ -28,10 +29,12 @@ import requests
 import swiftioc as _pkg
 
 from .extract import extract_indicators_from_text
-from .http_client import choose_ua, ensure_text, logger
+from .http_client import ensure_text, logger
 from .models import (
+    CVE_RE,
     DATE_FIELD_RE,
     JA3_RE,
+    SHA256_RE,
     TAGS_FIELD_RE,
     Indicator,
     classify,
@@ -95,25 +98,37 @@ def fetch_cisa_kev(url: str, ref_url: str, source: str, ws: datetime) -> List[In
     out: List[Indicator] = []
     now = now_utc()
     for it in data.get("vulnerabilities", []) or []:
+        if not isinstance(it, dict):
+            continue
         cve = it.get("cveID")
         pub = parse_dt(it.get("dateAdded"))
-        if not cve:
+        if not isinstance(cve, str) or not CVE_RE.fullmatch(cve.strip()):
             continue
         out.append(
             Indicator(
-                indicator=cve, type="cve", source=source,
+                indicator=cve.strip().upper(), type="cve", source=source,
                 first_seen=iso(pub or now), last_seen=iso(now),
                 confidence="high", tlp="CLEAR",
                 tags="cve,exploited-in-the-wild",
                 reference=ref_url or "",
-                context=it.get("notes") or it.get("shortDescription") or "CISA KEV",
+                context=it.get("shortDescription") or it.get("notes") or "CISA KEV",
+                vulnerability={"cisa_kev": {
+                    "source": source, "reference": ref_url,
+                    "catalog_checked_at": iso(now),
+                    "date_added": it.get("dateAdded"),
+                    "vendor": it.get("vendorProject"), "product": it.get("product"),
+                    "title": it.get("vulnerabilityName"),
+                    "description": it.get("shortDescription"),
+                    "required_action": it.get("requiredAction"), "due_date": it.get("dueDate"),
+                    "ransomware_use": it.get("knownRansomwareCampaignUse"), "notes": it.get("notes"),
+                }},
             )
         )
     return out
 
 
 @register_parser("nvd", "nist_nvd", "nist_nvd_recent")
-def fetch_nvd_recent(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
+def fetch_nvd_recent(url: str, ref_url: str, source: str, ws: datetime, *, api_key_env: Optional[str] = None) -> List[Indicator]:
     now = now_utc()
     # The NVD 2.0 API returns the *oldest* CVEs first (startIndex 0), so an
     # unfiltered query yields 1999-era CVEs that the lookback window then drops,
@@ -126,7 +141,8 @@ def fetch_nvd_recent(url: str, ref_url: str, source: str, ws: datetime) -> List[
     # Match the NVD host by parsed hostname, not a substring of the whole URL,
     # so a lookalike like nvd.nist.gov.evil.com or ?x=nvd.nist.gov can't trip it.
     # Use endswith so the real config host (services.nvd.nist.gov) still matches.
-    if host == "nvd.nist.gov" or host.endswith(".nvd.nist.gov"):
+    is_nvd_host = host == "nvd.nist.gov" or host.endswith(".nvd.nist.gov")
+    if is_nvd_host:
         query = parse_qs(parsed.query)
         if not any(k in query for k in ("lastModStartDate", "pubStartDate")):
             fmt = "%Y-%m-%dT%H:%M:%S.000"
@@ -134,7 +150,9 @@ def fetch_nvd_recent(url: str, ref_url: str, source: str, ws: datetime) -> List[
             query["lastModStartDate"] = [start.strftime(fmt)]
             query["lastModEndDate"] = [now.strftime(fmt)]
             url = parsed._replace(query=urlencode(query, doseq=True)).geturl()
-    text = ensure_text(_pkg.http_get(url, name=source))
+    api_key = os.environ.get(api_key_env) if api_key_env else None
+    request_headers = {"apiKey": api_key} if api_key else None
+    text = ensure_text(_pkg.http_get(url, name=source, headers=request_headers))
     try:
         data = json.loads(text)
     except json.JSONDecodeError:
@@ -143,6 +161,35 @@ def fetch_nvd_recent(url: str, ref_url: str, source: str, ws: datetime) -> List[
     records = data.get("vulnerabilities") if isinstance(data, dict) else None
     if not isinstance(records, list):
         return []
+    # NVD uses offset pagination. The configured page size is 200 but busy
+    # modification windows routinely exceed that, so only consuming the first
+    # page silently dropped valid CVEs. Keep every page from this bounded time
+    # query while preserving the configured resultsPerPage value.
+    if is_nvd_host:
+        page_url = urlparse(url)
+        page_query = parse_qs(page_url.query)
+        try:
+            start_index = int(page_query.get("startIndex", ["0"])[0])
+            page_size = int(data.get("resultsPerPage") or page_query.get("resultsPerPage", [len(records)])[0])
+            total_results = int(data.get("totalResults") or len(records))
+        except (TypeError, ValueError):
+            start_index, page_size, total_results = 0, len(records), len(records)
+        if page_size > 0:
+            for next_index in range(start_index + page_size, start_index + total_results, page_size):
+                page_query["startIndex"] = [str(next_index)]
+                next_url = page_url._replace(query=urlencode(page_query, doseq=True)).geturl()
+                try:
+                    next_data = json.loads(ensure_text(_pkg.http_get(next_url, name=source, headers=request_headers)))
+                except (json.JSONDecodeError, requests.exceptions.RequestException) as exc:
+                    logger.warning("%s pagination stopped at startIndex %d: %s", source, next_index, exc)
+                    break
+                next_records = next_data.get("vulnerabilities") if isinstance(next_data, dict) else None
+                if not isinstance(next_records, list):
+                    logger.warning("%s returned no vulnerability list at startIndex %d", source, next_index)
+                    break
+                records.extend(next_records)
+                if not next_records:
+                    break
     out: List[Indicator] = []
 
     def extract_severity(entry: Dict[str, Any]) -> Optional[str]:
@@ -174,7 +221,7 @@ def fetch_nvd_recent(url: str, ref_url: str, source: str, ws: datetime) -> List[
         if not isinstance(cve, dict):
             continue
         cve_id = cve.get("id")
-        if not isinstance(cve_id, str):
+        if not isinstance(cve_id, str) or not CVE_RE.fullmatch(cve_id.strip()):
             continue
         published = parse_dt(cve.get("published"))
         last_modified = parse_dt(cve.get("lastModified"))
@@ -204,7 +251,7 @@ def fetch_nvd_recent(url: str, ref_url: str, source: str, ws: datetime) -> List[
         context = description or "NVD recent CVE"
         out.append(
             Indicator(
-                indicator=cve_id.upper(),
+                indicator=cve_id.strip().upper(),
                 type="cve",
                 source=source,
                 first_seen=iso(first_seen or now),
@@ -214,6 +261,14 @@ def fetch_nvd_recent(url: str, ref_url: str, source: str, ws: datetime) -> List[
                 tags=",".join(sorted(tags)),
                 reference=ref_url or "",
                 context=context,
+                vulnerability={"nvd": {
+                    "source": source,
+                    "reference": "https://nvd.nist.gov/vuln/detail/" + cve_id.strip().upper(),
+                    "published_at": cve.get("published"), "modified_at": cve.get("lastModified"),
+                    "status": cve.get("vulnStatus"), "severity": severity,
+                    "description": description,
+                    "configurations": cve.get("configurations", []),
+                }},
             )
         )
     return out
@@ -283,24 +338,21 @@ def fetch_malwarebazaar_csv(
             raise
     out: List[Indicator] = []
     now = now_utc()
-    for row in csv.reader(io.StringIO(text)):
-        if not row or row[0].startswith("#"):
+    # Export columns: first_seen_utc, sha256_hash, md5_hash, sha1_hash,
+    # reporter, file_name, file_type_guess, mime_type, signature, ...
+    # Spaces precede quoted fields in the live export; skipinitialspace
+    # keeps commas in quoted filenames from shifting subsequent columns.
+    for row in csv.reader(io.StringIO(text), skipinitialspace=True):
+        if len(row) < 2 or row[0].strip().startswith("#"):
             continue
-        try:
-            first_seen = parse_dt(row[0].strip())
-            sha256 = (row[3] if len(row) > 3 else "").strip().strip('"')
-            sig_raw = ""
-            if len(row) > 8:
-                sig_raw = row[8]
-            elif len(row) > 7:
-                sig_raw = row[7]
-            sig = sig_raw.strip().strip('"')
-            if sig.lower() in {"", "n/a", "na", "none"}:
-                sig = ""
-        except Exception:
+        first_seen = parse_dt(row[0].strip())
+        sha256 = row[1].strip()
+        if not SHA256_RE.fullmatch(sha256):
             continue
-        if not sha256:
-            continue
+        # Column 7 is MIME type, never a fallback malware signature.
+        sig = row[8].strip() if len(row) > 8 else ""
+        if sig.lower() in {"", "n/a", "na", "none"}:
+            sig = ""
         if first_seen and first_seen < ws:
             continue
         out.append(
@@ -370,7 +422,16 @@ def fetch_threatfox_export_json(url: str, ref_url: str, source: str, ws: datetim
         if itype == "ip:port":
             # "1.2.3.4:443" -> classify the bare address; keeps the value
             # comparable with other IP feeds so corroboration can match.
-            host = ioc.rsplit(":", 1)[0]
+            # IPv6 endpoints are RFC 3986 bracketed ("[2001:db8::1]:443").
+            # Splitting that form leaves brackets around the address, which
+            # classify() correctly rejects; unwrap it before validation.
+            if ioc.startswith("["):
+                end = ioc.find("]")
+                if end == -1 or not ioc[end + 1 :].startswith(":"):
+                    continue
+                host = ioc[1:end]
+            else:
+                host = ioc.rsplit(":", 1)[0]
             t = classify(host)
             if t not in {"ipv4", "ipv6"}:
                 continue
@@ -426,6 +487,10 @@ def fetch_feodo_ipblocklist(
             ip = row[1].strip()
             family = row[5].strip() if len(row) > 5 else ""
         except Exception:
+            continue
+        # A malformed value was previously emitted with a hardcoded ipv4
+        # type, bypassing the normal false-positive/validation path.
+        if classify(ip) != "ipv4":
             continue
 
         if not disable_window and seen and seen < ws:
@@ -721,7 +786,11 @@ def fetch_rss(url: str, ref_url: str, source: str, ws: datetime, *, per_entry_ca
             return []
         raise
     try:
-        feed = fp.parse(url, request_headers=choose_ua())
+        # Fetch through the shared client so RSS gets the same retry, response
+        # cap, redirect validation, raw capture, and diagnostics as every
+        # other source. Passing a URL directly to feedparser bypassed all of
+        # those controls.
+        feed = fp.parse(ensure_text(_pkg.http_get(url, name=source)))
     except Exception as exc:
         logger.warning("RSS parse failed for %s: %s", source, exc)
         return []
@@ -940,5 +1009,3 @@ def fetch_universal(
         )
 
     return list(uniq.values())
-
-
