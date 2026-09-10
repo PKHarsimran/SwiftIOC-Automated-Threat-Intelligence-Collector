@@ -31,6 +31,7 @@ import swiftioc as _pkg
 from .extract import extract_indicators_from_text
 from .http_client import ensure_text, logger
 from .models import (
+    CVE_RE,
     DATE_FIELD_RE,
     JA3_RE,
     SHA256_RE,
@@ -97,18 +98,30 @@ def fetch_cisa_kev(url: str, ref_url: str, source: str, ws: datetime) -> List[In
     out: List[Indicator] = []
     now = now_utc()
     for it in data.get("vulnerabilities", []) or []:
+        if not isinstance(it, dict):
+            continue
         cve = it.get("cveID")
         pub = parse_dt(it.get("dateAdded"))
-        if not cve:
+        if not isinstance(cve, str) or not CVE_RE.fullmatch(cve.strip()):
             continue
         out.append(
             Indicator(
-                indicator=cve, type="cve", source=source,
+                indicator=cve.strip().upper(), type="cve", source=source,
                 first_seen=iso(pub or now), last_seen=iso(now),
                 confidence="high", tlp="CLEAR",
                 tags="cve,exploited-in-the-wild",
                 reference=ref_url or "",
-                context=it.get("notes") or it.get("shortDescription") or "CISA KEV",
+                context=it.get("shortDescription") or it.get("notes") or "CISA KEV",
+                vulnerability={"cisa_kev": {
+                    "source": source, "reference": ref_url,
+                    "catalog_checked_at": iso(now),
+                    "date_added": it.get("dateAdded"),
+                    "vendor": it.get("vendorProject"), "product": it.get("product"),
+                    "title": it.get("vulnerabilityName"),
+                    "description": it.get("shortDescription"),
+                    "required_action": it.get("requiredAction"), "due_date": it.get("dueDate"),
+                    "ransomware_use": it.get("knownRansomwareCampaignUse"), "notes": it.get("notes"),
+                }},
             )
         )
     return out
@@ -208,7 +221,7 @@ def fetch_nvd_recent(url: str, ref_url: str, source: str, ws: datetime, *, api_k
         if not isinstance(cve, dict):
             continue
         cve_id = cve.get("id")
-        if not isinstance(cve_id, str):
+        if not isinstance(cve_id, str) or not CVE_RE.fullmatch(cve_id.strip()):
             continue
         published = parse_dt(cve.get("published"))
         last_modified = parse_dt(cve.get("lastModified"))
@@ -238,7 +251,7 @@ def fetch_nvd_recent(url: str, ref_url: str, source: str, ws: datetime, *, api_k
         context = description or "NVD recent CVE"
         out.append(
             Indicator(
-                indicator=cve_id.upper(),
+                indicator=cve_id.strip().upper(),
                 type="cve",
                 source=source,
                 first_seen=iso(first_seen or now),
@@ -248,6 +261,14 @@ def fetch_nvd_recent(url: str, ref_url: str, source: str, ws: datetime, *, api_k
                 tags=",".join(sorted(tags)),
                 reference=ref_url or "",
                 context=context,
+                vulnerability={"nvd": {
+                    "source": source,
+                    "reference": "https://nvd.nist.gov/vuln/detail/" + cve_id.strip().upper(),
+                    "published_at": cve.get("published"), "modified_at": cve.get("lastModified"),
+                    "status": cve.get("vulnStatus"), "severity": severity,
+                    "description": description,
+                    "configurations": cve.get("configurations", []),
+                }},
             )
         )
     return out

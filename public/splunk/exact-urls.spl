@@ -1,0 +1,7 @@
+index=YOUR_PROXY_INDEX earliest=-24h latest=now
+| fields _time host src_ip user url action
+| fields - sf_*
+| eval sf_type="url", sf_value=replace(replace(trim(url), "\\[\\.\\]", "."), "(?i)^hxxp", "http")
+| lookup swiftioc_iocs.csv sf_type sf_value OUTPUT sf_value AS sf_match sf_score sf_sources sf_tags sf_last_seen sf_references
+| where isnotnull(sf_match)
+| table _time host src_ip user url action sf_match sf_score sf_sources sf_last_seen sf_references

@@ -123,6 +123,15 @@ def _score_band(score: int) -> str:
     return "aging"
 
 
+def _vulnerability_evidence(reports: Dict[str, Any]) -> Dict[str, Any]:
+    """Compare provider evidence without alerting on every KEV catalog poll."""
+    return {
+        provider: {key: value for key, value in report.items() if key != "catalog_checked_at"}
+        if provider == "cisa_kev" and isinstance(report, dict) else report
+        for provider, report in reports.items()
+    }
+
+
 def build_delta(
     previous: List[Indicator],
     current: List[Indicator],
@@ -137,6 +146,8 @@ def build_delta(
     run as thousands of new alerts would make the feed unsafe for automation.
     Score updates are material only when they cross a dashboard band or move by
     at least five points, which suppresses routine decay noise.
+    Provider evidence changes are material; the local KEV catalog poll time
+    alone is not. Event payloads still retain the complete provider reports.
     """
     events: List[Dict[str, Any]] = []
     if baseline_available:
@@ -155,6 +166,11 @@ def build_delta(
                 old_value, new_value = getattr(old, field), getattr(new, field)
                 if old_value != new_value:
                     changes[field] = {"from": old_value, "to": new_value}
+            if _vulnerability_evidence(old.vulnerability) != _vulnerability_evidence(new.vulnerability):
+                changes["vulnerability"] = {
+                    "from": asdict(old)["vulnerability"],
+                    "to": asdict(new)["vulnerability"],
+                }
             if old.score != new.score and (
                 abs(new.score - old.score) >= 5 or _score_band(old.score) != _score_band(new.score)
             ):

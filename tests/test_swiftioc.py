@@ -1364,3 +1364,16 @@ def test_collect_from_yaml_single_worker_matches(monkeypatch):
     rows_parallel = run(4)
     rows_serial = run(1)
     assert [r.indicator for r in rows_parallel] == [r.indicator for r in rows_serial]
+
+
+def test_nvd_retains_applicability_conditions_for_inventory_matching(monkeypatch):
+    now = si.now_utc()
+    configurations = [{"operator": "AND", "nodes": [{"operator": "OR", "cpeMatch": [{
+        "vulnerable": True, "criteria": "cpe:2.3:a:vendor:server:*:*:*:*:*:*:*:*",
+        "versionStartIncluding": "2.0", "versionEndExcluding": "3.0",
+    }]}]}]
+    payload = {"vulnerabilities": [{"cve": {"id": "CVE-2026-1234",
+        "published": si.iso(now), "lastModified": si.iso(now), "configurations": configurations}}]}
+    monkeypatch.setattr(si, "http_get", lambda *args, **kwargs: json.dumps(payload))
+    rows = si.fetch_nvd_recent("https://example.com/nvd", "ref", "nvd", now - timedelta(hours=1))
+    assert rows[0].vulnerability["nvd"]["configurations"] == configurations

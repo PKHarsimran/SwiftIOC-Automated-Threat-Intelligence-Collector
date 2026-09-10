@@ -13,6 +13,7 @@ import yaml
 
 from . import http_client
 from .collect import collect_from_yaml, parse_name_int_pairs, top_tags, type_breakdown
+from .collections import write_collections
 from .detections import write_detection_pack
 from .http_client import UA_POOL, get_fetch_metrics, logger
 from .logging_utils import configure_logging
@@ -112,7 +113,7 @@ def main() -> int:
     ap.add_argument("--max-age-days", type=int, default=None,
                     help="Retention: drop indicators whose last_seen is older than N days")
     ap.add_argument("--max-store", type=int, default=None,
-                    help="Retention: keep only the top N indicators by score/recency (KEVIntel-style curation)")
+                    help="Retention: keep at most N; recently checked KEV CVEs first, then score/recency")
     ap.add_argument("--dashboard-rows", type=int, default=1000,
                     help="Rows in the compact dashboard.jsonl the web dashboard downloads (default 1000)")
     ap.add_argument("--site-url", type=str,
@@ -309,6 +310,7 @@ def main() -> int:
     )
 
     run_ts = iso(now_utc())
+    collection_counts = write_collections(out_dir / "collections", rows, generated_at=run_ts)
     detection_manifest = write_detection_pack(
         out_dir / "detections", high_conf, generated_at=run_ts
     )
@@ -407,6 +409,7 @@ def main() -> int:
         "window_hours": args.window_hours,
         "total": len(rows),
         "total_before_dedup": raw_total,
+        "collections": collection_counts,
         "duplicates_removed": duplicates_removed,
         "false_positives_removed": stats.get("false_positives_removed", 0),
         "persist_feed": bool(args.persist_feed),

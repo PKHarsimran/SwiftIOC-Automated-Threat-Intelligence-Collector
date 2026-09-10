@@ -1,392 +1,175 @@
-# ⚡ SwiftIOC – Open Source Automated Threat Intelligence Collector
+# SwiftIOC
 
-[![CI – SwiftIOC](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/ci.yml)
+**Public threat feeds, one searchable workspace, and a change stream for security operations.**
+
+[![CI](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/codeql.yml)
 [![Collection](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/collect.yml/badge.svg?branch=main)](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/collect.yml)
-[![IOCs](https://img.shields.io/endpoint?url=https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/badge.json)](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/)
-[![Dashboard](https://img.shields.io/website?url=https%3A%2F%2Fharsim.ca%2FSwiftIOC-Automated-Threat-Intelligence-Collector%2F&label=dashboard&up_message=online&down_message=offline)](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/)
-[![Last commit](https://img.shields.io/github/last-commit/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector?branch=main&label=feed%20activity)](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/commits/main)
-[![License](https://img.shields.io/github/license/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector)](./LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector?style=flat&logo=github)](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/stargazers)
-[![Security Policy](https://img.shields.io/badge/security-policy-informational?logo=github)](./SECURITY.md)
+[![License](https://img.shields.io/github/license/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector)](LICENSE)
 
-SwiftIOC is an open-source Python threat intelligence automation toolkit that
-keeps recent Indicators of Compromise (IOCs) in machine-readable formats. The
-lightweight collector (`swiftioc/`) ingests threat feeds via YAML
-configuration, normalises and deduplicates the indicators, and exports them to
-CSV, TSV, JSON, JSON Lines, STIX 2.1, TAXII 2.1, and MISP alongside searchable
-run diagnostics and a compact change stream for continuous ingestion.
+SwiftIOC collects indicators of compromise (IOCs) and vulnerability reports with Python, then publishes a static threat intelligence dashboard and machine-readable feeds. Use it to investigate an IP or domain, follow exploited CVEs affecting products you watch, or bring changes into your own security tools.
 
-Designed for security operations teams, SOC analysts, and cyber threat hunters,
-SwiftIOC runs anywhere Python is available—local workstations, CI/CD pipelines,
-GitHub Actions, or automated cron jobs. Outputs land under `public/` by default
-so they can be published directly with GitHub Pages, integrated into SIEM and
-SOAR tooling, or archived for compliance reporting. The repository includes
-ready-to-use examples for rapid deployment in modern DevSecOps workflows.
+**[Open the dashboard](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/) · [Explore CVEs](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/#vulnerabilities) · [Read the latest run report](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/diagnostics/REPORT.md)**
 
-**[Open the live dashboard](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/)**
-· **[Download the high-confidence CSV](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/iocs/high_confidence.csv)**
-· **[Read the run diagnostics](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/diagnostics/summary.html)**
+[![Observables in the published snapshot](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fharsim.ca%2FSwiftIOC-Automated-Threat-Intelligence-Collector%2Fdiagnostics%2Frun.json&query=%24.collections.observables&label=Observables&color=blue)](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/diagnostics/run.json)
+[![CVEs in the published snapshot](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fharsim.ca%2FSwiftIOC-Automated-Threat-Intelligence-Collector%2Fdiagnostics%2Frun.json&query=%24.collections.vulnerabilities&label=CVEs&color=purple)](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/diagnostics/run.json)
+[![Known exploited in the published snapshot](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fharsim.ca%2FSwiftIOC-Automated-Threat-Intelligence-Collector%2Fdiagnostics%2Frun.json&query=%24.collections.known_exploited&label=Known+exploited&color=orange)](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/diagnostics/run.json)
 
-## 🧭 Start here
+These live badges count records in the **published, retained snapshot**, not the complete upstream catalogs. “Known exploited” means CVEs with CISA KEV evidence; it does not measure attacks happening right now. Badge caching can delay updates. Check [run diagnostics](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/diagnostics/run.json) for source health and coverage.
 
-Choose the shortest path for what you are trying to do:
+## Start here
 
-| You are… | Start with… | What it gives you |
-| --- | --- | --- |
-| A SOC analyst or threat hunter | [Live dashboard](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/) | Search, filters, score explanations, source context, and a private browser-local investigation queue. |
-| Feeding a SIEM, EDR, firewall, or SOAR | [High-confidence JSONL](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/iocs/high_confidence.jsonl) | The strongest current indicators in a stream-friendly format. |
-| Building continuous automation | [SOC Delta output guide](#-outputs--diagnostics) | Additions, material updates, and removals since the previous validated snapshot. |
-| Using a CTI platform | [Interoperability outputs](#-outputs--diagnostics) or the live [MISP manifest](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/misp/manifest.json) | STIX, TAXII, and MISP objects with stable identifiers for repeatable imports. |
-| Investigating historical activity | [`ioc_timeline.py`](scripts/ioc_timeline.py) | Answer whether an IOC was present, when it appeared, and how its score changed. |
-| Running your own collector | [Quick start](#-quick-start) | A configurable local, container, cron, or GitHub Actions deployment. |
-| Contributing a parser or fix | [Development and testing](#-development--testing) | Setup, test commands, and contribution guidance. |
+| I want to… | Start with… |
+| --- | --- |
+| Investigate an indicator without installing anything | [Live dashboard](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/) |
+| Prioritize vulnerabilities for products I use | [CVE briefing](#cve-briefing) |
+| Run my own collection and dashboard | [Quick start](#quick-start) |
+| Import intelligence into a SIEM or CTI platform | [Feeds and integrations](#feeds-and-integrations) |
+| Understand where the data and scores come from | [How it works](#how-it-works) and [Scoring and retention](#scoring-and-retention) |
+| Schedule collection or publish a fork | [Running continuously](#running-continuously) |
+| Add a source or contribute a fix | [Source configuration](#source-configuration) and [Development](#development) |
 
-### Pick the right feed
+## How it works
 
-| Feed | Use it when | Operational note |
-| --- | --- | --- |
-| `high_confidence.csv` | A human needs a small, block-ready spreadsheet or import file. | Review against local allowlists and policy before enforcement. |
-| `high_confidence.jsonl` | A machine ingests strong indicators one record at a time. | Includes score, sources, timestamps, tags, and context. |
-| `latest.jsonl` | You need the complete current SwiftIOC snapshot. | Larger download; use for initial sync and recovery. |
-| `delta.jsonl` | You poll SwiftIOC every collection cycle. | Idempotently apply `added`/`updated`; remove `removed_from_feed` from the working set. |
-| `stix2.json` / `taxii2-envelope.json` | Your CTI tooling understands STIX or TAXII objects. | Objects are built together so their versions remain identical. |
-| `feed.xml` | A person wants high-confidence additions in an RSS reader. | Best for awareness; use JSONL for automation. |
+SwiftIOC has two parts: a **Python collector** that produces files and a **browser dashboard** that reads them. Browsing the published site does not require a running Python API, a database server, or an account.
 
-> [!CAUTION]
-> Threat intelligence is evidence for triage, not an automatic verdict. Apply
-> local allowlists, asset context, and response policy before blocking. A
-> `removed_from_feed` event means SwiftIOC no longer publishes that IOC; it does
-> not prove the indicator became benign. Indicators are defanged in human-facing
-> views to reduce accidental activation.
-
-## 📚 Table of contents
-- [Start here](#-start-here)
-- [SwiftIOC at a glance](#-swiftioc-at-a-glance)
-- [Features](#-features)
-- [GitHub project health](#-github-project-health)
-- [Supported threat intelligence sources](#-supported-threat-intelligence-sources)
-- [Use cases & SEO-friendly keywords](#-use-cases--seo-friendly-keywords)
-- [Repository layout](#-repository-layout)
-- [How it works](#-how-it-works)
-- [Indicator scoring & the living feed](#-indicator-scoring--the-living-feed)
-- [Quick start](#-quick-start)
-- [Configuring sources](#-configuring-sources)
-- [CLI reference](#-cli-reference)
-- [Outputs & diagnostics](#-outputs--diagnostics)
-- [GitHub Pages preview & publishing](#-github-pages-preview--publishing)
-- [Running in GitHub Actions](#-running-in-github-actions)
-- [Auto-generated IOC summary](#auto-generated-ioc-summary)
-- [Development & testing](#-development--testing)
-
-## 🔍 SwiftIOC at a glance
-SwiftIOC helps cybersecurity teams automate the collection and publication of
-high-fidelity IOCs from authoritative sources. The project emphasises:
-
-- **Automated threat feed aggregation** with YAML-based configuration.
-- **Consistent IOC enrichment** ready for SIEM, SOAR, IDS, and DFIR tooling.
-- **Git-friendly artefacts** tailored for GitHub Pages, GitHub Actions, and
-  other CI/CD environments.
-
-## 🚀 Features
-- **Analyst-first live dashboard** – search raw or defanged IOCs, combine
-  multi-select type/source/tag/score/age filters, inspect score rationale, and
-  shortlist findings in a private investigation queue that persists in the
-  browser. Queue contents can be copied or exported as CSV/JSON without being
-  sent to a server. The interface includes responsive threat visualisations and
-  motion that automatically disables when reduced motion is requested.
-- **YAML-driven feeds** – feed metadata lives in `sources.yml` so collections can
-  be changed without touching Python code. The example file includes adapters for
-  CISA KEV, NVD, URLhaus, MalwareBazaar, ThreatFox, Feodo Tracker, SSLBL JA3,
-  Spamhaus DROP, DShield/SANS ISC, OpenPhish, CINS Army, Tor exit lists, and more.
-- **Indicator normalisation** – every indicator is represented by the
-  `Indicator` dataclass and classified (IPv4/IPv6, URL, domain, hash, CVE, etc.)
-  before being written to disk. 
-- **Defanging & deduplication** – helper functions defang URLs/domains and
-  remove duplicate indicators so that downstream tools receive safe, unique
-  values. Host casing is normalised before dedup so `Evil.COM` and `evil.com`
-  collapse to one record.
-- **False-positive filtering** – bogon IP ranges (private, loopback,
-  link-local, reserved, multicast) and well-known benign hosts (`example.com`,
-  `localhost`, `*.test`, …) are dropped automatically; disable with
-  `--no-fp-filter`. The count is reported in diagnostics.
-- **Indicator scoring, decay & a living feed** – every indicator gets a 0–100
-  relevance score combining source confidence, cross-source corroboration
-  (independent feeds agreeing boosts the score), and age-based exponential
-  decay with per-type half-lives. With `--persist-feed` the collector merges
-  the previously published feed each run: re-observed indicators refresh to
-  full score, unobserved ones fade out, and entries below `--min-score`
-  expire. Most free aggregators publish stale snapshots — SwiftIOC publishes
-  a self-maintaining feed.
-- **Curated high-confidence feed** – alongside the full exports, every run emits
-  `high_confidence.csv`/`.jsonl` containing only indicators that score ≥80 or
-  are confirmed by 2+ independent sources, strongest-first. This is the
-  block-ready subset for SIEM/firewall ingestion where false positives are
-  costly.
-- **SOC Delta stream** – `delta.json` and `delta.jsonl` describe additions,
-  material changes, and removals since the last validated snapshot. Consumers
-  can poll a small change feed during normal operation and reserve the complete
-  snapshot for initial sync or recovery.
-- **Interoperable and verifiable delivery** – the same in-memory STIX objects
-  are published as a STIX 2.1 bundle and static TAXII 2.1 envelope. An optional
-  keyless Sigstore workflow signs canonical feeds, and
-  [`integrations/README.md`](integrations/README.md) provides starter guidance
-  for Splunk, Elastic Security, and Microsoft Sentinel.
-- **Deployment-ready container** – the included image runs as an unprivileged
-  user, persists output through `/data`, and exposes the collector self-test as
-  its health check.
-- **Retention / "top IOCs" curation** – `--max-age-days` drops indicators not
-  seen recently and `--max-store` keeps only the top N by score and recency, so
-  the published feed stays small, fresh, and high-signal (think *KEV catalogue,
-  but for indicators*) instead of an unbounded dump. The scheduled workflow
-  curates to the last 30 days and the top 10,000 indicators.
-- **MISP feed** – every run writes a MISP-compatible feed (`public/misp/` —
-  `manifest.json` + one event) that any MISP instance can subscribe to
-  directly (Sync Actions → Feeds → add by URL), no API key needed on either
-  side. The event UUID is stable across runs, so it updates in place instead
-  of accumulating a new event forever.
-- **RSS feed & status badge** – `public/feed.xml` lets people subscribe to the
-  newest high-confidence indicators instead of polling the dashboard.
-  `public/badge.json` is a shields.io endpoint badge showing live indicator
-  count — see the `IOCs` badge at the top of this README.
-- **Trend history & IOC lookup** – the dashboard renders a sparkline of feed
-  size over the last ~90 runs (`diagnostics/history.json`) and a search box to
-  check whether a specific IP/domain/URL/hash is currently in the feed
-  (instant against the top feed, falls back to a one-time full-feed scan if
-  not found there).
-- **IOC time machine** – because every run commits `latest.jsonl`, the git
-  history is an append-only archive of *what was publicly known-bad at time T,
-  at what score, confirmed by which sources*.
-  [`scripts/build_history_index.py`](scripts/build_history_index.py) turns that
-  history into a SQLite index + a compact `history_summary.json`, and
-  [`scripts/ioc_timeline.py`](scripts/ioc_timeline.py) answers the forensic
-  question commercial platforms charge for — *"was this indicator known-bad on
-  the day we saw it, and how confidently?"* — from free, auditable public data:
-
-  ```bash
-  python scripts/build_history_index.py --out-dir public --since-days 180
-  python scripts/ioc_timeline.py 45.137.21.9
-  python scripts/ioc_timeline.py --at 2026-03-01 evil.example.com
-  ```
-
-  Both scripts take a few more flags than shown above — run either with
-  `--help`, or see: `build_history_index.py` also accepts `--max-commits`
-  (cap the number of feed commits walked) and `--summary-max` (cap
-  `history_summary.json` to the N most-attested indicators); `ioc_timeline.py`
-  also accepts `--db` (point at a different index file) and `--json` (emit
-  the raw record instead of the human-readable summary).
-- **Sightings** – each indicator tracks how many collection runs have
-  re-observed it (`sightings`), so a one-off scanner hit is distinguishable
-  from an IP flagged across dozens of runs. Surfaced in the exports and the
-  dashboard lookup dossier.
-- **Concurrent collection** – sources are fetched in parallel (configurable via
-  `--max-workers`), so a full run completes in a fraction of the time of a
-  sequential fetch without changing the deterministic output.
-- **Multiple export formats** – each run emits CSV, TSV, JSON, JSON Lines, a
-  STIX 2.1 bundle, and a Markdown changelog. The STIX bundle covers every
-  indicator type (IPs and CIDRs, domains, URLs, all hash sizes, emails, JA3/JA3S,
-  wallets) with deterministic RFC 4122 UUIDs, a producer `identity`, and a TLP
-  marking, so re-imports stay idempotent in MISP, OpenCTI, and similar platforms.
-  CVEs are emitted as `vulnerability` objects. The changelog is capped to the
-  most recent runs to keep it committable indefinitely.
-- **Rich diagnostics** – a JSON run summary, Markdown report, and per-source
-  counts are generated automatically for audits and dashboards. 
-- **Optional RSS collection** – RSS feeds are processed when `feedparser` is
-  installed; use `--skip-rss` (or `--ci-safe`) to run without the dependency.
-- **CI-friendly defaults** – JSON logging, deterministic output paths, and
-  guard-rail flags (`--fail-on-empty`, `--fail-if-stale`, `--grace-on-404`) make
-  the collector predictable in automation.
-
-## 🛡️ GitHub project health
-- **Continuous integration** – the `CI – SwiftIOC` workflow lint-checks the
-  Python codebase, validates types, audits dependencies, and exercises the
-  collector end-to-end on every push and pull request.
-- **CodeQL scanning** – GitHub's CodeQL workflow analyses the repository for
-  common security issues to keep the collector safe for automation.
-- **Security policy** – coordinated vulnerability disclosures are handled via
-  [`SECURITY.md`](SECURITY.md) with direct contact guidance for maintainers.
-
-## 🌐 Supported threat intelligence sources
-SwiftIOC ships with parsers and adapters for widely referenced cyber threat
-intelligence feeds used by SOC teams and managed security providers:
-
-- **CISA Known Exploited Vulnerabilities (KEV)** – prioritise patching by
-  monitoring the official CISA KEV catalogue.
-- **NVD (NIST National Vulnerability Database)** – recently published/updated
-  CVEs with CVSS severity, corroborating and enriching the KEV catalogue.
-- **URLhaus** – ingest malicious URL indicators to protect web gateways and
-  proxies.
-- **MalwareBazaar** – track malicious file hashes for EDR, AV, and sandbox
-  tooling.
-- **ThreatFox** – add IPs, domains, URLs, and hashes curated by abuse.ch.
-- **Feodo Tracker & SSLBL JA3 fingerprints** – detect C2 traffic associated
-  with banking trojans and malicious TLS fingerprints.
-- **Spamhaus DROP/EDROP** – block known botnet controllers at the network edge.
-- **DShield / SANS Internet Storm Center** – the top attacking netblocks from
-  DShield's independent, distributed sensor network — a genuinely different
-  detection methodology from the abuse.ch/CINS/IPsum feeds above, so overlap
-  with them is real cross-vendor corroboration, not double-counting.
-- **OpenPhish, CINS Army, Tor exit lists, blocklist.de, IPsum, and more** –
-  extend coverage with phishing, scanning, and anonymiser indicators.
-
-Each feed is configurable through `sources.yml`, allowing teams to fine-tune the
-collection cadence, lookback windows, and authentication as required.
-
-## 🎯 Use cases & SEO-friendly keywords
-SwiftIOC supports a wide range of cybersecurity automation workflows. Common
-use cases include:
-
-- **Security Operations Centre (SOC) automation** – schedule IOC collection
-  jobs to keep SIEM and IDS rules current with open-source threat intelligence.
-- **Digital forensics & incident response (DFIR)** – export defanged indicators
-  for investigations without risking accidental activation.
-- **DevSecOps pipelines** – integrate threat feed enrichment into CI/CD, GitOps,
-  or infrastructure-as-code projects.
-- **Threat hunting playbooks** – generate STIX 2.1 bundles consumable by MISP,
-  OpenCTI, and other CTI platforms.
-- **Compliance reporting and executive dashboards** – leverage Markdown and
-  JSON diagnostics for stakeholder-friendly reporting.
-
-Keywords to improve discoverability: "automated threat intelligence collector",
-"open source IOC feed aggregator", "Python threat hunting toolkit", "cyber
-threat intelligence automation", "STIX export for SOC", and "GitHub Actions
-threat feed workflow".
-
-## 🗂️ Repository layout
-```
-├── public/                 # Default output directory for generated feeds
-│   ├── iocs/               # CSV, JSON, JSONL, TSV, and STIX artifacts
-│   ├── diagnostics/        # Run report, JSON diagnostics, and auto summary
-│   └── changelog/          # Markdown changelog between runs
-├── scripts/                # Utility helpers for post-processing
-│   ├── summarize_iocs.py       # Generates Markdown summaries for Pages & artifacts
-│   ├── build_history_index.py  # Builds the IOC time-machine SQLite index from git history
-│   └── ioc_timeline.py         # Queries the time-machine index for an indicator's history
-├── tests/                  # Offline pytest suite (parsers, STIX, dedup)
-├── requirements.txt        # Python runtime dependencies
-├── requirements-dev.txt    # Runtime + lint/type/test tooling
-├── pyproject.toml          # Ruff, Pyright, and pytest configuration
-├── sources.example.yml     # Sample feed configuration
-├── swiftioc/               # Main collector implementation & CLI (package)
-├── index.html              # Optional GitHub Pages entry point
-├── README.md               # This document
-└── SECURITY.md             # Security reporting policy
+```mermaid
+flowchart TD
+    A[Configured API and RSS feeds] --> B[Fetch and parse in Python]
+    B --> C[Normalize, filter and deduplicate]
+    P[Previous validated snapshot] --> D[Merge, score and apply retention]
+    C --> D
+    D --> E[Observable and CVE collections]
+    D --> F[Exports, deltas and diagnostics]
+    E --> G[Static browser dashboard]
+    F --> G
+    F --> H[SIEM, CTI and automation]
 ```
 
-> **Note on outputs & git:** the compact `latest.csv` and `latest.jsonl` feeds
-> are committed to the repository, while the bulkier regenerated formats
-> (`latest.json`, `latest.tsv`, `stix2.json`) are ignored by git and instead
-> published through GitHub Pages and workflow artifacts. This keeps the
-> repository small while still exposing every format at the published site.
+1. **Collect.** YAML selects sources and parsers. Requests run concurrently; diagnostics record source failures and returned volumes.
+2. **Normalize.** Parsers turn different feed formats into a shared indicator model. Deduplication uses `(type, indicator)`, retaining source and tag context. Default filtering removes known false positives such as private IPs and example domains.
+3. **Maintain the snapshot.** With `--persist-feed`, merge the previous feed, preserve observation history, rescore aging records, and apply configured limits. Without persistence, the snapshot is based on the current collection.
+4. **Publish.** Write separate observable and CVE collections, compatibility exports, change events, and run diagnostics.
+5. **Investigate or integrate.** The dashboard loads published data; your own tools can consume full snapshots or poll the delta feed.
 
-## 🧠 How it works
-1. **Load configuration** – `swiftioc` reads `sources.yml` (falling back to
-   `sources.example.yml` when needed) and sets up logging, user agents, and
-   output directories. 
-2. **Collect per source** – each API or RSS source is routed to a parser
-   registered via `@register_parser`, which fetches and converts raw feed data
-   into `Indicator` objects. Sources are fetched concurrently.
-3. **Deduplicate & filter** – indicators are normalised, merged, deduplicated,
-   filtered for false positives, and bounded by the configured lookback window.
-4. **Score & age** – each indicator receives a 0–100 score; with
-   `--persist-feed` the previous feed is merged in and stale entries expire.
-5. **Publish outputs** – all formats, diagnostics, and changelog entries are
-   written beneath the chosen output directory. 
+Two reports about the **same CVE** become one CVE record with separate provider reports. Two different CVE IDs remain separate, even when they share a provider, product, or tag. CVEs are vulnerabilities to investigate and patch; IPs, URLs, domains, and hashes are observables to investigate or match against telemetry.
 
-## 📈 Indicator scoring & the living feed
-Every published indicator carries a `score` (0–100) computed as:
+### What the dashboard adds
 
-```
-score = (confidence base + corroboration bonus) × 0.5^(age / half-life)
-```
+| Capability | How it helps |
+| --- | --- |
+| Search and filters | Narrow indicators by type, source, age, score, and other available context. |
+| Discovery lenses | Surface recent sightings and uncommon investigative tags, excluding known feed-name tags. |
+| Investigation workspace | Keep selected indicators in a browser-local queue and export a working set. |
+| Provider and tag graph | Search displayed nodes by indicator, provider, tag, or raw feed name; inspect every connected node and export the graph or a selected neighborhood as evidence JSON. |
+| CVE briefing | Match watched products and distinguish newly encountered records from changed evidence. |
+| Diagnostics | Explain missing data, source failures, retention, and the latest collection results. |
 
-- **Confidence base** – `high` = 80, `medium` = 60, `low` = 40 (assigned by the
-  source adapter).
-- **Corroboration bonus** – +8 per additional independent source reporting the
-  same indicator, capped at +16. An IP flagged by Feodo Tracker *and* ThreatFox
-  *and* a vendor blog outranks a single scanner hit.
-- **Age decay** – exponential on hours since `last_seen`, with per-type
-  half-lives that mirror how quickly each indicator class goes stale: URLs and
-  IPs decay in about a week (phishing pages die fast; C2 IPs get reassigned),
-  domains in two, curated CIDR blocks and JA3 fingerprints in a month, file
-  hashes over six months, and CVEs over a year.
+The graph groups known aliases under their reporting provider: several abuse.ch exports are one provider, not several independent confirmations. Aggregate and context feeds, such as IPsum and the Tor exit directory, are distinguished from mapped reporting providers. Graph links show shared reporting or tags; they do not establish a threat actor or campaign attribution. Sampling and graph limits can omit relationships.
 
-With `--persist-feed` (enabled in the scheduled collection workflow) the
-previous `latest.jsonl` is merged into each run, making the published feed
-**stateful**: re-observed indicators refresh to full score with their original
-`first_seen` and accumulated source history preserved, indicators that stop
-appearing decay run over run, and anything whose score falls below
-`--min-score` (default 20) is expired from the feed. The same score is emitted
-as the STIX 2.1 `confidence` property, so downstream platforms can prioritise
-on it directly.
+## CVE briefing
 
-## 🏁 Quick start
-Prerequisites:
-- Python 3.10 or newer (tested with CPython on Linux and GitHub Actions)
-- `pip` for dependency management
+The vulnerability view starts with **Known exploited** when no products are watched. **All CVEs** broadens coverage, while additional views focus on ransomware evidence, recent KEV additions, and recent publication or updates. These dates answer different questions: an old CVE newly added to KEV is not a newly disclosed vulnerability.
+
+**My briefing** makes that collection personal:
+
+1. Add an exact vendor, optionally narrowed to an exact product, from the structured CISA fields.
+2. The first matching valid snapshot establishes a baseline without flagging every historical CVE as new.
+3. Return to see records **new to your watched collection** and material evidence changes, such as exploitation status, ransomware use, severity, required action, or a due date.
+4. Mark an item **Investigating** or **Reviewed**, and export the filtered briefing as JSON with provider reports and triage state.
+
+A routine poll timestamp does not create a new evidence alert. Rejected records remain visible in the watched briefing when needed to explain a status change; other views hide them by default. Invalid or out-of-order snapshots cannot advance the briefing baseline.
+
+Watchlists and review state stay in this browser's local storage. There is no account sync or automatic notification service; blocked storage limits persistence to the current tab. Product matching uses available CISA vendor/product fields, so an NVD-only record without those fields cannot match a watch. Coverage is limited to the retained collection, not an asset inventory or a complete vulnerability assessment.
+
+## Local exposure report
+
+Open **Exposure report** in the CVE section, download the sample JSON, replace
+its example values, and import your inventory. Up to 200 assets and 500 KB are
+accepted. Inventory stays in memory in the current tab: it is not uploaded,
+saved to local storage, or shared with other users. Export the report before
+closing the tab if you need to retain it.
+
+Each asset needs a unique `id`, `vendor`, and `product`. Supply `version` for
+version checks, `exposure` (`internet`, `internal`, or `unknown`), and
+`importance` (`critical` or `standard`) for prioritization. These are your
+assertions, not scan results. Optional `cpe_vendor` and `cpe_product` must use
+explicit NVD CPE identifiers; `cpe_part` defaults to `a` (application), with
+`o` (operating system) and `h` (hardware) also supported. Display names are not
+automatically translated into CPE identities.
+
+The report distinguishes **version match**, **needs verification**, and
+**outside reported range**. Simple NVD applicability rules support exact
+versions and dotted-numeric inclusive/exclusive boundaries. Complex platform
+conditions, missing evidence, and unsupported version ordering remain uncertain.
+CISA-only product matches cannot confirm affected versions. Older snapshots
+without NVD configurations still support product-level review; a new collection
+run supplies applicability evidence when NVD provides it.
+
+Reports include provider evidence, matching reasons, remediation, the snapshot
+timestamp, and assets without a retained match. No match is not a safety verdict.
+The display paginates findings; exports include the whole calculated report,
+up to a disclosed 10,000-finding limit. Failed, future, or out-of-order snapshot
+refreshes disable the report until usable evidence returns. This first version
+is an on-demand assessment, not a scanner, SBOM parser, or change-alert service.
+
+## Quick start
+
+Requires **Python 3.10+** and Git. Run these commands from a terminal.
+
+### macOS or Linux
 
 ```bash
-# 1. Clone and enter the repository
 git clone https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector.git
 cd SwiftIOC-Automated-Threat-Intelligence-Collector
-
-# 2. (Optional) Create and activate a virtual environment
-python -m venv .venv
-source .venv/bin/activate  # Linux/macOS
-.venv\Scripts\activate     # Windows PowerShell
-
-# 3. Install dependencies
-pip install -r requirements.txt
-
-# 4. Run the collector with the sample sources
-python -m swiftioc --sources sources.example.yml --out-dir public
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e .
+cp sources.example.yml sources.yml
+python -m swiftioc --self-test
+python -m swiftioc --sources sources.yml --out-dir public --persist-feed --max-age-days 30 --max-store 10000
+python -m http.server 8765 --directory public
 ```
 
-Artifacts appear under `public/`. Add `--verbose` for progress logging or
-`--self-test` to run the built-in sanity checks without touching the network.
+### Windows PowerShell
 
-> **Installing as a package:** `pip install .` (or `pip install -e .` for
-> development) also registers a `swiftioc` console script, so `swiftioc
-> --sources sources.example.yml --out-dir public` works identically to
-> `python -m swiftioc ...` without the `-m` invocation.
+```powershell
+git clone https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector.git
+Set-Location SwiftIOC-Automated-Threat-Intelligence-Collector
+py -3 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e .
+Copy-Item sources.example.yml sources.yml
+.\.venv\Scripts\python.exe -m swiftioc --self-test
+.\.venv\Scripts\python.exe -m swiftioc --sources sources.yml --out-dir public --persist-feed --max-age-days 30 --max-store 10000
+.\.venv\Scripts\python.exe -m http.server 8765 --directory public
+```
 
-### Container quick start
+Open **http://localhost:8765**. Stop the local server with `Ctrl+C`. The collection command makes network requests and can take time; inspect `public/diagnostics/REPORT.md` if a source fails or a collection is empty.
 
-The included image runs as an unprivileged user and stores generated output in
-`/data`:
+The repository supplies the dashboard HTML and assets in `public/`. The collector writes data into that directory; choosing a different `--out-dir` does not copy the frontend there. Run collection before expecting generated CVE and observable collections to be available locally. `swiftioc` and `python -m swiftioc` are equivalent after installation.
+
+### Docker
 
 ```bash
 docker build -t swiftioc .
 docker volume create swiftioc-data
-docker run --rm \
-  -v swiftioc-data:/data \
-  swiftioc
+docker run --rm -v swiftioc-data:/data swiftioc
 ```
 
-The default container command uses `sources.example.yml`, persists the living
-feed, retains the strongest 10,000 indicators from the last 30 days, and runs a
-built-in health check. Mount your own source configuration when needed:
+This runs the collector once and keeps output in a named volume. The default command enables persistence, a 30-day age limit, and a 10,000-record cap. The image's health check runs built-in assertions; it is not a feed-freshness check. The container does not serve the dashboard.
+
+To use your configuration on macOS or Linux:
 
 ```bash
-docker run --rm \
-  -v "$PWD/sources.yml:/app/sources.yml:ro" \
-  -v swiftioc-data:/data \
-  swiftioc
+docker run --rm -v "$PWD/sources.yml:/app/sources.yml:ro" -v swiftioc-data:/data swiftioc
 ```
 
-For starter mappings and polling guidance for Splunk, Elastic Security, and
-Microsoft Sentinel, see [`integrations/README.md`](integrations/README.md).
+## Source configuration
 
-
-## 🧾 Configuring sources
-Create a `sources.yml` to describe the feeds you care about. The file mirrors the
-structure in `sources.example.yml` and supports per-source options. `window_hours`
-defines the global lookback window; override it for individual feeds using
-`--source-window name=HOURS` on the CLI. 
+Copy and edit [sources.example.yml](sources.example.yml). Local `sources.yml` is Git-ignored; when it is absent, the collector falls back to the example configuration.
 
 ```yaml
 window_hours: 48
-
 apis:
   - name: cisa_kev
     kind: json
@@ -394,33 +177,123 @@ apis:
     url: https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json
     reference: https://www.cisa.gov/known-exploited-vulnerabilities-catalog
 
-  - name: urlhaus_recent_urls
-    kind: csv
-    parse: urlhaus
-    url: https://urlhaus.abuse.ch/downloads/csv_recent/
-    reference: https://urlhaus.abuse.ch/
-    # Optional filter supplied via --urlhaus-status
-
-# RSS is supported (parse: rss) for feeds whose entries embed IOCs. Most
-# security-blog feeds only summarise posts, so they rarely yield indicators
-# and are left out of the defaults.
-rss:
-  - name: my_ioc_blog
-    url: https://example.com/feed.xml
-    reference: https://example.com/
+  - name: nist_nvd_recent
+    kind: json
+    parse: nvd
+    url: https://services.nvd.nist.gov/rest/json/cves/2.0/?resultsPerPage=200
+    reference: https://nvd.nist.gov/
+    options:
+      api_key_env: NVD_API_KEY
 ```
 
-Each parser can accept additional keyword arguments defined under `options:`.
-Custom parsers are supported via Python dotted paths (for example,
-`parse: my_package.parsers:parse_feed`).
+The optional NVD setting reads the key from the named environment variable. Keep credentials out of committed YAML. Feed availability, authentication requirements, and rate limits depend on the provider; consult diagnostics rather than assuming every configured source succeeded.
 
-For feeds without a dedicated adapter you can fall back to the universal
-collector by setting `parse: universal`. It will autodetect JSON, CSV, or plain
-text payloads, discover common timestamp/tag fields, and extract indicators via
-the same heuristics used for RSS content.
+Included adapters cover CISA KEV, NVD, abuse.ch feeds, OpenPhish, Spamhaus DROP, SANS ISC/DShield, blocklist.de, GreenSnow, CINS Army, Tor exits, Emerging Threats, Binary Defense, and IPsum. Some are aggregate or contextual sources: membership in a Tor exit list alone does not establish malicious behavior.
 
-## 📋 CLI reference
-Run `python -m swiftioc --help` for the full list of switches. Highlights:
+Use `options:` for parser-specific arguments, `--source-window name=HOURS` for a per-source lookback, or `parse: universal` for supported JSON, CSV, and text feeds without a dedicated adapter. Custom Python parsers use `parse: my_package.parsers:parse_feed`. RSS extraction is also supported, but blog summaries often contain no usable indicators. See [CONTRIBUTING.md](CONTRIBUTING.md) for parser development.
+
+## Scoring and retention
+
+Scores help rank records; they are not a probability of maliciousness. The current collector starts with a confidence base, adds a source-identifier bonus, and applies exponential decay since `last_seen`:
+
+```text
+base = low: 40, medium: 60, high: 80
+bonus = 8 per additional source identifier, capped at 16
+score = round((base + bonus) × 0.5 ^ (age / half-life)), bounded to 0–100
+```
+
+The bonus counts source identifiers, **not verified independent providers**. Provider grouping in the graph is a separate presentation step and does not change that score.
+
+| Indicator type | Score half-life |
+| --- | --- |
+| URL, IPv4, IPv6 | 7 days |
+| Domain | 14 days |
+| CIDR, JA3/JA3S, email | 30 days |
+| Bitcoin address | 90 days |
+| File hash | 180 days |
+| CVE | 365 days |
+
+For example, a high-confidence IP from two source identifiers starts at 88 and decays to 44 after seven days without a newer sighting. Source observation timestamps do not necessarily describe attacks happening at that time.
+
+`--persist-feed` carries forward records not seen in the latest fetch. `--min-score` (default 20), `--max-age-days`, and `--max-store` control expiry and capacity. When capped, non-rejected KEV records checked within 24 hours take priority, ordered by newest KEV addition, then other records compete by score and recency. Age/score expiry and finite capacity still limit coverage.
+
+The `high_confidence` feed includes records at or above the threshold (default 80) **or with at least two source identifiers**. Review provenance, age, and local context before using any feed for blocking. Use the observable collection when an integration must exclude CVE IDs.
+
+## Investigation queue SPL
+
+Adding observables to the investigation queue automatically builds a copyable Splunk hunt for those selected values. The query updates on removal and supports IPs/CIDRs, exact DNS domains, full URLs, and MD5/SHA-1/SHA-256. Unsupported entries are listed explicitly; an empty supported selection disables export. Replace `YOUR_INDEX` and map the documented event fields before use. Results retain all matching queued IOC identities. This is a bounded triage query; use the lookup-based Splunk library for full-feed matching. Validate execution in your own Splunk deployment.
+
+## Feeds and integrations
+
+**[Splunk hunt library](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/splunk/)** — copy-ready SPL for source/destination IPs, exact DNS domains, SHA-256 hashes, and exact URLs, with lookup preparation and field-mapping instructions.
+
+Paths below are relative to the published site or your `--out-dir`.
+
+| Output | Contents and intended use |
+| --- | --- |
+| [`collections/observables.jsonl`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/collections/observables.jsonl) | Non-CVE indicators for matching against telemetry. |
+| [`collections/vulnerabilities.json`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/collections/vulnerabilities.json) | One record per CVE with separate provider reports and exploitation evidence. |
+| [`iocs/latest.jsonl`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/iocs/latest.jsonl) | Full retained snapshot, including CVEs; also available as CSV, TSV, and JSON. |
+| [`iocs/high_confidence.jsonl`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/iocs/high_confidence.jsonl) | Threshold/multi-source subset; also available as CSV. |
+| `iocs/dashboard.jsonl` | Compact dashboard preview, default 1,000 rows; not the full feed. |
+| [`iocs/delta.json`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/iocs/delta.json) and `delta.jsonl` | Additions, removals, and material updates since the previous validated snapshot. |
+| `iocs/stix2.json` | STIX 2.1 bundle for compatible tooling. |
+| `iocs/taxii2-envelope.json` | Static TAXII 2.1 envelope; this is not a TAXII API server. |
+| [`misp/manifest.json`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/misp/manifest.json) and event files | MISP feed for repeatable imports. |
+| `detections/` | Generated detection packs; review and adapt to your environment. |
+| [`feed.xml`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/feed.xml) | RSS feed for recent high-confidence records. |
+| `diagnostics/run.json` and `diagnostics/REPORT.md` | Machine-readable source/run results and a readable report. |
+| `badge.json` | Live snapshot count and update timestamp for Shields endpoint badges. |
+
+### Consume changes safely
+
+Start with the full snapshot for initial synchronization, then poll the delta feed. An unavailable or invalid previous snapshot establishes a baseline without emitting a historical additions flood. The browser's personal briefing baseline is separate from this collector baseline.
+
+An `added` event means new to the retained feed; it does not prove the indicator was just created. A `removed` event means absent from the current snapshot, not benign. Material score and vulnerability-report changes produce `updated` events; a changed polling timestamp alone does not. A delta describes one collection interval, so consumers that miss runs should reconcile against the full snapshot.
+
+See [integration examples](integrations/README.md) for Splunk, Elastic Security, Microsoft Sentinel, and detection guidance. For retained Git history, [build_history_index.py](scripts/build_history_index.py) and [ioc_timeline.py](scripts/ioc_timeline.py) support indicator timeline investigations.
+
+## Running continuously
+
+The repository's [collection workflow](.github/workflows/collect.yml) is scheduled every four hours and can be run manually. It collects data, persists the feed, writes diagnostics and summaries, and publishes the site. Scheduled execution can be delayed; check the latest run and data timestamps instead of treating the schedule as a freshness guarantee.
+
+For your own fork:
+
+1. Review the source configuration and collection flags in the workflow.
+2. Enable GitHub Actions and configure GitHub Pages to deploy through Actions.
+3. Set your own public URL with `--site-url` where appropriate and configure any required provider credentials as secrets.
+4. Run collection manually, inspect diagnostics, and confirm the generated collections load on your published site.
+
+For a workstation, server, or another CI system, schedule the collector command from the quick start. Keep the output directory between runs for persistence and deltas, and prevent overlapping runs against the same directory. Publishing `public/` serves both the existing frontend and generated files.
+
+### Check the collection, not just the website
+
+An available static site can still contain stale data. Use source diagnostics and the collection workflow status together. Options include `--fail-on-empty name`, `--fail-if-stale name=HOURS` (based on newest `first_seen`), and `--warn-if-volume-drop name=PERCENT`. Save raw responses with `--save-raw-dir` when investigating parser failures.
+
+Generate the readable IOC summary manually with:
+
+```bash
+python scripts/summarize_iocs.py --diag public/diagnostics/run.json --ioc-jsonl public/iocs/latest.jsonl
+```
+
+### Troubleshooting
+
+| Symptom | Check |
+| --- | --- |
+| Local dashboard cannot load data | Serve `public/` over HTTP and run collection first; do not open `index.html` as a local file. |
+| CVEs are unavailable in a fresh checkout | Generate `collections/vulnerabilities.json`; generated collections may not be committed. |
+| A source has no results | Read its diagnostics for HTTP errors, rate limits, parser problems, or a genuinely empty window. |
+| Fewer records than the upstream catalog | Check lookback, filtering, score expiry, age limits, and the storage cap. |
+| My watched product has no CVEs | Check exact vendor/product spelling and whether the retained records have structured CISA fields. |
+| Review state disappears | Check browser storage settings; local state does not follow you to another browser or device. |
+| The graph shows fewer providers than raw feeds | Known aliases share a provider; context/aggregate feeds and sampling are handled separately. |
+
+## CLI reference
+
+Run `python -m swiftioc --help` for the installed version's options.
+
+<details>
+<summary>Expand collection, retention, diagnostics, and export options</summary>
 
 | Flag | Purpose |
 | --- | --- |
@@ -435,16 +308,16 @@ Run `python -m swiftioc --help` for the full list of switches. Highlights:
 | `--min-score N` | Expire indicators whose decayed score falls below `N` (default `20`). |
 | `--high-confidence-score N` | Score at/above which an indicator enters the curated `high_confidence` feed (default `80`; multi-source indicators always qualify). |
 | `--max-age-days N` | Retention: drop indicators whose `last_seen` is older than `N` days. |
-| `--max-store N` | Retention: keep only the top `N` indicators by score/recency (KEVIntel-style curation; keeps the stored feed small and high-signal). |
-| `--dashboard-rows N` | Rows in the compact `dashboard.jsonl` the web dashboard downloads (default `1000`, ~2–3% of the full feed's size). |
+| `--max-store N` | Retention: keep at most `N`; non-rejected KEV entries checked within 24 hours take priority (newest catalog additions first), then other records by score/recency. |
+| `--dashboard-rows N` | Rows in the compact `dashboard.jsonl` the web dashboard downloads (default `1000`). |
 | `--site-url URL` | Public site URL used as the RSS `<link>` (override for forks/custom domains). |
 | `--rss-limit N` | Number of items in `feed.xml` (default `50`). |
 | `--no-misp-feed` | Disable writing the MISP feed directory. |
 | `--urlhaus-status {any,online,offline}` | Filter URLhaus indicators by status. |
 | `--source-window name=N` | Override the lookback window for specific sources. |
-| `--grace-on-404 name…` | Treat HTTP 404 for listed sources as a non-fatal empty result. |
+| `--grace-on-404 name` | Treat HTTP 404 for listed sources as a non-fatal empty result. |
 | `--fail-on-empty name…` | Fail the run if any listed sources return zero indicators. |
-| `--fail-if-stale name=N` | Fail when the newest indicator from `name` is older than `N` hours. |
+| `--fail-if-stale name=N` | Fail when the newest `first_seen` from `name` is older than `N` hours. |
 | `--warn-if-volume-drop name=N` | Warn when a source returns at least `N` percent fewer rows than the prior run. |
 | `--save-raw-dir PATH` | Persist raw feed responses for later inspection. |
 | `--diag-json PATH` | Write diagnostics JSON (defaults to `<out-dir>/diagnostics/run.json`). |
@@ -457,193 +330,40 @@ Run `python -m swiftioc --help` for the full list of switches. Highlights:
 | `--log-format {text,json}` | Choose console/file log format. |
 | `--log-file-level LEVEL` | Control the file log level (default `DEBUG`). |
 
-## 📦 Outputs & diagnostics
+</details>
 
-Every run also publishes `iocs/delta.json` and `iocs/delta.jsonl`. These SOC
-Delta feeds describe indicators added to the published snapshot, removed from
-it, or materially changed since the previous run. A removal means the IOC is no
-longer in the current SwiftIOC snapshot; it does not assert that the IOC is
-benign. The first run emits an empty delta until a baseline exists.
+## Development
 
-The collector populates the following structure (paths relative to `--out-dir`):
+The core code lives in [`swiftioc/`](swiftioc/), the static frontend in [`public/assets/`](public/assets/), Python regression tests in [`tests/`](tests/), and operational/browser helpers in [`scripts/`](scripts/).
 
-```
-public/
-├── index.md
-├── feed.xml                   # RSS: newest high-confidence indicators
-├── badge.json                 # shields.io endpoint badge (live IOC count)
-├── iocs/
-│   ├── latest.csv
-│   ├── latest.tsv
-│   ├── latest.json
-│   ├── latest.jsonl
-│   ├── delta.json              # SOC Delta envelope + counts
-│   ├── delta.jsonl             # stream-friendly change events
-│   ├── taxii2-envelope.json    # TAXII 2.1 envelope containing STIX objects
-│   ├── high_confidence.csv    # curated: score ≥80 or 2+ sources
-│   ├── high_confidence.jsonl  # same, machine-readable
-│   ├── dashboard.jsonl        # compact top-N feed the web dashboard loads
-│   └── stix2.json
-├── misp/
-│   ├── manifest.json          # MISP feed manifest (add by URL in MISP)
-│   └── <event-uuid>.json      # single stable event, updated in place
-├── changelog/
-│   └── CHANGELOG.md
-└── diagnostics/
-    ├── REPORT.md
-    ├── run.json
-    ├── summary.md
-    ├── history.json           # rolling per-run stats (dashboard sparkline)
-    └── raw/                 # present when --save-raw-dir is used
-```
-
-The diagnostics include per-source counts, duplicate statistics, earliest and
-latest timestamps, and any recorded failures. These summaries are useful for CI
-status checks and dashboards.
-
-## 🌍 GitHub Pages preview & publishing
-SwiftIOC ships with a Pages-ready dashboard so the collected indicators can be
-browsed without additional tooling. The project uses `public/` as both the
-artifact directory and the published site root:
-
-- `public/index.html` renders the live preview, source breakdowns, tag counts,
-  and export links using the JSON/JSONL outputs produced by `swiftioc`.
-- `index.html` at the repository root provides a branded landing page that
-  redirects to `public/` after a short delay while offering quick links for
-  manual navigation.
-
-To publish on GitHub Pages:
-
-1. Run the collector locally or in CI to populate `public/` (see
-   [Quick start](#-quick-start)).
-2. Commit the generated artifacts or upload them as a workflow artifact (as
-   shown in [Running in GitHub Actions](#-running-in-github-actions)).
-3. Enable GitHub Pages with the **GitHub Actions** source so deployments pick up
-   the latest `public/` output automatically.
-
-The dashboard ranks preview rows by the collector's 0–100 relevance score
-(corroboration + freshness baked in), then by how many independent sources
-confirm each indicator, so the most dangerous and most corroborated IOCs sit at
-the top of the feed. Multi-select facets combine type, source, tag, score band,
-and age filters; a signal filter isolates high-score (≥80), corroborated (2+
-sources), or new (last 48h) indicators. Analysts can add table or lookup results
-to a private browser-local investigation queue and export that shortlist without
-uploading it anywhere.
-
-The interface includes an animated feed radar, progressive metrics, score-band
-motion, and responsive threat cards. Animations use transform/opacity paths and
-are disabled when the browser reports `prefers-reduced-motion: reduce`. Mobile
-breakpoints convert the preview into card-style rows, collapsed details remain
-hidden until requested, and human-facing IOC metadata stays defanged to reduce
-accidental activation.
-
-## ⚙️ Running in GitHub Actions
-SwiftIOC runs cleanly inside GitHub Actions and emits artifacts that can be
-published via GitHub Pages. The minimal workflow below collects IOCs every 4
-hours and deploys `public/` — it's a stripped-down starting point; it does
-**not** persist the feed across runs (see the callout below the code block).
-For the full production setup — including the living feed, retention, MISP
-feed, RSS, and auto-committing outputs back to the repo — see the actual
-[`.github/workflows/collect.yml`](.github/workflows/collect.yml) this project
-runs on itself.
-
-```yaml
-name: SwiftIOC – Threat Intel Collector
-
-on:
-  schedule:
-    - cron: "0 */4 * * *"   # Run every 4 hours
-  workflow_dispatch:         # Allow manual runs from the Actions tab
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: true
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      - name: Collect recent IOCs
-        run: python -m swiftioc --ci-safe --window-hours 48 --out-dir public
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./public
-
-  deploy:
-    environment:
-      name: github-pages
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
-```
-
-`--ci-safe` enables JSON logging, ensures diagnostic directories exist, and
-suppresses hard failures when the optional RSS dependency is missing.
-
-> **This example is stateless.** Each run starts from an empty feed and
-> publishes only what it collects in `--window-hours 48` — it does not get
-> the self-maintaining "living feed" or "top IOCs" curation described in
-> [Indicator scoring & the living feed](#-indicator-scoring--the-living-feed).
-> To get that, checkout with `fetch-depth: 0`, add `--persist-feed
-> --max-age-days 30 --max-store 10000` to the collector invocation, and
-> auto-commit `public/` back to the repo before deploying — exactly what
-> `.github/workflows/collect.yml` does.
-
-
-## 🧪 Auto-generated IOC summary
-The helper script [`scripts/summarize_iocs.py`](scripts/summarize_iocs.py)
-turns the diagnostics and JSONL output into Markdown summaries. It runs
-automatically in the "Collect – SwiftIOC" workflow and can also be executed
-manually:
+After the quick-start installation:
 
 ```bash
-python scripts/summarize_iocs.py \
-  --diag public/diagnostics/run.json \
-  --ioc-jsonl public/iocs/latest.jsonl
+python -m pip install -r requirements-dev.txt
+ruff check .
+pyright
+python -m swiftioc --self-test
+pytest -q
+node --test public/assets/dashboard-core.test.js public/assets/inventory-core.test.js
 ```
 
-Override `--out` or `--index` to control where the summary is written. When the
-repository is published with GitHub Pages, everything under `public/` becomes the
-site content.
-
-## 🧑‍💻 Development & testing
-Contributions are welcome. Set up a development environment and run the same
-checks CI runs:
+Python tests mock network calls. The frontend core suite checks data logic with Node.js. For browser regressions, install Playwright and serve the site:
 
 ```bash
-pip install -r requirements-dev.txt
-
-ruff check .          # lint
-pyright               # static type check
-python -m swiftioc --self-test   # built-in sanity assertions
-pytest -q             # offline unit tests (parsers, STIX, dedup, changelog)
+npm install --no-save --package-lock=false playwright
+npx playwright install chromium
+python -m http.server 8765 --directory public
 ```
 
-The `tests/` suite is fully offline—parsers that would hit the network have
-their HTTP layer monkeypatched—so it is safe to run anywhere and catches feed
-format drift before it reaches production. When `stix2` is installed the suite
-also validates the generated bundle against the reference library.
+In a second terminal:
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add a new feed parser and the
-full contribution workflow.
+```bash
+node scripts/test_vulnerability_ui.cjs
+node scripts/test_dashboard_layout.cjs
+node scripts/test_personal_briefing.cjs
+node scripts/test_inventory_ui.cjs
+```
 
----
+These suites use synthetic fixtures to exercise filtering, refresh failures, mobile layout, personal briefing state, and provider graph behavior. Set `BASE_URL` for a different local server or `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` for an existing Chromium browser.
 
-For security disclosures, please see [SECURITY.md](SECURITY.md).
+Read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting a parser or feature. Report vulnerabilities through [SECURITY.md](SECURITY.md). SwiftIOC is distributed under the [MIT license](LICENSE); upstream feeds retain their own terms and attribution requirements.

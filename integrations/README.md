@@ -17,6 +17,12 @@ working set. It is not evidence that the indicator became benign.
 
 ## Splunk
 
+Start with the [Splunk hunt library](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/splunk/) for copy/download SPL and a guided CSV lookup setup. Source queries live in [public/splunk](../public/splunk/). Templates match typed IOC values, preserve URL path/query case, and check both network endpoints. Map your event fields and validate locally before scheduling.
+
+To edit the library, update the `.spl` files and `scripts/build_splunk_guide.py`, then run `python scripts/build_splunk_guide.py` from the repository root to regenerate the copyable page.
+
+For a custom streaming ingestion pipeline:
+
 Use a scheduled scripted input or HTTP Event Collector forwarder. Set the
 event sourcetype to `_json`, use `action` as the change field, and deduplicate
 on `current.type + current.indicator` (falling back to `previous` for removals).
@@ -45,3 +51,17 @@ cosign verify-blob public/iocs/delta.jsonl \
   --certificate-identity-regexp 'https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/' \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com
 ```
+
+
+## DNS response policy export
+
+The generated `detections/dns/swiftioc.rpz` contains exact-domain and wildcard
+QNAME triggers. Load it under your chosen response-policy zone origin. Trigger
+owners are deliberately relative (`evil.example` and `*.evil.example`); adding
+a trailing dot would place them outside that policy zone. The CNAME target `.`
+is absolute and specifies the NXDOMAIN action.
+
+Validate the generated file with `named-checkzone YOUR_POLICY_ZONE swiftioc.rpz`
+before deployment. See the [BIND RPZ documentation](https://bind9.readthedocs.io/en/v9.16.43/reference.html)
+for resolver configuration and policy behavior. Regenerate older SwiftIOC packs
+to obtain the corrected relative trigger names.
