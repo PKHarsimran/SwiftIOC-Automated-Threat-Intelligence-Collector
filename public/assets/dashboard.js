@@ -414,9 +414,26 @@
     const sigma = qs('[data-investigation-sigma]', root);
     const suricata = qs('[data-investigation-suricata]', root);
     const clear = qs('[data-investigation-clear]', root);
+    const splCode = qs('[data-investigation-spl-code]', root);
+    const splStatus = qs('[data-investigation-spl-status]', root);
+    const splCopy = qs('[data-investigation-spl-copy]', root);
+    const splDownload = qs('[data-investigation-spl-download]', root);
+    let currentSpl = '';
+    splCopy?.addEventListener('click', () => {
+      if (currentSpl) copyOrPrompt(currentSpl, 'Selected-IOC SPL copied. Map your event fields before running.');
+    });
+    splDownload?.addEventListener('click', () => {
+      if (currentSpl) downloadDetection(currentSpl, 'swiftioc-selected-iocs.spl', 'text/plain');
+    });
 
     const render = (rows) => {
       root.hidden = !rows.length;
+      const hunt = dashboardCore.rowsToSpl(rows);
+      currentSpl = hunt.spl;
+      setText(splCode, currentSpl || 'Add a supported observable to generate SPL.');
+      setText(splStatus, `${hunt.included} queued IOCs included. ${hunt.skipped.length} unsupported or invalid entries skipped${hunt.skipped.length ? ': ' + hunt.skipped.map((row) => `${row.type || 'unknown'} ${row.indicator || ''}`).join('; ') : ''}. Updates automatically with your queue.`);
+      if (splCopy) splCopy.disabled = !currentSpl;
+      if (splDownload) splDownload.disabled = !currentSpl;
       setText(count, formatNumber(rows.length));
       if (!list) return;
       list.innerHTML = '';

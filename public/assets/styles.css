@@ -3646,3 +3646,102 @@ input.lookup-input { border-radius: 0.3rem; background: var(--bg-color); }
 .inventory-results h3 { margin-top: 0; font-size: 1rem; }
 .inventory-results pre { max-height: 20rem; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; font-size: .75rem; }
 .inventory-results summary { cursor: pointer; }
+
+/* Quiet interaction feedback: content remains visible without animation support. */
+.button, .button-link, .hero-download, .nav-links a,
+.discovery-lenses button, .vulnerability-views button {
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+.vulnerability-card, .inventory-results article, .threat-card {
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+.vulnerability-card:focus-within, .inventory-results article:focus-within,
+.threat-card:focus-within {
+  border-color: var(--accent);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+.nav-links a { text-underline-offset: .4em; }
+.nav-links a:hover, .nav-links a:focus-visible { text-decoration: underline; }
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes desk-enter {
+    from { opacity: .35; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes desk-detail-enter {
+    from { opacity: .55; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .page-header-main > div { animation: desk-enter 460ms cubic-bezier(.2,.7,.2,1) both; }
+  .page-header .hero-download { animation: desk-enter 460ms 70ms cubic-bezier(.2,.7,.2,1) both; }
+  .vulnerability-card, .inventory-results article, .threat-card {
+    animation: desk-enter 280ms cubic-bezier(.2,.7,.2,1) both;
+  }
+  .vulnerability-card:nth-child(2), .inventory-results article:nth-child(2), .threat-card:nth-child(2) { animation-delay: 30ms; }
+  .vulnerability-card:nth-child(3), .inventory-results article:nth-child(3), .threat-card:nth-child(3) { animation-delay: 60ms; }
+  .vulnerability-card:nth-child(4), .inventory-results article:nth-child(4), .threat-card:nth-child(4) { animation-delay: 90ms; }
+  .vulnerability-card:nth-child(n+13), .inventory-results article:nth-child(n+13), .threat-card:nth-child(n+13) { animation: none; }
+  .collection-notes[open] > :not(summary), .campaign-feed-evidence[open] > :not(summary),
+  .inventory-results details[open] > :not(summary), .vulnerability-card details[open] > :not(summary) {
+    animation: desk-detail-enter 180ms ease-out both;
+  }
+  .button, .button-link, .hero-download {
+    transition: transform 160ms ease, background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+  }
+  .button:not(:disabled):active, .button-link:active { transform: translateY(1px); }
+  @media (hover: hover) and (pointer: fine) {
+    .button:not(:disabled):hover, .button-link:hover { transform: translateY(-2px); }
+    .vulnerability-card:hover, .inventory-results article:hover, .threat-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 5px 16px rgb(0 0 0 / .12);
+    }
+  }
+}
+
+.investigation-spl { margin-top: 1.25rem; border-top: 1px solid var(--border-control); padding-top: 1rem; min-width: 0; }
+.investigation-spl p { font-size: .8rem; overflow-wrap: anywhere; }
+.investigation-spl pre { max-width: 100%; max-height: 22rem; overflow: auto; padding: 1rem; background: var(--bg-color); border: 1px solid var(--border-control); border-radius: .3rem; font-size: .78rem; }
+@media (prefers-reduced-motion: no-preference) { .investigation-spl { animation: desk-detail-enter 180ms ease-out; } }
+
+/* Instrument-panel detail, confined to navigation and the graph. */
+.page-header { position: relative; isolation: isolate; overflow: hidden; padding-block: 1.5rem; border-block: 1px solid var(--border-control); }
+.page-header::before {
+  content: ''; position: absolute; z-index: -1; inset: 0 0 0 52%; pointer-events: none;
+  background-image: linear-gradient(rgb(167 196 124 / .12) 1px, transparent 1px), linear-gradient(90deg, rgb(167 196 124 / .12) 1px, transparent 1px);
+  background-size: 24px 24px;
+  mask-image: linear-gradient(90deg, transparent, #000);
+}
+.campaign-inspector { border-top: 2px solid var(--accent); }
+.campaign-node:is(.pivot, .indicator).is-selected .campaign-node-core { stroke: #dcf3b0; stroke-width: 3; }
+.campaign-node:is(.pivot, .indicator).is-connected .campaign-node-core { stroke: #c5d5af; }
+.hero-download { position: relative; overflow: hidden; }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes desk-grid-scan {
+    from { transform: translateX(-160%); opacity: 0; }
+    15%, 75% { opacity: .5; }
+    to { transform: translateX(280%); opacity: 0; }
+  }
+  @keyframes desk-link-trace { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
+  @keyframes desk-node-lock {
+    from { stroke-width: 5; stroke-opacity: .45; }
+    to { stroke-width: 3; stroke-opacity: 1; }
+  }
+  @keyframes desk-control-sheen {
+    from { transform: translateX(-180%) skewX(-20deg); }
+    to { transform: translateX(380%) skewX(-20deg); }
+  }
+  .page-header::after {
+    content: ''; position: absolute; z-index: -1; inset: 0 0 0 65%; pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgb(167 196 124 / .14), transparent);
+    animation: desk-grid-scan 2400ms ease-in-out 2 both;
+  }
+  .campaign-edge.is-connected { stroke-dasharray: 5 7; animation: desk-link-trace 1200ms linear 3; }
+  .campaign-node.is-selected .campaign-node-core { animation: desk-node-lock 320ms ease-out; }
+  .hero-download::after {
+    content: ''; position: absolute; inset: 0; width: 35%; pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgb(220 243 176 / .2), transparent);
+    transform: translateX(-180%) skewX(-20deg);
+  }
+  .hero-download:hover::after, .hero-download:focus-visible::after { animation: desk-control-sheen 600ms ease-out; }
+}
+@media (max-width: 640px) { .page-header::before { inset-inline-start: 72%; opacity: .5; } }

@@ -198,6 +198,50 @@
     .map((value) => `${' '.repeat(indent)}- ${JSON.stringify(value)}`)
     .join('\n');
 
+  const rowsToSpl = (value) => {
+    const rows = Array.isArray(value) ? value : [];
+    const clauses = [], skipped = [], seen = new Set();
+    for (const row of rows) {
+      const type = lower(row?.type);
+      let indicator = refang(row?.indicator);
+      let condition = '';
+      const quote = JSON.stringify;
+      if (!indicator || /[\u0000-\u001f\u007f]/.test(indicator)) { skipped.push(row); continue; }
+      if (['ipv4', 'ipv6', 'ipv4_cidr', 'ipv6_cidr', 'domain'].includes(type)) {
+        const validated = detectionRows([row])[0];
+        if (validated) {
+          indicator = validated.indicator.toLowerCase();
+          if (type === 'domain') condition = `lower(rtrim(trim(query), "."))=${quote(indicator)}`;
+          else {
+            const network = type.endsWith('_cidr') ? indicator : `${indicator}/${type === 'ipv6' ? 128 : 32}`;
+            condition = `(cidrmatch(${quote(network)}, src_ip) OR cidrmatch(${quote(network)}, dest_ip))`;
+          }
+        }
+      } else if (['md5', 'sha1', 'sha256'].includes(type)) {
+        const length = { md5: 32, sha1: 40, sha256: 64 }[type];
+        if (new RegExp(`^[a-f0-9]{${length}}$`, 'i').test(indicator)) {
+          indicator = indicator.toLowerCase();
+          condition = `lower(trim(${type}))=${quote(indicator)}`;
+        }
+      } else if (type === 'url') {
+        try {
+          if (['http:', 'https:'].includes(new URL(indicator).protocol)) condition = `url=${quote(indicator)}`;
+        } catch { /* Unsupported URL remains in the skipped list. */ }
+      }
+      if (!condition) { skipped.push(row); continue; }
+      const key = `${type}:${indicator}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      clauses.push(`    if(${condition}, ${quote(key)}, null())`);
+    }
+    return { included: seen.size, skipped,
+      spl: clauses.length ? 'index=YOUR_INDEX earliest=-24h latest=now\n'
+        + '| fields _time host user src_ip dest_ip query url md5 sha1 sha256 action\n'
+        + '| eval swiftioc_matches=mvappend(\n' + clauses.join(',\n') + ',\n    null())\n'
+        + '| where mvcount(swiftioc_matches)>0\n'
+        + '| table _time host user src_ip dest_ip query url action swiftioc_matches\n' : '' };
+  };
+
   const rowsToSigma = (value) => {
     const rows = detectionRows(value);
     const addresses = rows.filter((row) => /^ipv[46]$/.test(row.type)).map((row) => row.indicator);
@@ -888,6 +932,7 @@
     refang,
     rowsToCsv,
     rowsToSigma,
+    rowsToSpl,
     rowsToSuricata,
     writeViewUrl,
   };

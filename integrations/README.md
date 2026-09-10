@@ -17,6 +17,12 @@ working set. It is not evidence that the indicator became benign.
 
 ## Splunk
 
+Start with the [Splunk hunt library](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/splunk/) for copy/download SPL and a guided CSV lookup setup. Source queries live in [public/splunk](../public/splunk/). Templates match typed IOC values, preserve URL path/query case, and check both network endpoints. Map your event fields and validate locally before scheduling.
+
+To edit the library, update the `.spl` files and `scripts/build_splunk_guide.py`, then run `python scripts/build_splunk_guide.py` from the repository root to regenerate the copyable page.
+
+For a custom streaming ingestion pipeline:
+
 Use a scheduled scripted input or HTTP Event Collector forwarder. Set the
 event sourcetype to `_json`, use `action` as the change field, and deduplicate
 on `current.type + current.indicator` (falling back to `previous` for removals).

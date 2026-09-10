@@ -1,0 +1,9 @@
+| inputlookup swiftioc_raw.csv
+| eval sf_type=lower(trim(type)), sf_value=replace(trim(indicator), "\\[\\.\\]", ".")
+| where sf_type IN ("ipv4", "ipv6", "domain", "sha256", "url")
+| eval sf_value=if(sf_type="url", replace(sf_value, "(?i)^hxxp", "http"), lower(sf_value))
+| eval sf_value=if(sf_type="domain", rtrim(sf_value, "."), sf_value)
+| where isnotnull(sf_value) AND len(sf_value)>0
+| eval sf_score=tonumber(score), sf_prepared_at=now()
+| stats max(sf_score) AS sf_score values(source) AS sf_sources values(tags) AS sf_tags values(last_seen) AS sf_last_seen values(reference) AS sf_references max(sf_prepared_at) AS sf_prepared_at BY sf_type sf_value
+| outputlookup swiftioc_iocs.csv

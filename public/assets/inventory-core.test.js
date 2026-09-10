@@ -71,3 +71,43 @@ test('separate OR ranges retain a matching version and do not mutate evidence', 
   assert.equal(match(item).status, 'version-match');
   assert.equal(JSON.stringify(item), before);
 });
+
+test('exact CPE versions require literal equality; numeric ranges still compare components', () => {
+  for (const [installed, criterion] of [['2.4.0', '2.4'], ['02.4', '2.4'], ['2.4', '2.4.0'], ['release-B', 'release-A']]) {
+    assert.equal(core.versionMatch(installed, {}, criterion), false);
+  }
+  assert.equal(core.versionMatch('release-A', {}, 'release-A'), true);
+  assert.equal(core.versionMatch('2.4', {}, '2.*'), null);
+  assert.equal(core.versionMatch('2.4.0', { versionStartIncluding: '2.4', versionEndExcluding: '2.5' }, '*'), true);
+});
+
+test('200 unmatched assets parse a 10000-record snapshot only once per record', () => {
+  let reads = 0;
+  const items = Array.from({ length: 10000 }, (_, i) => {
+    const item = fixture({ versionEndIncluding: '3' });
+    item.cve_id = `CVE-2026-${10000 + i}`;
+    const configurations = item.reports.nvd.configurations;
+    Object.defineProperty(item.reports.nvd, 'configurations', { get() { reads += 1; return configurations; } });
+    return item;
+  });
+  const assets = Array.from({ length: 200 }, (_, i) => ({ ...asset, id: `unmatched-${i}`, vendor: 'Other', cpe_vendor: 'other' }));
+  const start = performance.now();
+  const report = core.buildReport(assets, items, '2026-09-01');
+  assert.equal(reads, 10000);
+  assert.equal(report.findings.length, 0);
+  assert.equal(report.unmatched_assets.length, 200);
+  console.log(`Indexed 200 assets / 10000 CVEs in ${Math.round(performance.now() - start)}ms`);
+});
+
+test('CISA/CPE candidate union deduplicates records and preserves complex-condition uncertainty', () => {
+  const item = fixture({ versionEndIncluding: '3' });
+  let reads = 0;
+  const configurations = item.reports.nvd.configurations;
+  configurations[0].operator = 'AND';
+  Object.defineProperty(item.reports.nvd, 'configurations', { get() { reads += 1; return configurations; } });
+  const report = core.buildReport([asset, { ...asset, id: 'second' }], [item], '2026-09-01');
+  assert.equal(reads, 1);
+  assert.equal(report.findings.length, 2);
+  assert.ok(report.findings.every((finding) => finding.status === 'needs-verification'));
+  assert.ok(report.findings.every((finding) => finding.nvd_rules.length === 1));
+});
