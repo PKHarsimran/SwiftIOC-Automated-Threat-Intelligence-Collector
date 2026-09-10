@@ -3745,3 +3745,24 @@ input.lookup-input { border-radius: 0.3rem; background: var(--bg-color); }
   .hero-download:hover::after, .hero-download:focus-visible::after { animation: desk-control-sheen 600ms ease-out; }
 }
 @media (max-width: 640px) { .page-header::before { inset-inline-start: 72%; opacity: .5; } }
+
+/* Keep the queue and its working query in view without expanding the whole page. */
+.investigation-workbench { display: grid; grid-template-columns: minmax(230px, .8fr) minmax(0, 1.6fr); gap: 1.5rem; align-items: start; }
+.investigation-workbench .investigation-list { grid-template-columns: minmax(0, 1fr); max-height: 38rem; overflow: auto; overscroll-behavior: contain; margin-top: 1rem; }
+.investigation-workbench .investigation-spl { border-top: 0; border-left: 1px solid var(--border-control); padding: 1rem 0 0 1.5rem; margin-top: 0; }
+.hunt-heading { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; justify-content: space-between; }
+.hunt-heading h3 { margin: 0 0 .6rem; }
+.hunt-heading .eyebrow { margin: 0 0 .3rem; }
+.hunt-local { color: var(--text-muted); font-size: .7rem; }
+.hunt-toolbar, .hunt-field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; margin: .75rem 0; }
+.hunt-toolbar label, .hunt-field-grid label { display: grid; gap: .35rem; font-size: .78rem; }
+.hunt-toolbar input, .hunt-toolbar select, .hunt-field-grid input { min-width: 0; width: 100%; min-height: 2.75rem; border: 1px solid var(--border-control); background: var(--bg-color); color: var(--text-primary); padding: .55rem .7rem; border-radius: .3rem; font: inherit; }
+.hunt-mappings { padding: .65rem 0; border-block: 1px solid var(--border-control); }
+.hunt-mappings > summary { cursor: pointer; font-size: .82rem; }
+.hunt-error { color: #ffb3a7; }
+@media (max-width: 900px) {
+  .investigation-workbench { grid-template-columns: minmax(0, 1fr); }
+  .investigation-workbench .investigation-list { grid-template-columns: minmax(0, 1fr); max-height: 16rem; }
+  .investigation-workbench .investigation-spl { border-left: 0; border-top: 1px solid var(--border-control); padding-left: 0; }
+}
+@media (max-width: 480px) { .hunt-toolbar, .hunt-field-grid { grid-template-columns: minmax(0, 1fr); } }

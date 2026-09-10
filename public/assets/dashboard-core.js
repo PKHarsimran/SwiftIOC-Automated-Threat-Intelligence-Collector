@@ -198,7 +198,18 @@
     .map((value) => `${' '.repeat(indent)}- ${JSON.stringify(value)}`)
     .join('\n');
 
-  const rowsToSpl = (value) => {
+  const rowsToSpl = (value, options = {}) => {
+    const index = stringValue(options.index ?? 'YOUR_INDEX');
+    const earliest = options.earliest ?? '-24h';
+    const names = ['src_ip', 'dest_ip', 'query', 'url', 'md5', 'sha1', 'sha256'];
+    const mapping = Object.fromEntries(names.map((name) => [name, stringValue(options.fields?.[name] ?? name)]));
+    let error = '';
+    if (!/^[a-zA-Z0-9_][a-zA-Z0-9_-]{0,99}$/.test(index)) error = 'Enter one index name using letters, numbers, underscores or hyphens.';
+    else if (!['-15m', '-1h', '-24h', '-7d', '-30d'].includes(earliest)) error = 'Choose one of the supported time ranges.';
+    else if (Object.values(mapping).some((name) => !/^[a-zA-Z_][a-zA-Z0-9_.]{0,99}$/.test(name) || name === 'swiftioc_matches')) error = 'Field names must start with a letter or underscore and contain only letters, numbers, underscores or dots. swiftioc_matches is reserved.';
+    if (error) return { included: 0, skipped: [], spl: '', error };
+    const field = (name) => `'${mapping[name]}'`;
+    const outputFields = [...new Set(['_time', 'host', 'user', 'action', ...Object.values(mapping)])].map((name) => JSON.stringify(name)).join(' ');
     const rows = Array.isArray(value) ? value : [];
     const clauses = [], skipped = [], seen = new Set();
     for (const row of rows) {
@@ -211,21 +222,21 @@
         const validated = detectionRows([row])[0];
         if (validated) {
           indicator = validated.indicator.toLowerCase();
-          if (type === 'domain') condition = `lower(rtrim(trim(query), "."))=${quote(indicator)}`;
+          if (type === 'domain') condition = `lower(rtrim(trim(${field('query')}), "."))=${quote(indicator)}`;
           else {
             const network = type.endsWith('_cidr') ? indicator : `${indicator}/${type === 'ipv6' ? 128 : 32}`;
-            condition = `(cidrmatch(${quote(network)}, src_ip) OR cidrmatch(${quote(network)}, dest_ip))`;
+            condition = `(cidrmatch(${quote(network)}, ${field('src_ip')}) OR cidrmatch(${quote(network)}, ${field('dest_ip')}))`;
           }
         }
       } else if (['md5', 'sha1', 'sha256'].includes(type)) {
         const length = { md5: 32, sha1: 40, sha256: 64 }[type];
         if (new RegExp(`^[a-f0-9]{${length}}$`, 'i').test(indicator)) {
           indicator = indicator.toLowerCase();
-          condition = `lower(trim(${type}))=${quote(indicator)}`;
+          condition = `lower(trim(${field(type)}))=${quote(indicator)}`;
         }
       } else if (type === 'url') {
         try {
-          if (['http:', 'https:'].includes(new URL(indicator).protocol)) condition = `url=${quote(indicator)}`;
+          if (['http:', 'https:'].includes(new URL(indicator).protocol)) condition = `${field('url')}=${quote(indicator)}`;
         } catch { /* Unsupported URL remains in the skipped list. */ }
       }
       if (!condition) { skipped.push(row); continue; }
@@ -235,11 +246,11 @@
       clauses.push(`    if(${condition}, ${quote(key)}, null())`);
     }
     return { included: seen.size, skipped,
-      spl: clauses.length ? 'index=YOUR_INDEX earliest=-24h latest=now\n'
-        + '| fields _time host user src_ip dest_ip query url md5 sha1 sha256 action\n'
+      spl: clauses.length ? `index=${index} earliest=${earliest} latest=now\n`
+        + `| fields ${outputFields}\n`
         + '| eval swiftioc_matches=mvappend(\n' + clauses.join(',\n') + ',\n    null())\n'
         + '| where mvcount(swiftioc_matches)>0\n'
-        + '| table _time host user src_ip dest_ip query url action swiftioc_matches\n' : '' };
+        + `| table ${outputFields} swiftioc_matches\n` : '' };
   };
 
   const rowsToSigma = (value) => {

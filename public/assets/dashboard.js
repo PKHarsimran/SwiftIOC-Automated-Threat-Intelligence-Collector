@@ -420,20 +420,38 @@
     const splDownload = qs('[data-investigation-spl-download]', root);
     let currentSpl = '';
     splCopy?.addEventListener('click', () => {
-      if (currentSpl) copyOrPrompt(currentSpl, 'Selected-IOC SPL copied. Map your event fields before running.');
+      if (currentSpl) copyOrPrompt(currentSpl, 'Selected-IOC SPL copied.');
     });
     splDownload?.addEventListener('click', () => {
       if (currentSpl) downloadDetection(currentSpl, 'swiftioc-selected-iocs.spl', 'text/plain');
     });
 
-    const render = (rows) => {
-      root.hidden = !rows.length;
-      const hunt = dashboardCore.rowsToSpl(rows);
+    const indexInput = qs('[data-spl-index]', root);
+    const timeInput = qs('[data-spl-time]', root);
+    const fieldInputs = qsa('[data-spl-field]', root);
+    const renderHunt = (rows) => {
+      const hunt = dashboardCore.rowsToSpl(rows, {
+        index: indexInput?.value,
+        earliest: timeInput?.value,
+        fields: Object.fromEntries(fieldInputs.map((input) => [input.dataset.splField, input.value])),
+      });
       currentSpl = hunt.spl;
-      setText(splCode, currentSpl || 'Add a supported observable to generate SPL.');
-      setText(splStatus, `${hunt.included} queued IOCs included. ${hunt.skipped.length} unsupported or invalid entries skipped${hunt.skipped.length ? ': ' + hunt.skipped.map((row) => `${row.type || 'unknown'} ${row.indicator || ''}`).join('; ') : ''}. Updates automatically with your queue.`);
+      setText(splCode, currentSpl || (hunt.error ? 'Correct the hunt settings to generate SPL.' : 'Add a supported observable to generate SPL.'));
+      setText(splStatus, hunt.error || `${hunt.included} queued IOCs included. ${hunt.skipped.length} unsupported or invalid entries skipped${hunt.skipped.length ? ': ' + hunt.skipped.map((row) => `${row.type || 'unknown'} ${row.indicator || ''}`).join('; ') : ''}.${indexInput?.value === 'YOUR_INDEX' ? ' Replace YOUR_INDEX before running.' : ' Query updated for your settings.'}`);
+      splStatus?.classList.toggle('hunt-error', !!hunt.error);
       if (splCopy) splCopy.disabled = !currentSpl;
       if (splDownload) splDownload.disabled = !currentSpl;
+    };
+    [indexInput, timeInput, ...fieldInputs].filter(Boolean).forEach((input) => input.addEventListener('input', () => renderHunt(investigationWorkspace.getRows())));
+    qs('[data-spl-reset]', root)?.addEventListener('click', () => {
+      if (indexInput) indexInput.value = 'YOUR_INDEX';
+      if (timeInput) timeInput.value = '-24h';
+      fieldInputs.forEach((input) => { input.value = input.dataset.splField; });
+      renderHunt(investigationWorkspace.getRows());
+    });
+    const render = (rows) => {
+      root.hidden = !rows.length;
+      renderHunt(rows);
       setText(count, formatNumber(rows.length));
       if (!list) return;
       list.innerHTML = '';
