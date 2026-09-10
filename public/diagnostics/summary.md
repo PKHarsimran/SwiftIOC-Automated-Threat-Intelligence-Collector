@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-09-10T02:51:26Z_
+_Generated 2026-09-10T08:35:41Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-10T02:51:26Z |
+| Generated | 2026-09-10T08:35:41Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6255 |
+| Duplicates removed | 5898 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-source overlaps | 539 |
+| Multi-source overlaps | 560 |
 | Score (min / avg / max) | 80 / 80.4 / 96 |
 | High-score indicators (≥80) | 10000 |
-| Corroborated (2+ sources) | 539 |
-| Earliest first_seen | 2019-07-15T19:15:16Z |
-| Newest first_seen | 2026-09-10T02:40:07Z |
+| Corroborated (2+ sources) | 560 |
+| Earliest first_seen | 2016-05-11T01:59:46Z |
+| Newest first_seen | 2026-09-10T08:24:13Z |
 
 ## Top indicators by score
 
@@ -31,7 +31,7 @@ _Generated 2026-09-10T02:51:26Z_
 | ipv4: `43[.]156[.]71[.]43` | score 96, 4 sources |
 | ipv4: `45[.]17[.]39[.]120` | score 96, 4 sources |
 | ipv4: `68[.]233[.]116[.]124` | score 96, 4 sources |
-| ipv4: `94[.]154[.]43[.]69` | score 94, 3 sources |
+| ipv4: `94[.]154[.]43[.]69` | score 92, 3 sources |
 | sha256: `00147abaca1263e02190ac12e15ab0db45bf250ef2dae53e945a9d8b40c01598` | score 88, 2 sources |
 
 ## Per-source totals
@@ -39,43 +39,43 @@ _Generated 2026-09-10T02:51:26Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| nist_nvd_recent | 5392 |
-| greensnow_blocklist | 5250 |
-| blocklist_de_ssh | 4940 |
+| greensnow_blocklist | 5263 |
+| blocklist_de_ssh | 5102 |
 | ipsum_level5 | 3889 |
-| threatfox_export_json | 2760 |
 | binarydefense_banlist | 2650 |
+| nist_nvd_recent | 2200 |
 | spamhaus_drop | 1709 |
 | cisa_kev | 1703 |
-| tor_exit_nodes | 1337 |
+| threatfox_export_json | 1610 |
+| tor_exit_nodes | 1339 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 4059 |
-| domain | 1967 |
+| cve | 5102 |
 | ipv4_cidr | 1708 |
-| sha256 | 1113 |
-| url | 568 |
-| ipv4 | 299 |
-| sha1 | 247 |
-| md5 | 39 |
+| sha256 | 1200 |
+| domain | 863 |
+| url | 514 |
+| ipv4 | 293 |
+| sha1 | 264 |
+| md5 | 56 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| cve | 4059 |
-| threatfox | 2871 |
-| nvd | 2590 |
+| cve | 5102 |
+| nvd | 3637 |
+| threatfox | 1765 |
+| malware | 1725 |
 | drop | 1708 |
 | spamhaus | 1708 |
 | exploited-in-the-wild | 1703 |
-| malware | 1646 |
-| etherhiding | 1401 |
-| high | 1161 |
-| Sepolia | 829 |
+| high | 1517 |
+| medium | 1131 |
+| compromised | 397 |
 
 ## Multi-source overlaps
 
