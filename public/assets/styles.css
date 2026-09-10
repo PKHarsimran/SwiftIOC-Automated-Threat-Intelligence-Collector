@@ -3707,8 +3707,8 @@ input.lookup-input { border-radius: 0.3rem; background: var(--bg-color); }
   mask-image: linear-gradient(90deg, transparent, #000);
 }
 .campaign-inspector { border-top: 2px solid var(--accent); }
-.campaign-node.is-selected .campaign-node-core { stroke: #dcf3b0; stroke-width: 3; }
-.campaign-node.is-connected .campaign-node-core { stroke: #c5d5af; }
+.campaign-node:is(.pivot, .indicator).is-selected .campaign-node-core { stroke: #dcf3b0; stroke-width: 3; }
+.campaign-node:is(.pivot, .indicator).is-connected .campaign-node-core { stroke: #c5d5af; }
 .hero-download { position: relative; overflow: hidden; }
 @media (prefers-reduced-motion: no-preference) {
   @keyframes desk-grid-scan {
