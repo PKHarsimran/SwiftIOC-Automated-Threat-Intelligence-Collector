@@ -3843,3 +3843,14 @@ body:has(.workspace-dock:not([hidden])) .toast { bottom: 6rem; }
 .button:disabled, .button-link:disabled, .button-link[aria-disabled="true"] {
   transform: none !important; cursor: not-allowed;
 }
+
+/* Inset content on the surfaced CVE panel, including narrow screens. */
+.discovery-desk.vulnerability-desk {
+  padding: clamp(1rem, 2.5vw, 1.75rem);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-card);
+}
+.vulnerability-views { gap: .5rem; }
+.vulnerability-rejected-control { display: flex; align-items: flex-start; gap: .6rem; }
+.vulnerability-rejected-control input[type="checkbox"] { flex: 0 0 auto; margin: .25em 0 0; }
+.vulnerability-pagination { flex-wrap: wrap; gap: .75rem; }
