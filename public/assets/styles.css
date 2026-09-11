@@ -3787,28 +3787,11 @@ body:has(.workspace-dock:not([hidden])) .toast { bottom: 6rem; }
   .workspace-dock button { transition: background-color 140ms ease, box-shadow 140ms ease; }
 }
 
-/* Interaction-driven radar cues; decorative layers never intercept graph input. */
-.campaign-stage::before {
-  content: ''; position: absolute; inset: 12% 20%; border-radius: 50%;
-  pointer-events: none; opacity: 0;
-  background: conic-gradient(from 0deg, transparent 0deg 285deg, rgb(167 196 124 / .16) 355deg, transparent 360deg);
-}
+/* Keep a brief interaction cue on the workspace shortcut. */
 @media (prefers-reduced-motion: no-preference) {
-  @keyframes intel-radar-sweep {
-    0% { transform: rotate(-90deg); opacity: 0; }
-    15%, 80% { opacity: 1; }
-    100% { transform: rotate(270deg); opacity: 0; }
-  }
-  @keyframes intel-ring-trace { to { stroke-dashoffset: -28.8; } }
   @keyframes intel-workspace-signal {
     0%, 100% { box-shadow: 0 5px 24px #0006; }
     45% { box-shadow: 0 5px 24px #0006, 0 0 0 4px rgb(167 196 124 / .16); }
-  }
-  .campaign-stage:hover::before, .campaign-stage:focus-within::before {
-    animation: intel-radar-sweep 2400ms linear 1;
-  }
-  .campaign-node.is-selected .campaign-corroboration-ring {
-    animation: intel-ring-trace 1800ms linear 2;
   }
   .workspace-dock:hover, .workspace-dock:focus-within {
     animation: intel-workspace-signal 900ms ease-out 1;
@@ -3843,3 +3826,27 @@ body:has(.workspace-dock:not([hidden])) .toast { bottom: 6rem; }
 .button:disabled, .button-link:disabled, .button-link[aria-disabled="true"] {
   transform: none !important; cursor: not-allowed;
 }
+
+/* Inset content on the surfaced CVE panel, including narrow screens. */
+.discovery-desk.vulnerability-desk {
+  padding: clamp(1rem, 2.5vw, 1.75rem);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-card);
+}
+.vulnerability-views { gap: .5rem; }
+.vulnerability-rejected-control { display: flex; align-items: flex-start; gap: .6rem; }
+.vulnerability-rejected-control input[type="checkbox"] { flex: 0 0 auto; margin: .25em 0 0; }
+.vulnerability-pagination { flex-wrap: wrap; gap: .75rem; }
+
+
+/* Quiet relationship map: reserve emphasis for the selected evidence path. */
+.campaign-edge { stroke-dasharray: none; stroke-width: 1; opacity: .3; animation: none; }
+.campaign-edge.is-connected { stroke-dasharray: none; stroke-width: 2.2; opacity: .95; animation: none; }
+.campaign-edge.is-dimmed { opacity: .07; }
+.campaign-node .campaign-corroboration-ring { stroke-dasharray: none; opacity: .65; }
+.campaign-node.is-selected .campaign-corroboration-ring { stroke-width: 2; opacity: 1; }
+.campaign-node.indicator text {
+  paint-order: stroke fill; stroke: #1b211c; stroke-width: 3px; stroke-linejoin: round;
+}
+
+.campaign-interaction-hint { grid-column: 1 / -1; margin: 0; padding: .65rem 1rem; color: var(--text-muted); font-size: .78rem; border-bottom: 1px solid var(--border-soft); }

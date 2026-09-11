@@ -3871,6 +3871,11 @@
       if (nextSelected) selectNode(nextSelected);
     };
 
+    svg.addEventListener('click', (event) => {
+      if (!selected || event.target.closest('[data-graph-node]')) return;
+      selected = null;
+      render();
+    });
     search?.addEventListener('input', updateSearch);
     reset?.addEventListener('click', () => {
       selected = null;
