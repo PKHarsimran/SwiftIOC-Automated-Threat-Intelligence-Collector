@@ -2,16 +2,16 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-09-11T18:56:10Z_
+_Generated 2026-09-11T21:17:00Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-11T18:56:10Z |
+| Generated | 2026-09-11T21:17:00Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 5904 |
+| Duplicates removed | 5872 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-source overlaps | 658 |
@@ -19,7 +19,7 @@ _Generated 2026-09-11T18:56:10Z_
 | High-score indicators (≥80) | 10000 |
 | Corroborated (2+ sources) | 658 |
 | Earliest first_seen | 2016-05-11T01:59:46Z |
-| Newest first_seen | 2026-09-11T18:42:23Z |
+| Newest first_seen | 2026-09-11T21:05:06Z |
 
 ## Top indicators by score
 
@@ -41,43 +41,43 @@ _Generated 2026-09-11T18:56:10Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| threatfox_export_json | 6367 |
-| blocklist_de_ssh | 5296 |
-| greensnow_blocklist | 4678 |
+| threatfox_export_json | 6126 |
+| blocklist_de_ssh | 5232 |
+| greensnow_blocklist | 4611 |
 | ipsum_level5 | 4011 |
-| nist_nvd_recent | 3197 |
 | binarydefense_banlist | 2896 |
+| nist_nvd_recent | 2400 |
 | spamhaus_drop | 1723 |
-| cisa_kev | 1708 |
-| tor_exit_nodes | 1341 |
+| cisa_kev | 1709 |
+| tor_exit_nodes | 1339 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3677 |
-| cve | 2117 |
+| sha256 | 3415 |
+| cve | 2318 |
 | ipv4_cidr | 1722 |
-| domain | 1507 |
-| url | 424 |
+| domain | 1518 |
+| url | 443 |
 | sha1 | 290 |
-| ipv4 | 181 |
+| ipv4 | 212 |
 | md5 | 82 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 5559 |
-| rat | 3080 |
-| asyncrat | 3078 |
-| cve | 2117 |
+| threatfox | 5323 |
+| rat | 2797 |
+| asyncrat | 2795 |
+| cve | 2318 |
 | drop | 1722 |
 | spamhaus | 1722 |
-| exploited-in-the-wild | 1708 |
-| malware | 994 |
+| exploited-in-the-wild | 1709 |
+| malware | 1029 |
 | etherhiding | 895 |
-| nvd | 652 |
+| nvd | 852 |
 
 ## Multi-source overlaps
 
