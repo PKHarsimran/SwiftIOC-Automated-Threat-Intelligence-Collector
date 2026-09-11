@@ -46,7 +46,7 @@
       });
     </script>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/styles.css?v=34" />
+    <link rel="stylesheet" href="assets/styles.css?v=35" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -176,7 +176,7 @@
               Investigation queue
               <span class="investigation-count" data-investigation-count>0</span>
             </h2>
-            <p>Shortlist indicators while you triage. This queue stays in this browser.</p>
+            <p>Shortlist indicators while you triage.</p>
           </div>
           <div class="investigation-actions">
             <button type="button" class="button ghost" data-investigation-copy>
@@ -199,6 +199,8 @@
             </button>
           </div>
         </div>
+        <p data-investigation-storage role="status"></p>
+        <button type="button" class="button ghost" data-investigation-retry hidden>Retry save</button>
         <div class="investigation-workbench">
         <ul class="investigation-list" data-investigation-list aria-label="Queued indicators"></ul>
         <div class="investigation-spl" data-investigation-spl>
@@ -1068,9 +1070,9 @@
     </div>
 
     <div class="toast" data-toast role="status" aria-live="polite" aria-atomic="true" hidden></div>
-    <script defer src="assets/dashboard-core.js?v=34"></script>
-    <script defer src="assets/inventory-core.js?v=34"></script>
-    <script defer src="assets/inventory.js?v=34"></script>
-    <script defer src="assets/dashboard.js?v=34"></script>
+    <script defer src="assets/dashboard-core.js?v=35"></script>
+    <script defer src="assets/inventory-core.js?v=35"></script>
+    <script defer src="assets/inventory.js?v=35"></script>
+    <script defer src="assets/dashboard.js?v=35"></script>
   </body>
 </html>

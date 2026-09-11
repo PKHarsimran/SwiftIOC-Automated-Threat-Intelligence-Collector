@@ -97,6 +97,19 @@ const assert = require('node:assert/strict');
     assert.equal(await page.locator('[data-workspace-dock-count]').innerText(), '1');
     await page.locator('[data-investigation-clear]').click();
     assert.equal(await page.evaluate(() => document.activeElement?.id), 'ioc-lookup-input');
+    await page.locator('[data-workspace-undo]').click();
+    await page.evaluate(() => {
+      window.originalStorageSetItem = Storage.prototype.setItem;
+      Storage.prototype.setItem = function () { throw new DOMException('Full', 'QuotaExceededError'); };
+    });
+    await page.locator('[data-investigation-clear]').click();
+    assert.equal(await page.locator('[data-investigation-root]').isVisible(), true);
+    assert.match(await page.locator('[data-investigation-storage]').innerText(), /Browser save failed/);
+    assert.equal(await page.locator('[data-investigation-retry]').isVisible(), true);
+    await page.evaluate(() => { Storage.prototype.setItem = window.originalStorageSetItem; });
+    await page.locator('[data-investigation-retry]').click();
+    assert.equal(await page.locator('[data-investigation-root]').isHidden(), true);
+    assert.equal(await page.evaluate(() => localStorage.getItem('swiftioc-investigation-workspace-v1')), '[]');
     assert.deepEqual(errors, []);
     console.log('PASS: queued SPL, copy/download contents, skipped types, stale-query removal, mobile layout.');
   } finally { await browser.close(); }

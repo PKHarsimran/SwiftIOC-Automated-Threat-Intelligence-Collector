@@ -302,12 +302,14 @@
   ) || (Array.isArray(value) ? value.filter((row) => row?.indicator).slice(0, INVESTIGATION_LIMIT) : []);
 
   let investigationRows = [];
+  let investigationStorageFailed = false;
   try {
     investigationRows = cleanInvestigationRows(
       JSON.parse(window.localStorage.getItem(INVESTIGATION_STORAGE_KEY) || '[]')
     );
   } catch (error) {
     investigationRows = [];
+    investigationStorageFailed = true;
   }
 
   const notifyInvestigationListeners = () => {
@@ -321,7 +323,9 @@
         INVESTIGATION_STORAGE_KEY,
         JSON.stringify(investigationRows)
       );
+      investigationStorageFailed = false;
     } catch (error) {
+      investigationStorageFailed = true;
       console.warn('Investigation workspace could not be saved', error);
     }
     notifyInvestigationListeners();
@@ -419,6 +423,14 @@
   const initialiseInvestigationWorkspace = () => {
     const root = qs('[data-investigation-root]');
     if (!root) return;
+    const storageStatus = qs('[data-investigation-storage]', root);
+    const retrySave = qs('[data-investigation-retry]', root);
+    retrySave?.addEventListener('click', () => {
+      saveInvestigationRows();
+      if (!investigationStorageFailed) {
+        (investigationRows.length ? qs('#investigation-heading', root) : qs('[data-lookup-input]'))?.focus({ preventScroll: true });
+      }
+    });
     const dock = qs('[data-workspace-dock]');
     const returnButton = qs('[data-workspace-return]');
     const undoButton = qs('[data-workspace-undo]');
@@ -490,7 +502,12 @@
       renderHunt(investigationWorkspace.getRows());
     });
     const render = (rows) => {
-      root.hidden = !rows.length;
+      root.hidden = !rows.length && !investigationStorageFailed;
+      setText(storageStatus, investigationStorageFailed
+        ? 'Browser save failed. Changes are only in this tab; export the queue before leaving or retry saving. A previous saved queue may reappear after reload.'
+        : `${rows.length} of ${INVESTIGATION_LIMIT} slots used · Saved in this browser.${rows.length === INVESTIGATION_LIMIT ? ' Queue full: remove an indicator before adding another.' : ''}`);
+      storageStatus?.classList.toggle('hunt-error', investigationStorageFailed);
+      if (retrySave) retrySave.hidden = !investigationStorageFailed;
       if (dock) dock.hidden = !rows.length && !investigationWorkspace.canUndo();
       if (openButton) openButton.hidden = !rows.length;
       if (undoButton) undoButton.hidden = !investigationWorkspace.canUndo();
