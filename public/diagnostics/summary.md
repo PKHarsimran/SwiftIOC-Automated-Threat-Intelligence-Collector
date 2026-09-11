@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-09-11T15:46:09Z_
+_Generated 2026-09-11T18:56:10Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-11T15:46:09Z |
+| Generated | 2026-09-11T18:56:10Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 5922 |
+| Duplicates removed | 5904 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-source overlaps | 654 |
+| Multi-source overlaps | 658 |
 | Score (min / avg / max) | 80 / 80.5 / 96 |
 | High-score indicators (≥80) | 10000 |
-| Corroborated (2+ sources) | 654 |
+| Corroborated (2+ sources) | 658 |
 | Earliest first_seen | 2016-05-11T01:59:46Z |
-| Newest first_seen | 2026-09-11T15:44:30Z |
+| Newest first_seen | 2026-09-11T18:42:23Z |
 
 ## Top indicators by score
 
@@ -39,43 +39,43 @@ _Generated 2026-09-11T15:46:09Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| threatfox_export_json | 6016 |
+| threatfox_export_json | 6367 |
 | blocklist_de_ssh | 5296 |
-| greensnow_blocklist | 4545 |
+| greensnow_blocklist | 4678 |
 | ipsum_level5 | 4011 |
+| nist_nvd_recent | 3197 |
 | binarydefense_banlist | 2896 |
-| nist_nvd_recent | 2600 |
 | spamhaus_drop | 1723 |
-| cisa_kev | 1705 |
-| tor_exit_nodes | 1336 |
+| cisa_kev | 1708 |
+| tor_exit_nodes | 1341 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 4056 |
-| cve | 2037 |
+| sha256 | 3677 |
+| cve | 2117 |
 | ipv4_cidr | 1722 |
-| domain | 1253 |
-| url | 362 |
+| domain | 1507 |
+| url | 424 |
 | sha1 | 290 |
-| ipv4 | 198 |
+| ipv4 | 181 |
 | md5 | 82 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 5452 |
-| rat | 3294 |
-| asyncrat | 3293 |
-| cve | 2037 |
+| threatfox | 5559 |
+| rat | 3080 |
+| asyncrat | 3078 |
+| cve | 2117 |
 | drop | 1722 |
 | spamhaus | 1722 |
-| exploited-in-the-wild | 1705 |
-| malware | 1181 |
+| exploited-in-the-wild | 1708 |
+| malware | 994 |
 | etherhiding | 895 |
-| Polygon | 631 |
+| nvd | 652 |
 
 ## Multi-source overlaps
 
