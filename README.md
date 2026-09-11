@@ -219,6 +219,8 @@ For example, a high-confidence IP from two source identifiers starts at 88 and d
 
 The `high_confidence` feed includes records at or above the threshold (default 80) **or with at least two source identifiers**. Review provenance, age, and local context before using any feed for blocking. Use the observable collection when an integration must exclude CVE IDs.
 
+The workspace shortcut includes **Undo last change** for additions, removals, and clearing the queue. Undo restores the previous queue order and regenerates its SPL. One undo step is kept in page memory; reloading clears undo history while preserving the saved queue.
+
 ## Investigation queue SPL
 
 Adding observables to the investigation queue automatically builds a copyable Splunk hunt for those selected values. The query updates on removal and supports IPs/CIDRs, exact DNS domains, full URLs, and MD5/SHA-1/SHA-256. Unsupported entries are listed explicitly; an empty supported selection disables export. Set your index and time range beside the live query, then expand **Map event fields** to match your extracted fields (including dotted names such as `source.ip`). These settings remain in memory until the page reloads; changing the queue preserves them. Invalid settings clear the query and disable copying/downloading until corrected. Use one index name and single-valued event fields; the builder supports letters, numbers, underscores and dots in field names, with a leading letter or underscore. Results retain all matching queued IOC identities. This is a bounded triage query; use the lookup-based Splunk library for full-feed matching. Validate execution in your own Splunk deployment.
