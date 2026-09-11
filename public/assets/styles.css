@@ -3766,3 +3766,14 @@ input.lookup-input { border-radius: 0.3rem; background: var(--bg-color); }
   .investigation-workbench .investigation-spl { border-left: 0; border-top: 1px solid var(--border-control); padding-left: 0; }
 }
 @media (max-width: 480px) { .hunt-toolbar, .hunt-field-grid { grid-template-columns: minmax(0, 1fr); } }
+
+/* The analyst queue stays one click away while browsing long feeds. */
+.workspace-dock { position: fixed; bottom: max(1rem, env(safe-area-inset-bottom)); right: max(1rem, env(safe-area-inset-right)); z-index: 60; display: flex; gap: .4rem; padding: .4rem; border: 1px solid var(--border-control); border-radius: .5rem; background: var(--bg-color); box-shadow: 0 5px 24px #0006; }
+.workspace-dock[hidden], .workspace-dock button[hidden] { display: none; }
+.workspace-dock button { min-height: 44px; padding: .5rem .8rem; border: 0; border-radius: .3rem; background: var(--surface-color, #252b21); color: var(--text-primary); font: inherit; font-size: .85rem; cursor: pointer; }
+.workspace-dock button:hover { background: #394232; }
+.workspace-dock button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.workspace-dock span { margin-left: .4rem; font-variant-numeric: tabular-nums; color: var(--accent); }
+body:has(.workspace-dock:not([hidden])) { padding-bottom: 5.5rem; }
+body:has(.workspace-dock:not([hidden])) .toast { bottom: 6rem; }
+@media print { .workspace-dock { display: none; } }
