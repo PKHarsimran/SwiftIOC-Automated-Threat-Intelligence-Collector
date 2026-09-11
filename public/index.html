@@ -83,6 +83,10 @@
   </head>
   <body data-ioc-root=".">
     <a class="skip-link" href="#live-preview">Skip to IOC results</a>
+    <nav class="workspace-dock" data-workspace-dock aria-label="Investigation shortcuts" hidden>
+      <button type="button" data-workspace-open aria-controls="investigation-workspace">Workspace <span data-workspace-dock-count>0</span></button>
+      <button type="button" data-workspace-return hidden>Back to results</button>
+    </nav>
     <div class="page-wrapper">
       <nav class="top-nav" aria-label="SwiftIOC navigation">
         <a class="brand" href="index.html">
@@ -1061,10 +1065,6 @@
       </main>
     </div>
 
-    <nav class="workspace-dock" data-workspace-dock aria-label="Investigation shortcuts" hidden>
-      <button type="button" data-workspace-open aria-controls="investigation-workspace">Workspace <span data-workspace-dock-count>0</span></button>
-      <button type="button" data-workspace-return hidden>Back to results</button>
-    </nav>
     <div class="toast" data-toast role="status" aria-live="polite" aria-atomic="true" hidden></div>
     <script defer src="assets/dashboard-core.js?v=28"></script>
     <script defer src="assets/inventory-core.js?v=28"></script>
