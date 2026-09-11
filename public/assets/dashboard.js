@@ -412,7 +412,7 @@
     const scrollBehavior = () => matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth';
     qs('[data-workspace-open]')?.addEventListener('click', () => {
       const bounds = root.getBoundingClientRect();
-      if (bounds.bottom < 0 || bounds.top > innerHeight) {
+      if (returnPosition == null && (bounds.top < 0 || bounds.top > innerHeight)) {
         returnPosition = window.scrollY;
         if (returnButton) returnButton.hidden = false;
       }
@@ -481,7 +481,7 @@
       setText(count, formatNumber(rows.length));
       if (!list) return;
       list.innerHTML = '';
-      rows.forEach((row) => {
+      rows.forEach((row, index) => {
         const item = document.createElement('li');
         const identity = document.createElement('div');
         identity.className = 'investigation-identity';
@@ -502,6 +502,8 @@
         remove.setAttribute('aria-label', `Remove ${row.indicator} from investigation queue`);
         remove.addEventListener('click', () => {
           investigationWorkspace.remove(row);
+          const remaining = qsa('.row-action', list);
+          (remaining[Math.min(index, remaining.length - 1)] || qs('[data-lookup-input]'))?.focus({ preventScroll: true });
           showToast('Removed from the investigation queue.');
         });
         item.append(identity, remove);
@@ -547,6 +549,7 @@
     });
     clear?.addEventListener('click', () => {
       investigationWorkspace.clear();
+      qs('[data-lookup-input]')?.focus({ preventScroll: true });
       showToast('Investigation queue cleared.');
     });
 

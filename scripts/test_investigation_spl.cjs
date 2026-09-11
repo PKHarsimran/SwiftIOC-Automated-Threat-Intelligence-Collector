@@ -18,7 +18,16 @@ const assert = require('node:assert/strict');
     assert.ok(await page.evaluate(() => scrollY) < originalScroll);
     await page.locator('[data-workspace-return]').click();
     assert.ok(Math.abs(await page.evaluate(() => scrollY) - originalScroll) < 2);
+    await page.evaluate(() => {
+      const root = document.querySelector('[data-investigation-root]');
+      window.scrollTo({ top: root.offsetTop + 100, behavior: 'instant' });
+    });
+    const partialScroll = await page.evaluate(() => scrollY);
     await page.locator('[data-workspace-open]').click();
+    assert.equal(await page.locator('[data-workspace-return]').isVisible(), true);
+    await page.locator('[data-workspace-open]').click();
+    await page.locator('[data-workspace-return]').click();
+    assert.ok(Math.abs(await page.evaluate(() => scrollY) - partialScroll) < 2);
     await page.locator('[data-investigation-spl-copy]').click();
     const code = await page.locator('[data-investigation-spl-code]').textContent();
     assert.ok(code.includes('cidrmatch("1.2.3.4/32"'));
@@ -61,8 +70,15 @@ const assert = require('node:assert/strict');
     assert.ok(!(await page.locator('[data-investigation-spl-code]').textContent()).includes('1.2.3.4'));
     assert.equal(await page.locator('[data-spl-index]').inputValue(), 'retain_this');
     assert.equal(await page.locator('[data-workspace-dock-count]').innerText(), '1');
+    assert.equal(await page.evaluate(() => document.activeElement?.getAttribute('aria-label')), 'Remove CVE-2026-1234 from investigation queue');
+    await page.setViewportSize({ width: 320, height: 640 });
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+    const dockBounds = await page.locator('[data-workspace-dock]').boundingBox();
+    assert.ok(dockBounds.x >= 0 && dockBounds.x + dockBounds.width <= 320);
+
     await page.getByRole('button', { name: 'Remove CVE-2026-1234 from investigation queue', exact: true }).click();
     assert.equal(await page.locator('[data-workspace-dock]').isHidden(), true);
+    assert.equal(await page.evaluate(() => document.activeElement?.id), 'ioc-lookup-input');
     assert.deepEqual(errors, []);
     console.log('PASS: queued SPL, copy/download contents, skipped types, stale-query removal, mobile layout.');
   } finally { await browser.close(); }

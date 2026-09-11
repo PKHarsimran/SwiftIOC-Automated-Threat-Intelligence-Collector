@@ -3777,3 +3777,12 @@ input.lookup-input { border-radius: 0.3rem; background: var(--bg-color); }
 body:has(.workspace-dock:not([hidden])) { padding-bottom: 5.5rem; }
 body:has(.workspace-dock:not([hidden])) .toast { bottom: 6rem; }
 @media print { .workspace-dock { display: none; } }
+
+/* Preserve full observable identities and keep dock controls inside small viewports. */
+.investigation-identity code { white-space: normal; overflow-wrap: anywhere; text-overflow: clip; }
+.workspace-dock { max-width: calc(100vw - 2rem); flex-wrap: wrap; }
+.workspace-dock button { flex: 1 1 auto; }
+@media (max-width: 380px) { .workspace-dock button { padding-inline: .55rem; font-size: .78rem; } }
+@media (prefers-reduced-motion: no-preference) {
+  .workspace-dock button { transition: background-color 140ms ease, box-shadow 140ms ease; }
+}
