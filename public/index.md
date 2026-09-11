@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-09-11T02:40:42Z_
+_Generated 2026-09-11T06:22:03Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-11T02:40:42Z |
+| Generated | 2026-09-11T06:22:03Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6643 |
+| Duplicates removed | 6524 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-source overlaps | 563 |
+| Multi-source overlaps | 571 |
 | Score (min / avg / max) | 80 / 80.4 / 96 |
 | High-score indicators (≥80) | 10000 |
-| Corroborated (2+ sources) | 563 |
+| Corroborated (2+ sources) | 571 |
 | Earliest first_seen | 2016-05-11T01:59:46Z |
-| Newest first_seen | 2026-09-11T02:39:29Z |
+| Newest first_seen | 2026-09-11T06:19:14Z |
 
 ## Top indicators by score
 
@@ -41,11 +41,11 @@ _Generated 2026-09-11T02:40:42Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| threatfox_export_json | 6054 |
-| greensnow_blocklist | 5303 |
-| blocklist_de_ssh | 5280 |
+| threatfox_export_json | 6120 |
+| greensnow_blocklist | 5292 |
+| blocklist_de_ssh | 5255 |
 | ipsum_level5 | 4011 |
-| nist_nvd_recent | 3988 |
+| nist_nvd_recent | 3919 |
 | binarydefense_banlist | 2896 |
 | spamhaus_drop | 1711 |
 | cisa_kev | 1705 |
@@ -55,29 +55,29 @@ _Generated 2026-09-11T02:40:42Z_
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 4085 |
-| cve | 2108 |
-| ipv4_cidr | 1701 |
-| domain | 1329 |
-| url | 358 |
+| sha256 | 4139 |
+| cve | 2126 |
+| ipv4_cidr | 1710 |
+| domain | 1263 |
+| url | 328 |
 | sha1 | 225 |
-| ipv4 | 177 |
+| ipv4 | 192 |
 | md5 | 17 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 5270 |
+| threatfox | 5279 |
+| rat | 3294 |
 | asyncrat | 3293 |
-| rat | 3293 |
-| cve | 2108 |
+| cve | 2126 |
+| drop | 1710 |
+| spamhaus | 1710 |
 | exploited-in-the-wild | 1705 |
-| drop | 1701 |
-| spamhaus | 1701 |
-| malware | 1222 |
+| malware | 1194 |
 | etherhiding | 867 |
-| nvd | 643 |
+| nvd | 661 |
 
 ## Multi-source overlaps
 
