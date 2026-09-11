@@ -143,7 +143,10 @@ def load_previous_feed(path: Path) -> List[Indicator]:
     """Load a previously published latest.jsonl so the feed can persist.
 
     Tolerant of missing files, malformed lines, and schema drift (unknown
-    keys are ignored; rows missing required fields are skipped). Entries that
+    keys are ignored; rows with missing or incompatible fields are skipped).
+    Stream lines so large snapshots do not require a second full-file copy
+    in memory; a malformed encoding on one line does not discard later rows.
+    Entries that
     the current false-positive rules would reject are dropped on load, so an
     improved FP list retroactively cleans the carried-forward feed. File
     hashes are validated and reclassified to repair legacy type mismatches
@@ -153,37 +156,50 @@ def load_previous_feed(path: Path) -> List[Indicator]:
         return []
     field_names = {f.name for f in dataclass_fields(Indicator)}
     out: List[Indicator] = []
-    for line in path.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if not line:
-            continue
-        try:
-            data = json.loads(line)
-        except json.JSONDecodeError:
-            continue
-        if not isinstance(data, dict):
-            continue
-        try:
-            ind = Indicator(**{k: v for k, v in data.items() if k in field_names})
-        except TypeError:
-            continue
-        if ind.type in {"md5", "sha1", "sha256", "sha512"}:
-            if not isinstance(ind.indicator, str):
+    with path.open("rb") as snapshot:
+        for line in snapshot:
+            line = line.strip()
+            if not line:
                 continue
-            actual_type = classify(ind.indicator)
-            if actual_type not in {"md5", "sha1", "sha256", "sha512"}:
+            try:
+                data = json.loads(line)
+            except (json.JSONDecodeError, UnicodeDecodeError):
                 continue
-            ind.type = actual_type
-            ind.indicator = ind.indicator.strip().lower()
-        if ind.type == "cve":
-            if not isinstance(ind.indicator, str) or classify(ind.indicator.strip()) != "cve":
+            if not isinstance(data, dict):
                 continue
-            ind.indicator = normalize_value("cve", ind.indicator)
-        if not isinstance(ind.vulnerability, dict):
-            ind.vulnerability = {}
-        if is_false_positive(ind.type, ind.indicator):
-            continue
-        out.append(ind)
+            try:
+                ind = Indicator(**{k: v for k, v in data.items() if k in field_names})
+            except TypeError:
+                continue
+            # Dataclasses do not enforce annotations. Reject incompatible rows
+            # before key(), split(), false-positive checks or scoring use them.
+            text_fields = ("indicator", "type", "source", "first_seen", "last_seen",
+                           "confidence", "tlp", "tags", "reference", "context")
+            if any(not isinstance(getattr(ind, name), str) for name in text_fields):
+                continue
+            if not ind.indicator.strip() or not ind.type.strip():
+                continue
+            if type(ind.score) is not int or not 0 <= ind.score <= 100:
+                continue
+            if type(ind.sightings) is not int or ind.sightings < 1:
+                continue
+            if ind.type in {"md5", "sha1", "sha256", "sha512"}:
+                if not isinstance(ind.indicator, str):
+                    continue
+                actual_type = classify(ind.indicator)
+                if actual_type not in {"md5", "sha1", "sha256", "sha512"}:
+                    continue
+                ind.type = actual_type
+                ind.indicator = ind.indicator.strip().lower()
+            if ind.type == "cve":
+                if not isinstance(ind.indicator, str) or classify(ind.indicator.strip()) != "cve":
+                    continue
+                ind.indicator = normalize_value("cve", ind.indicator)
+            if not isinstance(ind.vulnerability, dict):
+                ind.vulnerability = {}
+            if is_false_positive(ind.type, ind.indicator):
+                continue
+            out.append(ind)
     return out
 
 
