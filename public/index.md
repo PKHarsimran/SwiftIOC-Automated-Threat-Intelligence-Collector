@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-09-11T06:22:03Z_
+_Generated 2026-09-11T06:38:37Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-11T06:22:03Z |
-| Window (hours) | 48 |
+| Generated | 2026-09-11T06:38:37Z |
+| Window (hours) | 24 |
 | Total indicators | 10000 |
-| Duplicates removed | 6524 |
+| Duplicates removed | 6492 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-source overlaps | 571 |
-| Score (min / avg / max) | 80 / 80.4 / 96 |
+| Multi-source overlaps | 644 |
+| Score (min / avg / max) | 80 / 80.5 / 96 |
 | High-score indicators (≥80) | 10000 |
-| Corroborated (2+ sources) | 571 |
+| Corroborated (2+ sources) | 644 |
 | Earliest first_seen | 2016-05-11T01:59:46Z |
-| Newest first_seen | 2026-09-11T06:19:14Z |
+| Newest first_seen | 2026-09-11T06:32:30Z |
 
 ## Top indicators by score
 
@@ -34,50 +34,50 @@ _Generated 2026-09-11T06:22:03Z_
 | ipv4: `43[.]156[.]71[.]43` | score 96, 4 sources |
 | ipv4: `45[.]17[.]39[.]120` | score 96, 4 sources |
 | ipv4: `68[.]233[.]116[.]124` | score 96, 4 sources |
-| sha256: `066f74af1398ed730c07f281018946359d16d6e8eccd6c99d9ec7e606d55005a` | score 88, 2 sources |
+| sha256: `0298b368f84837c39e3361517e0efc6ff0e1e25e17cdd34cfd297f15f4a149ff` | score 88, 2 sources |
 
 ## Per-source totals
 
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| threatfox_export_json | 6120 |
-| greensnow_blocklist | 5292 |
-| blocklist_de_ssh | 5255 |
+| greensnow_blocklist | 5307 |
+| blocklist_de_ssh | 5250 |
+| threatfox_export_json | 5122 |
 | ipsum_level5 | 4011 |
-| nist_nvd_recent | 3919 |
 | binarydefense_banlist | 2896 |
 | spamhaus_drop | 1711 |
 | cisa_kev | 1705 |
+| nist_nvd_recent | 1533 |
 | tor_exit_nodes | 1336 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 4139 |
-| cve | 2126 |
+| sha256 | 4095 |
+| cve | 2110 |
 | ipv4_cidr | 1710 |
-| domain | 1263 |
-| url | 328 |
-| sha1 | 225 |
+| domain | 1207 |
+| sha1 | 307 |
+| url | 280 |
 | ipv4 | 192 |
-| md5 | 17 |
+| md5 | 99 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 5279 |
-| rat | 3294 |
+| threatfox | 5425 |
+| rat | 3295 |
 | asyncrat | 3293 |
-| cve | 2126 |
+| cve | 2110 |
 | drop | 1710 |
 | spamhaus | 1710 |
 | exploited-in-the-wild | 1705 |
-| malware | 1194 |
+| malware | 1137 |
 | etherhiding | 867 |
-| nvd | 661 |
+| nvd | 645 |
 
 ## Multi-source overlaps
 
