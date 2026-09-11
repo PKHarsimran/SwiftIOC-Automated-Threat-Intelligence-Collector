@@ -3688,9 +3688,9 @@ input.lookup-input { border-radius: 0.3rem; background: var(--bg-color); }
   .button, .button-link, .hero-download {
     transition: transform 160ms ease, background-color 160ms ease, border-color 160ms ease, color 160ms ease;
   }
-  .button:not(:disabled):active, .button-link:active { transform: translateY(1px); }
+  .button:not(:disabled):active, .button-link:not(:disabled):not([aria-disabled="true"]):active { transform: translateY(1px); }
   @media (hover: hover) and (pointer: fine) {
-    .button:not(:disabled):hover, .button-link:hover { transform: translateY(-2px); }
+    .button:not(:disabled):hover, .button-link:not(:disabled):not([aria-disabled="true"]):hover { transform: translateY(-2px); }
     .vulnerability-card:hover, .inventory-results article:hover, .threat-card:hover {
       border-color: var(--accent);
       box-shadow: 0 5px 16px rgb(0 0 0 / .12);
@@ -3813,4 +3813,33 @@ body:has(.workspace-dock:not([hidden])) .toast { bottom: 6rem; }
   .workspace-dock:hover, .workspace-dock:focus-within {
     animation: intel-workspace-signal 900ms ease-out 1;
   }
+}
+
+
+/* Shared surface colors keep gradients quiet and text contrast predictable. */
+:root {
+  --surface-gradient: linear-gradient(135deg, #262e27 0%, #202620 55%, #1c211d 100%);
+  --surface-raised-gradient: linear-gradient(135deg, #303a2d, #252d24);
+  --surface-color: #252d24;
+  --graph-source-fill: #18535b;
+  --graph-tag-fill: #493758;
+}
+.investigation-workspace, .campaign-inspector, .vulnerability-desk {
+  background: var(--surface-gradient);
+}
+.workspace-dock { background: var(--surface-raised-gradient); border-color: #7e8b78; }
+.campaign-stage {
+  background-color: #1b211c;
+  background-image: linear-gradient(rgb(167 196 124 / .045) 1px, transparent 1px), linear-gradient(90deg, rgb(167 196 124 / .045) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+.campaign-node.pivot.source .campaign-node-core { fill: var(--graph-source-fill); }
+.campaign-node.pivot.tag .campaign-node-core { fill: var(--graph-tag-fill); }
+.campaign-node.pivot .campaign-node-subtitle { fill: #e0e9df; }
+.campaign-node.indicator .campaign-node-subtitle { fill: #bccbbb; }
+.campaign-stage-stats dt { color: #b8c5b4; }
+.investigation-identity span { color: #b8c5b4; }
+.hunt-error { color: #ffc0b6; }
+.button:disabled, .button-link:disabled, .button-link[aria-disabled="true"] {
+  transform: none !important; cursor: not-allowed;
 }
