@@ -46,7 +46,7 @@
       });
     </script>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/styles.css?v=26" />
+    <link rel="stylesheet" href="assets/styles.css?v=28" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -83,6 +83,10 @@
   </head>
   <body data-ioc-root=".">
     <a class="skip-link" href="#live-preview">Skip to IOC results</a>
+    <nav class="workspace-dock" data-workspace-dock aria-label="Investigation shortcuts" hidden>
+      <button type="button" data-workspace-open aria-controls="investigation-workspace">Workspace <span data-workspace-dock-count>0</span></button>
+      <button type="button" data-workspace-return hidden>Back to results</button>
+    </nav>
     <div class="page-wrapper">
       <nav class="top-nav" aria-label="SwiftIOC navigation">
         <a class="brand" href="index.html">
@@ -167,7 +171,7 @@
         <div class="investigation-heading">
           <div>
             <p class="eyebrow">Private analyst workspace</p>
-            <h2 id="investigation-heading">
+            <h2 id="investigation-heading" tabindex="-1">
               Investigation queue
               <span class="investigation-count" data-investigation-count>0</span>
             </h2>
@@ -1062,9 +1066,9 @@
     </div>
 
     <div class="toast" data-toast role="status" aria-live="polite" aria-atomic="true" hidden></div>
-    <script defer src="assets/dashboard-core.js?v=26"></script>
-    <script defer src="assets/inventory-core.js?v=26"></script>
-    <script defer src="assets/inventory.js?v=26"></script>
-    <script defer src="assets/dashboard.js?v=26"></script>
+    <script defer src="assets/dashboard-core.js?v=28"></script>
+    <script defer src="assets/inventory-core.js?v=28"></script>
+    <script defer src="assets/inventory.js?v=28"></script>
+    <script defer src="assets/dashboard.js?v=28"></script>
   </body>
 </html>

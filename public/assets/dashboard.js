@@ -406,6 +406,26 @@
   const initialiseInvestigationWorkspace = () => {
     const root = qs('[data-investigation-root]');
     if (!root) return;
+    const dock = qs('[data-workspace-dock]');
+    const returnButton = qs('[data-workspace-return]');
+    let returnPosition = null;
+    const scrollBehavior = () => matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth';
+    qs('[data-workspace-open]')?.addEventListener('click', () => {
+      const bounds = root.getBoundingClientRect();
+      if (returnPosition == null && (bounds.top < 0 || bounds.top > innerHeight)) {
+        returnPosition = window.scrollY;
+        if (returnButton) returnButton.hidden = false;
+      }
+      qs('#investigation-heading', root)?.focus({ preventScroll: true });
+      root.scrollIntoView({ behavior: scrollBehavior(), block: 'start' });
+    });
+    returnButton?.addEventListener('click', () => {
+      if (returnPosition == null) return;
+      window.scrollTo({ top: returnPosition, behavior: scrollBehavior() });
+      qs('[data-workspace-open]')?.focus({ preventScroll: true });
+      returnPosition = null;
+      returnButton.hidden = true;
+    });
     const list = qs('[data-investigation-list]', root);
     const count = qs('[data-investigation-count]', root);
     const copy = qs('[data-investigation-copy]', root);
@@ -451,11 +471,17 @@
     });
     const render = (rows) => {
       root.hidden = !rows.length;
+      if (dock) dock.hidden = !rows.length;
+      setText(qs('[data-workspace-dock-count]'), formatNumber(rows.length));
+      if (!rows.length) {
+        returnPosition = null;
+        if (returnButton) returnButton.hidden = true;
+      }
       renderHunt(rows);
       setText(count, formatNumber(rows.length));
       if (!list) return;
       list.innerHTML = '';
-      rows.forEach((row) => {
+      rows.forEach((row, index) => {
         const item = document.createElement('li');
         const identity = document.createElement('div');
         identity.className = 'investigation-identity';
@@ -476,6 +502,8 @@
         remove.setAttribute('aria-label', `Remove ${row.indicator} from investigation queue`);
         remove.addEventListener('click', () => {
           investigationWorkspace.remove(row);
+          const remaining = qsa('.row-action', list);
+          (remaining[Math.min(index, remaining.length - 1)] || qs('[data-lookup-input]'))?.focus({ preventScroll: true });
           showToast('Removed from the investigation queue.');
         });
         item.append(identity, remove);
@@ -521,6 +549,7 @@
     });
     clear?.addEventListener('click', () => {
       investigationWorkspace.clear();
+      qs('[data-lookup-input]')?.focus({ preventScroll: true });
       showToast('Investigation queue cleared.');
     });
 
