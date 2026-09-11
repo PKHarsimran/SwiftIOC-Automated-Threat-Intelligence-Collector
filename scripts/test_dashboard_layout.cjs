@@ -44,6 +44,13 @@ const assert = require('node:assert/strict');
     }
     await page.locator('[data-graph-node]').first().click();
     assert.equal(await page.locator('[data-graph-node][aria-pressed="true"]').count(), 1);
+    await page.locator('[data-campaign-graph]').click({ position: { x: 4, y: 4 } });
+    assert.equal(await page.locator('[data-graph-node][aria-pressed="true"]').count(), 0);
+    assert.equal(await page.locator('.campaign-edge.is-dimmed').count(), 0);
+    await page.locator('[data-graph-node]').first().click();
+    assert.equal(await page.locator('[data-graph-node][aria-pressed="true"]').count(), 1);
+    await page.keyboard.press('Escape');
+    assert.equal(await page.locator('[data-graph-node][aria-pressed="true"]').count(), 0);
     // Malformed fragments cannot break bootstrap or expose a selector error.
     await page.goto(`${base}/#%E0%A4%A`, { waitUntil: 'networkidle' });
     assert.equal(await rows.count(), 12);

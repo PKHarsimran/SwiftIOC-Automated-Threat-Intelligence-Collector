@@ -3848,3 +3848,5 @@ body:has(.workspace-dock:not([hidden])) .toast { bottom: 6rem; }
 .campaign-node.indicator text {
   paint-order: stroke fill; stroke: #1b211c; stroke-width: 3px; stroke-linejoin: round;
 }
+
+.campaign-interaction-hint { grid-column: 1 / -1; margin: 0; padding: .65rem 1rem; color: var(--text-muted); font-size: .78rem; border-bottom: 1px solid var(--border-soft); }
