@@ -141,7 +141,7 @@ jobs:
             --fail-on-empty urlhaus_recent_urls malwarebazaar_recent
 
       - name: Summarize IOC outputs
-        if: always()
+        if: success()
         shell: bash
         run: |
           set -Eeuo pipefail
