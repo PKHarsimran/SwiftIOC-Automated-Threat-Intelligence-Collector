@@ -3854,3 +3854,25 @@ body:has(.workspace-dock:not([hidden])) .toast { bottom: 6rem; }
   body:has([data-workspace-undo]:not([hidden])) { padding-bottom: 9rem; }
   body:has([data-workspace-undo]:not([hidden])) .toast { bottom: 9rem; }
 }
+
+/* Short, optional paths distinguish observable hunts from vulnerability review. */
+.analyst-guide { margin: 0 0 1.5rem; padding: 1rem; border: 1px solid var(--border-soft); border-radius: var(--radius-card); background: var(--card-bg-soft); }
+.analyst-guide > summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+.analyst-guide-paths { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; padding-top: .5rem; }
+.analyst-guide h3, .cve-next-steps h3 { margin-bottom: .5rem; }
+.analyst-guide ol, .cve-next-steps ol { padding-left: 1.35rem; }
+.analyst-guide li, .cve-next-steps li { margin-block: .5rem; }
+.analyst-guide a, .cve-next-steps a { color: var(--accent-soft); text-decoration: underline; text-underline-offset: .18em; }
+.cve-next-steps { padding: 1rem; margin-bottom: 1rem; border: 1px solid var(--border-control); border-left: 3px solid var(--warning); border-radius: .3rem; background: var(--card-bg-soft); }
+[data-cve-next-steps][hidden], [data-investigation-spl-builder][hidden] { display: none; }
+@media (max-width: 700px) { .analyst-guide-paths { grid-template-columns: minmax(0, 1fr); gap: .5rem; } }
+
+.queue-row-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .4rem; flex: 0 0 auto; max-width: 100%; }
+.investigation-list li:has(.queue-row-actions button + button) { flex-wrap: wrap; }
+
+.investigation-import { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-soft); }
+.investigation-import label { display: block; font-weight: 600; }
+.investigation-import input { max-width: 100%; }
+.investigation-import p { overflow-wrap: anywhere; }
+.investigation-import input::file-selector-button { min-height: 44px; margin-right: .65rem; padding: .5rem .8rem; border: 1px solid var(--border-soft); border-radius: .5rem; background: var(--card-bg-soft); color: var(--accent); font: inherit; cursor: pointer; }
+.investigation-import input:disabled::file-selector-button { opacity: .6; cursor: wait; }

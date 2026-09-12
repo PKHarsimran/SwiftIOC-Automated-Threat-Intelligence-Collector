@@ -88,11 +88,30 @@ The graph groups known aliases under their reporting provider: several abuse.ch 
 
 ## Investigation workspace
 
+```mermaid
+flowchart TD
+    A[Find an IOC in the dashboard] --> B[Add it to the investigation queue]
+    B --> C[Set Splunk index, time range and event fields]
+    C --> D{Valid settings and at least one supported IOC?}
+    D -->|Yes| E[Copy or download the generated SPL]
+    D -->|No| F[Correct settings or change the queue]
+    F --> C
+    E --> G[Validate and run in your own Splunk]
+```
+
+The browser builds the query; it does not connect to or run searches in Splunk. Unsupported queued records are disclosed and excluded from the query.
+
 1. **Queue indicators** while browsing the feed, lookup results, or graph.
 2. **Open Workspace** from the floating shortcut. **Back to results** returns to your earlier scroll position.
 3. **Configure the live SPL (Splunk search):** choose an index and time range, then expand **Map event fields** if your logs use names such as `source.ip`.
 4. **Copy or export:** the query updates with the queue and lists every matching queued IOC in each result. Other export buttons produce the selected working set.
-5. **Recover mistakes:** **Undo last change** restores the prior queue after an addition, removal, or clear, including its order and generated SPL.
+5. **Recover mistakes:** **Undo last change** restores the prior queue after an addition, import, removal, or clear, including its order and generated SPL.
+
+**CVE-only queues show a software-verification checklist instead of SPL controls.** Use **Review evidence** beside a queued CVE to search for its exact ID across all statuses, including rejected records. CVE IDs are excluded from IOC SPL; mixed queues still generate searches for supported observables. Use the exposure report to compare installed vendor/product/version evidence, then confirm applicability with vendor guidance or scanner results. Splunk can support this only when your own inventory or scanner telemetry is available.
+
+The dashboard’s **Get started or resume an investigation** guide links directly to IOC lookup, CVE evidence, the exposure report and product watches.
+
+**Resume saved work:** choose **Export JSON** in Workspace. Later, open **Get started or resume an investigation → Resume a saved investigation** and select that file (up to 500 KB). Import merges with your current queue, preserves existing evidence for duplicates, and keeps URL paths case-sensitive. Invalid or over-capacity files leave the queue unchanged. One Undo restores the entire previous queue; duplicate-only imports preserve your existing Undo step. Files are read locally and are not uploaded.
 
 The queue holds **50 indicators**. It reports save failures, offers **Retry save**, and shows remaining capacity. Export your work before leaving if storage is unavailable. Undo retains one step in page memory and resets on reload.
 
@@ -117,6 +136,26 @@ The dashboard fetches public feeds; it does not upload your queue or inventory. 
 ## CVE briefing
 
 The vulnerability view starts with **Known exploited** when no products are watched. **All CVEs** broadens coverage, while additional views focus on ransomware evidence, recent KEV additions, and recent publication or updates. These dates answer different questions: an old CVE newly added to KEV is not a newly disclosed vulnerability.
+
+<details>
+<summary><strong>How to choose a CVE workflow</strong></summary>
+
+```mermaid
+flowchart TD
+    A[Open the retained CVE collection] --> B{What do you need?}
+    B -->|Exploitation evidence| C[Known exploited: CISA KEV records]
+    B -->|Product tracking| D[My briefing: exact vendor and product watches]
+    B -->|Asset and version review| E[Exposure report: import local inventory]
+    C --> F[Review evidence, dates and required action]
+    D --> F
+    E --> G[Version match, needs verification, or outside reported range]
+    F --> H[Investigate and prioritize in your environment]
+    G --> H
+```
+
+KEV inclusion is evidence of known exploitation. An NVD severity score describes severity, not proof of exploitation. Inventory matching is an evidence comparison; it does not scan your assets. All three paths use the retained collection.
+
+</details>
 
 **My briefing** supports up to 20 product watches and makes that collection personal:
 
@@ -250,6 +289,25 @@ Paths below are relative to the published site or your `--out-dir`.
 ### Consume changes safely
 
 Start with the full snapshot for initial synchronization, then poll the delta feed. When the previous snapshot is unavailable or invalid, the current run establishes a new baseline without emitting a historical additions flood. The browser's personal briefing baseline is separate from this collector baseline.
+
+<details>
+<summary><strong>How the collector decides which changes to publish</strong></summary>
+
+```mermaid
+flowchart TD
+    A[Current retained snapshot] --> B{Valid previous baseline?}
+    B -->|No| C[Publish snapshot with no historical change events]
+    B -->|Yes| D{Where is this IOC key present?}
+    D -->|Current only| E[Added]
+    D -->|Previous only| F[Removed from feed]
+    D -->|Both| G{Tracked evidence or material score changed?}
+    G -->|Yes| H[Updated]
+    G -->|No| I[No change event]
+```
+
+Keys combine indicator type and value. Removed events use the action `removed_from_feed` in the JSON feed. Material score changes cross a score band or move by at least five points. Changes to source, confidence, tags or provider evidence can also produce updates; the routine KEV catalog poll timestamp alone cannot. Changes cover one collection interval, so a consumer that misses runs should reconcile with the full snapshot.
+
+</details>
 
 An `added` event means new to the retained feed; it does not prove the indicator was just created. A `removed` event means absent from the current snapshot, not benign. Material score and vulnerability-report changes produce `updated` events; a changed polling timestamp alone does not. A delta describes one collection interval, so consumers that miss runs should reconcile against the full snapshot.
 
@@ -434,6 +492,7 @@ node scripts/test_dashboard_layout.cjs
 node scripts/test_personal_briefing.cjs
 node scripts/test_inventory_ui.cjs
 node scripts/test_investigation_spl.cjs
+node scripts/test_investigation_import.cjs
 ```
 
 These suites use synthetic fixtures to exercise filtering, refresh failures, mobile layout, personal briefing state, and provider graph behavior. Set `BASE_URL` for a different local server or `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` for an existing Chromium browser.

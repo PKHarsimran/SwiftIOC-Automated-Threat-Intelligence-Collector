@@ -335,6 +335,15 @@
 
   const investigationWorkspace = {
     getRows: () => investigationRows.slice(),
+    importRows: (value) => {
+      const result = dashboardCore.mergeInvestigationImport(investigationRows, value);
+      if (result.added) {
+        investigationUndoRows = investigationRows.slice();
+        investigationRows = result.rows;
+        saveInvestigationRows();
+      }
+      return result;
+    },
     canUndo: () => investigationUndoRows !== null,
     undo: () => {
       if (investigationUndoRows === null) return false;
@@ -425,6 +434,29 @@
     if (!root) return;
     const storageStatus = qs('[data-investigation-storage]', root);
     const retrySave = qs('[data-investigation-retry]', root);
+    const importFile = qs('[data-investigation-import]');
+    const importStatus = qs('[data-investigation-import-status]');
+    importFile?.addEventListener('change', async () => {
+      const file = importFile.files?.[0];
+      if (!file) return;
+      importFile.disabled = true;
+      importStatus?.classList.remove('hunt-error');
+      setText(importStatus, 'Reading queue export…');
+      try {
+        if (file.size > 500000) throw new Error('Choose a JSON export smaller than 500 KB. Nothing was imported.');
+        let value;
+        try { value = JSON.parse(await file.text()); }
+        catch { throw new Error('The file could not be read as JSON. Nothing was imported.'); }
+        const result = investigationWorkspace.importRows(value);
+        setText(importStatus, `${result.added} indicators imported; ${result.duplicates} duplicates skipped. Existing queued evidence kept.${result.added ? ' Use Workspace to review them or Undo last change to revert.' : ''}${investigationStorageFailed ? ' Browser save failed: export before leaving or retry saving.' : ''}`);
+      } catch (error) {
+        importStatus?.classList.add('hunt-error');
+        setText(importStatus, error.message);
+      } finally {
+        importFile.value = '';
+        importFile.disabled = false;
+      }
+    });
     retrySave?.addEventListener('click', () => {
       saveInvestigationRows();
       if (!investigationStorageFailed) {
@@ -482,6 +514,12 @@
     const timeInput = qs('[data-spl-time]', root);
     const fieldInputs = qsa('[data-spl-field]', root);
     const renderHunt = (rows) => {
+      const cveCount = rows.filter((row) => normaliseLower(row.type) === 'cve').length;
+      const cveGuide = qs('[data-cve-next-steps]', root);
+      const splBuilder = qs('[data-investigation-spl-builder]', root);
+      if (cveGuide) cveGuide.hidden = !cveCount;
+      if (splBuilder) splBuilder.hidden = rows.length > 0 && cveCount === rows.length;
+      setText(qs('[data-cve-queue-summary]', root), `${cveCount} queued CVE${cveCount === 1 ? '' : 's'} excluded from IOC SPL. A CVE identifier alone cannot tell you whether a system is affected.`);
       const hunt = dashboardCore.rowsToSpl(rows, {
         index: indexInput?.value,
         earliest: timeInput?.value,
@@ -545,7 +583,19 @@
           (remaining[Math.min(index, remaining.length - 1)] || qs('[data-lookup-input]'))?.focus({ preventScroll: true });
           showToast('Removed from the investigation queue.');
         });
-        item.append(identity, remove);
+        const actions = document.createElement('div');
+        actions.className = 'queue-row-actions';
+        if (normaliseLower(row.type) === 'cve' && /^CVE-\d{4}-\d{4,}$/i.test(row.indicator)) {
+          const review = document.createElement('button');
+          review.type = 'button';
+          review.className = 'button ghost';
+          review.textContent = 'Review evidence';
+          review.setAttribute('aria-label', `Review evidence for ${row.indicator}`);
+          review.addEventListener('click', () => window.dispatchEvent(new CustomEvent('swiftioc:review-cve', { detail: { id: row.indicator } })));
+          actions.appendChild(review);
+        }
+        actions.appendChild(remove);
+        item.append(identity, actions);
         list.appendChild(item);
       });
       syncInvestigationButtons();
@@ -3454,6 +3504,18 @@
       page = 0;
       render();
     }));
+    window.addEventListener('swiftioc:review-cve', (event) => {
+      const id = event.detail?.id;
+      if (typeof id !== 'string' || !/^CVE-\d{4}-\d{4,}$/i.test(id)) return;
+      search.value = id.toUpperCase();
+      filter.value = 'all';
+      view = 'priority';
+      includeRejected.checked = true;
+      page = 0;
+      render();
+      root.scrollIntoView({ block: 'start', behavior: reducedMotion?.matches ? 'instant' : 'smooth' });
+      search.focus({ preventScroll: true });
+    });
     extraView.addEventListener('change', () => { if (extraView.value) { view = extraView.value; page = 0; render(); } });
     includeRejected.addEventListener('change', () => { page = 0; render(); });
     // Re-evaluate rolling windows and freshness when an analyst returns to an
