@@ -5,7 +5,7 @@ import argparse
 import json
 import logging
 import os
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -18,6 +18,7 @@ from .detections import write_detection_pack
 from .http_client import UA_POOL, get_fetch_metrics, logger
 from .logging_utils import configure_logging
 from .models import classify, defang_min, iso, now_utc, parse_dt
+from .quality import publication_failures, source_rule
 from .scoring import (
     apply_retention,
     compute_score,
@@ -126,8 +127,11 @@ def main() -> int:
                     help="Score at/above which an indicator enters the curated high_confidence feed (default 80)")
     ap.add_argument("--urlhaus-status", choices=["any", "online", "offline"], default="any")
     ap.add_argument("--source-window", action="append", default=[], help="Override lookback per source: name=HOURS")
-    ap.add_argument("--fail-on-empty", nargs="*", default=None, help="Fail if any listed sources return zero")
-    ap.add_argument("--fail-if-stale", action="append", default=[], help="Fail if source newest first_seen older than HOURS: name=HOURS")
+    ap.add_argument("--fail-on-empty", nargs="+", default=None, help="Fail if any listed sources return zero")
+    ap.add_argument("--fail-if-stale", action="append", type=source_rule, default=[],
+                    help="Keep the published snapshot if source newest first_seen is older than HOURS (1-876000): name=HOURS")
+    ap.add_argument("--fail-if-volume-drop", action="append", type=lambda value: source_rule(value, 100), default=[],
+                    help="Keep the published snapshot if a source count drops by PERCENT (1-100): name=PERCENT")
     ap.add_argument("--warn-if-volume-drop", action="append", default=[],
                     help="Warn if a source's count drops by PERCENT versus the previous run: name=PERCENT")
     ap.add_argument("--grace-on-404", action="append", default=[], help="Treat 404 on these sources as empty but non-fatal: name")
@@ -248,6 +252,28 @@ def main() -> int:
         max_workers=args.max_workers,
         fp_filter=args.fp_filter,
     )
+    # A failed collection must not replace live exports or the baseline used
+    # for the next Delta. Keep rejected-attempt diagnostics separate from run.json.
+    failures = publication_failures(
+        counts, stats.get("source_newest_first_seen", {}), previous_counts,
+        required=args.fail_on_empty or [], stale=dict(args.fail_if_stale),
+        volume_drop=dict(args.fail_if_volume_drop), now=now_utc(),
+    )
+    attempt = {
+        "phase": "quality_checks",
+        "ts": iso(now_utc()), "status": "rejected" if failures else "accepted",
+        "counts": counts, "source_newest_first_seen": stats.get("source_newest_first_seen", {}),
+        "quality_failures": failures, "source_failures": stats.get("failures", []),
+        "volume_baseline_missing": [name for name, _ in args.fail_if_volume_drop if previous_counts.get(name, 0) <= 0],
+    }
+    write_json_document(out_dir / "diagnostics" / "collection-attempt.json", attempt)
+    if failures:
+        for failure in failures:
+            logger.error("Publication rejected: %s (%s)", failure["source"], failure["reason"])
+        append_gh_summary(["### SwiftIOC collection rejected", "", "Previous published snapshot retained.",
+                           *[f"- {f['source']}: {f['reason']}" for f in failures]])
+        return 1
+
     # Snapshot the post-dedup, pre-persist/expiry/retention count: rows is
     # about to be grown (carried-forward indicators) and shrunk (expiry,
     # retention) below, and duplicates_removed must reflect cross-source
@@ -431,6 +457,7 @@ def main() -> int:
         "delta_counts": delta["counts"],
         "delta_baseline_available": delta["baseline_available"],
         "counts": counts,
+        "source_newest_first_seen": stats.get("source_newest_first_seen", {}),
         "stored_counts": stored_counts,
         "type_counts": {k: v for k, v in type_totals},
         "tag_counts": {k: v for k, v in top_tags(rows, 25)},
@@ -550,34 +577,6 @@ def main() -> int:
         summary_lines.extend(["", "#### Issues", "", *issues_summary])
     summary_lines.append("")
     append_gh_summary(summary_lines)
-
-    # guardrails
-    if args.fail_on_empty:
-        empty = [s for s in args.fail_on_empty if counts.get(s, 0) == 0]
-        if empty:
-            logger.error("Failing due to empty sources: %s", empty)
-            return 1
-
-    stale_cfg = parse_name_int_pairs(args.fail_if_stale, "--fail-if-stale")
-    if stale_cfg:
-        newest: Dict[str, Optional[datetime]] = {}
-        for r in rows:
-            dt = parse_dt(r.first_seen)
-            if dt is None:
-                continue
-            cur = newest.get(r.source)
-            if cur is None or dt > cur:
-                newest[r.source] = dt
-        too_old: List[str] = []
-        now = now_utc()
-        for name, hours in stale_cfg.items():
-            limit = now - timedelta(hours=hours)
-            n = newest.get(name)
-            if n is None or n < limit:
-                too_old.append(name)
-        if too_old:
-            logger.error("Failing due to stale sources: %s", too_old)
-            return 1
 
     if args.skip_rss:
         logger.info("RSS skipped — install 'feedparser' to enable RSS")

@@ -194,6 +194,8 @@ def collect_from_yaml(
     failures: List[Dict[str, str]] = []
     raw_total = 0
     fp_removed = 0
+    newest_first_seen: Dict[str, str] = {}
+    collected_at = now_utc()
     for result in results:
         if result is None:
             continue
@@ -213,6 +215,11 @@ def collect_from_yaml(
         raw_total += len(got)
         indicators.extend(got)
         counts[result["name"]] = len(got)
+        # Preserve source-specific evidence before deduplication merges source
+        # names and replaces first_seen with the earliest cross-source date.
+        dates = [dt for ind in got if (dt := parse_dt(ind.first_seen)) is not None and dt <= collected_at]
+        if dates:
+            newest_first_seen[result["name"]] = iso(max(dates))
 
     # Dedup + merge
     uniq: Dict[Tuple[str, str], Indicator] = {}
@@ -245,7 +252,7 @@ def collect_from_yaml(
         "raw_total": raw_total,
         "failures": failures,
         "false_positives_removed": fp_removed,
+        "source_newest_first_seen": newest_first_seen,
     }
     return final, counts, stats
-
 
