@@ -138,6 +138,9 @@ jobs:
             --report "$DIAG_DIR/REPORT.md" \
             --fail-on-empty urlhaus_recent_urls malwarebazaar_recent
 
+      - name: Verify generated detection pack
+        run: python -m swiftioc.verify_detections "$OUT_DIR/detections" --json
+
       - name: Summarize IOC outputs
         if: always()
         shell: bash

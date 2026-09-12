@@ -115,15 +115,19 @@ def _sigma_documents(grouped: Dict[str, List[str]], generated_at: str) -> Dict[s
     return documents
 
 
-def _sid(value: str, used: set[int], registry: Dict[str, int]) -> int:
+def _sid(value: str, used: set[int], reserved: set[int], registry: Dict[str, int]) -> int:
     registered = registry.get(value)
     if registered is not None and registered not in used:
         used.add(registered)
         return registered
     candidate = 4_000_000 + int(hashlib.sha256(value.encode("utf-8")).hexdigest()[:8], 16) % 900_000
-    while candidate in used:
+    start = candidate
+    while candidate in used or candidate in reserved:
         candidate = 4_000_000 + ((candidate - 4_000_000 + 1) % 900_000)
+        if candidate == start:
+            raise ValueError("Suricata SID range exhausted; review the retained SID registry")
     used.add(candidate)
+    reserved.add(candidate)
     registry[value] = candidate
     return candidate
 
@@ -131,6 +135,9 @@ def _sid(value: str, used: set[int], registry: Dict[str, int]) -> int:
 def _suricata_rules(grouped: Dict[str, List[str]], registry: Dict[str, int]) -> Tuple[str, int]:
     rules: List[str] = []
     used: set[int] = set()
+    # Reserve even currently inactive assignments before processing new IOCs.
+    # Otherwise an earlier new rule can steal the SID of a later old rule.
+    reserved = set(registry.values())
     addresses = grouped["ipv4"] + grouped["ipv6"] + grouped["ipv4_cidr"] + grouped["ipv6_cidr"]
     for address in addresses:
         target = f"[{address}]" if ":" in address else address
@@ -138,13 +145,13 @@ def _suricata_rules(grouped: Dict[str, List[str]], registry: Dict[str, int]) -> 
             ("inbound", f"alert ip {target} any -> $HOME_NET any"),
             ("outbound", f"alert ip $HOME_NET any -> {target} any"),
         ):
-            sid = _sid(f"ip:{address}:{direction}", used, registry)
+            sid = _sid(f"ip:{address}:{direction}", used, reserved, registry)
             rules.append(
                 f'{header} (msg:"SwiftIOC {direction} high-confidence IP match"; '
                 f'classtype:trojan-activity; sid:{sid}; rev:1;)'
             )
     for domain in grouped["domain"]:
-        sid = _sid(f"dns:{domain}", used, registry)
+        sid = _sid(f"dns:{domain}", used, reserved, registry)
         rules.append(
             'alert dns $HOME_NET any -> any 53 '
             f'(msg:"SwiftIOC high-confidence DNS match"; dns.query; dotprefix; content:".{domain}"; '
@@ -166,9 +173,11 @@ def _load_detection_state(out_dir: Path) -> Tuple[Dict[str, int], int | None]:
     except (OSError, ValueError, TypeError):
         previous = {}
     if isinstance(previous, dict):
-        for key, value in previous.items():
-            if isinstance(key, str) and isinstance(value, int) and 1 <= value <= 0xFFFFFFFF:
+        assigned: set[int] = set()
+        for key, value in sorted(previous.items()):
+            if isinstance(key, str) and type(value) is int and 1 <= value <= 0xFFFFFFFF and value not in assigned:
                 registry[key] = value
+                assigned.add(value)
 
     previous_serial: int | None = None
     try:
@@ -178,7 +187,7 @@ def _load_detection_state(out_dir: Path) -> Tuple[Dict[str, int], int | None]:
             value = int(match.group(1))
             if 0 <= value <= 0xFFFFFFFF:
                 previous_serial = value
-    except OSError:
+    except (OSError, UnicodeError):
         pass
     return registry, previous_serial
 
@@ -215,7 +224,9 @@ Generated from the curated high-confidence feed. Treat these artifacts as detect
 - `suricata/swiftioc.rules` contains stable-SID inbound, outbound, and DNS alert rules.
 - `suricata/sid-registry.json` preserves collision-resolved SIDs across feed revisions.
 - `dns/swiftioc.rpz` is a response-policy zone for exact domains and their subdomains.
-- `manifest.json` records coverage and every unsupported or invalid indicator type that was skipped.
+- `manifest.json` records coverage, skipped types, and the SHA-256 and byte size of every managed file.
+
+Run `python -m swiftioc.verify_detections PATH_TO_PACK` after downloading the complete pack. A successful check detects no missing, stale or modified managed files; it does not validate rule syntax or authenticate the publisher. Keep the manifest from a trusted source. Preserve `suricata/sid-registry.json` between generation runs to retain rule IDs, including when indicators disappear and return.
 
 Compile Sigma for your backend with Sigma CLI, load the Suricata file through your managed rules directory, or configure the RPZ as a secondary policy zone. Field mappings and network variables vary by environment, so validate generated detections before production use.
 """
@@ -245,13 +256,18 @@ def write_detection_pack(out_dir: Path, rows: Sequence[Indicator], *, generated_
         (out_dir / relative).unlink(missing_ok=True)
     included = {kind: len(values) for kind, values in grouped.items() if values}
     manifest: Dict[str, Any] = {
-        "schema_version": 1,
+        "schema_version": 2,
         "generated_at": generated_at,
         "source": "SwiftIOC high-confidence feed",
         "policy": "review-required",
         "rpz_serial": rpz_serial,
         "included": included,
         "skipped": dict(sorted(skipped.items())),
+        "files": {
+            relative: {"sha256": hashlib.sha256(content.encode("utf-8")).hexdigest(),
+                       "bytes": len(content.encode("utf-8"))}
+            for relative, content in sorted(artifacts.items())
+        },
         "artifacts": {
             "sigma_rules": len(sigma),
             "suricata_rules": suricata_count,
@@ -259,7 +275,8 @@ def write_detection_pack(out_dir: Path, rows: Sequence[Indicator], *, generated_
         },
     }
     for relative, content in artifacts.items():
-        with _atomic_text_writer(out_dir / relative) as handle:
+        # Preserve the hashed UTF-8/LF bytes on Windows as well as Unix.
+        with _atomic_text_writer(out_dir / relative, newline="") as handle:
             handle.write(content)
     with _atomic_text_writer(out_dir / "manifest.json") as handle:
         json.dump(manifest, handle, ensure_ascii=False, indent=2, sort_keys=True)
