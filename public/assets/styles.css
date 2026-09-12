@@ -3866,3 +3866,6 @@ body:has(.workspace-dock:not([hidden])) .toast { bottom: 6rem; }
 .cve-next-steps { padding: 1rem; margin-bottom: 1rem; border: 1px solid var(--border-control); border-left: 3px solid var(--warning); border-radius: .3rem; background: var(--card-bg-soft); }
 [data-cve-next-steps][hidden], [data-investigation-spl-builder][hidden] { display: none; }
 @media (max-width: 700px) { .analyst-guide-paths { grid-template-columns: minmax(0, 1fr); gap: .5rem; } }
+
+.queue-row-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .4rem; flex: 0 0 auto; max-width: 100%; }
+.investigation-list li:has(.queue-row-actions button + button) { flex-wrap: wrap; }

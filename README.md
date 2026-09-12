@@ -107,7 +107,7 @@ The browser builds the query; it does not connect to or run searches in Splunk. 
 4. **Copy or export:** the query updates with the queue and lists every matching queued IOC in each result. Other export buttons produce the selected working set.
 5. **Recover mistakes:** **Undo last change** restores the prior queue after an addition, removal, or clear, including its order and generated SPL.
 
-**CVE-only queues show a software-verification checklist instead of SPL controls.** CVE IDs are excluded from IOC SPL; mixed queues still generate searches for supported observables. Use the exposure report to compare installed vendor/product/version evidence, then confirm applicability with vendor guidance or scanner results. Splunk can support this only when your own inventory or scanner telemetry is available.
+**CVE-only queues show a software-verification checklist instead of SPL controls.** Use **Review evidence** beside a queued CVE to search for its exact ID across all statuses, including rejected records. CVE IDs are excluded from IOC SPL; mixed queues still generate searches for supported observables. Use the exposure report to compare installed vendor/product/version evidence, then confirm applicability with vendor guidance or scanner results. Splunk can support this only when your own inventory or scanner telemetry is available.
 
 The dashboard’s **New here? Choose your next step** guide links directly to IOC lookup, CVE evidence, the exposure report and product watches.
 

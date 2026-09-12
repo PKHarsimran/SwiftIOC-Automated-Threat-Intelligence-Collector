@@ -542,7 +542,7 @@ test('exploited and ransomware views require explicit evidence and never fall ba
 test('vulnerability release uses coordinated new asset cache keys', () => {
   const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
   for (const asset of ['styles.css', 'dashboard-core.js', 'dashboard.js']) {
-    assert.ok(html.includes(`assets/${asset}?v=36`));
+    assert.ok(html.includes(`assets/${asset}?v=37`));
   }
 });
 
@@ -736,4 +736,16 @@ test('invalid settings cannot leave an executable or injected hunt', () => {
     const hunt = core.rowsToSpl(rows, options);
     assert.equal(hunt.spl, ''); assert.ok(hunt.error);
   }
+});
+
+
+test('complete CVE searches match identity rather than prefixes or incidental mentions', () => {
+  const items = [
+    { cve_id: 'CVE-2026-1234', reports: {} },
+    { cve_id: 'CVE-2026-12345', reports: {} },
+    { cve_id: 'CVE-2026-9000', description: 'Related to CVE-2026-1234', reports: {} },
+  ];
+  assert.deepEqual(core.filterVulnerabilities(items, ' cve-2026-1234 ').map(x => x.cve_id), ['CVE-2026-1234']);
+  assert.equal(core.filterVulnerabilities(items, 'Related to').length, 1);
+  assert.equal(core.filterVulnerabilities(items, 'CVE-2026-12').length, 3);
 });

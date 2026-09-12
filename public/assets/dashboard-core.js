@@ -829,6 +829,7 @@
       if (view === 'updated7' && !recent(facts.modified, 7)) return false;
       const kev = item.reports?.cisa_kev || {};
       const nvd = item.reports?.nvd || {};
+      if (/^cve-\d{4}-\d{4,}$/.test(query)) return lower(item.cve_id) === query;
       return !query || lower([item.cve_id, item.title, item.description, kev.vendor,
         kev.product, kev.description, nvd.description, ...(item.sources || [])].join(' ')).includes(query);
     }).sort((a, b) => Number(a.facts.rejected) - Number(b.facts.rejected)

@@ -551,7 +551,19 @@
           (remaining[Math.min(index, remaining.length - 1)] || qs('[data-lookup-input]'))?.focus({ preventScroll: true });
           showToast('Removed from the investigation queue.');
         });
-        item.append(identity, remove);
+        const actions = document.createElement('div');
+        actions.className = 'queue-row-actions';
+        if (normaliseLower(row.type) === 'cve' && /^CVE-\d{4}-\d{4,}$/i.test(row.indicator)) {
+          const review = document.createElement('button');
+          review.type = 'button';
+          review.className = 'button ghost';
+          review.textContent = 'Review evidence';
+          review.setAttribute('aria-label', `Review evidence for ${row.indicator}`);
+          review.addEventListener('click', () => window.dispatchEvent(new CustomEvent('swiftioc:review-cve', { detail: { id: row.indicator } })));
+          actions.appendChild(review);
+        }
+        actions.appendChild(remove);
+        item.append(identity, actions);
         list.appendChild(item);
       });
       syncInvestigationButtons();
@@ -3460,6 +3472,18 @@
       page = 0;
       render();
     }));
+    window.addEventListener('swiftioc:review-cve', (event) => {
+      const id = event.detail?.id;
+      if (typeof id !== 'string' || !/^CVE-\d{4}-\d{4,}$/i.test(id)) return;
+      search.value = id.toUpperCase();
+      filter.value = 'all';
+      view = 'priority';
+      includeRejected.checked = true;
+      page = 0;
+      render();
+      root.scrollIntoView({ block: 'start', behavior: reducedMotion?.matches ? 'instant' : 'smooth' });
+      search.focus({ preventScroll: true });
+    });
     extraView.addEventListener('change', () => { if (extraView.value) { view = extraView.value; page = 0; render(); } });
     includeRejected.addEventListener('change', () => { page = 0; render(); });
     // Re-evaluate rolling windows and freshness when an analyst returns to an
