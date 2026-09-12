@@ -482,6 +482,12 @@
     const timeInput = qs('[data-spl-time]', root);
     const fieldInputs = qsa('[data-spl-field]', root);
     const renderHunt = (rows) => {
+      const cveCount = rows.filter((row) => normaliseLower(row.type) === 'cve').length;
+      const cveGuide = qs('[data-cve-next-steps]', root);
+      const splBuilder = qs('[data-investigation-spl-builder]', root);
+      if (cveGuide) cveGuide.hidden = !cveCount;
+      if (splBuilder) splBuilder.hidden = rows.length > 0 && cveCount === rows.length;
+      setText(qs('[data-cve-queue-summary]', root), `${cveCount} queued CVE${cveCount === 1 ? '' : 's'} excluded from IOC SPL. A CVE identifier alone cannot tell you whether a system is affected.`);
       const hunt = dashboardCore.rowsToSpl(rows, {
         index: indexInput?.value,
         earliest: timeInput?.value,

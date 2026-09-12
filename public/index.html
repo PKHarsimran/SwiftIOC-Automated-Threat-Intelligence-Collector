@@ -46,7 +46,7 @@
       });
     </script>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/styles.css?v=35" />
+    <link rel="stylesheet" href="assets/styles.css?v=36" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -128,6 +128,20 @@
         </div>
       </header>
 
+      <details class="analyst-guide">
+        <summary>New here? Choose your next step</summary>
+        <div class="analyst-guide-paths">
+          <section aria-labelledby="guide-ioc-heading">
+            <h3 id="guide-ioc-heading">Investigate an indicator</h3>
+            <ol><li><a href="#ioc-lookup">Look up an IP, domain, URL or hash</a>.</li><li>Review its sources, dates and score; add useful records to your queue.</li><li>Open Workspace, map your event fields, then copy the IOC SPL or export your list.</li></ol>
+          </section>
+          <section aria-labelledby="guide-cve-heading">
+            <h3 id="guide-cve-heading">Review a vulnerability</h3>
+            <ol><li><a href="#vulnerabilities">Review known exploited CVEs</a> and provider evidence.</li><li><a href="#exposure-report">Compare a software inventory</a>, or <a href="#product-briefing">follow a vendor and product</a>.</li><li>Verify installed versions and applicability with the vendor advisory or your vulnerability scanner.</li></ol>
+          </section>
+        </div>
+      </details>
+
       <section id="ioc-lookup" class="ioc-lookup" aria-labelledby="ioc-lookup-heading">
         <div class="lookup-heading">
           <div>
@@ -204,6 +218,14 @@
         <div class="investigation-workbench">
         <ul class="investigation-list" data-investigation-list aria-label="Queued indicators"></ul>
         <div class="investigation-spl" data-investigation-spl>
+          <section class="cve-next-steps" data-cve-next-steps hidden aria-labelledby="cve-next-heading">
+            <p class="eyebrow">Vulnerability review</p>
+            <h3 id="cve-next-heading">Check affected software, not a CVE string</h3>
+            <p data-cve-queue-summary></p>
+            <ol><li><a href="#vulnerabilities">Review the CVE evidence</a> for affected products and remediation.</li><li><a href="#exposure-report">Open the exposure report</a> to compare vendor, product and version from your inventory.</li><li>Verify applicability with the vendor advisory or a vulnerability scanner. A product match alone is not confirmation.</li></ol>
+            <p>Splunk needs inventory or scanner telemetry to check CVE exposure. The IOC hunt below, when available, only matches observable values in your logs.</p>
+          </section>
+          <div data-investigation-spl-builder>
           <div class="hunt-heading"><div><p class="eyebrow">Live hunt builder</p><h3>Hunt this queue in Splunk</h3></div><span class="hunt-local">Settings stay in this tab</span></div>
           <div class="hunt-toolbar">
             <label>Splunk index<input data-spl-index value="YOUR_INDEX" maxlength="100" autocomplete="off" spellcheck="false" aria-describedby="hunt-settings-help" /></label>
@@ -224,6 +246,7 @@
           </div>
           <pre><code data-investigation-spl-code></code></pre>
           <p>IP/CIDR matching checks both endpoints. Domains match exact DNS names; URL paths and queries retain case and require exact event values. No match does not mean safe. Validate field mappings in Splunk before scheduling.</p>
+          </div>
         </div>
         </div>
       </section>
@@ -351,7 +374,7 @@
           <a class="button ghost" href="collections/vulnerabilities.json" data-vulnerability-download>Collection JSON ↗</a>
         </div>
         <details class="collection-notes inventory-desk" data-inventory-root>
-          <summary>Exposure report · match your software inventory</summary>
+          <summary id="exposure-report">Exposure report · match your software inventory</summary>
           <p>Import up to 200 assets as JSON. Your inventory stays in this tab and is never uploaded or saved to browser storage. Explicit CPE mapping enables conservative version checks; product-only matches need verification.</p>
           <div class="inventory-actions">
             <label>Inventory JSON <input type="file" accept=".json,application/json" data-inventory-file /></label>
@@ -365,7 +388,7 @@
           <button type="button" class="button ghost" data-inventory-more hidden>Show more findings</button>
         </details>
         <details class="collection-notes briefing-settings" data-briefing-settings>
-          <summary>Personal briefing · follow vendors &amp; products</summary>
+          <summary id="product-briefing">Personal briefing · follow vendors &amp; products</summary>
           <p>Match exact CISA vendor and product fields. NVD-only records without these fields cannot be matched. Watches stay in this browser; a product match does not confirm your installed version is affected.</p>
           <form class="briefing-form" data-briefing-form>
             <label>Vendor<input data-briefing-vendor list="briefing-vendors" maxlength="100" required placeholder="e.g. Microsoft" autocomplete="off" /></label>
@@ -1070,9 +1093,9 @@
     </div>
 
     <div class="toast" data-toast role="status" aria-live="polite" aria-atomic="true" hidden></div>
-    <script defer src="assets/dashboard-core.js?v=35"></script>
-    <script defer src="assets/inventory-core.js?v=35"></script>
-    <script defer src="assets/inventory.js?v=35"></script>
-    <script defer src="assets/dashboard.js?v=35"></script>
+    <script defer src="assets/dashboard-core.js?v=36"></script>
+    <script defer src="assets/inventory-core.js?v=36"></script>
+    <script defer src="assets/inventory.js?v=36"></script>
+    <script defer src="assets/dashboard.js?v=36"></script>
   </body>
 </html>

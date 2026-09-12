@@ -76,6 +76,14 @@ const assert = require('node:assert/strict');
         assert.ok(link.height >= 44, 'Navigation touch target too short');
       }
     }
+    await page.locator('.analyst-guide > summary').click();
+    await page.locator('.analyst-guide a[href="#product-briefing"]').click();
+    await page.waitForFunction(() => document.querySelector('[data-briefing-settings]').open);
+    assert.equal(await page.locator('[data-briefing-settings]').getAttribute('open'), '');
+    await page.locator('[data-briefing-settings]').evaluate(el => { el.open = false; });
+    await page.locator('.analyst-guide a[href="#product-briefing"]').click();
+    await page.waitForFunction(() => document.querySelector('[data-briefing-settings]').open);
+    assert.equal(await page.locator('[data-briefing-settings]').getAttribute('open'), '');
     assert.deepEqual(errors, []);
     // Downloads remain available if dashboard JavaScript fails or is disabled.
     const noJs = await browser.newPage({ javaScriptEnabled: false });
