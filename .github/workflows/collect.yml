@@ -37,7 +37,9 @@ env:
   DIAG_DIR: "public/diagnostics"
   IOC_DIR: "public/iocs"
   CHANGELOG_DIR: "public/changelog"
-  RAW_DIR: "public/diagnostics/raw"
+  # Upstream captures may contain credentials embedded in phishing URLs.
+  # Keep them outside every public artifact and the Pages deployment tree.
+  RAW_DIR: "_private/diagnostics/raw"
   SOURCES_FILE: "sources.yml"
 
 jobs:
@@ -180,6 +182,7 @@ jobs:
             public/collections/**
             public/feed.xml
             public/badge.json
+            !public/diagnostics/raw/**
 
       - name: Upload built public site
         if: success() && github.ref == 'refs/heads/main'
@@ -188,7 +191,9 @@ jobs:
           name: swiftioc-public-site
           retention-days: 3
           if-no-files-found: error
-          path: public/**
+          path: |
+            public/**
+            !public/diagnostics/raw/**
 
       - name: Auto-commit updated outputs
         if: success() && github.ref == 'refs/heads/main'

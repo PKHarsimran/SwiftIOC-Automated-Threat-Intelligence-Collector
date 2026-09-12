@@ -18,6 +18,7 @@ from .detections import write_detection_pack
 from .http_client import UA_POOL, get_fetch_metrics, logger
 from .logging_utils import configure_logging
 from .models import classify, defang_min, iso, now_utc, parse_dt
+from .publication import filter_public_rows
 from .quality import publication_failures, source_rule
 from .scoring import (
     apply_retention,
@@ -282,6 +283,16 @@ def main() -> int:
     # dedup alone, not get conflated with those later mutations.
     deduped_count = len(rows)
 
+    # Apply the same publication boundary to fresh and retained records. The
+    # previous snapshot also feeds Delta removals and their previous payloads.
+    rows, sensitive_rows_omitted = filter_public_rows(rows)
+    previous_rows, sensitive_previous_omitted = filter_public_rows(previous_rows)
+    if sensitive_rows_omitted or sensitive_previous_omitted:
+        logger.warning(
+            "Omitted Google-key-shaped records from publication: %d current, %d previous",
+            sensitive_rows_omitted, sensitive_previous_omitted,
+        )
+
     # Living feed: merge the previously published feed so indicators persist
     # across runs. Re-observed entries refresh (score resets to full); entries
     # no longer being reported decay by age until they expire below --min-score.
@@ -440,6 +451,8 @@ def main() -> int:
         "collections": collection_counts,
         "duplicates_removed": duplicates_removed,
         "false_positives_removed": stats.get("false_positives_removed", 0),
+        "sensitive_rows_omitted": sensitive_rows_omitted,
+        "sensitive_previous_rows_omitted": sensitive_previous_omitted,
         "persist_feed": bool(args.persist_feed),
         "carried_forward": carried_forward,
         "expired_low_score": expired,

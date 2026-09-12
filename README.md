@@ -389,7 +389,7 @@ For a workstation, server, or another CI system, schedule the collector command 
 
 ### Check the collection, not just the website
 
-An available static site can still contain stale data. Individual sources can fail while collection succeeds unless failure guardrails are configured. Use source diagnostics and the collection workflow status together. Options include `--fail-on-empty name`, `--fail-if-stale name=HOURS` (based on newest `first_seen`), and `--warn-if-volume-drop name=PERCENT`. Save raw responses with `--save-raw-dir` when investigating parser failures.
+An available static site can still contain stale data. Individual sources can fail while collection succeeds unless failure guardrails are configured. Use source diagnostics and the collection workflow status together. Options include `--fail-on-empty name`, `--fail-if-stale name=HOURS` (based on newest `first_seen`), and `--warn-if-volume-drop name=PERCENT`. Save raw responses with `--save-raw-dir` outside the published directory when investigating parser failures. The workflow keeps raw captures outside public artifacts. Collected Google-key-shaped records are omitted from exports and Delta; see [collected-credential handling](SECURITY.md#collected-credentials-and-secret-scanning-alerts) for scope and historical-alert guidance.
 
 Required-source checks run **before** replacing feed exports. If `--fail-on-empty`, `--fail-if-stale`, or `--fail-if-volume-drop` fails, the collector exits with code 1 and retains the published snapshot and its `diagnostics/run.json` Delta baseline. The separate `diagnostics/collection-attempt.json` reports attempted source counts, per-source newest timestamps, fetch failures and rejection reasons. Its `accepted` status means quality checks passed, not that every later write or deployment completed; check the process/workflow result too. Failed GitHub Actions runs retain this report in the diagnostics artifact.
 
@@ -452,8 +452,7 @@ Run `python -m swiftioc --help` for the installed version's options.
 | `--source-window name=N` | Override the lookback window for specific sources. |
 | `--grace-on-404 name` | Treat HTTP 404 for listed sources as a non-fatal empty result. |
 | `--fail-on-empty name…` | Fail the run if any listed sources return zero indicators. |
-| `--fail-if-stale name=N` | Retain the published feed if the source has no valid recent `first_seen` within `N` hours (1–876000). |
-| `--fail-if-volume-drop name=N` | Retain the published feed if a source returns at least `N` percent fewer rows than the last published run (1–100). |
+| `--fail-if-stale name=N` | Fail when the newest `first_seen` from `name` is older than `N` hours. |
 | `--warn-if-volume-drop name=N` | Warn when a source returns at least `N` percent fewer rows than the prior run. |
 | `--save-raw-dir PATH` | Persist raw feed responses for later inspection. |
 | `--diag-json PATH` | Write diagnostics JSON (defaults to `<out-dir>/diagnostics/run.json`). |
