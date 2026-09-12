@@ -218,7 +218,9 @@ def main() -> int:
     previous_counts: Dict[str, int] = {}
     previous_generated_at: Optional[str] = None
     previous_total: Optional[int] = None
-    previous_diag = out_dir / "diagnostics" / "run.json"
+    # Read the same diagnostics location that successful runs publish to,
+    # including --diag-json overrides; otherwise volume checks lose baseline.
+    previous_diag = args.diag_json
     if previous_diag.exists():
         try:
             raw_previous = json.loads(previous_diag.read_text(encoding="utf-8"))

@@ -12,6 +12,8 @@ from __future__ import annotations
 import json
 from typing import Any, Dict
 
+import pytest
+
 import swiftioc as si
 
 
@@ -241,19 +243,25 @@ def test_cli_retains_fresh_kev_before_higher_scoring_ioc_when_capped(tmp_path, m
     assert (out_dir / "collections/observables.jsonl").read_text() == ""
 
 
-def test_rejected_collection_preserves_published_files_and_next_delta_baseline(tmp_path, monkeypatch):
+@pytest.mark.parametrize('custom_diag', [False, True])
+def test_rejected_collection_preserves_published_files_and_next_delta_baseline(tmp_path, monkeypatch, custom_diag):
     sources = tmp_path / 'sources.yml'
     _write_sources_yml(sources)
     out = tmp_path / 'out'
     base = ['swiftioc', '--sources', str(sources), '--out-dir', str(out), '--skip-rss']
+    diagnostics = tmp_path / 'separate-diagnostics.json' if custom_diag else out / 'diagnostics/run.json'
+    if custom_diag:
+        base += ['--diag-json', str(diagnostics)]
     monkeypatch.setattr(si, 'http_get', _fake_http_get)
     assert _run_main(monkeypatch, base) == 0
+    baseline_diagnostics = diagnostics.read_bytes()
     snapshot = {p.relative_to(out): p.read_bytes() for p in out.rglob('*') if p.is_file()
                 and p.name != 'collection-attempt.json'}
     monkeypatch.setattr(si, 'http_get', lambda *a, **kw: '')
     for rules in [['--fail-on-empty', 'src_a'], ['--fail-if-stale', 'src_a=24'],
                   ['--fail-if-volume-drop', 'src_a=50']]:
         assert _run_main(monkeypatch, base + ['--persist-feed'] + rules) == 1
+        assert diagnostics.read_bytes() == baseline_diagnostics
         for path, content in snapshot.items():
             assert (out / path).read_bytes() == content, path
         attempt = json.loads((out / 'diagnostics/collection-attempt.json').read_text())
