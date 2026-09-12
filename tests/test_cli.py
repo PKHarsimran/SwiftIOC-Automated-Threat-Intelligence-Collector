@@ -239,3 +239,45 @@ def test_cli_retains_fresh_kev_before_higher_scoring_ioc_when_capped(tmp_path, m
     retained = json.loads((out_dir / "iocs/latest.jsonl").read_text())
     assert retained["type"] == "cve"
     assert (out_dir / "collections/observables.jsonl").read_text() == ""
+
+
+def test_cli_does_not_republish_collected_keys_in_exports_or_delta(tmp_path, monkeypatch):
+    from dataclasses import asdict, replace
+    from swiftioc import cli
+    from swiftioc.models import iso, now_utc
+
+    # Keep reserved synthetic URLs eligible for snapshot loading so this test
+    # exercises the publication boundary, rather than the unrelated FP filter.
+    monkeypatch.setattr('swiftioc.scoring.is_false_positive', lambda *_: False)
+
+    sources = tmp_path / 'sources.yml'
+    sources.write_text('{}', encoding='utf-8')
+    stamp = iso(now_utc())
+    safe = si.Indicator('8[.]8[.]4[.]4', 'ipv4', 'test', stamp, stamp, 'high', 'CLEAR', '', '', '')
+    key = 'AI' + 'za' + '0123456789_' * 3 + 'ab'
+    unsafe = replace(safe, type='url', indicator='hxxps://example[.]invalid/?apiKey=' + key)
+    metadata = replace(safe, indicator='1[.]2[.]3[.]4', vulnerability={'nvd': {'description': key}})
+    for persist in (False, True):
+        out = tmp_path / str(persist)
+        (out / 'iocs').mkdir(parents=True)
+        (out / 'diagnostics').mkdir()
+        # A valid previous baseline must not leak through a removed event.
+        (out / 'iocs/latest.jsonl').write_text(json.dumps(asdict(unsafe)) + '\n', encoding='utf-8')
+        (out / 'diagnostics/run.json').write_text(json.dumps({'total': 1, 'ts': stamp, 'counts': {}}), encoding='utf-8')
+        monkeypatch.setattr(cli, 'collect_from_yaml', lambda *a, **kw: ([safe, metadata, unsafe], {'test': 3}, {'raw_total': 3}))
+        args = ['swiftioc', '--sources', str(sources), '--out-dir', str(out), '--skip-rss']
+        if persist:
+            args.append('--persist-feed')
+        assert _run_main(monkeypatch, args) == 0
+        for path in out.rglob('*'):
+            if path.is_file():
+                assert key not in path.read_text(encoding='utf-8'), path.relative_to(out)
+        diag = json.loads((out / 'diagnostics/run.json').read_text(encoding='utf-8'))
+        assert diag['sensitive_rows_omitted'] == 2
+        assert diag['sensitive_previous_rows_omitted'] == 1
+        assert diag['duplicates_removed'] == 0
+        assert diag['total'] == 1
+        assert diag['carried_forward'] == 0
+        delta = json.loads((out / 'iocs/delta.json').read_text(encoding='utf-8'))
+        assert delta['baseline_available'] is True
+        assert delta['counts'] == {'added': 1, 'updated': 0, 'removed': 0}
