@@ -311,6 +311,22 @@ Keys combine indicator type and value. Removed events use the action `removed_fr
 
 An `added` event means new to the retained feed; it does not prove the indicator was just created. A `removed` event means absent from the current snapshot, not benign. Material score and vulnerability-report changes produce `updated` events; a changed polling timestamp alone does not. A delta describes one collection interval, so consumers that miss runs should reconcile against the full snapshot.
 
+### Verify a detection pack before loading it
+
+Download the complete `detections/` directory from a collection artifact, then run:
+
+```bash
+python -m swiftioc.verify_detections ./detections
+# For automation: JSON result, exit 0 on success or 1 on verification failure
+python -m swiftioc.verify_detections ./detections --json
+```
+
+Schema-version 2 manifests list SHA-256 checksums and byte sizes for the generated Sigma, Suricata, RPZ, SID registry and README files. Verification detects missing or modified files and stale managed Sigma rules left over from another pack; it rejects symlinks and unsupported manifest paths. Older packs need regeneration. The collection workflow verifies packs before publishing them.
+
+Checksums establish consistency with the manifest you supplied, **not publisher authenticity or detection correctness**. Obtain the manifest from a trusted source and still validate rule syntax and local mappings before deployment. Unrelated files outside the managed set are not checked.
+
+When generating successive packs locally, retain `detections/suricata/sid-registry.json` so assigned Suricata IDs remain reserved even if an IOC disappears and returns. Deleting that state, or generating on a fresh runner without restoring it, loses collision history. The pack writer uses UTF-8 with consistent line endings so verification also works on Windows.
+
 See [integration examples](integrations/README.md) for Splunk, Elastic Security, Microsoft Sentinel, and detection guidance. For retained Git history, [build_history_index.py](scripts/build_history_index.py) and [ioc_timeline.py](scripts/ioc_timeline.py) support indicator timeline investigations.
 
 ## Source configuration

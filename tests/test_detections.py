@@ -68,6 +68,8 @@ def test_detection_pack_writes_valid_type_aware_artifacts(tmp_path):
     assert "evil.example CNAME ." in rpz
     assert "*.evil.example CNAME ." in rpz
     assert json.loads((tmp_path / "manifest.json").read_text()) == manifest
+    from swiftioc.verify_detections import verify_detection_pack
+    assert verify_detection_pack(tmp_path) == {'valid': True, 'checked_files': 6, 'errors': []}
 
 
 def test_detection_pack_is_deterministic_and_deduplicates(tmp_path):
@@ -158,3 +160,33 @@ def test_rpz_triggers_remain_relative_to_the_policy_zone(tmp_path):
         assert record_type == "CNAME"
         assert target == ".", "NXDOMAIN action must remain an absolute root target"
     assert {owner for owner, *_ in triggers} == {"evil.example", "*.evil.example"}
+
+
+def test_new_collision_cannot_steal_existing_or_inactive_sid(tmp_path):
+    # These two real hash collisions also cover insertion order: IP rules are
+    # generated before DNS rules, even when the DNS assignment already exists.
+    domain = _indicator('fakelouisvuitton.org', 'domain')
+    address = _indicator('154.91.59.103', 'ipv4')
+    stamp = '2026-09-08T02:00:00Z'
+    si.write_detection_pack(tmp_path, [domain], generated_at=stamp)
+    registry_path = tmp_path / 'suricata/sid-registry.json'
+    original = json.loads(registry_path.read_text())['dns:fakelouisvuitton.org']
+    si.write_detection_pack(tmp_path, [address], generated_at=stamp)
+    registry = json.loads(registry_path.read_text())
+    assert registry['dns:fakelouisvuitton.org'] == original
+    assert len(set(registry.values())) == len(registry)
+    si.write_detection_pack(tmp_path, [address, domain], generated_at=stamp)
+    registry = json.loads(registry_path.read_text())
+    assert registry['dns:fakelouisvuitton.org'] == original
+    assert len(set(registry.values())) == len(registry)
+
+
+def test_corrupt_detection_state_recovers_without_boolean_or_duplicate_sids(tmp_path):
+    from swiftioc.detections import _load_detection_state
+    (tmp_path / 'suricata').mkdir()
+    (tmp_path / 'dns').mkdir()
+    (tmp_path / 'suricata/sid-registry.json').write_text(json.dumps({'a': True, 'b': 4000001, 'c': 4000001}))
+    (tmp_path / 'dns/swiftioc.rpz').write_bytes(b'\xff\xfe')
+    registry, serial = _load_detection_state(tmp_path)
+    assert registry == {'b': 4000001}
+    assert serial is None
