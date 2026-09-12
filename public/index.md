@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-09-12T18:02:21Z_
+_Generated 2026-09-12T21:54:10Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-12T18:02:21Z |
+| Generated | 2026-09-12T21:54:10Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 5982 |
+| Duplicates removed | 5995 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-source overlaps | 723 |
+| Multi-source overlaps | 724 |
 | Score (min / avg / max) | 80 / 80.5 / 96 |
 | High-score indicators (≥80) | 10000 |
-| Corroborated (2+ sources) | 723 |
+| Corroborated (2+ sources) | 724 |
 | Earliest first_seen | 2016-05-11T01:59:46Z |
-| Newest first_seen | 2026-09-12T18:02:04Z |
+| Newest first_seen | 2026-09-12T21:45:23Z |
 
 ## Top indicators by score
 
@@ -41,43 +41,43 @@ _Generated 2026-09-12T18:02:21Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 11233 |
-| threatfox_export_json | 5158 |
-| greensnow_blocklist | 4423 |
+| blocklist_de_ssh | 11263 |
+| threatfox_export_json | 4577 |
+| greensnow_blocklist | 4337 |
 | ipsum_level5 | 4059 |
 | binarydefense_banlist | 3111 |
-| nist_nvd_recent | 1937 |
 | spamhaus_drop | 1723 |
 | cisa_kev | 1709 |
-| tor_exit_nodes | 1330 |
+| nist_nvd_recent | 1472 |
+| tor_exit_nodes | 1328 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3035 |
-| cve | 2593 |
+| sha256 | 3071 |
+| cve | 2849 |
 | ipv4_cidr | 1722 |
-| domain | 1385 |
-| url | 471 |
+| domain | 1008 |
+| url | 536 |
 | sha1 | 348 |
-| ipv4 | 306 |
+| ipv4 | 326 |
 | md5 | 140 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 5084 |
-| cve | 2593 |
+| threatfox | 4758 |
+| cve | 2849 |
 | rat | 2376 |
 | asyncrat | 2373 |
 | drop | 1722 |
 | spamhaus | 1722 |
 | exploited-in-the-wild | 1709 |
-| nvd | 1128 |
-| malware | 1053 |
-| etherhiding | 906 |
+| nvd | 1384 |
+| malware | 1123 |
+| etherhiding | 523 |
 
 ## Multi-source overlaps
 
