@@ -12,6 +12,8 @@ from __future__ import annotations
 import json
 from typing import Any, Dict
 
+import pytest
+
 import swiftioc as si
 
 
@@ -239,3 +241,106 @@ def test_cli_retains_fresh_kev_before_higher_scoring_ioc_when_capped(tmp_path, m
     retained = json.loads((out_dir / "iocs/latest.jsonl").read_text())
     assert retained["type"] == "cve"
     assert (out_dir / "collections/observables.jsonl").read_text() == ""
+
+
+@pytest.mark.parametrize('custom_diag', [False, True])
+def test_rejected_collection_preserves_published_files_and_next_delta_baseline(tmp_path, monkeypatch, custom_diag):
+    sources = tmp_path / 'sources.yml'
+    _write_sources_yml(sources)
+    out = tmp_path / 'out'
+    base = ['swiftioc', '--sources', str(sources), '--out-dir', str(out), '--skip-rss']
+    diagnostics = tmp_path / 'separate-diagnostics.json' if custom_diag else out / 'diagnostics/run.json'
+    if custom_diag:
+        base += ['--diag-json', str(diagnostics)]
+    monkeypatch.setattr(si, 'http_get', _fake_http_get)
+    assert _run_main(monkeypatch, base) == 0
+    baseline_diagnostics = diagnostics.read_bytes()
+    snapshot = {p.relative_to(out): p.read_bytes() for p in out.rglob('*') if p.is_file()
+                and p.name != 'collection-attempt.json'}
+    monkeypatch.setattr(si, 'http_get', lambda *a, **kw: '')
+    for rules in [['--fail-on-empty', 'src_a'], ['--fail-if-stale', 'src_a=24'],
+                  ['--fail-if-volume-drop', 'src_a=50']]:
+        assert _run_main(monkeypatch, base + ['--persist-feed'] + rules) == 1
+        assert diagnostics.read_bytes() == baseline_diagnostics
+        for path, content in snapshot.items():
+            assert (out / path).read_bytes() == content, path
+        attempt = json.loads((out / 'diagnostics/collection-attempt.json').read_text())
+        assert attempt['status'] == 'rejected'
+        assert attempt['quality_failures'][0]['source'] == 'src_a'
+    monkeypatch.setattr(si, 'http_get', _fake_http_get)
+    assert _run_main(monkeypatch, base + ['--fail-if-stale', 'src_a=24', '--fail-if-volume-drop', 'src_a=50']) == 0
+    delta = json.loads((out / 'iocs/delta.json').read_text())
+    assert delta['baseline_available'] is True
+    assert delta['counts']['added'] == delta['counts']['removed'] == 0
+    assert json.loads((out / 'diagnostics/collection-attempt.json').read_text())['status'] == 'accepted'
+
+
+def test_stale_check_uses_each_sources_own_premerge_timestamp(tmp_path, monkeypatch):
+    from datetime import timedelta
+    from swiftioc import collect
+    sources = tmp_path / 'sources.yml'
+    _write_sources_yml(sources)
+    now = si.now_utc()
+    dates = {'src_a': si.iso(now - timedelta(hours=1)), 'src_b': si.iso(now - timedelta(days=10))}
+    def parser(url, ref_url, source, ws):
+        return [si.Indicator('8[.]8[.]4[.]4', 'ipv4', source, dates[source], si.iso(now), 'high', 'CLEAR', '', '', '')]
+    monkeypatch.setattr(collect, 'resolve_parser', lambda _: parser)
+    out = tmp_path / 'out'
+    base = ['swiftioc', '--sources', str(sources), '--out-dir', str(out), '--skip-rss']
+    assert _run_main(monkeypatch, base + ['--fail-if-stale', 'src_a=24']) == 0
+    diag = json.loads((out / 'diagnostics/run.json').read_text())
+    assert diag['source_newest_first_seen'] == dates
+    assert _run_main(monkeypatch, base + ['--fail-if-stale', 'src_b=24']) == 1
+
+
+def test_invalid_quality_flags_abort_before_collection(tmp_path, monkeypatch):
+    import pytest
+    from swiftioc import cli
+    monkeypatch.setattr(cli, 'collect_from_yaml', lambda *a, **kw: pytest.fail('must validate before collecting'))
+    for flags in [['--fail-if-stale', 'feed=oops'], ['--fail-if-volume-drop', 'feed=101'], ['--fail-on-empty']]:
+        with pytest.raises(SystemExit) as error:
+            _run_main(monkeypatch, ['swiftioc', '--out-dir', str(tmp_path / 'untouched')] + flags)
+        assert error.value.code == 2
+        assert not (tmp_path / 'untouched').exists()
+
+
+def test_cli_does_not_republish_collected_keys_in_exports_or_delta(tmp_path, monkeypatch):
+    from dataclasses import asdict, replace
+    from swiftioc import cli
+    from swiftioc.models import iso, now_utc
+
+    # Keep reserved synthetic URLs eligible for snapshot loading so this test
+    # exercises the publication boundary, rather than the unrelated FP filter.
+    monkeypatch.setattr('swiftioc.scoring.is_false_positive', lambda *_: False)
+
+    sources = tmp_path / 'sources.yml'
+    sources.write_text('{}', encoding='utf-8')
+    stamp = iso(now_utc())
+    safe = si.Indicator('8[.]8[.]4[.]4', 'ipv4', 'test', stamp, stamp, 'high', 'CLEAR', '', '', '')
+    key = 'AI' + 'za' + '0123456789_' * 3 + 'ab'
+    unsafe = replace(safe, type='url', indicator='hxxps://example[.]invalid/?apiKey=' + key)
+    metadata = replace(safe, indicator='1[.]2[.]3[.]4', vulnerability={'nvd': {'description': key}})
+    for persist in (False, True):
+        out = tmp_path / str(persist)
+        (out / 'iocs').mkdir(parents=True)
+        (out / 'diagnostics').mkdir()
+        # A valid previous baseline must not leak through a removed event.
+        (out / 'iocs/latest.jsonl').write_text(json.dumps(asdict(unsafe)) + '\n', encoding='utf-8')
+        (out / 'diagnostics/run.json').write_text(json.dumps({'total': 1, 'ts': stamp, 'counts': {}}), encoding='utf-8')
+        monkeypatch.setattr(cli, 'collect_from_yaml', lambda *a, **kw: ([safe, metadata, unsafe], {'test': 3}, {'raw_total': 3}))
+        args = ['swiftioc', '--sources', str(sources), '--out-dir', str(out), '--skip-rss']
+        if persist:
+            args.append('--persist-feed')
+        assert _run_main(monkeypatch, args) == 0
+        for path in out.rglob('*'):
+            if path.is_file():
+                assert key not in path.read_text(encoding='utf-8'), path.relative_to(out)
+        diag = json.loads((out / 'diagnostics/run.json').read_text(encoding='utf-8'))
+        assert diag['sensitive_rows_omitted'] == 2
+        assert diag['sensitive_previous_rows_omitted'] == 1
+        assert diag['duplicates_removed'] == 0
+        assert diag['total'] == 1
+        assert diag['carried_forward'] == 0
+        delta = json.loads((out / 'iocs/delta.json').read_text(encoding='utf-8'))
+        assert delta['baseline_available'] is True
+        assert delta['counts'] == {'added': 1, 'updated': 0, 'removed': 0}

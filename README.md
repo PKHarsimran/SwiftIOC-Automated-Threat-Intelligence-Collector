@@ -405,7 +405,21 @@ For a workstation, server, or another CI system, schedule the collector command 
 
 ### Check the collection, not just the website
 
-An available static site can still contain stale data. Individual sources can fail while collection succeeds unless failure guardrails are configured. Use source diagnostics and the collection workflow status together. Options include `--fail-on-empty name`, `--fail-if-stale name=HOURS` (based on newest `first_seen`), and `--warn-if-volume-drop name=PERCENT`. Save raw responses with `--save-raw-dir` when investigating parser failures.
+An available static site can still contain stale data. Individual sources can fail while collection succeeds unless failure guardrails are configured. Use source diagnostics and the collection workflow status together. Options include `--fail-on-empty name`, `--fail-if-stale name=HOURS` (based on newest `first_seen`), and `--warn-if-volume-drop name=PERCENT`. Save raw responses with `--save-raw-dir` outside the published directory when investigating parser failures. The workflow keeps raw captures outside public artifacts. Collected Google-key-shaped records are omitted from exports and Delta; see [collected-credential handling](SECURITY.md#collected-credentials-and-secret-scanning-alerts) for scope and historical-alert guidance.
+
+Required-source checks run **before** replacing feed exports. If `--fail-on-empty`, `--fail-if-stale`, or `--fail-if-volume-drop` fails, the collector exits with code 1 and retains the published snapshot and its `diagnostics/run.json` Delta baseline. The separate `diagnostics/collection-attempt.json` reports attempted source counts, per-source newest timestamps, fetch failures and rejection reasons. Its `accepted` status means quality checks passed, not that every later write or deployment completed; check the process/workflow result too. Failed GitHub Actions runs retain this report in the diagnostics artifact.
+
+For example, require a nonempty URLhaus result and reject a drop of 50% or more:
+
+```bash
+python -m swiftioc --sources sources.yml --out-dir public \
+  --fail-on-empty urlhaus_recent_urls \
+  --fail-if-volume-drop urlhaus_recent_urls=50
+```
+
+The volume check rejects a drop of **at least** the configured percentage (1–100), compared with the last published run under comparable source settings. It skips comparisons when no positive baseline exists and lists those sources in `volume_baseline_missing`; an unknown source name fails. Rejected attempts never become the next volume baseline. A volume drop can be legitimate, so choose thresholds for each source's normal behavior.
+
+Freshness checks use each source's newest valid, non-future `first_seen` **before** cross-source deduplication, persistence, scoring and retention. They measure recent entries, not HTTP availability or the provider's poll time; configure them only where that distinction fits the feed. Hours must be 1–876000. These checks protect against rejected collections, not every disk failure: individual exports remain atomic, but the output directory is not a transactional snapshot.
 
 Generate the readable IOC summary manually with:
 
