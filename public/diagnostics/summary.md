@@ -1,15 +1,15 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-09-12T04:31:46Z_
+_Generated 2026-09-12T04:46:21Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-12T04:31:46Z |
+| Generated | 2026-09-12T04:46:21Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6616 |
+| Duplicates removed | 6613 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-source overlaps | 660 |
@@ -17,7 +17,7 @@ _Generated 2026-09-12T04:31:46Z_
 | High-score indicators (≥80) | 10000 |
 | Corroborated (2+ sources) | 660 |
 | Earliest first_seen | 2016-05-11T01:59:46Z |
-| Newest first_seen | 2026-09-12T04:09:48Z |
+| Newest first_seen | 2026-09-12T04:37:25Z |
 
 ## Top indicators by score
 
@@ -39,8 +39,8 @@ _Generated 2026-09-12T04:31:46Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| threatfox_export_json | 6246 |
-| greensnow_blocklist | 5442 |
+| threatfox_export_json | 6224 |
+| greensnow_blocklist | 5443 |
 | blocklist_de_ssh | 5152 |
 | ipsum_level5 | 4059 |
 | binarydefense_banlist | 3111 |
@@ -53,11 +53,11 @@ _Generated 2026-09-12T04:31:46Z_
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 2845 |
+| sha256 | 2841 |
 | cve | 2645 |
 | domain | 1749 |
 | ipv4_cidr | 1722 |
-| url | 423 |
+| url | 427 |
 | sha1 | 290 |
 | ipv4 | 244 |
 | md5 | 82 |
@@ -66,16 +66,16 @@ _Generated 2026-09-12T04:31:46Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 4962 |
+| threatfox | 4958 |
 | cve | 2645 |
-| rat | 2161 |
-| asyncrat | 2159 |
+| rat | 2157 |
+| asyncrat | 2155 |
 | drop | 1722 |
 | spamhaus | 1722 |
 | exploited-in-the-wild | 1709 |
 | nvd | 1180 |
 | etherhiding | 1085 |
-| malware | 1063 |
+| malware | 1067 |
 
 ## Multi-source overlaps
 

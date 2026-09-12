@@ -3,7 +3,19 @@
   <title>SwiftIOC — Newest High-Confidence IOCs</title>
   <link>https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector</link>
   <description>Freshest scored, cross-source-corroborated indicators of compromise.</description>
-  <lastBuildDate>Sat, 12 Sep 2026 04:31:48 +0000</lastBuildDate>
+  <lastBuildDate>Sat, 12 Sep 2026 04:46:22 +0000</lastBuildDate>
+    <item>
+      <title>[80] url: hxxp://115[.]204[.]116[.]105:37201/bin[.]sh</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,arm,elf,Mozi</description>
+      <guid isPermaLink="false">b5bae3fe-abf7-5f00-9613-1eae50bc03eb</guid>
+      <pubDate>Sat, 12 Sep 2026 04:37:25 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxp://196[.]189[.]197[.]131:42974/bin[.]sh</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,arm,elf,mirai,Mozi</description>
+      <guid isPermaLink="false">f9e1e13a-d734-5f3b-8527-f63f5e688188</guid>
+      <pubDate>Sat, 12 Sep 2026 04:27:23 +0000</pubDate>
+    </item>
     <item>
       <title>[80] domain: cdn-rcs-cloud[.]beer</title>
       <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClearFake,ClickFix,ErrTraffic,EtherHiding,threatfox</description>
@@ -24,13 +36,13 @@
     </item>
     <item>
       <title>[80] url: hxxp://42[.]226[.]209[.]82:46014/i</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,elf,mips,Mozi</description>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: 32-bit,Mozi,elf,malware,malware_download,mips</description>
       <guid isPermaLink="false">b397d188-8aa6-5545-9268-98458202e3b2</guid>
       <pubDate>Sat, 12 Sep 2026 04:02:22 +0000</pubDate>
     </item>
     <item>
       <title>[80] url: hxxp://193[.]178[.]158[.]107/bin/46d0be2a38b04583_syshost_loader[.]exe</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,10x09x2026,dropped-by-Stealc</description>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: 10x09x2026,dropped-by-Stealc,malware,malware_download</description>
       <guid isPermaLink="false">76d358d4-dd3a-5383-b63d-6c9994ddabbe</guid>
       <pubDate>Sat, 12 Sep 2026 04:02:10 +0000</pubDate>
     </item>
@@ -42,7 +54,7 @@
     </item>
     <item>
       <title>[80] url: hxxp://105[.]184[.]139[.]80:45613/i</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,arm,elf,mirai,Mozi</description>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: 32-bit,Mozi,arm,elf,malware,malware_download,mirai</description>
       <guid isPermaLink="false">517128ac-80e1-5899-b78d-eb4b71a47646</guid>
       <pubDate>Sat, 12 Sep 2026 03:57:20 +0000</pubDate>
     </item>
@@ -102,7 +114,7 @@
     </item>
     <item>
       <title>[80] url: hxxp://42[.]231[.]47[.]159:47811/bin[.]sh</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,elf,mips,Mozi</description>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: 32-bit,Mozi,elf,malware,malware_download,mips</description>
       <guid isPermaLink="false">48b81753-04c3-5358-9f79-d65049897b22</guid>
       <pubDate>Sat, 12 Sep 2026 03:31:23 +0000</pubDate>
     </item>
@@ -138,7 +150,7 @@
     </item>
     <item>
       <title>[80] url: hxxp://105[.]184[.]139[.]80:45613/bin[.]sh</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,arm,elf,mirai,Mozi</description>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: 32-bit,Mozi,arm,elf,malware,malware_download,mirai</description>
       <guid isPermaLink="false">710ce1bc-ed7e-5e69-8ae5-6d427243e2fb</guid>
       <pubDate>Sat, 12 Sep 2026 03:11:16 +0000</pubDate>
     </item>
@@ -174,7 +186,7 @@
     </item>
     <item>
       <title>[80] url: hxxp://193[.]178[.]158[.]107/bin/189e7e8ebfcbd873_CryptoClipper[.]exe</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,dropped-by-Stealc,Loaded</description>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: Loaded,dropped-by-Stealc,malware,malware_download</description>
       <guid isPermaLink="false">d53c212a-79a0-5bc4-90fc-e913a94c4535</guid>
       <pubDate>Sat, 12 Sep 2026 03:03:13 +0000</pubDate>
     </item>
@@ -291,17 +303,5 @@
       <description>Score 80, confidence high, sources: threatfox_export_json, tags: threatfox,vshell</description>
       <guid isPermaLink="false">8ef5c83f-1c7b-51af-8217-6d332308c2ed</guid>
       <pubDate>Sat, 12 Sep 2026 02:05:06 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] ipv4: 50[.]114[.]172[.]219</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: threatfox,vshell</description>
-      <guid isPermaLink="false">f9b18bae-cdb0-50e5-8b4a-c4e34f31953e</guid>
-      <pubDate>Sat, 12 Sep 2026 02:05:04 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxp://115[.]56[.]157[.]163:33718/bin[.]sh</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: 32-bit,Mozi,elf,malware,malware_download,mips</description>
-      <guid isPermaLink="false">f6006adf-44d6-50bc-8b64-3c4ee2dc007e</guid>
-      <pubDate>Sat, 12 Sep 2026 02:04:23 +0000</pubDate>
     </item>
 </channel></rss>

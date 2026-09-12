@@ -4,19 +4,19 @@
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-12T04:31:46Z |
+| Generated | 2026-09-12T04:46:21Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6616 |
-| Carried forward | 322 |
+| Duplicates removed | 6613 |
+| Carried forward | 284 |
 | Expired (score < 20) | 0 |
 | Aged out (> 30d) | 0 |
-| Pruned over cap (10000) | 32350 |
+| Pruned over cap (10000) | 32292 |
 | Stored | 10000 |
 | Score (min / avg / max) | 80 / 80.5 / 96 |
 | High-confidence indicators | 10000 |
 | Earliest first_seen | 2016-05-11T01:59:46Z |
-| Newest first_seen | 2026-09-12T04:09:48Z |
+| Newest first_seen | 2026-09-12T04:37:25Z |
 
 ## Per-source counts
 
@@ -29,26 +29,26 @@
 | dshield_block | 20 |
 | et_compromised | 610 |
 | feodo_ipblocklist | 5 |
-| greensnow_blocklist | 5442 |
+| greensnow_blocklist | 5443 |
 | ipsum_level5 | 4059 |
 | malwarebazaar_recent | 870 |
 | nist_nvd_recent | 2597 |
 | openphish_feed | 300 |
 | spamhaus_drop | 1723 |
 | sslbl_ja3 | 97 |
-| threatfox_export_json | 6246 |
+| threatfox_export_json | 6224 |
 | tor_exit_nodes | 1339 |
-| urlhaus_recent_urls | 364 |
+| urlhaus_recent_urls | 362 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 2845 |
+| sha256 | 2841 |
 | cve | 2645 |
 | domain | 1749 |
 | ipv4_cidr | 1722 |
-| url | 423 |
+| url | 427 |
 | sha1 | 290 |
 | ipv4 | 244 |
 | md5 | 82 |
