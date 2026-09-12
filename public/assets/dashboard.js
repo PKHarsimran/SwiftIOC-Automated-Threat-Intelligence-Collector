@@ -335,6 +335,15 @@
 
   const investigationWorkspace = {
     getRows: () => investigationRows.slice(),
+    importRows: (value) => {
+      const result = dashboardCore.mergeInvestigationImport(investigationRows, value);
+      if (result.added) {
+        investigationUndoRows = investigationRows.slice();
+        investigationRows = result.rows;
+        saveInvestigationRows();
+      }
+      return result;
+    },
     canUndo: () => investigationUndoRows !== null,
     undo: () => {
       if (investigationUndoRows === null) return false;
@@ -425,6 +434,29 @@
     if (!root) return;
     const storageStatus = qs('[data-investigation-storage]', root);
     const retrySave = qs('[data-investigation-retry]', root);
+    const importFile = qs('[data-investigation-import]');
+    const importStatus = qs('[data-investigation-import-status]');
+    importFile?.addEventListener('change', async () => {
+      const file = importFile.files?.[0];
+      if (!file) return;
+      importFile.disabled = true;
+      importStatus?.classList.remove('hunt-error');
+      setText(importStatus, 'Reading queue export…');
+      try {
+        if (file.size > 500000) throw new Error('Choose a JSON export smaller than 500 KB. Nothing was imported.');
+        let value;
+        try { value = JSON.parse(await file.text()); }
+        catch { throw new Error('The file could not be read as JSON. Nothing was imported.'); }
+        const result = investigationWorkspace.importRows(value);
+        setText(importStatus, `${result.added} indicators imported; ${result.duplicates} duplicates skipped. Existing queued evidence kept.${result.added ? ' Use Workspace to review them or Undo last change to revert.' : ''}${investigationStorageFailed ? ' Browser save failed: export before leaving or retry saving.' : ''}`);
+      } catch (error) {
+        importStatus?.classList.add('hunt-error');
+        setText(importStatus, error.message);
+      } finally {
+        importFile.value = '';
+        importFile.disabled = false;
+      }
+    });
     retrySave?.addEventListener('click', () => {
       saveInvestigationRows();
       if (!investigationStorageFailed) {

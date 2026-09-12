@@ -3869,3 +3869,10 @@ body:has(.workspace-dock:not([hidden])) .toast { bottom: 6rem; }
 
 .queue-row-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .4rem; flex: 0 0 auto; max-width: 100%; }
 .investigation-list li:has(.queue-row-actions button + button) { flex-wrap: wrap; }
+
+.investigation-import { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-soft); }
+.investigation-import label { display: block; font-weight: 600; }
+.investigation-import input { max-width: 100%; }
+.investigation-import p { overflow-wrap: anywhere; }
+.investigation-import input::file-selector-button { min-height: 44px; margin-right: .65rem; padding: .5rem .8rem; border: 1px solid var(--border-soft); border-radius: .5rem; background: var(--card-bg-soft); color: var(--accent); font: inherit; cursor: pointer; }
+.investigation-import input:disabled::file-selector-button { opacity: .6; cursor: wait; }

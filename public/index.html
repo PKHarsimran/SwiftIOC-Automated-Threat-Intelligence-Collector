@@ -46,7 +46,7 @@
       });
     </script>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/styles.css?v=37" />
+    <link rel="stylesheet" href="assets/styles.css?v=38" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -129,7 +129,7 @@
       </header>
 
       <details class="analyst-guide">
-        <summary>New here? Choose your next step</summary>
+        <summary>Get started or resume an investigation</summary>
         <div class="analyst-guide-paths">
           <section aria-labelledby="guide-ioc-heading">
             <h3 id="guide-ioc-heading">Investigate an indicator</h3>
@@ -139,6 +139,12 @@
             <h3 id="guide-cve-heading">Review a vulnerability</h3>
             <ol><li><a href="#vulnerabilities">Review known exploited CVEs</a> and provider evidence.</li><li><a href="#exposure-report">Compare a software inventory</a>, or <a href="#product-briefing">follow a vendor and product</a>.</li><li>Verify installed versions and applicability with the vendor advisory or your vulnerability scanner.</li></ol>
           </section>
+        </div>
+        <div class="investigation-import">
+          <label for="investigation-import">Resume a saved investigation</label>
+          <p id="investigation-import-help">Import an exported queue JSON file. Merges up to 50 indicators, keeps existing evidence for duplicates, and stays in this browser. Maximum 500 KB.</p>
+          <input id="investigation-import" type="file" accept=".json,application/json" data-investigation-import aria-describedby="investigation-import-help investigation-import-status" />
+          <p id="investigation-import-status" data-investigation-import-status role="status"></p>
         </div>
       </details>
 
@@ -1093,9 +1099,9 @@
     </div>
 
     <div class="toast" data-toast role="status" aria-live="polite" aria-atomic="true" hidden></div>
-    <script defer src="assets/dashboard-core.js?v=37"></script>
-    <script defer src="assets/inventory-core.js?v=37"></script>
-    <script defer src="assets/inventory.js?v=37"></script>
-    <script defer src="assets/dashboard.js?v=37"></script>
+    <script defer src="assets/dashboard-core.js?v=38"></script>
+    <script defer src="assets/inventory-core.js?v=38"></script>
+    <script defer src="assets/inventory.js?v=38"></script>
+    <script defer src="assets/dashboard.js?v=38"></script>
   </body>
 </html>

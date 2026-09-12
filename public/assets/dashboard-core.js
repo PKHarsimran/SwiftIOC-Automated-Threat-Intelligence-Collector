@@ -142,6 +142,29 @@
     return rows;
   };
 
+  // Import is all-or-nothing: storage recovery may discard bad rows, but an
+  // explicit analyst import must never silently lose records or exceed capacity.
+  const mergeInvestigationImport = (current, value) => {
+    if (!Array.isArray(value) || !value.length || value.length > 50) {
+      throw new Error('Choose a queue JSON export containing 1–50 records.');
+    }
+    const strings = ['confidence', 'source', 'firstSeen', 'lastSeen', 'reference', 'context', 'tlp'];
+    value.forEach((row, index) => {
+      const valid = row && typeof row === 'object' && !Array.isArray(row)
+        && typeof row.indicator === 'string' && row.indicator.trim().length > 0 && row.indicator.length <= 2048
+        && typeof row.type === 'string' && row.type.trim().length > 0 && row.type.length <= 64
+        && strings.every((field) => row[field] === undefined || typeof row[field] === 'string')
+        && ['tags', 'sourceList'].every((field) => row[field] === undefined || (Array.isArray(row[field])
+          && row[field].length <= (field === 'tags' ? 50 : 25) && row[field].every((item) => typeof item === 'string')))
+        && (row.score === undefined || (typeof row.score === 'number' && Number.isFinite(row.score) && row.score >= 0 && row.score <= 100));
+      if (!valid) throw new Error(`Record ${index + 1} is not a valid queue export. Nothing was imported.`);
+    });
+    const merged = normaliseInvestigationRows([...current, ...value], 250);
+    if (merged.length > 50) throw new Error(`This import would use ${merged.length} of 50 slots. Remove some queued indicators first.`);
+    const added = merged.length - current.length;
+    return { rows: merged, added, duplicates: value.length - added };
+  };
+
   const validIpv4 = (value) => {
     const parts = value.split('.');
     return parts.length === 4 && parts.every((part) =>
@@ -940,6 +963,7 @@
     detectionRows,
     matchesRow,
     normaliseInvestigationRows,
+    mergeInvestigationImport,
     readViewState,
     refang,
     rowsToCsv,

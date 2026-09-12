@@ -105,11 +105,13 @@ The browser builds the query; it does not connect to or run searches in Splunk. 
 2. **Open Workspace** from the floating shortcut. **Back to results** returns to your earlier scroll position.
 3. **Configure the live SPL (Splunk search):** choose an index and time range, then expand **Map event fields** if your logs use names such as `source.ip`.
 4. **Copy or export:** the query updates with the queue and lists every matching queued IOC in each result. Other export buttons produce the selected working set.
-5. **Recover mistakes:** **Undo last change** restores the prior queue after an addition, removal, or clear, including its order and generated SPL.
+5. **Recover mistakes:** **Undo last change** restores the prior queue after an addition, import, removal, or clear, including its order and generated SPL.
 
 **CVE-only queues show a software-verification checklist instead of SPL controls.** Use **Review evidence** beside a queued CVE to search for its exact ID across all statuses, including rejected records. CVE IDs are excluded from IOC SPL; mixed queues still generate searches for supported observables. Use the exposure report to compare installed vendor/product/version evidence, then confirm applicability with vendor guidance or scanner results. Splunk can support this only when your own inventory or scanner telemetry is available.
 
-The dashboard’s **New here? Choose your next step** guide links directly to IOC lookup, CVE evidence, the exposure report and product watches.
+The dashboard’s **Get started or resume an investigation** guide links directly to IOC lookup, CVE evidence, the exposure report and product watches.
+
+**Resume saved work:** choose **Export JSON** in Workspace. Later, open **Get started or resume an investigation → Resume a saved investigation** and select that file (up to 500 KB). Import merges with your current queue, preserves existing evidence for duplicates, and keeps URL paths case-sensitive. Invalid or over-capacity files leave the queue unchanged. One Undo restores the entire previous queue; duplicate-only imports preserve your existing Undo step. Files are read locally and are not uploaded.
 
 The queue holds **50 indicators**. It reports save failures, offers **Retry save**, and shows remaining capacity. Export your work before leaving if storage is unavailable. Undo retains one step in page memory and resets on reload.
 
@@ -490,6 +492,7 @@ node scripts/test_dashboard_layout.cjs
 node scripts/test_personal_briefing.cjs
 node scripts/test_inventory_ui.cjs
 node scripts/test_investigation_spl.cjs
+node scripts/test_investigation_import.cjs
 ```
 
 These suites use synthetic fixtures to exercise filtering, refresh failures, mobile layout, personal briefing state, and provider graph behavior. Set `BASE_URL` for a different local server or `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` for an existing Chromium browser.

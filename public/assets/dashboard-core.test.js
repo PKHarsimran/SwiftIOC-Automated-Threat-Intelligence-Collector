@@ -542,7 +542,7 @@ test('exploited and ransomware views require explicit evidence and never fall ba
 test('vulnerability release uses coordinated new asset cache keys', () => {
   const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
   for (const asset of ['styles.css', 'dashboard-core.js', 'dashboard.js']) {
-    assert.ok(html.includes(`assets/${asset}?v=37`));
+    assert.ok(html.includes(`assets/${asset}?v=38`));
   }
 });
 
@@ -748,4 +748,28 @@ test('complete CVE searches match identity rather than prefixes or incidental me
   assert.deepEqual(core.filterVulnerabilities(items, ' cve-2026-1234 ').map(x => x.cve_id), ['CVE-2026-1234']);
   assert.equal(core.filterVulnerabilities(items, 'Related to').length, 1);
   assert.equal(core.filterVulnerabilities(items, 'CVE-2026-12').length, 3);
+});
+
+test('queue imports preserve evidence, URL case and metadata without mutating the baseline', () => {
+  const saved = { ...row, score: 72 };
+  const current = [saved];
+  const imported = JSON.parse(JSON.stringify([saved, { ...saved, indicator: 'hxxps://host/Payload', type: 'url' }, { ...saved, indicator: 'hxxps://host/payload', type: 'url' }]));
+  imported[0].score = 99;
+  const result = core.mergeInvestigationImport(current, imported);
+  assert.equal(result.added, 2);
+  assert.equal(result.duplicates, 1);
+  assert.equal(result.rows[0].score, 72);
+  assert.deepEqual(result.rows[1].tags, saved.tags);
+  assert.equal(current.length, 1);
+  assert.equal(current[0].score, 72);
+});
+
+test('queue imports reject invalid records and over-capacity merges atomically', () => {
+  const current = Array.from({ length: 50 }, (_, i) => ({ indicator: `host${i}.test`, type: 'domain' }));
+  assert.equal(core.mergeInvestigationImport(current, current).added, 0);
+  assert.throws(() => core.mergeInvestigationImport(current, [{ indicator: 'new.test', type: 'domain' }]), /51 of 50/);
+  for (const invalid of [null, {}, [], [row, null], [{ ...row, indicator: 42 }], [{ ...row, tags: [42] }], [{ ...row, score: -1 }], [{ ...row, type: '' }], [{ ...row, sourceList: 'source' }]]) {
+    assert.throws(() => core.mergeInvestigationImport(current, invalid));
+  }
+  assert.equal(current.length, 50);
 });
