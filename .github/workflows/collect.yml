@@ -107,6 +107,20 @@ jobs:
           echo "OUT_DIR=$OUT_DIR"
           echo "SOURCES_FILE=$SOURCES_FILE"
 
+      - name: Restore committed Suricata SID registry
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          registry="$OUT_DIR/detections/suricata/sid-registry.json"
+          # The first run bootstraps the registry. Subsequent fresh checkouts
+          # restore the force-tracked state committed by successful runs.
+          if git cat-file -e "HEAD:$registry" 2>/dev/null; then
+            mkdir -p "$(dirname "$registry")"
+            git show "HEAD:$registry" > "$registry"
+          else
+            echo "No committed SID registry yet; bootstrapping on this run."
+          fi
+
       - name: Run collector
         id: collector
         shell: bash
@@ -192,6 +206,15 @@ jobs:
           retention-days: 3
           if-no-files-found: error
           path: public/**
+
+      - name: Stage persistent Suricata SID registry
+        if: success() && github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          # Detection outputs are ignored, but this small state file must
+          # survive fresh checkouts, including assignments for inactive IOCs.
+          git add -f -- "$OUT_DIR/detections/suricata/sid-registry.json"
 
       - name: Auto-commit updated outputs
         if: success() && github.ref == 'refs/heads/main'
