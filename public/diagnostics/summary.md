@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-09-13T08:43:07Z_
+_Generated 2026-09-13T15:30:19Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-13T08:43:07Z |
+| Generated | 2026-09-13T15:30:19Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 5188 |
-| Sources reporting | 16 |
+| Duplicates removed | 6481 |
+| Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-source overlaps | 723 |
+| Multi-source overlaps | 736 |
 | Score (min / avg / max) | 80 / 80.5 / 96 |
 | High-score indicators (≥80) | 10000 |
-| Corroborated (2+ sources) | 723 |
+| Corroborated (2+ sources) | 736 |
 | Earliest first_seen | 2016-05-11T01:59:46Z |
-| Newest first_seen | 2026-09-13T08:35:16Z |
+| Newest first_seen | 2026-09-13T15:30:00Z |
 
 ## Top indicators by score
 
@@ -39,43 +39,43 @@ _Generated 2026-09-13T08:43:07Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 11363 |
+| blocklist_de_ssh | 11496 |
 | ipsum_level5 | 4677 |
-| threatfox_export_json | 4008 |
+| threatfox_export_json | 4331 |
+| greensnow_blocklist | 4047 |
 | binarydefense_banlist | 3373 |
-| spamhaus_drop | 1723 |
+| spamhaus_drop | 1724 |
 | cisa_kev | 1709 |
-| nist_nvd_recent | 1461 |
-| tor_exit_nodes | 1330 |
-| et_compromised | 610 |
+| tor_exit_nodes | 1323 |
+| nist_nvd_recent | 1183 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3241 |
-| cve | 3050 |
-| ipv4_cidr | 1722 |
-| domain | 704 |
-| url | 503 |
+| sha256 | 3247 |
+| cve | 2669 |
+| ipv4_cidr | 1721 |
+| domain | 928 |
+| url | 639 |
 | sha1 | 348 |
-| ipv4 | 292 |
+| ipv4 | 308 |
 | md5 | 140 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 4495 |
-| cve | 3050 |
+| threatfox | 4815 |
+| cve | 2669 |
 | rat | 2376 |
 | asyncrat | 2373 |
-| drop | 1722 |
-| spamhaus | 1722 |
+| drop | 1721 |
+| spamhaus | 1721 |
 | exploited-in-the-wild | 1709 |
-| nvd | 1585 |
-| malware | 1184 |
-| high | 669 |
+| malware | 1259 |
+| nvd | 1204 |
+| ClickFix | 631 |
 
 ## Multi-source overlaps
 
