@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-09-13T22:02:06Z_
+_Generated 2026-09-14T03:01:58Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-13T22:02:06Z |
+| Generated | 2026-09-14T03:01:58Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6538 |
+| Duplicates removed | 7076 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
 | Multi-source overlaps | 792 |
-| Score (min / avg / max) | 80 / 80.6 / 96 |
-| High-score indicators (≥80) | 10000 |
+| Score (min / avg / max) | 79 / 80.6 / 96 |
+| High-score indicators (≥80) | 9922 |
 | Corroborated (2+ sources) | 792 |
 | Earliest first_seen | 2016-05-11T01:59:46Z |
-| Newest first_seen | 2026-09-13T21:54:28Z |
+| Newest first_seen | 2026-09-14T02:58:22Z |
 
 ## Top indicators by score
 
@@ -41,44 +41,44 @@ _Generated 2026-09-13T22:02:06Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 11484 |
-| ipsum_level5 | 4677 |
-| threatfox_export_json | 4111 |
-| greensnow_blocklist | 3991 |
-| binarydefense_banlist | 3373 |
+| blocklist_de_ssh | 11465 |
+| greensnow_blocklist | 4750 |
+| ipsum_level5 | 4238 |
+| threatfox_export_json | 3953 |
+| binarydefense_banlist | 3643 |
 | spamhaus_drop | 1725 |
 | cisa_kev | 1709 |
-| tor_exit_nodes | 1324 |
+| tor_exit_nodes | 1325 |
 | et_compromised | 610 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3383 |
-| cve | 2752 |
+| sha256 | 3403 |
+| cve | 2798 |
 | ipv4_cidr | 1724 |
-| domain | 579 |
-| url | 575 |
+| url | 538 |
+| domain | 506 |
 | sha1 | 418 |
-| ipv4 | 314 |
+| ipv4 | 306 |
 | md5 | 210 |
-| ja3 | 45 |
+| ja3 | 97 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 4584 |
-| cve | 2752 |
+| threatfox | 4498 |
+| cve | 2798 |
 | rat | 2375 |
 | asyncrat | 2373 |
 | drop | 1724 |
 | spamhaus | 1724 |
 | exploited-in-the-wild | 1709 |
-| malware | 1409 |
-| nvd | 1287 |
-| high | 529 |
+| malware | 1397 |
+| nvd | 1333 |
+| high | 535 |
 
 ## Multi-source overlaps
 
