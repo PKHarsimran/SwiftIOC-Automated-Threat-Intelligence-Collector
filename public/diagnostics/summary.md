@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-09-14T09:30:11Z_
+_Generated 2026-09-14T17:30:16Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-14T09:30:11Z |
+| Generated | 2026-09-14T17:30:16Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6613 |
+| Duplicates removed | 6239 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-source overlaps | 821 |
+| Multi-source overlaps | 840 |
 | Score (min / avg / max) | 80 / 80.6 / 96 |
 | High-score indicators (≥80) | 10000 |
-| Corroborated (2+ sources) | 821 |
+| Corroborated (2+ sources) | 840 |
 | Earliest first_seen | 2016-05-11T01:59:46Z |
-| Newest first_seen | 2026-09-14T09:24:40Z |
+| Newest first_seen | 2026-09-14T17:30:01Z |
 
 ## Top indicators by score
 
@@ -39,43 +39,43 @@ _Generated 2026-09-14T09:30:11Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5128 |
-| greensnow_blocklist | 4932 |
+| blocklist_de_ssh | 5177 |
+| greensnow_blocklist | 4252 |
 | ipsum_level5 | 4238 |
 | binarydefense_banlist | 3643 |
+| threatfox_export_json | 1998 |
 | spamhaus_drop | 1725 |
 | cisa_kev | 1709 |
-| threatfox_export_json | 1687 |
-| tor_exit_nodes | 1327 |
-| nist_nvd_recent | 665 |
+| tor_exit_nodes | 1224 |
+| nist_nvd_recent | 1155 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3509 |
-| cve | 2845 |
-| ipv4_cidr | 1613 |
-| url | 619 |
-| domain | 475 |
-| sha1 | 418 |
-| ipv4 | 311 |
-| md5 | 210 |
+| sha256 | 3618 |
+| cve | 3036 |
+| ipv4_cidr | 1182 |
+| url | 664 |
+| domain | 541 |
+| sha1 | 434 |
+| ipv4 | 299 |
+| md5 | 226 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 4582 |
-| cve | 2845 |
-| rat | 2395 |
+| threatfox | 4700 |
+| cve | 3036 |
+| rat | 2396 |
 | asyncrat | 2373 |
 | exploited-in-the-wild | 1709 |
-| drop | 1613 |
-| spamhaus | 1613 |
-| malware | 1507 |
-| nvd | 1380 |
-| high | 536 |
+| malware | 1648 |
+| nvd | 1571 |
+| drop | 1182 |
+| spamhaus | 1182 |
+| high | 575 |
 
 ## Multi-source overlaps
 
