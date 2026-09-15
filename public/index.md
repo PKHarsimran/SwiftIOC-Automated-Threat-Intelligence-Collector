@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-09-15T03:05:02Z_
+_Generated 2026-09-15T09:10:26Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-15T03:05:02Z |
+| Generated | 2026-09-15T09:10:26Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 5676 |
+| Duplicates removed | 5378 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-source overlaps | 842 |
+| Multi-source overlaps | 844 |
 | Score (min / avg / max) | 80 / 80.6 / 96 |
 | High-score indicators (≥80) | 10000 |
-| Corroborated (2+ sources) | 842 |
+| Corroborated (2+ sources) | 844 |
 | Earliest first_seen | 2016-05-11T01:59:46Z |
-| Newest first_seen | 2026-09-15T03:04:11Z |
+| Newest first_seen | 2026-09-15T09:08:20Z |
 
 ## Top indicators by score
 
@@ -41,43 +41,43 @@ _Generated 2026-09-15T03:05:02Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| greensnow_blocklist | 5063 |
-| blocklist_de_ssh | 4952 |
+| greensnow_blocklist | 5163 |
+| blocklist_de_ssh | 4924 |
+| threatfox_export_json | 4106 |
 | binarydefense_banlist | 3899 |
 | ipsum_level5 | 2865 |
-| threatfox_export_json | 2242 |
-| nist_nvd_recent | 1898 |
+| nist_nvd_recent | 1851 |
 | spamhaus_drop | 1725 |
 | cisa_kev | 1710 |
-| tor_exit_nodes | 1346 |
+| tor_exit_nodes | 1345 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3446 |
-| cve | 2731 |
-| ipv4_cidr | 1574 |
-| domain | 796 |
-| url | 675 |
+| cve | 2697 |
+| sha256 | 2322 |
+| ipv4_cidr | 1724 |
+| domain | 1720 |
+| url | 755 |
 | sha1 | 352 |
-| ipv4 | 282 |
+| ipv4 | 286 |
 | md5 | 144 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 4537 |
-| cve | 2731 |
-| rat | 2224 |
-| asyncrat | 2202 |
-| malware | 1724 |
+| threatfox | 4181 |
+| cve | 2697 |
+| malware | 1965 |
+| drop | 1724 |
+| spamhaus | 1724 |
 | exploited-in-the-wild | 1710 |
-| drop | 1574 |
-| spamhaus | 1574 |
-| nvd | 1267 |
-| ClickFix | 529 |
+| nvd | 1233 |
+| rat | 973 |
+| asyncrat | 951 |
+| Sepolia | 924 |
 
 ## Multi-source overlaps
 
