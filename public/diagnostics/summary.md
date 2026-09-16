@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-09-16T19:28:44Z_
+_Generated 2026-09-16T22:36:41Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-16T19:28:44Z |
+| Generated | 2026-09-16T22:36:41Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6200 |
+| Duplicates removed | 6227 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-source overlaps | 869 |
+| Multi-source overlaps | 873 |
 | Score (min / avg / max) | 80 / 80.6 / 96 |
 | High-score indicators (≥80) | 10000 |
-| Corroborated (2+ sources) | 869 |
+| Corroborated (2+ sources) | 873 |
 | Earliest first_seen | 2016-05-11T01:59:46Z |
-| Newest first_seen | 2026-09-16T19:28:19Z |
+| Newest first_seen | 2026-09-16T22:35:45Z |
 
 ## Top indicators by score
 
@@ -39,27 +39,27 @@ _Generated 2026-09-16T19:28:44Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4714 |
-| greensnow_blocklist | 4509 |
+| blocklist_de_ssh | 4717 |
+| greensnow_blocklist | 4429 |
 | binarydefense_banlist | 4148 |
 | ipsum_level5 | 4117 |
-| threatfox_export_json | 3295 |
-| nist_nvd_recent | 2600 |
+| threatfox_export_json | 3148 |
+| nist_nvd_recent | 3000 |
 | spamhaus_drop | 1715 |
 | cisa_kev | 1713 |
-| malwarebazaar_recent | 1614 |
+| malwarebazaar_recent | 1675 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
 | cve | 3680 |
-| sha256 | 2593 |
-| domain | 1392 |
-| ipv4_cidr | 1083 |
-| url | 808 |
+| sha256 | 1961 |
+| ipv4_cidr | 1714 |
+| domain | 1405 |
+| url | 764 |
 | sha1 | 229 |
-| ipv4 | 194 |
+| ipv4 | 226 |
 | md5 | 21 |
 
 ## Top tags
@@ -67,13 +67,13 @@ _Generated 2026-09-16T19:28:44Z_
 | Tag | Indicators |
 | --- | ---: |
 | cve | 3680 |
-| threatfox | 3084 |
-| malware | 2746 |
-| nvd | 2214 |
+| malware | 2749 |
+| threatfox | 2453 |
+| nvd | 2215 |
+| drop | 1714 |
+| spamhaus | 1714 |
 | exploited-in-the-wild | 1713 |
-| drop | 1083 |
-| spamhaus | 1083 |
-| high | 1056 |
+| high | 1057 |
 | etherhiding | 1026 |
 | Sepolia | 1010 |
 
