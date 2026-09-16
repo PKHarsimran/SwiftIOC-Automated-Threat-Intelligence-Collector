@@ -344,3 +344,32 @@ def test_cli_does_not_republish_collected_keys_in_exports_or_delta(tmp_path, mon
         delta = json.loads((out / 'iocs/delta.json').read_text(encoding='utf-8'))
         assert delta['baseline_available'] is True
         assert delta['counts'] == {'added': 1, 'updated': 0, 'removed': 0}
+
+
+@pytest.mark.parametrize('explicit_capture', [False, True])
+def test_ci_safe_requires_opt_in_for_raw_capture(tmp_path, monkeypatch, explicit_capture):
+    from swiftioc import http_client
+    monkeypatch.chdir(tmp_path)
+    sources = tmp_path / 'sources.yml'
+    _write_sources_yml(sources)
+    out = tmp_path / 'custom-public'
+    private = tmp_path / 'private-capture'
+    def fake_get(url, *, name, **kwargs):
+        # Exercise the capture path used by real HTTP responses without a
+        # network request or a real credential in the regression fixture.
+        http_client.save_raw(name, 'unfiltered upstream body', 'text')
+        return _fake_http_get(url, name=name)
+    monkeypatch.setattr(si, 'http_get', fake_get)
+    # CLI normally resets this singleton; isolate it for other tests as well.
+    monkeypatch.setattr(http_client, '_SAVE_RAW_DIR', None)
+    args = ['swiftioc', '--sources', str(sources), '--out-dir', str(out), '--skip-rss', '--ci-safe']
+    if explicit_capture:
+        args += ['--save-raw-dir', str(private)]
+    assert _run_main(monkeypatch, args) == 0
+    assert not (tmp_path / 'public').exists()
+    assert not (out / 'diagnostics/raw').exists()
+    if explicit_capture:
+        assert (private / 'src_a.txt').read_text() == 'unfiltered upstream body'
+    else:
+        assert not private.exists()
+        assert http_client._SAVE_RAW_DIR is None

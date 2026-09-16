@@ -164,8 +164,9 @@ def main() -> int:
     on_ci = os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
     if args.ci_safe:
         args.log_format = "json"
-        if not args.save_raw_dir:
-            args.save_raw_dir = Path("public/diagnostics/raw")
+        # Raw upstream bodies can contain credentials. CI conveniences must
+        # not enable capture implicitly into a directory that gets published.
+        # Operators can opt in with an explicit private --save-raw-dir.
         # RSS still runs; fetch_rss tolerates a missing feedparser dependency.
     if on_ci and args.verbose == 0:
         # default to INFO on CI to get more signal in logs

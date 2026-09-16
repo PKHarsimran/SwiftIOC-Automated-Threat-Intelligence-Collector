@@ -54,7 +54,9 @@ Standalone writer APIs do not apply it; callers must filter their inputs.
 The collection workflow stores raw upstream responses outside `public/` and
 excludes legacy raw-capture paths from uploaded artifacts. When running locally,
 keep `--save-raw-dir` outside your published directory; raw captures are not
-sanitized. In particular, override the raw path when using `--ci-safe`.
+sanitized. `--ci-safe` does not enable raw capture; use an explicit private
+`--save-raw-dir` when you need it. Both CI and collection workflows keep raw
+responses outside the uploaded public directories.
 
 Removing a key from current exports does not revoke it or erase historical
 commits, old artifacts, forks, or clones. Confirm ownership before resolving an
