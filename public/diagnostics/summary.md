@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-09-16T16:00:48Z_
+_Generated 2026-09-16T19:28:44Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-16T16:00:48Z |
+| Generated | 2026-09-16T19:28:44Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6180 |
+| Duplicates removed | 6200 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-source overlaps | 868 |
+| Multi-source overlaps | 869 |
 | Score (min / avg / max) | 80 / 80.6 / 96 |
 | High-score indicators (≥80) | 10000 |
-| Corroborated (2+ sources) | 868 |
+| Corroborated (2+ sources) | 869 |
 | Earliest first_seen | 2016-05-11T01:59:46Z |
-| Newest first_seen | 2026-09-16T15:59:22Z |
+| Newest first_seen | 2026-09-16T19:28:19Z |
 
 ## Top indicators by score
 
@@ -39,43 +39,43 @@ _Generated 2026-09-16T16:00:48Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4625 |
-| greensnow_blocklist | 4548 |
+| blocklist_de_ssh | 4714 |
+| greensnow_blocklist | 4509 |
 | binarydefense_banlist | 4148 |
 | ipsum_level5 | 4117 |
-| nist_nvd_recent | 3820 |
-| threatfox_export_json | 3315 |
+| threatfox_export_json | 3295 |
+| nist_nvd_recent | 2600 |
 | spamhaus_drop | 1715 |
-| cisa_kev | 1711 |
-| malwarebazaar_recent | 1659 |
+| cisa_kev | 1713 |
+| malwarebazaar_recent | 1614 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3692 |
-| sha256 | 2766 |
-| domain | 1328 |
-| ipv4_cidr | 908 |
-| url | 863 |
+| cve | 3680 |
+| sha256 | 2593 |
+| domain | 1392 |
+| ipv4_cidr | 1083 |
+| url | 808 |
 | sha1 | 229 |
-| ipv4 | 193 |
+| ipv4 | 194 |
 | md5 | 21 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| cve | 3692 |
-| threatfox | 3278 |
-| malware | 2714 |
-| nvd | 2228 |
-| exploited-in-the-wild | 1711 |
-| high | 1051 |
+| cve | 3680 |
+| threatfox | 3084 |
+| malware | 2746 |
+| nvd | 2214 |
+| exploited-in-the-wild | 1713 |
+| drop | 1083 |
+| spamhaus | 1083 |
+| high | 1056 |
 | etherhiding | 1026 |
 | Sepolia | 1010 |
-| rat | 956 |
-| asyncrat | 952 |
 
 ## Multi-source overlaps
 
