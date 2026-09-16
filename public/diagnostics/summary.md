@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-09-15T22:39:52Z_
+_Generated 2026-09-16T03:03:56Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-15T22:39:52Z |
+| Generated | 2026-09-16T03:03:56Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 4988 |
+| Duplicates removed | 6961 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-source overlaps | 844 |
+| Multi-source overlaps | 855 |
 | Score (min / avg / max) | 80 / 80.6 / 96 |
 | High-score indicators (≥80) | 10000 |
-| Corroborated (2+ sources) | 844 |
+| Corroborated (2+ sources) | 855 |
 | Earliest first_seen | 2016-05-11T01:59:46Z |
-| Newest first_seen | 2026-09-15T22:39:36Z |
+| Newest first_seen | 2026-09-16T03:00:37Z |
 
 ## Top indicators by score
 
@@ -39,43 +39,43 @@ _Generated 2026-09-15T22:39:52Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4668 |
-| greensnow_blocklist | 4579 |
-| binarydefense_banlist | 3899 |
-| threatfox_export_json | 3677 |
-| ipsum_level5 | 2865 |
-| nist_nvd_recent | 2600 |
+| greensnow_blocklist | 5403 |
+| blocklist_de_ssh | 4694 |
+| binarydefense_banlist | 4148 |
+| ipsum_level5 | 4117 |
+| threatfox_export_json | 3788 |
+| nist_nvd_recent | 3541 |
 | spamhaus_drop | 1725 |
 | cisa_kev | 1710 |
-| tor_exit_nodes | 1342 |
+| tor_exit_nodes | 1343 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3030 |
-| sha256 | 2458 |
-| ipv4_cidr | 1720 |
-| domain | 1584 |
-| url | 708 |
-| ipv4 | 260 |
-| sha1 | 224 |
-| md5 | 16 |
+| cve | 3602 |
+| sha256 | 2328 |
+| ipv4_cidr | 1724 |
+| domain | 1497 |
+| url | 454 |
+| sha1 | 220 |
+| ipv4 | 163 |
+| md5 | 12 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3614 |
-| cve | 3030 |
-| malware | 2203 |
-| drop | 1720 |
-| spamhaus | 1720 |
+| cve | 3602 |
+| threatfox | 3326 |
+| nvd | 2138 |
+| malware | 1927 |
+| drop | 1724 |
+| spamhaus | 1724 |
 | exploited-in-the-wild | 1710 |
-| nvd | 1566 |
-| rat | 961 |
-| asyncrat | 952 |
-| Sepolia | 924 |
+| Sepolia | 1006 |
+| etherhiding | 1006 |
+| rat | 955 |
 
 ## Multi-source overlaps
 
