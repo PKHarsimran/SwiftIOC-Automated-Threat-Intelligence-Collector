@@ -97,7 +97,7 @@ jobs:
         timeout-minutes: 4
         run: |
           set -Eeuo pipefail
-          mkdir -p public/diagnostics/raw
+          mkdir -p public/diagnostics _private/diagnostics/raw
           python -m swiftioc -v \
             --out-dir public \
             --sources sources.ci.yml \
@@ -106,7 +106,7 @@ jobs:
             --log-file public/diagnostics/run.log \
             --log-format json \
             --log-file-level DEBUG \
-            --save-raw-dir public/diagnostics/raw \
+            --save-raw-dir _private/diagnostics/raw \
             --diag-json public/diagnostics/run.json \
             --report public/diagnostics/REPORT.md
 
@@ -120,3 +120,4 @@ jobs:
           path: |
             public/diagnostics/**
             public/iocs/**
+            !public/diagnostics/raw/**

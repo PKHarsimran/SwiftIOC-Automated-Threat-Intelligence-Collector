@@ -474,7 +474,7 @@ Run `python -m swiftioc --help` for the installed version's options.
 | `--diag-json PATH` | Write diagnostics JSON (defaults to `<out-dir>/diagnostics/run.json`). |
 | `--report PATH` | Write Markdown run report (defaults to `<out-dir>/diagnostics/REPORT.md`). |
 | `--ua-file PATH` | Provide a custom user-agent pool (one UA per line). |
-| `--ci-safe` | Convenience flag for CI runs (JSON logs, ensures diagnostics dirs, tolerates missing RSS dependency; defaults raw-response capture to `public/diagnostics/raw` unless `--save-raw-dir` is supplied). |
+| `--ci-safe` | Convenience flag for CI runs (JSON logs, ensures diagnostics dirs, tolerates missing RSS dependency; raw capture stays disabled unless an explicit `--save-raw-dir` is supplied). |
 | `--self-test` | Execute built-in assertions without fetching feeds. |
 | `-v/--verbose` | Increase console logging (`-vv` for debug). |
 | `--log-file PATH` | Send logs to a file. |
