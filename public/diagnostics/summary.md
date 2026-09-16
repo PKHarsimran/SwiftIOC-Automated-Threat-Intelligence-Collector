@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-09-16T09:00:37Z_
+_Generated 2026-09-16T16:00:48Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-16T09:00:37Z |
+| Generated | 2026-09-16T16:00:48Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6662 |
-| Sources reporting | 16 |
+| Duplicates removed | 6180 |
+| Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-source overlaps | 854 |
+| Multi-source overlaps | 868 |
 | Score (min / avg / max) | 80 / 80.6 / 96 |
 | High-score indicators (≥80) | 10000 |
-| Corroborated (2+ sources) | 854 |
+| Corroborated (2+ sources) | 868 |
 | Earliest first_seen | 2016-05-11T01:59:46Z |
-| Newest first_seen | 2026-09-16T08:45:42Z |
+| Newest first_seen | 2026-09-16T15:59:22Z |
 
 ## Top indicators by score
 
@@ -39,43 +39,43 @@ _Generated 2026-09-16T09:00:37Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| greensnow_blocklist | 5400 |
-| blocklist_de_ssh | 4717 |
+| blocklist_de_ssh | 4625 |
+| greensnow_blocklist | 4548 |
 | binarydefense_banlist | 4148 |
 | ipsum_level5 | 4117 |
-| threatfox_export_json | 3667 |
-| spamhaus_drop | 1725 |
-| cisa_kev | 1710 |
-| malwarebazaar_recent | 1356 |
-| tor_exit_nodes | 1345 |
+| nist_nvd_recent | 3820 |
+| threatfox_export_json | 3315 |
+| spamhaus_drop | 1715 |
+| cisa_kev | 1711 |
+| malwarebazaar_recent | 1659 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3527 |
-| sha256 | 2444 |
-| ipv4_cidr | 1613 |
-| domain | 1483 |
-| url | 524 |
-| sha1 | 220 |
-| ipv4 | 177 |
-| md5 | 12 |
+| cve | 3692 |
+| sha256 | 2766 |
+| domain | 1328 |
+| ipv4_cidr | 908 |
+| url | 863 |
+| sha1 | 229 |
+| ipv4 | 193 |
+| md5 | 21 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| cve | 3527 |
-| threatfox | 3364 |
-| malware | 2075 |
-| nvd | 2063 |
-| exploited-in-the-wild | 1710 |
-| drop | 1613 |
-| spamhaus | 1613 |
+| cve | 3692 |
+| threatfox | 3278 |
+| malware | 2714 |
+| nvd | 2228 |
+| exploited-in-the-wild | 1711 |
+| high | 1051 |
+| etherhiding | 1026 |
 | Sepolia | 1010 |
-| etherhiding | 1006 |
 | rat | 956 |
+| asyncrat | 952 |
 
 ## Multi-source overlaps
 
