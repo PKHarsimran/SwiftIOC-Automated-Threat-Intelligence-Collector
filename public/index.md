@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-09-17T03:05:04Z_
+_Generated 2026-09-17T09:07:44Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-17T03:05:04Z |
+| Generated | 2026-09-17T09:07:44Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 7574 |
+| Duplicates removed | 7156 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-source overlaps | 873 |
+| Multi-source overlaps | 871 |
 | Score (min / avg / max) | 80 / 80.6 / 96 |
 | High-score indicators (≥80) | 10000 |
-| Corroborated (2+ sources) | 873 |
+| Corroborated (2+ sources) | 871 |
 | Earliest first_seen | 2016-05-11T01:59:46Z |
-| Newest first_seen | 2026-09-17T03:00:15Z |
+| Newest first_seen | 2026-09-17T09:03:17Z |
 
 ## Top indicators by score
 
@@ -41,43 +41,43 @@ _Generated 2026-09-17T03:05:04Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| greensnow_blocklist | 5235 |
+| greensnow_blocklist | 5214 |
 | ipsum_level5 | 4835 |
-| blocklist_de_ssh | 4745 |
+| blocklist_de_ssh | 4759 |
 | binarydefense_banlist | 4355 |
-| nist_nvd_recent | 3400 |
-| threatfox_export_json | 3098 |
+| nist_nvd_recent | 2400 |
+| threatfox_export_json | 2323 |
 | spamhaus_drop | 1715 |
 | cisa_kev | 1713 |
-| malwarebazaar_recent | 1700 |
+| malwarebazaar_recent | 1530 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3680 |
-| sha256 | 1970 |
+| cve | 4378 |
+| sha256 | 2096 |
 | ipv4_cidr | 1714 |
-| domain | 1418 |
-| url | 748 |
+| url | 773 |
+| domain | 534 |
+| ipv4 | 255 |
 | sha1 | 229 |
-| ipv4 | 220 |
 | md5 | 21 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| cve | 3680 |
-| malware | 2749 |
-| threatfox | 2453 |
-| nvd | 2215 |
+| cve | 4378 |
+| nvd | 2913 |
+| malware | 2852 |
 | drop | 1714 |
 | spamhaus | 1714 |
 | exploited-in-the-wild | 1713 |
-| high | 1057 |
-| etherhiding | 1026 |
-| Sepolia | 1010 |
+| threatfox | 1650 |
+| high | 1242 |
+| medium | 688 |
+| malware_download | 578 |
 
 ## Multi-source overlaps
 
