@@ -1,15 +1,15 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-09-16T22:36:41Z_
+_Generated 2026-09-17T03:05:04Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-16T22:36:41Z |
+| Generated | 2026-09-17T03:05:04Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6227 |
+| Duplicates removed | 7574 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-source overlaps | 873 |
@@ -17,7 +17,7 @@ _Generated 2026-09-16T22:36:41Z_
 | High-score indicators (≥80) | 10000 |
 | Corroborated (2+ sources) | 873 |
 | Earliest first_seen | 2016-05-11T01:59:46Z |
-| Newest first_seen | 2026-09-16T22:35:45Z |
+| Newest first_seen | 2026-09-17T03:00:15Z |
 
 ## Top indicators by score
 
@@ -39,27 +39,27 @@ _Generated 2026-09-16T22:36:41Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4717 |
-| greensnow_blocklist | 4429 |
-| binarydefense_banlist | 4148 |
-| ipsum_level5 | 4117 |
-| threatfox_export_json | 3148 |
-| nist_nvd_recent | 3000 |
+| greensnow_blocklist | 5235 |
+| ipsum_level5 | 4835 |
+| blocklist_de_ssh | 4745 |
+| binarydefense_banlist | 4355 |
+| nist_nvd_recent | 3400 |
+| threatfox_export_json | 3098 |
 | spamhaus_drop | 1715 |
 | cisa_kev | 1713 |
-| malwarebazaar_recent | 1675 |
+| malwarebazaar_recent | 1700 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
 | cve | 3680 |
-| sha256 | 1961 |
+| sha256 | 1970 |
 | ipv4_cidr | 1714 |
-| domain | 1405 |
-| url | 764 |
+| domain | 1418 |
+| url | 748 |
 | sha1 | 229 |
-| ipv4 | 226 |
+| ipv4 | 220 |
 | md5 | 21 |
 
 ## Top tags
