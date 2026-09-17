@@ -2,16 +2,16 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-09-17T16:07:45Z_
+_Generated 2026-09-17T22:36:45Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-17T16:07:45Z |
+| Generated | 2026-09-17T22:36:45Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6732 |
+| Duplicates removed | 6782 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-source overlaps | 894 |
@@ -19,7 +19,7 @@ _Generated 2026-09-17T16:07:45Z_
 | High-score indicators (≥80) | 10000 |
 | Corroborated (2+ sources) | 894 |
 | Earliest first_seen | 2016-05-11T01:59:46Z |
-| Newest first_seen | 2026-09-17T16:00:20Z |
+| Newest first_seen | 2026-09-17T22:36:20Z |
 
 ## Top indicators by score
 
@@ -42,25 +42,25 @@ _Generated 2026-09-17T16:07:45Z_
 | --- | ---: |
 | ci_army_list | 15000 |
 | ipsum_level5 | 4835 |
-| blocklist_de_ssh | 4633 |
+| blocklist_de_ssh | 4714 |
 | binarydefense_banlist | 4355 |
-| greensnow_blocklist | 4270 |
-| nist_nvd_recent | 3781 |
-| threatfox_export_json | 2771 |
-| spamhaus_drop | 1715 |
+| greensnow_blocklist | 4300 |
+| nist_nvd_recent | 3000 |
+| threatfox_export_json | 2770 |
+| spamhaus_drop | 1714 |
 | cisa_kev | 1713 |
-| malwarebazaar_recent | 1490 |
+| malwarebazaar_recent | 1546 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 4107 |
-| sha256 | 2048 |
-| ipv4_cidr | 1566 |
-| domain | 890 |
-| url | 825 |
-| ipv4 | 268 |
+| cve | 3906 |
+| sha256 | 2112 |
+| ipv4_cidr | 1713 |
+| url | 856 |
+| domain | 843 |
+| ipv4 | 274 |
 | sha1 | 252 |
 | md5 | 44 |
 
@@ -68,16 +68,16 @@ _Generated 2026-09-17T16:07:45Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| cve | 4107 |
-| malware | 2856 |
-| nvd | 2643 |
+| cve | 3906 |
+| malware | 2910 |
+| nvd | 2442 |
 | threatfox | 2088 |
 | exploited-in-the-wild | 1713 |
-| drop | 1566 |
-| spamhaus | 1566 |
-| high | 1249 |
-| malware_download | 620 |
-| medium | 559 |
+| drop | 1713 |
+| spamhaus | 1713 |
+| high | 1195 |
+| malware_download | 624 |
+| medium | 527 |
 
 ## Multi-source overlaps
 
