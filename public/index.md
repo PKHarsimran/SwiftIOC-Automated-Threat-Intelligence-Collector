@@ -2,16 +2,16 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-09-19T18:21:43Z_
+_Generated 2026-09-19T22:03:54Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-19T18:21:43Z |
+| Generated | 2026-09-19T22:03:54Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 9502 |
+| Duplicates removed | 9548 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-source overlaps | 956 |
@@ -19,7 +19,7 @@ _Generated 2026-09-19T18:21:43Z_
 | High-score indicators (≥80) | 10000 |
 | Corroborated (2+ sources) | 956 |
 | Earliest first_seen | 2016-05-11T01:59:46Z |
-| Newest first_seen | 2026-09-19T18:09:26Z |
+| Newest first_seen | 2026-09-19T21:44:12Z |
 
 ## Top indicators by score
 
@@ -41,26 +41,26 @@ _Generated 2026-09-19T18:21:43Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 12162 |
+| blocklist_de_ssh | 12081 |
 | ipsum_level5 | 6371 |
-| greensnow_blocklist | 5114 |
+| greensnow_blocklist | 5082 |
 | binarydefense_banlist | 4792 |
-| nist_nvd_recent | 2465 |
+| nist_nvd_recent | 2093 |
 | cisa_kev | 1716 |
 | spamhaus_drop | 1713 |
-| malwarebazaar_recent | 1566 |
-| tor_exit_nodes | 1356 |
+| malwarebazaar_recent | 1619 |
+| tor_exit_nodes | 1357 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3800 |
-| sha256 | 2886 |
+| cve | 3784 |
+| sha256 | 2977 |
 | ipv4_cidr | 1712 |
-| url | 553 |
-| domain | 447 |
-| ipv4 | 292 |
+| url | 588 |
+| domain | 354 |
+| ipv4 | 275 |
 | sha1 | 259 |
 | md5 | 51 |
 
@@ -68,16 +68,16 @@ _Generated 2026-09-19T18:21:43Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| cve | 3800 |
-| malware | 3441 |
-| nvd | 2337 |
-| threatfox | 1723 |
+| cve | 3784 |
+| malware | 3575 |
+| nvd | 2321 |
 | exploited-in-the-wild | 1716 |
 | drop | 1712 |
 | spamhaus | 1712 |
-| high | 791 |
-| Mirai | 600 |
-| medium | 564 |
+| threatfox | 1605 |
+| high | 789 |
+| Mirai | 582 |
+| medium | 556 |
 
 ## Multi-source overlaps
 

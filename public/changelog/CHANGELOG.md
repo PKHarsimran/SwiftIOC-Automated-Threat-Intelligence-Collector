@@ -1,28 +1,5 @@
 # Changelog
 
-## 2026-09-10T02:51:28Z
-
-Total indicators: **10000**
-
-### By source
-- binarydefense_banlist: 2650
-- blocklist_de_ssh: 4940
-- ci_army_list: 15000
-- cisa_kev: 1703
-- dshield_block: 20
-- et_compromised: 570
-- feodo_ipblocklist: 5
-- greensnow_blocklist: 5250
-- ipsum_level5: 3889
-- malwarebazaar_recent: 771
-- nist_nvd_recent: 5392
-- openphish_feed: 300
-- spamhaus_drop: 1709
-- sslbl_ja3: 97
-- threatfox_export_json: 2760
-- tor_exit_nodes: 1337
-- urlhaus_recent_urls: 318
-
 ## 2026-09-10T08:35:43Z
 
 Total indicators: **10000**
@@ -1149,3 +1126,26 @@ Total indicators: **10000**
 - threatfox_export_json: 1213
 - tor_exit_nodes: 1356
 - urlhaus_recent_urls: 380
+
+## 2026-09-19T22:03:55Z
+
+Total indicators: **10000**
+
+### By source
+- binarydefense_banlist: 4792
+- blocklist_de_ssh: 12081
+- ci_army_list: 15000
+- cisa_kev: 1716
+- dshield_block: 20
+- et_compromised: 675
+- feodo_ipblocklist: 5
+- greensnow_blocklist: 5082
+- ipsum_level5: 6371
+- malwarebazaar_recent: 1619
+- nist_nvd_recent: 2093
+- openphish_feed: 300
+- spamhaus_drop: 1713
+- sslbl_ja3: 97
+- threatfox_export_json: 1087
+- tor_exit_nodes: 1357
+- urlhaus_recent_urls: 423
