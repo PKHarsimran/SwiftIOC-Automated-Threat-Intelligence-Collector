@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-09-19T08:28:17Z_
+_Generated 2026-09-19T13:51:47Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-19T08:28:17Z |
+| Generated | 2026-09-19T13:51:47Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 9887 |
+| Duplicates removed | 9416 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-source overlaps | 951 |
+| Multi-source overlaps | 948 |
 | Score (min / avg / max) | 80 / 80.6 / 96 |
 | High-score indicators (≥80) | 10000 |
-| Corroborated (2+ sources) | 951 |
+| Corroborated (2+ sources) | 948 |
 | Earliest first_seen | 2016-05-11T01:59:46Z |
-| Newest first_seen | 2026-09-19T08:27:53Z |
+| Newest first_seen | 2026-09-19T13:51:29Z |
 
 ## Top indicators by score
 
@@ -39,26 +39,26 @@ _Generated 2026-09-19T08:28:17Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 12092 |
+| blocklist_de_ssh | 12117 |
 | ipsum_level5 | 6371 |
-| greensnow_blocklist | 5723 |
+| greensnow_blocklist | 5057 |
 | binarydefense_banlist | 4792 |
-| nist_nvd_recent | 3400 |
+| nist_nvd_recent | 3000 |
 | cisa_kev | 1716 |
 | spamhaus_drop | 1713 |
-| threatfox_export_json | 1641 |
-| malwarebazaar_recent | 1531 |
+| malwarebazaar_recent | 1627 |
+| tor_exit_nodes | 1358 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3723 |
-| sha256 | 2536 |
-| ipv4_cidr | 1709 |
-| domain | 813 |
-| url | 611 |
-| ipv4 | 310 |
+| cve | 3817 |
+| sha256 | 2789 |
+| ipv4_cidr | 1712 |
+| url | 625 |
+| domain | 456 |
+| ipv4 | 303 |
 | sha1 | 253 |
 | md5 | 45 |
 
@@ -66,16 +66,16 @@ _Generated 2026-09-19T08:28:17Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| cve | 3723 |
-| malware | 3127 |
-| nvd | 2260 |
-| threatfox | 2112 |
+| cve | 3817 |
+| malware | 3411 |
+| nvd | 2354 |
+| threatfox | 1728 |
 | exploited-in-the-wild | 1716 |
-| drop | 1709 |
-| spamhaus | 1709 |
-| high | 791 |
-| Mirai | 499 |
-| medium | 457 |
+| drop | 1712 |
+| spamhaus | 1712 |
+| high | 824 |
+| Mirai | 593 |
+| medium | 489 |
 
 ## Multi-source overlaps
 
