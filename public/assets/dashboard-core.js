@@ -14,6 +14,64 @@
       .replace(/hxxp:\/\//gi, 'http://')
       .replace(/\[\.\]/g, '.');
 
+  const splQuote = (value) =>
+    `"${stringValue(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
+
+  const splIndexClause = (value) => {
+    const indexes = stringValue(value || '*')
+      .replace(/^index\s*=\s*/i, '')
+      .split(/[\s,]+/)
+      .filter(Boolean);
+    const safe = indexes.filter((index) => /^[a-z0-9_.\-*]+$/i.test(index));
+    if (!safe.length || safe.length !== indexes.length) return 'index=*';
+    const clauses = [...new Set(safe)].map((index) => `index=${index}`);
+    return clauses.length === 1 ? clauses[0] : `(${clauses.join(' OR ')})`;
+  };
+
+  const buildSplQuery = (row, index = '*', earliest = '-30d') => {
+    const original = stringValue(row?.indicator);
+    if (!original) return '';
+    const indicator = refang(original);
+    const type = lower(row?.type).replace(/[\s_-]/g, '');
+    const fieldsByType = {
+      ipv4: ['src_ip', 'dest_ip', 'clientip', 'ip'],
+      ipv6: ['src_ip', 'dest_ip', 'clientip', 'ip'],
+      ip: ['src_ip', 'dest_ip', 'clientip', 'ip'],
+      domain: ['query', 'domain', 'dest_host', 'host'],
+      hostname: ['query', 'domain', 'dest_host', 'host'],
+      url: ['url', 'uri', 'request', 'http_referrer'],
+      md5: ['file_hash', 'hash', 'md5'],
+      sha1: ['file_hash', 'hash', 'sha1'],
+      sha256: ['file_hash', 'hash', 'sha256'],
+      hash: ['file_hash', 'hash'],
+      email: ['sender', 'recipient', 'email'],
+      cve: ['cve', 'vulnerability', 'signature'],
+    };
+    const safeEarliest = /^-[1-9]\d*[smhdw]$/i.test(stringValue(earliest))
+      ? stringValue(earliest)
+      : '-30d';
+    const scope = `${splIndexClause(index)} earliest=${safeEarliest}`;
+    let search;
+    if (type === 'ipv4cidr' || type === 'ipv6cidr') {
+      search = `${scope}\n| where cidrmatch(${splQuote(indicator)}, src_ip) ` +
+        `OR cidrmatch(${splQuote(indicator)}, dest_ip) ` +
+        `OR cidrmatch(${splQuote(indicator)}, clientip) ` +
+        `OR cidrmatch(${splQuote(indicator)}, ip)`;
+    } else {
+      const fields = fieldsByType[type] || ['indicator', 'value'];
+      const values = [...new Set([indicator, original].filter(Boolean))];
+      const terms = [];
+      values.forEach((value) => {
+        terms.push(splQuote(value));
+        fields.forEach((field) => terms.push(`${field}=${splQuote(value)}`));
+      });
+      search = `${scope} (${terms.join(' OR ')})`;
+    }
+    return `${search}\n` +
+      '| stats count min(_time) as first_seen max(_time) as last_seen values(index) as indexes values(sourcetype) as sourcetypes\n' +
+      '| convert ctime(first_seen) ctime(last_seen)';
+  };
+
   const confidenceRank = (value) => {
     if (typeof value === 'number') {
       if (value >= 80) return 3;
@@ -231,6 +289,7 @@
   };
 
   return {
+    buildSplQuery,
     compareRows,
     effectiveScore,
     matchesRow,

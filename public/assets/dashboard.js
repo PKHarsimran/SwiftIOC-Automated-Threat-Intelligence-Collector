@@ -103,6 +103,32 @@
       .replace(/hxxp:\/\//gi, 'http://')
       .replace(/\[\.\]/g, '.'));
 
+  const copySplQuery = async (row) => {
+    if (!dashboardCore?.buildSplQuery) {
+      showToast('SPL query builder is unavailable.', 'error');
+      return;
+    }
+    let previous = '*';
+    try {
+      previous = window.localStorage?.getItem('swiftioc-spl-index') || '*';
+    } catch (error) {
+      // Reading storage can also fail in privacy mode.
+    }
+    const chosen = window.prompt(
+      'Splunk index (use * for every index, a wildcard such as security_*, or a comma-separated list):',
+      previous
+    );
+    if (chosen === null) return;
+    const index = normaliseString(chosen) || '*';
+    try {
+      window.localStorage?.setItem('swiftioc-spl-index', index);
+    } catch (error) {
+      // Storage can be unavailable in privacy mode; copying still works.
+    }
+    const query = dashboardCore.buildSplQuery(row, index);
+    await copyOrPrompt(query, 'Smart SPL query copied.', 'Copy this SPL query:');
+  };
+
   const coalesceString = (...values) => {
     for (const v of values) {
       const s = normaliseString(v);
@@ -2124,6 +2150,16 @@
         await copyOrPrompt(row.indicator, 'Indicator copied to clipboard.', 'Copy this indicator:');
         copy.disabled = false;
       });
+      const spl = document.createElement('button');
+      spl.type = 'button';
+      spl.className = 'button ghost row-action';
+      spl.textContent = 'SPL';
+      spl.setAttribute('aria-label', 'Copy Splunk query for ' + (row.indicator || ''));
+      spl.addEventListener('click', async () => {
+        spl.disabled = true;
+        await copySplQuery(row);
+        spl.disabled = false;
+      });
       const toggle = document.createElement('button');
       toggle.type = 'button';
       toggle.className = 'button ghost row-action';
@@ -2139,7 +2175,7 @@
         downloadJson(row);
         showToast('Indicator JSON downloaded.');
       });
-      actions.append(copy, toggle, download);
+      actions.append(copy, spl, toggle, download);
       actionsCell.appendChild(actions);
       tr.appendChild(actionsCell);
 
@@ -2868,6 +2904,9 @@
           makeAction('Copy indicator', async () => {
             await copyOrPrompt(row.indicator, 'Indicator copied to clipboard.', 'Copy this indicator:');
           })
+        );
+        actions.appendChild(
+          makeAction('Copy smart SPL', () => copySplQuery(row))
         );
         actions.appendChild(
           makeAction('Download JSON', () => downloadJson(row))

@@ -41,6 +41,43 @@ test('refangs raw and defanged indicators consistently', () => {
   );
 });
 
+test('builds type-aware SPL that supports wildcard and explicit indexes', () => {
+  const wildcard = core.buildSplQuery(row, '*');
+  assert.match(wildcard, /^index=\* earliest=-30d/);
+  assert.match(wildcard, /query="example\.evil"/);
+  assert.match(wildcard, /dest_host="example\.evil"/);
+  assert.match(wildcard, /stats count/);
+
+  const selected = core.buildSplQuery(
+    { indicator: '203.0.113.8', type: 'ipv4' },
+    'index=firewall,proxy_*',
+    '-7d'
+  );
+  assert.match(selected, /^\(index=firewall OR index=proxy_\*\) earliest=-7d/);
+  assert.match(selected, /src_ip="203\.0\.113\.8"/);
+  assert.match(selected, /dest_ip="203\.0\.113\.8"/);
+});
+
+test('SPL builder rejects injected indexes and escapes indicator strings', () => {
+  const query = core.buildSplQuery(
+    { indicator: 'bad"value', type: 'unknown' },
+    '* | delete',
+    'all time'
+  );
+  assert.match(query, /^index=\* earliest=-30d/);
+  assert.match(query, /bad\\"value/);
+  assert.doesNotMatch(query, /\| delete/);
+});
+
+test('SPL builder uses cidrmatch for network ranges', () => {
+  const query = core.buildSplQuery(
+    { indicator: '203.0.113.0/24', type: 'ipv4_cidr' },
+    '*'
+  );
+  assert.match(query, /where cidrmatch\("203\.0\.113\.0\/24", src_ip\)/);
+  assert.match(query, /cidrmatch\("203\.0\.113\.0\/24", dest_ip\)/);
+});
+
 test('combines source, tag, signal, score, and age facets', () => {
   const state = {
     ...defaults,

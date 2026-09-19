@@ -118,6 +118,10 @@ high-fidelity IOCs from authoritative sources. The project emphasises:
   re-observed it (`sightings`), so a one-off scanner hit is distinguishable
   from an IP flagged across dozens of runs. Surfaced in the exports and the
   dashboard lookup dossier.
+- **Smart Splunk hunting queries** – copy type-aware SPL directly from an IOC
+  result. Queries support `index=*`, wildcard index names, or comma-separated
+  indexes, refang observables, search common CIM-style fields, and summarize
+  first/last sightings across indexes and sourcetypes.
 - **Concurrent collection** – sources are fetched in parallel (configurable via
   `--max-workers`), so a full run completes in a fraction of the time of a
   sequential fetch without changing the deterministic output.
