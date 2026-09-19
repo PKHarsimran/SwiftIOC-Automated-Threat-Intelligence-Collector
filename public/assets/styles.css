@@ -2450,8 +2450,62 @@ input.lookup-input {
 
 .preview-row-actions {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
   gap: 0.35rem;
+}
+
+.row-actions-menu {
+  position: relative;
+}
+
+.row-actions-menu > summary {
+  display: inline-grid;
+  min-width: 2.5rem;
+  place-items: center;
+  list-style: none;
+  cursor: pointer;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+}
+
+.row-actions-menu > summary::-webkit-details-marker {
+  display: none;
+}
+
+.row-actions-menu[open] > summary,
+.queue-action[aria-pressed='true'] {
+  border-color: #72dba5;
+  background: rgba(27, 94, 65, 0.32);
+  color: #d8ffea;
+}
+
+.row-actions-menu-items {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 0.35rem);
+  right: 0;
+  display: grid;
+  min-width: 11rem;
+  padding: 0.35rem;
+  border: 1px solid #4b5f50;
+  border-radius: 0.6rem;
+  background: #171d18;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.48);
+}
+
+.row-actions-menu-items .button {
+  width: 100%;
+  justify-content: flex-start;
+  border-color: transparent;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.row-actions-menu-items .button:hover,
+.row-actions-menu-items .button:focus-visible {
+  border-color: #4b5f50;
+  background: #293229;
 }
 
 .row-action {
@@ -2712,7 +2766,14 @@ input.lookup-input {
   }
 
   .preview-row-actions .button {
-    flex: 1;
+    flex: 0 0 auto;
+  }
+
+  .preview-row-actions .queue-action { flex: 1; }
+
+  .row-actions-menu-items {
+    right: 0;
+    min-width: min(13rem, calc(100vw - 3rem));
   }
 
   .preview-detail-row {

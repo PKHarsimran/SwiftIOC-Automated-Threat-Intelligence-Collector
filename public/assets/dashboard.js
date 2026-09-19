@@ -79,6 +79,19 @@
   const qsa = (selector, root = document) =>
     Array.from(root.querySelectorAll(selector));
 
+  document.addEventListener('click', (event) => {
+    if (event.target.closest?.('[data-row-actions-menu]')) return;
+    qsa('[data-row-actions-menu][open]').forEach((menu) => { menu.open = false; });
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    const openMenus = qsa('[data-row-actions-menu][open]');
+    if (!openMenus.length) return;
+    openMenus.forEach((menu) => { menu.open = false; });
+    openMenus[0].querySelector('summary')?.focus();
+  });
+
   const setText = (el, value) => {
     if (!el) return;
     el.textContent = value ?? '';
@@ -428,7 +441,7 @@
       if (!row) return;
       const selected = investigationWorkspace.has(row);
       button.setAttribute('aria-pressed', String(selected));
-      button.textContent = selected ? 'Queued' : 'Add to queue';
+      button.textContent = selected ? 'Queued ✓' : 'Add to queue';
       button.title = selected
         ? 'Remove this indicator from the investigation queue'
         : 'Keep this indicator in the browser-local investigation queue';
@@ -452,7 +465,7 @@
     });
     const selected = investigationWorkspace.has(row);
     button.setAttribute('aria-pressed', String(selected));
-    button.textContent = selected ? 'Queued' : 'Add to queue';
+    button.textContent = selected ? 'Queued ✓' : 'Add to queue';
     button.title = selected
       ? 'Remove this indicator from the investigation queue'
       : 'Keep this indicator in the browser-local investigation queue';
@@ -2620,6 +2633,17 @@
       actionsCell.dataset.title = 'Actions';
       const actions = document.createElement('div');
       actions.className = 'preview-row-actions';
+      const menu = document.createElement('details');
+      menu.className = 'row-actions-menu';
+      menu.dataset.rowActionsMenu = '';
+      const menuToggle = document.createElement('summary');
+      menuToggle.className = 'button ghost row-action row-actions-toggle';
+      menuToggle.setAttribute('aria-label', 'More actions for ' + (row.indicator || 'indicator'));
+      menuToggle.title = 'More actions';
+      menuToggle.textContent = '•••';
+      const menuItems = document.createElement('div');
+      menuItems.className = 'row-actions-menu-items';
+      const closeMenu = () => { menu.open = false; };
       const copy = document.createElement('button');
       copy.type = 'button';
       copy.className = 'button ghost row-action';
@@ -2629,6 +2653,7 @@
         copy.disabled = true;
         await copyOrPrompt(row.indicator, 'Indicator copied to clipboard.', 'Copy this indicator:');
         copy.disabled = false;
+        closeMenu();
       });
       const spl = document.createElement('button');
       spl.type = 'button';
@@ -2639,6 +2664,7 @@
         spl.disabled = true;
         await copySplQuery(row);
         spl.disabled = false;
+        closeMenu();
       });
       const toggle = document.createElement('button');
       toggle.type = 'button';
@@ -2654,9 +2680,18 @@
       download.addEventListener('click', () => {
         downloadJson(row);
         showToast('Indicator JSON downloaded.');
+        closeMenu();
       });
       const queue = makeInvestigationButton(row);
-      actions.append(queue, copy, spl, toggle, download);
+      menuItems.append(copy, spl, toggle, download);
+      menu.append(menuToggle, menuItems);
+      menu.addEventListener('toggle', () => {
+        if (!menu.open) return;
+        qsa('[data-row-actions-menu][open]').forEach((candidate) => {
+          if (candidate !== menu) candidate.open = false;
+        });
+      });
+      actions.append(queue, menu);
       syncInvestigationButtons();
       actionsCell.appendChild(actions);
       tr.appendChild(actionsCell);
@@ -2708,6 +2743,7 @@
         toggle.setAttribute('aria-expanded', String(open));
         if (open) state.expanded.add(key);
         else state.expanded.delete(key);
+        closeMenu();
       });
       return [tr, detailRow];
     };
