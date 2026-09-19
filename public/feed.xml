@@ -3,305 +3,305 @@
   <title>SwiftIOC — Newest High-Confidence IOCs</title>
   <link>https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector</link>
   <description>Freshest scored, cross-source-corroborated indicators of compromise.</description>
-  <lastBuildDate>Tue, 21 Jul 2026 21:02:20 +0000</lastBuildDate>
+  <lastBuildDate>Sat, 19 Sep 2026 08:28:18 +0000</lastBuildDate>
     <item>
-      <title>[68] ipv4: 103[.]74[.]104[.]188</title>
-      <description>Score 68, confidence medium, sources: ci_army_list, greensnow_blocklist, tags: blocklist,cins,greensnow,scanner</description>
-      <guid isPermaLink="false">c5b8eb8f-b84a-51e2-b600-626acb4dc4cd</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:56 +0000</pubDate>
+      <title>[80] ipv4_cidr: 109.160.32.0/24</title>
+      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
+      <guid isPermaLink="false">57e8a15a-86b2-51d2-a018-c797cd27399b</guid>
+      <pubDate>Sat, 19 Sep 2026 08:27:53 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 114[.]30[.]180[.]58</title>
-      <description>Score 68, confidence medium, sources: greensnow_blocklist, ipsum_level5, tags: aggregated,blocklist,greensnow,ipsum,multi-list</description>
-      <guid isPermaLink="false">d5606963-6352-56cc-a6da-6048539efea2</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:56 +0000</pubDate>
+      <title>[80] ipv4_cidr: 185.245.62.0/23</title>
+      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
+      <guid isPermaLink="false">541e18ab-f6e6-5e1d-ae0e-5924937bd9aa</guid>
+      <pubDate>Sat, 19 Sep 2026 08:27:53 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 185[.]100[.]85[.]24</title>
-      <description>Score 68, confidence medium, sources: greensnow_blocklist, tor_exit_nodes, tags: blocklist,exit-node,greensnow,tor</description>
-      <guid isPermaLink="false">9700425d-e891-5bd1-bea3-bd0ba0a8e3ca</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:56 +0000</pubDate>
+      <title>[80] url: hxxp://115[.]56[.]108[.]116:51720/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,elf,mips,Mozi</description>
+      <guid isPermaLink="false">35d2a7c4-542c-5e26-881d-6a85f5bd3c9e</guid>
+      <pubDate>Sat, 19 Sep 2026 08:07:20 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 185[.]148[.]13[.]15</title>
-      <description>Score 68, confidence medium, sources: ci_army_list, greensnow_blocklist, tags: blocklist,cins,greensnow,scanner</description>
-      <guid isPermaLink="false">ea1dd3a4-551f-5534-8aac-030777df1f68</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:56 +0000</pubDate>
+      <title>[80] url: hxxp://36[.]70[.]231[.]123:60320/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,arm,elf,mirai,Mozi</description>
+      <guid isPermaLink="false">e9fa7676-c0c1-5d25-97b4-a333cfe77228</guid>
+      <pubDate>Sat, 19 Sep 2026 08:07:19 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 185[.]220[.]101[.]13</title>
-      <description>Score 68, confidence medium, sources: greensnow_blocklist, tor_exit_nodes, tags: blocklist,exit-node,greensnow,tor</description>
-      <guid isPermaLink="false">9ff23da6-1585-522f-af15-37dfd36127d4</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:56 +0000</pubDate>
+      <title>[80] domain: bsdsvltx[.]libertytokan[.]com</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClearFake,mac-0x68dc,macos,threatfox</description>
+      <guid isPermaLink="false">de8c631a-8018-51a0-a55c-cc4b252b0843</guid>
+      <pubDate>Sat, 19 Sep 2026 08:05:54 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 185[.]220[.]101[.]151</title>
-      <description>Score 68, confidence medium, sources: greensnow_blocklist, tor_exit_nodes, tags: blocklist,exit-node,greensnow,tor</description>
-      <guid isPermaLink="false">a32529bf-12f6-5a15-a9a9-5a7eedbe0a17</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:56 +0000</pubDate>
+      <title>[80] ipv4: 154[.]91[.]60[.]113</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: threatfox,vshell</description>
+      <guid isPermaLink="false">be290faf-aab0-55ca-bee4-61298d4211e8</guid>
+      <pubDate>Sat, 19 Sep 2026 08:05:08 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 185[.]242[.]226[.]72</title>
-      <description>Score 68, confidence medium, sources: ci_army_list, greensnow_blocklist, tags: blocklist,cins,greensnow,scanner</description>
-      <guid isPermaLink="false">6e101e9e-4775-5d6d-aa95-d21cc1955422</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:56 +0000</pubDate>
+      <title>[80] ipv4: 154[.]91[.]60[.]114</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: threatfox,vshell</description>
+      <guid isPermaLink="false">fab9fb62-2968-5947-9228-05d4e479bca0</guid>
+      <pubDate>Sat, 19 Sep 2026 08:05:08 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 195[.]254[.]165[.]244</title>
-      <description>Score 68, confidence medium, sources: ci_army_list, greensnow_blocklist, tags: blocklist,cins,greensnow,scanner</description>
-      <guid isPermaLink="false">eae70a64-042d-5710-9eef-a0f0579a1891</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:56 +0000</pubDate>
+      <title>[80] ipv4: 154[.]91[.]60[.]112</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: threatfox,vshell</description>
+      <guid isPermaLink="false">ab849f51-5a87-5424-9d19-bf50bc88755a</guid>
+      <pubDate>Sat, 19 Sep 2026 08:05:07 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 199[.]45[.]154[.]135</title>
-      <description>Score 68, confidence medium, sources: ci_army_list, greensnow_blocklist, tags: blocklist,cins,greensnow,scanner</description>
-      <guid isPermaLink="false">d6331c86-4b1c-5a72-b3dc-61048c95c9eb</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:56 +0000</pubDate>
+      <title>[80] ipv4: 154[.]91[.]60[.]110</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: threatfox,vshell</description>
+      <guid isPermaLink="false">ba6eb596-da40-5ae6-be6b-7750e7d09cea</guid>
+      <pubDate>Sat, 19 Sep 2026 08:05:06 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 203[.]123[.]219[.]137</title>
-      <description>Score 68, confidence medium, sources: greensnow_blocklist, ipsum_level5, tags: aggregated,blocklist,greensnow,ipsum,multi-list</description>
-      <guid isPermaLink="false">7bf1f3e2-f042-5315-b5af-0bfcc40755c2</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:56 +0000</pubDate>
+      <title>[80] ipv4: 154[.]91[.]60[.]108</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: threatfox,vshell</description>
+      <guid isPermaLink="false">7110c1e0-da05-5a08-b890-0fb5503ad433</guid>
+      <pubDate>Sat, 19 Sep 2026 08:05:04 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 213[.]177[.]179[.]12</title>
-      <description>Score 68, confidence medium, sources: binarydefense_banlist, greensnow_blocklist, tags: binarydefense,blocklist,greensnow,scanner</description>
-      <guid isPermaLink="false">71d702d7-c335-5cc0-9810-f38ab8ed1ed2</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:56 +0000</pubDate>
+      <title>[80] url: hxxp://154[.]223[.]128[.]222:57127/bin[.]sh</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,mirai</description>
+      <guid isPermaLink="false">cd9347ab-ab39-57b1-b094-b53192b36049</guid>
+      <pubDate>Sat, 19 Sep 2026 07:59:14 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 216[.]180[.]246[.]148</title>
-      <description>Score 68, confidence medium, sources: ci_army_list, greensnow_blocklist, tags: blocklist,cins,greensnow,scanner</description>
-      <guid isPermaLink="false">12de20c7-b06d-5ebc-8a94-9cac41f6a3a4</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:56 +0000</pubDate>
+      <title>[80] url: hxxp://182[.]117[.]69[.]11:59330/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,elf,mips,Mozi</description>
+      <guid isPermaLink="false">9949922e-95c4-5d24-9e5f-6079deaf6a90</guid>
+      <pubDate>Sat, 19 Sep 2026 07:46:28 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 216[.]180[.]246[.]150</title>
-      <description>Score 68, confidence medium, sources: ci_army_list, greensnow_blocklist, tags: blocklist,cins,greensnow,scanner</description>
-      <guid isPermaLink="false">290b5fe3-d498-541a-9c47-90a0ab960346</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:56 +0000</pubDate>
+      <title>[80] domain: usa-neurovera[.]us</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: 19September2026,ClearFake,Commandline,DomainShadowing,Windows,threatfox</description>
+      <guid isPermaLink="false">16a4e8b1-d1c2-5b1d-a80c-1830b5251b38</guid>
+      <pubDate>Sat, 19 Sep 2026 07:45:44 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 216[.]180[.]246[.]229</title>
-      <description>Score 68, confidence medium, sources: ci_army_list, greensnow_blocklist, tags: blocklist,cins,greensnow,scanner</description>
-      <guid isPermaLink="false">a18b9a44-2ae7-519d-9168-ed7d41dd9569</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:56 +0000</pubDate>
+      <title>[80] url: hxxps://testingcf[.]jsdelivr[.]net/gh/989A-A-3fF2465495760-2B3a/4657-8765943-85742-94856/22274659-87</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClearFake,threatfox</description>
+      <guid isPermaLink="false">95f75574-e8b9-5417-8eed-31cb3274230d</guid>
+      <pubDate>Sat, 19 Sep 2026 07:45:06 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 216[.]180[.]246[.]67</title>
-      <description>Score 68, confidence medium, sources: ci_army_list, greensnow_blocklist, tags: blocklist,cins,greensnow,scanner</description>
-      <guid isPermaLink="false">6f89cff3-d50c-5d53-81b1-eab7a622ee34</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:56 +0000</pubDate>
+      <title>[80] domain: pjilctsx[.]enus-metabodrops[.]com</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClearFake,mac-0xdcf2,macos,threatfox</description>
+      <guid isPermaLink="false">e2aa47a0-b122-5a73-904e-379779dcc5e5</guid>
+      <pubDate>Sat, 19 Sep 2026 07:43:43 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 216[.]180[.]246[.]81</title>
-      <description>Score 68, confidence medium, sources: ci_army_list, greensnow_blocklist, tags: blocklist,cins,greensnow,scanner</description>
-      <guid isPermaLink="false">bcbbbebc-4288-5c41-8aa4-f9e1ccb2d7d4</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:56 +0000</pubDate>
+      <title>[80] url: hxxp://36[.]70[.]231[.]123:60320/bin[.]sh</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,arm,elf,mirai,Mozi</description>
+      <guid isPermaLink="false">7636c40d-1ba0-5281-a531-416f86e92610</guid>
+      <pubDate>Sat, 19 Sep 2026 07:40:44 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 216[.]180[.]246[.]82</title>
-      <description>Score 68, confidence medium, sources: ci_army_list, greensnow_blocklist, tags: blocklist,cins,greensnow,scanner</description>
-      <guid isPermaLink="false">2e495e31-f8c7-580e-90fa-28a82c488256</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:56 +0000</pubDate>
+      <title>[80] url: hxxp://123[.]4[.]40[.]181:47310/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,elf,mips,Mozi</description>
+      <guid isPermaLink="false">698401c2-c9ed-54e5-8463-d9246667b689</guid>
+      <pubDate>Sat, 19 Sep 2026 07:34:25 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 216[.]73[.]159[.]101</title>
-      <description>Score 68, confidence medium, sources: greensnow_blocklist, tor_exit_nodes, tags: blocklist,exit-node,greensnow,tor</description>
-      <guid isPermaLink="false">c7ea84aa-e943-59c0-a3bf-45bcf59e78b5</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:56 +0000</pubDate>
+      <title>[80] url: hxxp://115[.]54[.]166[.]15:52466/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,elf,mips,Mozi</description>
+      <guid isPermaLink="false">bfae43cd-b2c1-5f48-b7df-bc334bbdb16d</guid>
+      <pubDate>Sat, 19 Sep 2026 07:32:26 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 45[.]84[.]107[.]54</title>
-      <description>Score 68, confidence medium, sources: greensnow_blocklist, tor_exit_nodes, tags: blocklist,exit-node,greensnow,tor</description>
-      <guid isPermaLink="false">bc242a88-b0f8-56c5-861f-f60356743683</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:56 +0000</pubDate>
+      <title>[80] url: hxxp://194[.]41[.]112[.]119/bins/arm</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,elf,mirai,ua-wget</description>
+      <guid isPermaLink="false">e48b3307-7a4a-51f9-a4a5-58a01260225e</guid>
+      <pubDate>Sat, 19 Sep 2026 07:29:22 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 51[.]159[.]125[.]104</title>
-      <description>Score 68, confidence medium, sources: ci_army_list, greensnow_blocklist, tags: blocklist,cins,greensnow,scanner</description>
-      <guid isPermaLink="false">50715fb9-d225-519c-9756-ab09d6b34347</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:56 +0000</pubDate>
+      <title>[80] url: hxxp://5[.]175[.]222[.]237/bins/i686</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,elf,mirai,ua-wget</description>
+      <guid isPermaLink="false">ff66dfe4-97e4-5fdc-861e-572b876a38e6</guid>
+      <pubDate>Sat, 19 Sep 2026 07:29:22 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 60[.]173[.]105[.]206</title>
-      <description>Score 68, confidence medium, sources: greensnow_blocklist, ipsum_level5, tags: aggregated,blocklist,greensnow,ipsum,multi-list</description>
-      <guid isPermaLink="false">33369782-8700-5b44-ac1a-07edba76018e</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:56 +0000</pubDate>
+      <title>[80] url: hxxp://5[.]175[.]222[.]237/bins/mpsl</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,elf,mirai,ua-wget</description>
+      <guid isPermaLink="false">e0b652bf-e387-5539-8167-51fa5b1d15ae</guid>
+      <pubDate>Sat, 19 Sep 2026 07:29:22 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 62[.]210[.]142[.]167</title>
-      <description>Score 68, confidence medium, sources: ci_army_list, greensnow_blocklist, tags: blocklist,cins,greensnow,scanner</description>
-      <guid isPermaLink="false">6d7b8dca-134d-585c-9c6d-4a8730a5624a</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:56 +0000</pubDate>
+      <title>[80] url: hxxp://182[.]183[.]154[.]234:54523/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,elf,mips,Mozi</description>
+      <guid isPermaLink="false">b97ee875-493a-5ca2-88ad-68f115949d66</guid>
+      <pubDate>Sat, 19 Sep 2026 07:29:21 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 80[.]66[.]81[.]140</title>
-      <description>Score 68, confidence medium, sources: ci_army_list, greensnow_blocklist, tags: blocklist,cins,greensnow,scanner</description>
-      <guid isPermaLink="false">8b6016b2-b63c-5325-bc0f-f09637df0764</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:56 +0000</pubDate>
+      <title>[80] url: hxxp://85[.]11[.]167[.]202/hiddenbin/Space[.]arm</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,elf,mirai,ua-wget</description>
+      <guid isPermaLink="false">6d9c299d-57e2-51e5-86eb-61f6e09ff4ee</guid>
+      <pubDate>Sat, 19 Sep 2026 07:29:21 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 85[.]217[.]140[.]45</title>
-      <description>Score 68, confidence medium, sources: ci_army_list, greensnow_blocklist, tags: blocklist,cins,greensnow,scanner</description>
-      <guid isPermaLink="false">1661728b-229f-5407-8b88-6cd7f8e02cf8</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:56 +0000</pubDate>
+      <title>[80] url: hxxp://85[.]11[.]167[.]202/hiddenbin/Space[.]arm6</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,elf,mirai,ua-wget</description>
+      <guid isPermaLink="false">18b9d421-d945-5a9d-948d-10e68f4cff85</guid>
+      <pubDate>Sat, 19 Sep 2026 07:29:21 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 85[.]217[.]149[.]63</title>
-      <description>Score 68, confidence medium, sources: ci_army_list, greensnow_blocklist, tags: blocklist,cins,greensnow,scanner</description>
-      <guid isPermaLink="false">b8f0b3a9-9b67-56fa-8966-c8154431e72b</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:56 +0000</pubDate>
+      <title>[80] url: hxxp://85[.]11[.]167[.]202/hiddenbin/Space[.]arm7</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,elf,mirai,ua-wget</description>
+      <guid isPermaLink="false">3480dda6-e1ae-51df-9059-111f6214c460</guid>
+      <pubDate>Sat, 19 Sep 2026 07:29:21 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 92[.]63[.]197[.]5</title>
-      <description>Score 68, confidence medium, sources: ci_army_list, greensnow_blocklist, tags: blocklist,cins,greensnow,scanner</description>
-      <guid isPermaLink="false">d073aebd-46c6-52ed-81c3-1dd6d4b40b89</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:56 +0000</pubDate>
+      <title>[80] url: hxxp://85[.]11[.]167[.]202/hiddenbin/Space[.]m68k</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,elf,mirai,ua-wget</description>
+      <guid isPermaLink="false">c3b2a59a-14ea-5a62-bcaf-172a97d60754</guid>
+      <pubDate>Sat, 19 Sep 2026 07:29:21 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 101[.]200[.]243[.]197</title>
-      <description>Score 68, confidence medium, sources: blocklist_de_ssh, ci_army_list, tags: blocklist,bruteforce,cins,scanner,ssh</description>
-      <guid isPermaLink="false">78778223-7384-5772-8764-626692721427</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:55 +0000</pubDate>
+      <title>[80] url: hxxp://85[.]11[.]167[.]202/hiddenbin/Space[.]mips</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,elf,mirai,ua-wget</description>
+      <guid isPermaLink="false">11c64b05-bf38-5ee1-938e-72030a8a48e0</guid>
+      <pubDate>Sat, 19 Sep 2026 07:29:21 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 101[.]89[.]134[.]2</title>
-      <description>Score 68, confidence medium, sources: binarydefense_banlist, ci_army_list, tags: binarydefense,blocklist,cins,scanner</description>
-      <guid isPermaLink="false">461ed5f6-bb2f-5968-803d-734c06627859</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:55 +0000</pubDate>
+      <title>[80] url: hxxp://85[.]11[.]167[.]202/hiddenbin/Space[.]mpsl</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,elf,mirai,ua-wget</description>
+      <guid isPermaLink="false">03cbca32-0fd4-5f8c-9f5e-d36fadeab461</guid>
+      <pubDate>Sat, 19 Sep 2026 07:29:21 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 102[.]88[.]137[.]145</title>
-      <description>Score 68, confidence medium, sources: blocklist_de_ssh, greensnow_blocklist, tags: blocklist,bruteforce,greensnow,ssh</description>
-      <guid isPermaLink="false">7d58667a-4f16-55d4-aaca-65127950a6f1</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:55 +0000</pubDate>
+      <title>[80] url: hxxp://85[.]11[.]167[.]202/hiddenbin/Space[.]ppc</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,elf,mirai,ua-wget</description>
+      <guid isPermaLink="false">0fe4a906-fa5b-5360-bc56-7ef9be9583b6</guid>
+      <pubDate>Sat, 19 Sep 2026 07:29:21 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 103[.]13[.]206[.]152</title>
-      <description>Score 68, confidence medium, sources: blocklist_de_ssh, greensnow_blocklist, tags: blocklist,bruteforce,greensnow,ssh</description>
-      <guid isPermaLink="false">8b419d69-c022-58dd-8b79-19a1deac8b06</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:55 +0000</pubDate>
+      <title>[80] url: hxxp://85[.]11[.]167[.]202/hiddenbin/Space[.]sh4</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,elf,mirai,ua-wget</description>
+      <guid isPermaLink="false">8d07e117-7a27-59e6-8a26-54ce909ea5a6</guid>
+      <pubDate>Sat, 19 Sep 2026 07:29:21 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 103[.]189[.]234[.]85</title>
-      <description>Score 68, confidence medium, sources: blocklist_de_ssh, greensnow_blocklist, tags: blocklist,bruteforce,greensnow,ssh</description>
-      <guid isPermaLink="false">d9e40a1f-880a-5c94-9aa0-ba91781e6d78</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:55 +0000</pubDate>
+      <title>[80] url: hxxp://85[.]11[.]167[.]202/hiddenbin/Space[.]spc</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,elf,mirai,ua-wget</description>
+      <guid isPermaLink="false">b69b6708-9f29-598f-83e3-3c2750335710</guid>
+      <pubDate>Sat, 19 Sep 2026 07:29:21 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 103[.]239[.]252[.]66</title>
-      <description>Score 68, confidence medium, sources: binarydefense_banlist, ci_army_list, tags: binarydefense,blocklist,cins,scanner</description>
-      <guid isPermaLink="false">29890845-46b3-5a4e-9f20-d88574a0dbed</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:55 +0000</pubDate>
+      <title>[80] url: hxxp://85[.]11[.]167[.]202/hiddenbin/Space[.]x86</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,elf,mirai,ua-wget</description>
+      <guid isPermaLink="false">7d14c17b-85c0-52b1-aa3b-8a0f47cd7ad5</guid>
+      <pubDate>Sat, 19 Sep 2026 07:29:21 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 103[.]26[.]136[.]173</title>
-      <description>Score 68, confidence medium, sources: blocklist_de_ssh, greensnow_blocklist, tags: blocklist,bruteforce,greensnow,ssh</description>
-      <guid isPermaLink="false">ead420b1-688e-5569-ba40-d3029b74c304</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:55 +0000</pubDate>
+      <title>[80] url: hxxp://85[.]11[.]167[.]202/hiddenbin/Space[.]x86_64</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,elf,mirai,ua-wget</description>
+      <guid isPermaLink="false">9a948b00-7b44-5297-a53b-81fe95fbec8c</guid>
+      <pubDate>Sat, 19 Sep 2026 07:29:21 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 107[.]150[.]117[.]121</title>
-      <description>Score 68, confidence medium, sources: blocklist_de_ssh, ci_army_list, tags: blocklist,bruteforce,cins,scanner,ssh</description>
-      <guid isPermaLink="false">66d91b0e-e647-58e7-888c-79c8d3e505f9</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:55 +0000</pubDate>
+      <title>[80] url: hxxp://85[.]11[.]167[.]202/hiddenbin/Space[.]arm5</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,elf,mirai,ua-wget</description>
+      <guid isPermaLink="false">1b25fd71-cfe8-5db9-ba30-aeff2bf6a963</guid>
+      <pubDate>Sat, 19 Sep 2026 07:29:20 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 112[.]47[.]127[.]211</title>
-      <description>Score 68, confidence medium, sources: binarydefense_banlist, ci_army_list, tags: binarydefense,blocklist,cins,scanner</description>
-      <guid isPermaLink="false">01145954-3119-5125-b1d9-c8e27b08d56b</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:55 +0000</pubDate>
+      <title>[80] url: hxxp://5[.]175[.]222[.]237/bins/sh4</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,elf,mirai,ua-wget</description>
+      <guid isPermaLink="false">6fb67914-9db2-5d1a-80a1-e7478269f6bd</guid>
+      <pubDate>Sat, 19 Sep 2026 07:29:14 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 115[.]190[.]138[.]163</title>
-      <description>Score 68, confidence medium, sources: blocklist_de_ssh, greensnow_blocklist, tags: blocklist,bruteforce,greensnow,ssh</description>
-      <guid isPermaLink="false">cbcd8cba-1c5a-52a5-8c69-71f7ad766e03</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:55 +0000</pubDate>
+      <title>[80] ipv4: 154[.]91[.]60[.]100</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: threatfox,vshell</description>
+      <guid isPermaLink="false">beefd427-93aa-5b51-a8e2-f93e2c077b25</guid>
+      <pubDate>Sat, 19 Sep 2026 07:05:07 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 117[.]88[.]69[.]10</title>
-      <description>Score 68, confidence medium, sources: binarydefense_banlist, ci_army_list, tags: binarydefense,blocklist,cins,scanner</description>
-      <guid isPermaLink="false">bb8d0954-6aa8-56a7-976f-151eb2075680</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:55 +0000</pubDate>
+      <title>[80] ipv4: 154[.]91[.]59[.]113</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: threatfox,vshell</description>
+      <guid isPermaLink="false">75cc7feb-9553-56f2-9d22-74986a2b849e</guid>
+      <pubDate>Sat, 19 Sep 2026 07:05:06 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 118[.]194[.]249[.]186</title>
-      <description>Score 68, confidence medium, sources: blocklist_de_ssh, et_compromised, tags: blocklist,bruteforce,compromised,emerging-threats,ssh</description>
-      <guid isPermaLink="false">50e38b30-77b5-558d-a1f2-bb534749e8f9</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:55 +0000</pubDate>
+      <title>[80] ipv4: 154[.]91[.]59[.]120</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: threatfox,vshell</description>
+      <guid isPermaLink="false">9d284004-85da-50f8-9408-83054dfaee10</guid>
+      <pubDate>Sat, 19 Sep 2026 07:05:06 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 120[.]48[.]152[.]13</title>
-      <description>Score 68, confidence medium, sources: blocklist_de_ssh, ci_army_list, tags: blocklist,bruteforce,cins,scanner,ssh</description>
-      <guid isPermaLink="false">8c87e5ea-75f5-57a4-b39c-6a202e6f90e9</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:55 +0000</pubDate>
+      <title>[80] ipv4: 154[.]91[.]59[.]122</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: threatfox,vshell</description>
+      <guid isPermaLink="false">fc501d11-770c-5495-ac6d-1fa0885df4a4</guid>
+      <pubDate>Sat, 19 Sep 2026 07:05:06 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 121[.]29[.]84[.]99</title>
-      <description>Score 68, confidence medium, sources: binarydefense_banlist, ci_army_list, tags: binarydefense,blocklist,cins,scanner</description>
-      <guid isPermaLink="false">61c8208a-885e-5c93-8a71-9aac6f81ab7f</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:55 +0000</pubDate>
+      <title>[80] ipv4: 154[.]91[.]59[.]102</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: threatfox,vshell</description>
+      <guid isPermaLink="false">0dfa822d-1e36-59b6-8344-98a57b86ebfa</guid>
+      <pubDate>Sat, 19 Sep 2026 07:05:05 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 121[.]40[.]20[.]65</title>
-      <description>Score 68, confidence medium, sources: blocklist_de_ssh, ci_army_list, tags: blocklist,bruteforce,cins,scanner,ssh</description>
-      <guid isPermaLink="false">0d59fc87-8c84-52ed-a6a4-49f7d22c1a77</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:55 +0000</pubDate>
+      <title>[80] sha256: 6e1ea5fd15caa678a08874d27a950c07a14092637b89b58b3dc3091b846697c2</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
+      <guid isPermaLink="false">9395ac4d-9c15-5094-bfeb-f32b9da6f07a</guid>
+      <pubDate>Sat, 19 Sep 2026 07:04:46 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 122[.]142[.]168[.]211</title>
-      <description>Score 68, confidence medium, sources: blocklist_de_ssh, ci_army_list, tags: blocklist,bruteforce,cins,scanner,ssh</description>
-      <guid isPermaLink="false">929817d6-185a-5871-bf07-90da1d7ec426</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:55 +0000</pubDate>
+      <title>[88] sha256: 8b60b132edfe051a17e79883e0da471f21c50804fbb7d1b2fdbc7ed5d606d9ed</title>
+      <description>Score 88, confidence high, sources: malwarebazaar_recent, threatfox_export_json, tags: VShell,exe,malware,threatfox</description>
+      <guid isPermaLink="false">13a52803-1493-5cb1-bf12-1c5955298628</guid>
+      <pubDate>Sat, 19 Sep 2026 07:03:01 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 135[.]125[.]226[.]120</title>
-      <description>Score 68, confidence medium, sources: blocklist_de_ssh, greensnow_blocklist, tags: blocklist,bruteforce,greensnow,ssh</description>
-      <guid isPermaLink="false">43e82a53-34c8-5ea0-8e75-5f5f8a1d00b4</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:55 +0000</pubDate>
+      <title>[88] sha256: 8b4caad4c51a87f10977d3fecd40938d5201bb9d8762a9d728c3c0454ba5e414</title>
+      <description>Score 88, confidence high, sources: malwarebazaar_recent, threatfox_export_json, tags: VShell,exe,malware,threatfox</description>
+      <guid isPermaLink="false">06097189-01ef-5bee-bcde-6cd4676e433f</guid>
+      <pubDate>Sat, 19 Sep 2026 07:02:58 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 136[.]248[.]247[.]188</title>
-      <description>Score 68, confidence medium, sources: blocklist_de_ssh, greensnow_blocklist, tags: blocklist,bruteforce,greensnow,ssh</description>
-      <guid isPermaLink="false">ae702e8c-8b15-5f82-aa8b-8c5b3d4741d8</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:55 +0000</pubDate>
+      <title>[80] sha256: dd7f432fbbfa00134e4c5e3cf29590465f9f1851a9522f364550dc21c21e2b24</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,Mirai</description>
+      <guid isPermaLink="false">bebfffc1-cdb9-5fb2-8bf7-98326e389418</guid>
+      <pubDate>Sat, 19 Sep 2026 07:02:55 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 139[.]59[.]132[.]168</title>
-      <description>Score 68, confidence medium, sources: binarydefense_banlist, ci_army_list, tags: binarydefense,blocklist,cins,scanner</description>
-      <guid isPermaLink="false">caf74a1c-112f-579e-8e28-47da61bb18ca</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:55 +0000</pubDate>
+      <title>[80] sha256: 1d96940e0e5310ae40a5dca86d311473721f86f940060b4d7e6fc0e82842e33c</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,Mirai</description>
+      <guid isPermaLink="false">854e2c6d-0faf-5ede-afa1-259794eab565</guid>
+      <pubDate>Sat, 19 Sep 2026 07:02:51 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 139[.]59[.]86[.]13</title>
-      <description>Score 68, confidence medium, sources: blocklist_de_ssh, et_compromised, tags: blocklist,bruteforce,compromised,emerging-threats,ssh</description>
-      <guid isPermaLink="false">ee180eef-d91a-555a-9bf8-ecec5a8d9102</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:55 +0000</pubDate>
+      <title>[80] sha256: f5c02265641a8234ab89db934cb8379528dfb9e2c6ae17bfc49811421a383171</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,VShell</description>
+      <guid isPermaLink="false">cf898132-edb0-5641-8054-1d050426e6c3</guid>
+      <pubDate>Sat, 19 Sep 2026 07:02:47 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 152[.]42[.]136[.]119</title>
-      <description>Score 68, confidence medium, sources: blocklist_de_ssh, et_compromised, tags: blocklist,bruteforce,compromised,emerging-threats,ssh</description>
-      <guid isPermaLink="false">5e076153-768b-5d71-9629-a7241777477e</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:55 +0000</pubDate>
+      <title>[80] sha256: 34e2ab96a954d1929dde4dd21dbbae1315bd5e100567f58300df34fa66d5e8a1</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
+      <guid isPermaLink="false">ddf31da9-d6f9-5e7c-90bf-cd7bd54f253b</guid>
+      <pubDate>Sat, 19 Sep 2026 07:02:20 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 154[.]70[.]102[.]114</title>
-      <description>Score 68, confidence medium, sources: blocklist_de_ssh, greensnow_blocklist, tags: blocklist,bruteforce,greensnow,ssh</description>
-      <guid isPermaLink="false">00d9874e-6073-590b-9373-cc94ffc279e8</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:55 +0000</pubDate>
+      <title>[80] sha256: 1f390d33127daf6b1220c8978f3a8f7f4489d6a84ebbff4277e0585d923a49a5</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
+      <guid isPermaLink="false">c43d07df-1ccf-56bb-881e-d5f5e639accb</guid>
+      <pubDate>Sat, 19 Sep 2026 06:55:13 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 162[.]19[.]250[.]18</title>
-      <description>Score 68, confidence medium, sources: blocklist_de_ssh, greensnow_blocklist, tags: blocklist,bruteforce,greensnow,ssh</description>
-      <guid isPermaLink="false">a431eb30-8044-520a-9d4d-84adde05a508</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:55 +0000</pubDate>
+      <title>[80] sha256: 91a40c60158eaa1b99472ccf27357f16444a741ecfd947d832a0f98542fe64a1</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
+      <guid isPermaLink="false">3b1662b3-185a-517b-a9c0-19a5260a4081</guid>
+      <pubDate>Sat, 19 Sep 2026 06:54:34 +0000</pubDate>
     </item>
     <item>
-      <title>[68] ipv4: 164[.]92[.]78[.]51</title>
-      <description>Score 68, confidence medium, sources: binarydefense_banlist, ci_army_list, tags: binarydefense,blocklist,cins,scanner</description>
-      <guid isPermaLink="false">5ede786d-7090-520e-ab66-1a51ee433da4</guid>
-      <pubDate>Tue, 21 Jul 2026 21:01:55 +0000</pubDate>
+      <title>[80] sha256: 592627c6d8f01519d9a88923db6fab9d65314ac0a9c43b2d75da8882995042b3</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,RustyStealer</description>
+      <guid isPermaLink="false">4d70b8d1-c6f8-5236-9261-068cf352318c</guid>
+      <pubDate>Sat, 19 Sep 2026 06:53:53 +0000</pubDate>
     </item>
 </channel></rss>

@@ -7,6 +7,8 @@ on:
       - "swiftioc/**"
       - "scripts/**"
       - "tests/**"
+      - "public/index.html"
+      - "public/assets/**"
       - "sources*.yml"
       - "requirements*.txt"
       - "pyproject.toml"
@@ -37,8 +39,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: Test dashboard JavaScript
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          node --test public/assets/dashboard-core.test.js public/assets/inventory-core.test.js
+          node --check public/assets/dashboard-core.js
+          node --check public/assets/dashboard.js
+          node --check public/assets/inventory.js
+          node --check public/assets/inventory-core.js
+
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
@@ -85,7 +97,7 @@ jobs:
         timeout-minutes: 4
         run: |
           set -Eeuo pipefail
-          mkdir -p public/diagnostics/raw
+          mkdir -p public/diagnostics _private/diagnostics/raw
           python -m swiftioc -v \
             --out-dir public \
             --sources sources.ci.yml \
@@ -94,7 +106,7 @@ jobs:
             --log-file public/diagnostics/run.log \
             --log-format json \
             --log-file-level DEBUG \
-            --save-raw-dir public/diagnostics/raw \
+            --save-raw-dir _private/diagnostics/raw \
             --diag-json public/diagnostics/run.json \
             --report public/diagnostics/REPORT.md
 
@@ -108,3 +120,4 @@ jobs:
           path: |
             public/diagnostics/**
             public/iocs/**
+            !public/diagnostics/raw/**

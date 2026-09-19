@@ -1,0 +1,8 @@
+index=YOUR_ENDPOINT_INDEX earliest=-24h latest=now
+| fields _time host user file_name file_path sha256
+| fields - sf_*
+| eval sf_type="sha256", sf_value=lower(trim(sha256))
+| where match(sf_value, "^[0-9a-f]{64}$")
+| lookup swiftioc_iocs.csv sf_type sf_value OUTPUT sf_value AS sf_match sf_score sf_sources sf_tags sf_last_seen sf_references
+| where isnotnull(sf_match)
+| table _time host user file_name file_path sf_match sf_score sf_sources sf_tags sf_last_seen sf_references

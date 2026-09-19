@@ -41,7 +41,7 @@ class FakeSession:
         self.calls = []
 
     def get(self, url, headers=None, timeout=None, stream=None, allow_redirects=None):
-        self.calls.append(url)
+        self.calls.append((url, headers))
         return self._responses.pop(0)
 
 
@@ -67,6 +67,33 @@ def test_http_get_records_telemetry_before_raising_on_error(monkeypatch):
 def test_http_get_returns_body_on_success(monkeypatch):
     _use_fake_session(monkeypatch, [FakeResponse(body=b"hello world")])
     assert hc.http_get("http://feed.example/x", name="src") == "hello world"
+
+
+def test_http_get_latency_includes_streamed_body(monkeypatch):
+    clock = [10.0]
+
+    class DelayedResponse(FakeResponse):
+        def iter_content(self, chunk_size=65536):
+            clock[0] += 0.125
+            yield from super().iter_content(chunk_size)
+
+    monkeypatch.setattr(hc.time, "perf_counter", lambda: clock[0])
+    _use_fake_session(monkeypatch, [DelayedResponse(body=b"body")])
+    hc.http_get("http://feed.example/x", name="src")
+    assert hc.get_fetch_metrics()["src"]["ms"] == 125
+
+
+def test_http_get_aggregates_paginated_source_metrics(monkeypatch):
+    _use_fake_session(monkeypatch, [FakeResponse(body=b"one"), FakeResponse(body=b"twos")])
+    hc.http_get("http://feed.example/one", name="src")
+    hc.http_get("http://feed.example/two", name="src")
+    assert hc.get_fetch_metrics()["src"] == {"ms": 0, "bytes": 7, "status": 200, "requests": 2}
+
+
+def test_http_get_allows_parser_specific_headers(monkeypatch):
+    fake = _use_fake_session(monkeypatch, [FakeResponse(body=b"ok")])
+    hc.http_get("http://feed.example/x", name="src", headers={"apiKey": "test-key"})
+    assert fake.calls[0][1]["apiKey"] == "test-key"
 
 
 def test_http_get_rejects_oversized_content_length(monkeypatch):
@@ -100,7 +127,7 @@ def test_http_get_follows_redirect_to_public_host(monkeypatch):
         ],
     )
     assert hc.http_get("http://feed.example/x", name="src") == "final content"
-    assert fake.calls == ["http://feed.example/x", "http://93.184.216.34/final"]
+    assert [url for url, _headers in fake.calls] == ["http://feed.example/x", "http://93.184.216.34/final"]
 
 
 def test_http_get_blocks_redirect_to_link_local_metadata_ip(monkeypatch):

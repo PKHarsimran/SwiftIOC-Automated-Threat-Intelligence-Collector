@@ -5,7 +5,7 @@ import argparse
 import json
 import logging
 import os
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -13,9 +13,13 @@ import yaml
 
 from . import http_client
 from .collect import collect_from_yaml, parse_name_int_pairs, top_tags, type_breakdown
+from .collections import write_collections
+from .detections import write_detection_pack
 from .http_client import UA_POOL, get_fetch_metrics, logger
 from .logging_utils import configure_logging
 from .models import classify, defang_min, iso, now_utc, parse_dt
+from .publication import filter_public_rows
+from .quality import publication_failures, source_rule
 from .scoring import (
     apply_retention,
     compute_score,
@@ -26,15 +30,20 @@ from .scoring import (
 )
 from .writers import (
     write_badge_json,
+    build_stix_bundle,
     write_changelog,
+    build_delta,
     write_csv,
     write_dashboard_feed,
+    write_delta,
     write_history,
     write_json,
+    write_json_document,
     write_jsonl,
     write_misp_feed,
     write_rss_feed,
     write_stix,
+    write_taxii_envelope,
     write_tsv,
 )
 
@@ -106,7 +115,7 @@ def main() -> int:
     ap.add_argument("--max-age-days", type=int, default=None,
                     help="Retention: drop indicators whose last_seen is older than N days")
     ap.add_argument("--max-store", type=int, default=None,
-                    help="Retention: keep only the top N indicators by score/recency (KEVIntel-style curation)")
+                    help="Retention: keep at most N; recently checked KEV CVEs first, then score/recency")
     ap.add_argument("--dashboard-rows", type=int, default=1000,
                     help="Rows in the compact dashboard.jsonl the web dashboard downloads (default 1000)")
     ap.add_argument("--site-url", type=str,
@@ -119,8 +128,13 @@ def main() -> int:
                     help="Score at/above which an indicator enters the curated high_confidence feed (default 80)")
     ap.add_argument("--urlhaus-status", choices=["any", "online", "offline"], default="any")
     ap.add_argument("--source-window", action="append", default=[], help="Override lookback per source: name=HOURS")
-    ap.add_argument("--fail-on-empty", nargs="*", default=None, help="Fail if any listed sources return zero")
-    ap.add_argument("--fail-if-stale", action="append", default=[], help="Fail if source newest first_seen older than HOURS: name=HOURS")
+    ap.add_argument("--fail-on-empty", nargs="+", default=None, help="Fail if any listed sources return zero")
+    ap.add_argument("--fail-if-stale", action="append", type=source_rule, default=[],
+                    help="Keep the published snapshot if source newest first_seen is older than HOURS (1-876000): name=HOURS")
+    ap.add_argument("--fail-if-volume-drop", action="append", type=lambda value: source_rule(value, 100), default=[],
+                    help="Keep the published snapshot if a source count drops by PERCENT (1-100): name=PERCENT")
+    ap.add_argument("--warn-if-volume-drop", action="append", default=[],
+                    help="Warn if a source's count drops by PERCENT versus the previous run: name=PERCENT")
     ap.add_argument("--grace-on-404", action="append", default=[], help="Treat 404 on these sources as empty but non-fatal: name")
 
     # logging / diag
@@ -150,8 +164,9 @@ def main() -> int:
     on_ci = os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
     if args.ci_safe:
         args.log_format = "json"
-        if not args.save_raw_dir:
-            args.save_raw_dir = Path("public/diagnostics/raw")
+        # Raw upstream bodies can contain credentials. CI conveniences must
+        # not enable capture implicitly into a directory that gets published.
+        # Operators can opt in with an explicit private --save-raw-dir.
         # RSS still runs; fetch_rss tolerates a missing feedparser dependency.
     if on_ci and args.verbose == 0:
         # default to INFO on CI to get more signal in logs
@@ -198,6 +213,36 @@ def main() -> int:
     with args.sources.open("r", encoding="utf-8") as f:
         cfg = yaml.safe_load(f) or {}
 
+    out_dir: Path = args.out_dir
+    previous_feed_path = out_dir / "iocs" / "latest.jsonl"
+    previous_rows = load_previous_feed(previous_feed_path) if previous_feed_path.exists() else []
+    baseline_available = False
+    previous_counts: Dict[str, int] = {}
+    previous_generated_at: Optional[str] = None
+    previous_total: Optional[int] = None
+    # Read the same diagnostics location that successful runs publish to,
+    # including --diag-json overrides; otherwise volume checks lose baseline.
+    previous_diag = args.diag_json
+    if previous_diag.exists():
+        try:
+            raw_previous = json.loads(previous_diag.read_text(encoding="utf-8"))
+            if isinstance(raw_previous, dict) and isinstance(raw_previous.get("counts"), dict):
+                previous_counts = {str(k): int(v) for k, v in raw_previous["counts"].items()}
+            if isinstance(raw_previous, dict) and isinstance(raw_previous.get("ts"), str):
+                previous_generated_at = raw_previous["ts"]
+            if isinstance(raw_previous, dict) and isinstance(raw_previous.get("total"), int):
+                previous_total = raw_previous["total"]
+        except (OSError, ValueError, TypeError):
+            logger.warning("Could not read previous source counts from %s", previous_diag)
+    if previous_feed_path.exists() and previous_total is not None and previous_total == len(previous_rows):
+        baseline_available = True
+    elif previous_feed_path.exists():
+        logger.warning(
+            "Ignoring unvalidated SOC Delta baseline: diagnostics expected %s rows, loaded %d",
+            previous_total if previous_total is not None else "unknown",
+            len(previous_rows),
+        )
+
     # collect
     rows, counts, stats = collect_from_yaml(
         cfg,
@@ -211,21 +256,50 @@ def main() -> int:
         max_workers=args.max_workers,
         fp_filter=args.fp_filter,
     )
+    # A failed collection must not replace live exports or the baseline used
+    # for the next Delta. Keep rejected-attempt diagnostics separate from run.json.
+    failures = publication_failures(
+        counts, stats.get("source_newest_first_seen", {}), previous_counts,
+        required=args.fail_on_empty or [], stale=dict(args.fail_if_stale),
+        volume_drop=dict(args.fail_if_volume_drop), now=now_utc(),
+    )
+    attempt = {
+        "phase": "quality_checks",
+        "ts": iso(now_utc()), "status": "rejected" if failures else "accepted",
+        "counts": counts, "source_newest_first_seen": stats.get("source_newest_first_seen", {}),
+        "quality_failures": failures, "source_failures": stats.get("failures", []),
+        "volume_baseline_missing": [name for name, _ in args.fail_if_volume_drop if previous_counts.get(name, 0) <= 0],
+    }
+    write_json_document(out_dir / "diagnostics" / "collection-attempt.json", attempt)
+    if failures:
+        for failure in failures:
+            logger.error("Publication rejected: %s (%s)", failure["source"], failure["reason"])
+        append_gh_summary(["### SwiftIOC collection rejected", "", "Previous published snapshot retained.",
+                           *[f"- {f['source']}: {f['reason']}" for f in failures]])
+        return 1
+
     # Snapshot the post-dedup, pre-persist/expiry/retention count: rows is
     # about to be grown (carried-forward indicators) and shrunk (expiry,
     # retention) below, and duplicates_removed must reflect cross-source
     # dedup alone, not get conflated with those later mutations.
     deduped_count = len(rows)
 
-    out_dir: Path = args.out_dir
+    # Apply the same publication boundary to fresh and retained records. The
+    # previous snapshot also feeds Delta removals and their previous payloads.
+    rows, sensitive_rows_omitted = filter_public_rows(rows)
+    previous_rows, sensitive_previous_omitted = filter_public_rows(previous_rows)
+    if sensitive_rows_omitted or sensitive_previous_omitted:
+        logger.warning(
+            "Omitted Google-key-shaped records from publication: %d current, %d previous",
+            sensitive_rows_omitted, sensitive_previous_omitted,
+        )
 
     # Living feed: merge the previously published feed so indicators persist
     # across runs. Re-observed entries refresh (score resets to full); entries
     # no longer being reported decay by age until they expire below --min-score.
     carried_forward = 0
     if args.persist_feed:
-        previous = load_previous_feed(out_dir / "iocs" / "latest.jsonl")
-        rows, carried_forward = merge_with_previous(rows, previous)
+        rows, carried_forward = merge_with_previous(rows, previous_rows)
         logger.info("Persisted feed: carried forward %d indicators from previous run", carried_forward)
 
     score_now = now_utc()
@@ -254,7 +328,12 @@ def main() -> int:
     write_tsv(out_dir / "iocs" / "latest.tsv", rows)
     write_json(out_dir / "iocs" / "latest.json", rows)
     write_jsonl(out_dir / "iocs" / "latest.jsonl", rows)
-    write_stix(out_dir / "iocs" / "stix2.json", rows)
+    stix_bundle = build_stix_bundle(rows)
+    write_stix(out_dir / "iocs" / "stix2.json", rows, bundle=stix_bundle)
+    taxii_objects = write_taxii_envelope(
+        out_dir / "iocs" / "taxii2-envelope.json", rows, bundle=stix_bundle
+    )
+    logger.info("Static TAXII 2.1 envelope: %d objects", taxii_objects)
 
     # Curated "block-ready" feed: only high-score or multi-source-confirmed
     # indicators, sorted strongest-first so the top of the file is the most
@@ -270,12 +349,35 @@ def main() -> int:
         len(high_conf), len(rows), args.high_confidence_score,
     )
 
+    run_ts = iso(now_utc())
+    collection_counts = write_collections(out_dir / "collections", rows, generated_at=run_ts)
+    detection_manifest = write_detection_pack(
+        out_dir / "detections", high_conf, generated_at=run_ts
+    )
+    logger.info(
+        "Detection pack: %d Sigma rules, %d Suricata rules, %d RPZ domains",
+        detection_manifest["artifacts"]["sigma_rules"],
+        detection_manifest["artifacts"]["suricata_rules"],
+        detection_manifest["artifacts"]["rpz_domains"],
+    )
+
     dashboard_written = write_dashboard_feed(
         out_dir / "iocs" / "dashboard.jsonl", rows, limit=args.dashboard_rows
     )
     logger.info("Dashboard feed: top %d rows written", dashboard_written)
 
-    run_ts = iso(now_utc())
+    delta = build_delta(
+        previous_rows,
+        rows,
+        generated_at=run_ts,
+        previous_generated_at=previous_generated_at,
+        baseline_available=baseline_available,
+    )
+    write_delta(out_dir / "iocs" / "delta.json", out_dir / "iocs" / "delta.jsonl", delta)
+    logger.info(
+        "SOC Delta: %d added, %d updated, %d removed",
+        delta["counts"]["added"], delta["counts"]["updated"], delta["counts"]["removed"],
+    )
 
     if args.misp_feed:
         misp_count = write_misp_feed(out_dir / "misp", high_conf, run_ts=run_ts)
@@ -312,6 +414,16 @@ def main() -> int:
     raw_total = stats.get("raw_total", deduped_count)
     duplicates_removed = max(raw_total - deduped_count, 0)
     empty_sources = sorted([name for name, count in counts.items() if count == 0])
+    volume_drops = []
+    for name, threshold in parse_name_int_pairs(args.warn_if_volume_drop, "--warn-if-volume-drop").items():
+        previous = previous_counts.get(name)
+        current = counts.get(name)
+        if previous is None or previous <= 0 or current is None:
+            continue
+        drop_pct = round((previous - current) * 100 / previous, 1)
+        if drop_pct >= threshold:
+            volume_drops.append({"source": name, "previous": previous, "current": current, "drop_percent": drop_pct})
+            logger.warning("%s volume dropped %.1f%% (%d -> %d)", name, drop_pct, previous, current)
     scores = [r.score for r in rows]
     # Full-feed aggregates the dashboard renders without downloading the whole
     # feed: score bands, corroboration count, and top tags.
@@ -337,8 +449,11 @@ def main() -> int:
         "window_hours": args.window_hours,
         "total": len(rows),
         "total_before_dedup": raw_total,
+        "collections": collection_counts,
         "duplicates_removed": duplicates_removed,
         "false_positives_removed": stats.get("false_positives_removed", 0),
+        "sensitive_rows_omitted": sensitive_rows_omitted,
+        "sensitive_previous_rows_omitted": sensitive_previous_omitted,
         "persist_feed": bool(args.persist_feed),
         "carried_forward": carried_forward,
         "expired_low_score": expired,
@@ -354,7 +469,11 @@ def main() -> int:
         "corroborated_total": corroborated_total,
         "high_confidence_total": len(high_conf),
         "high_confidence_score": args.high_confidence_score,
+        "detection_pack": detection_manifest["artifacts"],
+        "delta_counts": delta["counts"],
+        "delta_baseline_available": delta["baseline_available"],
         "counts": counts,
+        "source_newest_first_seen": stats.get("source_newest_first_seen", {}),
         "stored_counts": stored_counts,
         "type_counts": {k: v for k, v in type_totals},
         "tag_counts": {k: v for k, v in top_tags(rows, 25)},
@@ -362,12 +481,13 @@ def main() -> int:
         "earliest_first_seen": earliest,
         "newest_first_seen": latest,
         "empty_sources": empty_sources,
+        "volume_drops": volume_drops,
         "failures": stats.get("failures", []),
         "version": 3,
         "ts": run_ts,
     }
     if args.diag_json:
-        args.diag_json.write_text(json.dumps(diag, ensure_ascii=False, indent=2), encoding="utf-8")
+        write_json_document(args.diag_json, diag)
 
     if args.report:
         report_lines: List[str] = [
@@ -419,6 +539,8 @@ def main() -> int:
             issues.append(f"- ⚠️ **{src}**: {err}")
         for src in empty_sources:
             issues.append(f"- ⚠️ **{src}** returned zero indicators")
+        for drop in volume_drops:
+            issues.append(f"- ⚠️ **{drop['source']}** volume dropped {drop['drop_percent']}% ({drop['previous']} → {drop['current']})")
         if issues:
             report_lines.extend(["## Issues", "", *issues, ""])
         args.report.write_text("\n".join(report_lines), encoding="utf-8")
@@ -465,38 +587,12 @@ def main() -> int:
         issues_summary.append(f"- ⚠️ **{src}**: {err}")
     for src in empty_sources:
         issues_summary.append(f"- ⚠️ **{src}** returned zero indicators")
+    for drop in volume_drops:
+        issues_summary.append(f"- ⚠️ **{drop['source']}** volume dropped {drop['drop_percent']}% ({drop['previous']} → {drop['current']})")
     if issues_summary:
         summary_lines.extend(["", "#### Issues", "", *issues_summary])
     summary_lines.append("")
     append_gh_summary(summary_lines)
-
-    # guardrails
-    if args.fail_on_empty:
-        empty = [s for s in args.fail_on_empty if counts.get(s, 0) == 0]
-        if empty:
-            logger.error("Failing due to empty sources: %s", empty)
-            return 1
-
-    stale_cfg = parse_name_int_pairs(args.fail_if_stale, "--fail-if-stale")
-    if stale_cfg:
-        newest: Dict[str, Optional[datetime]] = {}
-        for r in rows:
-            dt = parse_dt(r.first_seen)
-            if dt is None:
-                continue
-            cur = newest.get(r.source)
-            if cur is None or dt > cur:
-                newest[r.source] = dt
-        too_old: List[str] = []
-        now = now_utc()
-        for name, hours in stale_cfg.items():
-            limit = now - timedelta(hours=hours)
-            n = newest.get(name)
-            if n is None or n < limit:
-                too_old.append(name)
-        if too_old:
-            logger.error("Failing due to stale sources: %s", too_old)
-            return 1
 
     if args.skip_rss:
         logger.info("RSS skipped — install 'feedparser' to enable RSS")

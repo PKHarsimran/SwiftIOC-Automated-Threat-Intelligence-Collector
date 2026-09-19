@@ -3,15 +3,18 @@ from __future__ import annotations
 
 import csv
 import json
+import os
 import re
+import tempfile
 import uuid
+from contextlib import contextmanager
 from dataclasses import asdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from .http_client import logger
 from .models import Indicator, iso, now_utc, parse_dt, refang
-from .scoring import source_count
+from .scoring import explain_score, source_count
 
 # Stable namespace for deterministic STIX 2.1 identifiers (uuid5).
 STIX_NAMESPACE = uuid.uuid5(uuid.NAMESPACE_DNS, "swiftioc.threatintel")
@@ -27,6 +30,31 @@ STIX_HASH_NAMES = {"md5": "MD5", "sha1": "SHA-1", "sha256": "SHA-256", "sha512":
 
 # ---------------- writers ----------------
 CSV_HEADER = ["indicator", "type", "source", "first_seen", "last_seen", "confidence", "score", "sightings", "tlp", "tags", "reference", "context"]
+
+
+@contextmanager
+def _atomic_text_writer(path: Path, *, newline: Optional[str] = None):
+    """Write a complete replacement beside ``path`` before publishing it.
+
+    Consumers polling a public feed must see either the previous complete file
+    or the new complete file, never a partially-written export from a stopped
+    collection run.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    handle = tempfile.NamedTemporaryFile("w", encoding="utf-8", newline=newline, dir=path.parent, delete=False)
+    temp_path = Path(handle.name)
+    # NamedTemporaryFile defaults to 0600; preserve public read access after
+    # os.replace for deployments where the static server runs as another user.
+    os.chmod(temp_path, 0o644)
+    try:
+        with handle:
+            yield handle
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temp_path, path)
+    except Exception:
+        temp_path.unlink(missing_ok=True)
+        raise
 
 
 _CSV_FORMULA_TRIGGERS = ("=", "+", "-", "@", "\t", "\r")
@@ -53,8 +81,7 @@ def _csv_row(r: Indicator) -> List[Any]:
 
 
 def write_csv(path: Path, rows: List[Indicator]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", newline="", encoding="utf-8") as f:
+    with _atomic_text_writer(path, newline="") as f:
         w = csv.writer(f)
         w.writerow(CSV_HEADER)
         for r in rows:
@@ -62,8 +89,7 @@ def write_csv(path: Path, rows: List[Indicator]) -> None:
 
 
 def write_tsv(path: Path, rows: List[Indicator]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", newline="", encoding="utf-8") as f:
+    with _atomic_text_writer(path, newline="") as f:
         w = csv.writer(f, delimiter="\t")
         w.writerow(CSV_HEADER)
         for r in rows:
@@ -71,16 +97,122 @@ def write_tsv(path: Path, rows: List[Indicator]) -> None:
 
 
 def write_json(path: Path, rows: List[Indicator]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8") as f:
-        json.dump([asdict(r) for r in rows], f, ensure_ascii=False, indent=2)
+    write_json_document(path, [asdict(r) for r in rows])
+
+
+def write_json_document(path: Path, payload: Any) -> None:
+    """Atomically publish a general JSON document used by the site."""
+    with _atomic_text_writer(path) as handle:
+        json.dump(payload, handle, ensure_ascii=False, indent=2)
+        handle.write("\n")
 
 
 def write_jsonl(path: Path, rows: List[Indicator]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8") as f:
+    with _atomic_text_writer(path) as f:
         for r in rows:
             f.write(json.dumps(asdict(r), ensure_ascii=False) + "\n")
+
+
+def _score_band(score: int) -> str:
+    if score >= 80:
+        return "high"
+    if score >= 60:
+        return "elevated"
+    if score >= 40:
+        return "moderate"
+    return "aging"
+
+
+def _vulnerability_evidence(reports: Dict[str, Any]) -> Dict[str, Any]:
+    """Compare provider evidence without alerting on every KEV catalog poll."""
+    return {
+        provider: {key: value for key, value in report.items() if key != "catalog_checked_at"}
+        if provider == "cisa_kev" and isinstance(report, dict) else report
+        for provider, report in reports.items()
+    }
+
+
+def build_delta(
+    previous: List[Indicator],
+    current: List[Indicator],
+    *,
+    generated_at: str,
+    previous_generated_at: Optional[str] = None,
+    baseline_available: bool = True,
+) -> Dict[str, Any]:
+    """Build a compact change feed between two published IOC snapshots.
+
+    A missing baseline deliberately produces no additions: treating the first
+    run as thousands of new alerts would make the feed unsafe for automation.
+    Score updates are material only when they cross a dashboard band or move by
+    at least five points, which suppresses routine decay noise.
+    Provider evidence changes are material; the local KEV catalog poll time
+    alone is not. Event payloads still retain the complete provider reports.
+    """
+    events: List[Dict[str, Any]] = []
+    if baseline_available:
+        before = {row.key(): row for row in previous}
+        after = {row.key(): row for row in current}
+        for key in sorted(after.keys() - before.keys()):
+            events.append({
+                "action": "added",
+                "observed_at": generated_at,
+                "current": asdict(after[key]),
+            })
+        for key in sorted(before.keys() & after.keys()):
+            old, new = before[key], after[key]
+            changes: Dict[str, Dict[str, Any]] = {}
+            for field in ("source", "confidence", "tags"):
+                old_value, new_value = getattr(old, field), getattr(new, field)
+                if old_value != new_value:
+                    changes[field] = {"from": old_value, "to": new_value}
+            if _vulnerability_evidence(old.vulnerability) != _vulnerability_evidence(new.vulnerability):
+                changes["vulnerability"] = {
+                    "from": asdict(old)["vulnerability"],
+                    "to": asdict(new)["vulnerability"],
+                }
+            if old.score != new.score and (
+                abs(new.score - old.score) >= 5 or _score_band(old.score) != _score_band(new.score)
+            ):
+                changes["score"] = {"from": old.score, "to": new.score}
+            if changes:
+                events.append({
+                    "action": "updated",
+                    "observed_at": generated_at,
+                    "indicator": new.indicator,
+                    "type": new.type,
+                    "changes": changes,
+                    "current": asdict(new),
+                })
+        for key in sorted(before.keys() - after.keys()):
+            events.append({
+                "action": "removed_from_feed",
+                "observed_at": generated_at,
+                "reason": "no_longer_in_published_snapshot",
+                "previous": asdict(before[key]),
+            })
+
+    counts = {
+        "added": sum(event["action"] == "added" for event in events),
+        "updated": sum(event["action"] == "updated" for event in events),
+        "removed": sum(event["action"] == "removed_from_feed" for event in events),
+    }
+    return {
+        "schema_version": 1,
+        "generated_at": generated_at,
+        "previous_generated_at": previous_generated_at,
+        "baseline_available": baseline_available,
+        "counts": counts,
+        "events": events,
+    }
+
+
+def write_delta(json_path: Path, jsonl_path: Path, delta: Dict[str, Any]) -> None:
+    """Atomically publish a delta envelope and stream-friendly event file."""
+    write_json_document(json_path, delta)
+    with _atomic_text_writer(jsonl_path) as handle:
+        for event in delta.get("events", []):
+            handle.write(json.dumps(event, ensure_ascii=False) + "\n")
 
 
 def write_dashboard_feed(path: Path, rows: List[Indicator], *, limit: int = 1000) -> int:
@@ -122,8 +254,7 @@ def write_dashboard_feed(path: Path, rows: List[Indicator], *, limit: int = 1000
             break
         chosen.setdefault(r.key(), r)
     ranked = sorted(chosen.values(), key=key, reverse=True)[:limit]
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8") as f:
+    with _atomic_text_writer(path) as f:
         for r in ranked:
             f.write(
                 json.dumps(
@@ -137,6 +268,10 @@ def write_dashboard_feed(path: Path, rows: List[Indicator], *, limit: int = 1000
                         "score": r.score,
                         "sightings": r.sightings,
                         "tags": r.tags,
+                        "reference": r.reference,
+                        "context": r.context,
+                        "tlp": r.tlp,
+                        "score_factors": explain_score(r),
                     },
                     ensure_ascii=False,
                 )
@@ -172,8 +307,7 @@ def _stix_pattern(itype: str, indicator: str) -> Optional[str]:
     return None
 
 
-def write_stix(path: Path, rows: List[Indicator]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
+def build_stix_bundle(rows: List[Indicator]) -> Dict[str, Any]:
     now = iso(now_utc())
     common = {
         "created": now,
@@ -224,9 +358,27 @@ def write_stix(path: Path, rows: List[Indicator]) -> None:
             "labels": [t for t in r.tags.split(",") if t],
             "x_swiftioc_source": r.source, "x_swiftioc_tlp": r.tlp, "x_swiftioc_reference": r.reference,
         })
-    bundle = {"type": "bundle", "id": f"bundle--{uuid.uuid5(STIX_NAMESPACE, 'bundle:' + now)}", "objects": objects}
-    with path.open("w", encoding="utf-8") as f:
-        json.dump(bundle, f, ensure_ascii=False, indent=2)
+    return {"type": "bundle", "id": f"bundle--{uuid.uuid5(STIX_NAMESPACE, 'bundle:' + now)}", "objects": objects}
+
+
+def write_stix(
+    path: Path, rows: List[Indicator], *, bundle: Optional[Dict[str, Any]] = None,
+) -> None:
+    write_json_document(path, bundle or build_stix_bundle(rows))
+
+
+def write_taxii_envelope(
+    path: Path, rows: List[Indicator], *, bundle: Optional[Dict[str, Any]] = None,
+) -> int:
+    """Publish the current STIX objects in a TAXII 2.1 envelope.
+
+    This static representation lets TAXII-aware importers consume the same
+    object list without requiring a long-running TAXII server. HTTP discovery,
+    filtering, and pagination remain a future server concern.
+    """
+    objects = (bundle or build_stix_bundle(rows))["objects"]
+    write_json_document(path, {"more": False, "objects": objects})
+    return len(objects)
 
 
 # ---------------- MISP feed ----------------
@@ -409,7 +561,7 @@ def write_badge_json(path: Path, *, total: int, generated: str) -> None:
         "message": f"{total:,} · updated {generated}",
         "color": "blue",
     }
-    path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+    write_json_document(path, payload)
 
 
 def write_history(path: Path, entry: Dict[str, Any], *, max_entries: int = 90) -> List[Dict[str, Any]]:
@@ -429,7 +581,7 @@ def write_history(path: Path, entry: Dict[str, Any], *, max_entries: int = 90) -
             history = []
     history.append(entry)
     history = history[-max_entries:]
-    path.write_text(json.dumps(history, ensure_ascii=False), encoding="utf-8")
+    write_json_document(path, history)
     return history
 
 
@@ -452,5 +604,3 @@ def write_changelog(path: Path, counts: Dict[str, int], total: int, *, max_entri
     entries = entries[-max_entries:]
     body = "# Changelog\n\n" + "\n\n".join(entries) + "\n"
     path.write_text(body, encoding="utf-8")
-
-

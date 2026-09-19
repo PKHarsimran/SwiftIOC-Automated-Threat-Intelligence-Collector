@@ -4,51 +4,51 @@
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-07-21T21:02:19Z |
+| Generated | 2026-09-19T08:28:17Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3933 |
-| Carried forward | 1867 |
+| Duplicates removed | 9887 |
+| Carried forward | 2384 |
 | Expired (score < 20) | 0 |
 | Aged out (> 30d) | 0 |
-| Pruned over cap (10000) | 26183 |
+| Pruned over cap (10000) | 39354 |
 | Stored | 10000 |
-| Score (min / avg / max) | 66 / 76.1 / 96 |
-| High-confidence indicators | 8824 |
-| Earliest first_seen | 2009-11-03T16:30:12Z |
-| Newest first_seen | 2026-07-21T21:01:56Z |
+| Score (min / avg / max) | 80 / 80.6 / 96 |
+| High-confidence indicators | 10000 |
+| Earliest first_seen | 2016-05-11T01:59:46Z |
+| Newest first_seen | 2026-09-19T08:27:53Z |
 
 ## Per-source counts
 
 | Source | Indicators |
 | --- | ---: |
-| binarydefense_banlist | 3281 |
-| blocklist_de_ssh | 5912 |
+| binarydefense_banlist | 4792 |
+| blocklist_de_ssh | 12092 |
 | ci_army_list | 15000 |
-| cisa_kev | 1651 |
+| cisa_kev | 1716 |
 | dshield_block | 20 |
-| et_compromised | 590 |
+| et_compromised | 675 |
 | feodo_ipblocklist | 5 |
-| greensnow_blocklist | 3578 |
-| ipsum_level5 | 2328 |
-| malwarebazaar_recent | 785 |
-| nist_nvd_recent | 200 |
+| greensnow_blocklist | 5723 |
+| ipsum_level5 | 6371 |
+| malwarebazaar_recent | 1531 |
+| nist_nvd_recent | 3400 |
 | openphish_feed | 300 |
-| spamhaus_drop | 1669 |
+| spamhaus_drop | 1713 |
 | sslbl_ja3 | 97 |
-| threatfox_export_json | 1016 |
-| tor_exit_nodes | 1421 |
-| urlhaus_recent_urls | 396 |
+| threatfox_export_json | 1641 |
+| tor_exit_nodes | 1365 |
+| urlhaus_recent_urls | 416 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| ipv4 | 4381 |
-| cve | 2294 |
-| ipv4_cidr | 1682 |
-| domain | 1191 |
-| url | 203 |
-| sha256 | 97 |
-| md5 | 76 |
-| sha1 | 76 |
+| cve | 3723 |
+| sha256 | 2536 |
+| ipv4_cidr | 1709 |
+| domain | 813 |
+| url | 611 |
+| ipv4 | 310 |
+| sha1 | 253 |
+| md5 | 45 |

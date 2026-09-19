@@ -10,6 +10,9 @@ this suite) so nothing touches the network.
 from __future__ import annotations
 
 import json
+from typing import Any, Dict
+
+import pytest
 
 import swiftioc as si
 
@@ -70,17 +73,28 @@ def test_cli_main_end_to_end_writes_expected_outputs(tmp_path, monkeypatch):
         "iocs/latest.csv", "iocs/latest.tsv", "iocs/latest.json", "iocs/latest.jsonl",
         "iocs/stix2.json", "iocs/high_confidence.csv", "iocs/high_confidence.jsonl",
         "iocs/dashboard.jsonl", "badge.json", "diagnostics/run.json", "diagnostics/REPORT.md",
+        "iocs/delta.json", "iocs/delta.jsonl",
+        "collections/observables.jsonl", "collections/vulnerabilities.json",
+        "iocs/taxii2-envelope.json",
         "changelog/CHANGELOG.md",
+        "detections/manifest.json", "detections/README.md",
+        "detections/sigma/network-iocs.yml",
+        "detections/suricata/swiftioc.rules", "detections/dns/swiftioc.rpz",
     ]:
         assert (out_dir / rel).exists(), f"missing output: {rel}"
 
     diag = json.loads((out_dir / "diagnostics" / "run.json").read_text(encoding="utf-8"))
+    assert diag["collections"]["observables"] == 3
+    assert diag["collections"]["vulnerabilities"] == 0
     assert diag["total_before_dedup"] == 5
     # 5 raw rows (3 from src_a, 2 from src_b, both overlapping src_a's first
     # two) dedup to 3 unique indicators -> 2 genuine duplicates removed.
     assert diag["duplicates_removed"] == 2
     assert diag["counts"] == {"src_a": 3, "src_b": 2}
     assert "score_bands" in diag and "fetch_metrics" in diag
+    assert diag["delta_baseline_available"] is False
+    assert diag["delta_counts"] == {"added": 0, "updated": 0, "removed": 0}
+    assert diag["detection_pack"]["suricata_rules"] == 4
 
     rows = [json.loads(line) for line in (out_dir / "iocs" / "latest.jsonl").read_text(encoding="utf-8").splitlines()]
     assert {r["indicator"] for r in rows} == {"1[.]1[.]1[.]1", "2[.]2[.]2[.]2", "3[.]3[.]3[.]3"}
@@ -139,3 +153,223 @@ def test_cli_main_duplicates_removed_not_conflated_with_persist_feed_growth(tmp_
     assert diag["total_before_dedup"] == 5
     assert diag["duplicates_removed"] == 2
     assert diag["total"] == 13
+
+
+def test_cli_warns_on_large_source_volume_drop(tmp_path, monkeypatch):
+    sources = tmp_path / "sources.yml"
+    _write_sources_yml(sources)
+    out_dir = tmp_path / "out"
+    (out_dir / "diagnostics").mkdir(parents=True)
+    (out_dir / "diagnostics" / "run.json").write_text(
+        json.dumps({"counts": {"src_a": 10, "src_b": 2}}), encoding="utf-8"
+    )
+    monkeypatch.setattr(si, "http_get", _fake_http_get)
+    rc = _run_main(monkeypatch, [
+        "swiftioc", "--sources", str(sources), "--out-dir", str(out_dir), "--skip-rss",
+        "--warn-if-volume-drop", "src_a=50",
+    ])
+    assert rc == 0
+    diag = json.loads((out_dir / "diagnostics" / "run.json").read_text(encoding="utf-8"))
+    assert diag["volume_drops"] == [{"source": "src_a", "previous": 10, "current": 3, "drop_percent": 70.0}]
+
+
+def test_cli_delta_tracks_changes_between_published_runs(tmp_path, monkeypatch):
+    sources = tmp_path / "sources.yml"
+    _write_sources_yml(sources)
+    out_dir = tmp_path / "out"
+    monkeypatch.setattr(si, "http_get", _fake_http_get)
+    assert _run_main(monkeypatch, [
+        "swiftioc", "--sources", str(sources), "--out-dir", str(out_dir), "--skip-rss",
+    ]) == 0
+
+    def changed_feed(url, *, name, **kwargs):
+        if name == "src_a":
+            return "1.1.1.1\n4.4.4.4\n"
+        if name == "src_b":
+            return "1.1.1.1\n"
+        raise AssertionError(name)
+
+    monkeypatch.setattr(si, "http_get", changed_feed)
+    assert _run_main(monkeypatch, [
+        "swiftioc", "--sources", str(sources), "--out-dir", str(out_dir), "--skip-rss",
+    ]) == 0
+    delta = json.loads((out_dir / "iocs" / "delta.json").read_text())
+    assert delta["baseline_available"] is True
+    assert delta["counts"] == {"added": 1, "updated": 0, "removed": 2}
+    assert {event["current"]["indicator"] for event in delta["events"] if event["action"] == "added"} == {
+        "4[.]4[.]4[.]4"
+    }
+
+
+def test_cli_rejects_truncated_delta_baseline(tmp_path, monkeypatch):
+    sources = tmp_path / "sources.yml"
+    _write_sources_yml(sources)
+    out_dir = tmp_path / "out"
+    iocs = out_dir / "iocs"
+    diagnostics = out_dir / "diagnostics"
+    iocs.mkdir(parents=True)
+    diagnostics.mkdir(parents=True)
+    (iocs / "latest.jsonl").write_text('{"truncated":', encoding="utf-8")
+    (diagnostics / "run.json").write_text(
+        json.dumps({"total": 250, "counts": {}, "ts": "2026-09-08T00:00:00Z"}),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(si, "http_get", _fake_http_get)
+    assert _run_main(monkeypatch, [
+        "swiftioc", "--sources", str(sources), "--out-dir", str(out_dir), "--skip-rss",
+    ]) == 0
+    delta = json.loads((iocs / "delta.json").read_text())
+    assert delta["baseline_available"] is False
+    assert delta["events"] == []
+    assert delta["counts"] == {"added": 0, "updated": 0, "removed": 0}
+
+
+
+def test_cli_retains_fresh_kev_before_higher_scoring_ioc_when_capped(tmp_path, monkeypatch):
+    sources = tmp_path / "sources.yml"
+    _write_sources_yml(sources)
+    now = si.iso(si.now_utc())
+    base: Dict[str, Any] = dict(first_seen=now, last_seen=now, confidence="high", tlp="CLEAR", tags="", reference="https://example.invalid", context="test")
+    kev = si.Indicator(indicator="CVE-1900-1234", type="cve", source="kev", vulnerability={
+        "cisa_kev": {"catalog_checked_at": now, "date_added": now}}, **base)
+    ip = si.Indicator(indicator="8.8.8.8", type="ipv4", source="a,b,c", **base)
+    monkeypatch.setattr("swiftioc.cli.collect_from_yaml", lambda *a, **kw: ([ip, kev], {"kev": 1, "a": 1}, {"raw_total": 2}))
+    out_dir = tmp_path / "out"
+    assert _run_main(monkeypatch, ["swiftioc", "--sources", str(sources), "--out-dir", str(out_dir), "--max-store", "1"]) == 0
+    document = json.loads((out_dir / "collections/vulnerabilities.json").read_text())
+    assert [r["cve_id"] for r in document["items"]] == ["CVE-1900-1234"]
+    retained = json.loads((out_dir / "iocs/latest.jsonl").read_text())
+    assert retained["type"] == "cve"
+    assert (out_dir / "collections/observables.jsonl").read_text() == ""
+
+
+@pytest.mark.parametrize('custom_diag', [False, True])
+def test_rejected_collection_preserves_published_files_and_next_delta_baseline(tmp_path, monkeypatch, custom_diag):
+    sources = tmp_path / 'sources.yml'
+    _write_sources_yml(sources)
+    out = tmp_path / 'out'
+    base = ['swiftioc', '--sources', str(sources), '--out-dir', str(out), '--skip-rss']
+    diagnostics = tmp_path / 'separate-diagnostics.json' if custom_diag else out / 'diagnostics/run.json'
+    if custom_diag:
+        base += ['--diag-json', str(diagnostics)]
+    monkeypatch.setattr(si, 'http_get', _fake_http_get)
+    assert _run_main(monkeypatch, base) == 0
+    baseline_diagnostics = diagnostics.read_bytes()
+    snapshot = {p.relative_to(out): p.read_bytes() for p in out.rglob('*') if p.is_file()
+                and p.name != 'collection-attempt.json'}
+    monkeypatch.setattr(si, 'http_get', lambda *a, **kw: '')
+    for rules in [['--fail-on-empty', 'src_a'], ['--fail-if-stale', 'src_a=24'],
+                  ['--fail-if-volume-drop', 'src_a=50']]:
+        assert _run_main(monkeypatch, base + ['--persist-feed'] + rules) == 1
+        assert diagnostics.read_bytes() == baseline_diagnostics
+        for path, content in snapshot.items():
+            assert (out / path).read_bytes() == content, path
+        attempt = json.loads((out / 'diagnostics/collection-attempt.json').read_text())
+        assert attempt['status'] == 'rejected'
+        assert attempt['quality_failures'][0]['source'] == 'src_a'
+    monkeypatch.setattr(si, 'http_get', _fake_http_get)
+    assert _run_main(monkeypatch, base + ['--fail-if-stale', 'src_a=24', '--fail-if-volume-drop', 'src_a=50']) == 0
+    delta = json.loads((out / 'iocs/delta.json').read_text())
+    assert delta['baseline_available'] is True
+    assert delta['counts']['added'] == delta['counts']['removed'] == 0
+    assert json.loads((out / 'diagnostics/collection-attempt.json').read_text())['status'] == 'accepted'
+
+
+def test_stale_check_uses_each_sources_own_premerge_timestamp(tmp_path, monkeypatch):
+    from datetime import timedelta
+    from swiftioc import collect
+    sources = tmp_path / 'sources.yml'
+    _write_sources_yml(sources)
+    now = si.now_utc()
+    dates = {'src_a': si.iso(now - timedelta(hours=1)), 'src_b': si.iso(now - timedelta(days=10))}
+    def parser(url, ref_url, source, ws):
+        return [si.Indicator('8[.]8[.]4[.]4', 'ipv4', source, dates[source], si.iso(now), 'high', 'CLEAR', '', '', '')]
+    monkeypatch.setattr(collect, 'resolve_parser', lambda _: parser)
+    out = tmp_path / 'out'
+    base = ['swiftioc', '--sources', str(sources), '--out-dir', str(out), '--skip-rss']
+    assert _run_main(monkeypatch, base + ['--fail-if-stale', 'src_a=24']) == 0
+    diag = json.loads((out / 'diagnostics/run.json').read_text())
+    assert diag['source_newest_first_seen'] == dates
+    assert _run_main(monkeypatch, base + ['--fail-if-stale', 'src_b=24']) == 1
+
+
+def test_invalid_quality_flags_abort_before_collection(tmp_path, monkeypatch):
+    import pytest
+    from swiftioc import cli
+    monkeypatch.setattr(cli, 'collect_from_yaml', lambda *a, **kw: pytest.fail('must validate before collecting'))
+    for flags in [['--fail-if-stale', 'feed=oops'], ['--fail-if-volume-drop', 'feed=101'], ['--fail-on-empty']]:
+        with pytest.raises(SystemExit) as error:
+            _run_main(monkeypatch, ['swiftioc', '--out-dir', str(tmp_path / 'untouched')] + flags)
+        assert error.value.code == 2
+        assert not (tmp_path / 'untouched').exists()
+
+
+def test_cli_does_not_republish_collected_keys_in_exports_or_delta(tmp_path, monkeypatch):
+    from dataclasses import asdict, replace
+    from swiftioc import cli
+    from swiftioc.models import iso, now_utc
+
+    # Keep reserved synthetic URLs eligible for snapshot loading so this test
+    # exercises the publication boundary, rather than the unrelated FP filter.
+    monkeypatch.setattr('swiftioc.scoring.is_false_positive', lambda *_: False)
+
+    sources = tmp_path / 'sources.yml'
+    sources.write_text('{}', encoding='utf-8')
+    stamp = iso(now_utc())
+    safe = si.Indicator('8[.]8[.]4[.]4', 'ipv4', 'test', stamp, stamp, 'high', 'CLEAR', '', '', '')
+    key = 'AI' + 'za' + '0123456789_' * 3 + 'ab'
+    unsafe = replace(safe, type='url', indicator='hxxps://example[.]invalid/?apiKey=' + key)
+    metadata = replace(safe, indicator='1[.]2[.]3[.]4', vulnerability={'nvd': {'description': key}})
+    for persist in (False, True):
+        out = tmp_path / str(persist)
+        (out / 'iocs').mkdir(parents=True)
+        (out / 'diagnostics').mkdir()
+        # A valid previous baseline must not leak through a removed event.
+        (out / 'iocs/latest.jsonl').write_text(json.dumps(asdict(unsafe)) + '\n', encoding='utf-8')
+        (out / 'diagnostics/run.json').write_text(json.dumps({'total': 1, 'ts': stamp, 'counts': {}}), encoding='utf-8')
+        monkeypatch.setattr(cli, 'collect_from_yaml', lambda *a, **kw: ([safe, metadata, unsafe], {'test': 3}, {'raw_total': 3}))
+        args = ['swiftioc', '--sources', str(sources), '--out-dir', str(out), '--skip-rss']
+        if persist:
+            args.append('--persist-feed')
+        assert _run_main(monkeypatch, args) == 0
+        for path in out.rglob('*'):
+            if path.is_file():
+                assert key not in path.read_text(encoding='utf-8'), path.relative_to(out)
+        diag = json.loads((out / 'diagnostics/run.json').read_text(encoding='utf-8'))
+        assert diag['sensitive_rows_omitted'] == 2
+        assert diag['sensitive_previous_rows_omitted'] == 1
+        assert diag['duplicates_removed'] == 0
+        assert diag['total'] == 1
+        assert diag['carried_forward'] == 0
+        delta = json.loads((out / 'iocs/delta.json').read_text(encoding='utf-8'))
+        assert delta['baseline_available'] is True
+        assert delta['counts'] == {'added': 1, 'updated': 0, 'removed': 0}
+
+
+@pytest.mark.parametrize('explicit_capture', [False, True])
+def test_ci_safe_requires_opt_in_for_raw_capture(tmp_path, monkeypatch, explicit_capture):
+    from swiftioc import http_client
+    monkeypatch.chdir(tmp_path)
+    sources = tmp_path / 'sources.yml'
+    _write_sources_yml(sources)
+    out = tmp_path / 'custom-public'
+    private = tmp_path / 'private-capture'
+    def fake_get(url, *, name, **kwargs):
+        # Exercise the capture path used by real HTTP responses without a
+        # network request or a real credential in the regression fixture.
+        http_client.save_raw(name, 'unfiltered upstream body', 'text')
+        return _fake_http_get(url, name=name)
+    monkeypatch.setattr(si, 'http_get', fake_get)
+    # CLI normally resets this singleton; isolate it for other tests as well.
+    monkeypatch.setattr(http_client, '_SAVE_RAW_DIR', None)
+    args = ['swiftioc', '--sources', str(sources), '--out-dir', str(out), '--skip-rss', '--ci-safe']
+    if explicit_capture:
+        args += ['--save-raw-dir', str(private)]
+    assert _run_main(monkeypatch, args) == 0
+    assert not (tmp_path / 'public').exists()
+    assert not (out / 'diagnostics/raw').exists()
+    if explicit_capture:
+        assert (private / 'src_a.txt').read_text() == 'unfiltered upstream body'
+    else:
+        assert not private.exists()
+        assert http_client._SAVE_RAW_DIR is None

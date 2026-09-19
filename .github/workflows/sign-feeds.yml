@@ -1,0 +1,49 @@
+name: Sign published IOC feeds
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Collect – SwiftIOC"]
+    types: [completed]
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: sign-swiftioc-feeds
+  cancel-in-progress: false
+
+jobs:
+  sign:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
+      - name: Sign canonical feeds
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p public/signatures
+          for feed in \
+            public/iocs/latest.csv \
+            public/iocs/latest.jsonl \
+            public/iocs/high_confidence.csv \
+            public/iocs/high_confidence.jsonl \
+            public/iocs/delta.json \
+            public/iocs/delta.jsonl; do
+            [ -f "$feed" ] || continue
+            name="${feed#public/iocs/}"
+            cosign sign-blob --yes --bundle "public/signatures/${name}.sigstore.json" "$feed"
+          done
+      - name: Commit signature bundles
+        uses: stefanzweifel/git-auto-commit-action@4a55954c782fc1ea30b9056cd3e7a2b40ca8887d # v7
+        with:
+          commit_message: "chore(sign): update feed signatures [skip ci]"
+          file_pattern: public/signatures
+          commit_user_name: SwiftIOC Bot
+          commit_user_email: actions@github.com

@@ -1,95 +1,95 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-07-21T21:02:19Z_
+_Generated 2026-09-19T08:28:17Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-07-21T21:02:19Z |
+| Generated | 2026-09-19T08:28:17Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3933 |
+| Duplicates removed | 9887 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-source overlaps | 4109 |
-| Score (min / avg / max) | 66 / 76.1 / 96 |
-| High-score indicators (≥80) | 4730 |
-| Corroborated (2+ sources) | 4109 |
-| Earliest first_seen | 2009-11-03T16:30:12Z |
-| Newest first_seen | 2026-07-21T21:01:56Z |
+| Multi-source overlaps | 951 |
+| Score (min / avg / max) | 80 / 80.6 / 96 |
+| High-score indicators (≥80) | 10000 |
+| Corroborated (2+ sources) | 951 |
+| Earliest first_seen | 2016-05-11T01:59:46Z |
+| Newest first_seen | 2026-09-19T08:27:53Z |
 
 ## Top indicators by score
 
 | Indicator | Score / corroboration |
 | --- | ---: |
-| ipv4: `94[.]154[.]43[.]77` | score 96, 5 sources |
-| ipv4_cidr: `195.178.110.0/24` | score 88, 2 sources |
-| ipv4_cidr: `43.228.157.0/24` | score 88, 2 sources |
-| ipv4_cidr: `45.142.193.0/24` | score 88, 2 sources |
-| ipv4_cidr: `45.148.10.0/24` | score 88, 2 sources |
-| ipv4_cidr: `77.90.185.0/24` | score 88, 2 sources |
-| cve: `CVE-2024-30088` | score 88, 2 sources |
-| cve: `CVE-2024-35250` | score 88, 2 sources |
-| cve: `CVE-2026-0770` | score 88, 2 sources |
-| cve: `CVE-2026-60137` | score 88, 2 sources |
+| ipv4: `77[.]239[.]124[.]108` | score 96, 6 sources |
+| ipv4: `94[.]154[.]43[.]60` | score 96, 5 sources |
+| ipv4: `94[.]154[.]43[.]69` | score 96, 5 sources |
+| ipv4: `103[.]176[.]64[.]36` | score 96, 4 sources |
+| ipv4: `103[.]182[.]132[.]154` | score 96, 4 sources |
+| ipv4: `114[.]111[.]53[.]214` | score 96, 4 sources |
+| ipv4: `176[.]65[.]139[.]206` | score 96, 4 sources |
+| ipv4: `43[.]129[.]53[.]19` | score 96, 4 sources |
+| ipv4: `43[.]156[.]71[.]43` | score 96, 4 sources |
+| ipv4: `45[.]17[.]39[.]120` | score 96, 4 sources |
 
 ## Per-source totals
 
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5912 |
-| greensnow_blocklist | 3578 |
-| binarydefense_banlist | 3281 |
-| ipsum_level5 | 2328 |
-| spamhaus_drop | 1669 |
-| cisa_kev | 1651 |
-| tor_exit_nodes | 1421 |
-| threatfox_export_json | 1016 |
-| malwarebazaar_recent | 785 |
+| blocklist_de_ssh | 12092 |
+| ipsum_level5 | 6371 |
+| greensnow_blocklist | 5723 |
+| binarydefense_banlist | 4792 |
+| nist_nvd_recent | 3400 |
+| cisa_kev | 1716 |
+| spamhaus_drop | 1713 |
+| threatfox_export_json | 1641 |
+| malwarebazaar_recent | 1531 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| ipv4 | 4381 |
-| cve | 2294 |
-| ipv4_cidr | 1682 |
-| domain | 1191 |
-| url | 203 |
-| sha256 | 97 |
-| md5 | 76 |
-| sha1 | 76 |
+| cve | 3723 |
+| sha256 | 2536 |
+| ipv4_cidr | 1709 |
+| domain | 813 |
+| url | 611 |
+| ipv4 | 310 |
+| sha1 | 253 |
+| md5 | 45 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| blocklist | 4094 |
-| aggregated | 2990 |
-| ipsum | 2990 |
-| multi-list | 2990 |
-| scanner | 2755 |
-| cve | 2294 |
-| cins | 2284 |
-| ssh | 2048 |
-| bruteforce | 2047 |
-| threatfox | 1926 |
+| cve | 3723 |
+| malware | 3127 |
+| nvd | 2260 |
+| threatfox | 2112 |
+| exploited-in-the-wild | 1716 |
+| drop | 1709 |
+| spamhaus | 1709 |
+| high | 791 |
+| Mirai | 499 |
+| medium | 457 |
 
 ## Multi-source overlaps
 
 | Indicator | Sources |
 | --- | --- |
-| ipv4: 154[.]90[.]70[.]254 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, et_compromised, greensnow_blocklist, ipsum_level5 |
-| ipv4: 192[.]142[.]28[.]77 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, et_compromised, greensnow_blocklist, ipsum_level5 |
-| ipv4: 195[.]178[.]110[.]137 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, et_compromised, greensnow_blocklist, ipsum_level5 |
-| ipv4: 94[.]154[.]43[.]50 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, et_compromised, greensnow_blocklist, ipsum_level5 |
-| ipv4: 101[.]47[.]15[.]119 | blocklist_de_ssh, ci_army_list, et_compromised, greensnow_blocklist, ipsum_level5 |
-| ipv4: 103[.]167[.]88[.]166 | blocklist_de_ssh, ci_army_list, et_compromised, greensnow_blocklist, ipsum_level5 |
-| ipv4: 107[.]189[.]10[.]124 | blocklist_de_ssh, ci_army_list, et_compromised, greensnow_blocklist, ipsum_level5 |
-| ipv4: 117[.]175[.]140[.]121 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, greensnow_blocklist, ipsum_level5 |
-| ipv4: 118[.]216[.]88[.]229 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, et_compromised, ipsum_level5 |
-| ipv4: 118[.]26[.]111[.]107 | blocklist_de_ssh, ci_army_list, et_compromised, greensnow_blocklist, ipsum_level5 |
+| ipv4: 77[.]239[.]124[.]108 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, et_compromised, ipsum_level5, threatfox_export_json |
+| ipv4: 94[.]154[.]43[.]60 | binarydefense_banlist, blocklist_de_ssh, et_compromised, ipsum_level5, threatfox_export_json |
+| ipv4: 94[.]154[.]43[.]69 | binarydefense_banlist, blocklist_de_ssh, et_compromised, ipsum_level5, threatfox_export_json |
+| ipv4: 103[.]176[.]64[.]36 | blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
+| ipv4: 103[.]182[.]132[.]154 | blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
+| ipv4: 114[.]111[.]53[.]214 | blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
+| ipv4: 176[.]65[.]139[.]206 | blocklist_de_ssh, et_compromised, ipsum_level5, threatfox_export_json |
+| ipv4: 43[.]129[.]53[.]19 | blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
+| ipv4: 43[.]156[.]71[.]43 | blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
+| ipv4: 45[.]17[.]39[.]120 | blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
 
 For more detail see [diagnostics/REPORT.md](diagnostics/REPORT.md) and the machine-readable feeds in [iocs/](iocs/).

@@ -37,7 +37,9 @@ env:
   DIAG_DIR: "public/diagnostics"
   IOC_DIR: "public/iocs"
   CHANGELOG_DIR: "public/changelog"
-  RAW_DIR: "public/diagnostics/raw"
+  # Upstream captures may contain credentials embedded in phishing URLs.
+  # Keep them outside every public artifact and the Pages deployment tree.
+  RAW_DIR: "_private/diagnostics/raw"
   SOURCES_FILE: "sources.yml"
 
 jobs:
@@ -59,7 +61,7 @@ jobs:
         # history.yml's git-log walk which genuinely needs fetch-depth: 0.
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
@@ -107,6 +109,20 @@ jobs:
           echo "OUT_DIR=$OUT_DIR"
           echo "SOURCES_FILE=$SOURCES_FILE"
 
+      - name: Restore committed Suricata SID registry
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          registry="$OUT_DIR/detections/suricata/sid-registry.json"
+          # The first run bootstraps the registry. Subsequent fresh checkouts
+          # restore the force-tracked state committed by successful runs.
+          if git cat-file -e "HEAD:$registry" 2>/dev/null; then
+            mkdir -p "$(dirname "$registry")"
+            git show "HEAD:$registry" > "$registry"
+          else
+            echo "No committed SID registry yet; bootstrapping on this run."
+          fi
+
       - name: Run collector
         id: collector
         shell: bash
@@ -138,8 +154,11 @@ jobs:
             --report "$DIAG_DIR/REPORT.md" \
             --fail-on-empty urlhaus_recent_urls malwarebazaar_recent
 
+      - name: Verify generated detection pack
+        run: python -m swiftioc.verify_detections "$OUT_DIR/detections" --json
+
       - name: Summarize IOC outputs
-        if: always()
+        if: success()
         shell: bash
         run: |
           set -Eeuo pipefail
@@ -176,8 +195,11 @@ jobs:
             public/changelog/**
             public/index.md
             public/misp/**
+            public/detections/**
+            public/collections/**
             public/feed.xml
             public/badge.json
+            !public/diagnostics/raw/**
 
       - name: Upload built public site
         if: success() && github.ref == 'refs/heads/main'
@@ -186,7 +208,18 @@ jobs:
           name: swiftioc-public-site
           retention-days: 3
           if-no-files-found: error
-          path: public/**
+          path: |
+            public/**
+            !public/diagnostics/raw/**
+
+      - name: Stage persistent Suricata SID registry
+        if: success() && github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          # Detection outputs are ignored, but this small state file must
+          # survive fresh checkouts, including assignments for inactive IOCs.
+          git add -f -- "$OUT_DIR/detections/suricata/sid-registry.json"
 
       - name: Auto-commit updated outputs
         if: success() && github.ref == 'refs/heads/main'

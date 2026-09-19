@@ -43,8 +43,9 @@ _SESSION: Optional[requests.Session] = None
 _FEEDPARSER = None
 _SAVE_RAW_DIR: Optional[Path] = None
 HTTP_DEBUG = False
-# Per-fetch telemetry ({name: {ms, bytes, status}}) filled by http_get, drained
-# into diagnostics so the dashboard can show a feed-health / latency panel.
+# Per-source telemetry ({name: {ms, bytes, status, requests}}) filled by
+# http_get, drained into diagnostics so the dashboard can show a feed-health /
+# latency panel. A parser may make several paginated or fallback requests.
 _FETCH_METRICS: Dict[str, Dict[str, Any]] = {}
 
 
@@ -140,6 +141,13 @@ def _validate_redirect_target(url: str) -> None:
         raise requests.exceptions.RequestException(f"Refusing redirect to a non-public host: {url!r}")
 
 
+def _origin(url: str) -> tuple[str, str, int]:
+    """Return a normalized HTTP origin for redirect credential handling."""
+    parsed = urlparse(url)
+    default_port = 443 if parsed.scheme.lower() == "https" else 80
+    return (parsed.scheme.lower(), (parsed.hostname or "").lower(), parsed.port or default_port)
+
+
 def _read_capped(r: requests.Response, max_bytes: int) -> bytes:
     """Read a streamed response body, aborting before it exceeds max_bytes.
 
@@ -170,13 +178,16 @@ def _read_capped(r: requests.Response, max_bytes: int) -> bytes:
     return b"".join(chunks)
 
 
-def http_get(url: str, *, name: str, kind: str = "text", timeout: int = 20) -> str | bytes:
+def http_get(
+    url: str, *, name: str, kind: str = "text", timeout: int = 20, headers: Optional[Dict[str, str]] = None,
+) -> str | bytes:
     s = ensure_session()
-    headers = choose_ua()
+    request_headers = choose_ua()
+    request_headers.update(headers or {})
     t0 = time.perf_counter()
 
     current_url = url
-    r = s.get(current_url, headers=headers, timeout=timeout, stream=True, allow_redirects=False)
+    r = s.get(current_url, headers=request_headers, timeout=timeout, stream=True, allow_redirects=False)
     hops = 0
     while r.is_redirect or r.is_permanent_redirect:
         location = r.headers.get("Location")
@@ -184,17 +195,30 @@ def http_get(url: str, *, name: str, kind: str = "text", timeout: int = 20) -> s
         hops += 1
         if not location or hops > MAX_REDIRECTS:
             raise requests.exceptions.TooManyRedirects(f"Exceeded {MAX_REDIRECTS} redirects fetching {url!r}")
-        current_url = urljoin(current_url, location)
+        next_url = urljoin(current_url, location)
+        if _origin(next_url) != _origin(current_url):
+            # A redirect is untrusted until its target is validated. Never
+            # forward credentials (for example an NVD API key) to another
+            # origin, even when that host resolves to a public address.
+            for key in list(request_headers):
+                if key.lower() in {"apikey", "authorization", "cookie", "proxy-authorization"}:
+                    del request_headers[key]
+        current_url = next_url
         _validate_redirect_target(current_url)
-        r = s.get(current_url, headers=headers, timeout=timeout, stream=True, allow_redirects=False)
+        r = s.get(current_url, headers=request_headers, timeout=timeout, stream=True, allow_redirects=False)
 
-    dt = time.perf_counter() - t0
     raw = _read_capped(r, MAX_RESPONSE_BYTES)
+    # Measure the complete fetch, including streamed response-body download.
+    # Recording the time immediately after receiving headers made a slow
+    # large feed look artificially fast in the dashboard diagnostics.
+    dt = time.perf_counter() - t0
     # Record telemetry before raise_for_status so failed statuses are captured.
+    previous = _FETCH_METRICS.get(name, {})
     _FETCH_METRICS[name] = {
-        "ms": round(dt * 1000),
-        "bytes": len(raw),
+        "ms": previous.get("ms", 0) + round(dt * 1000),
+        "bytes": previous.get("bytes", 0) + len(raw),
         "status": r.status_code,
+        "requests": previous.get("requests", 0) + 1,
     }
     if HTTP_DEBUG:
         logger.debug("HTTP %s %.2fs %s [%s]", r.status_code, dt, current_url, name)
@@ -228,4 +252,3 @@ def load_feedparser() -> Any:
         return _FEEDPARSER
     except ModuleNotFoundError as e:
         raise SystemExit("Missing 'feedparser'. Install it or run with --skip-rss") from e
-

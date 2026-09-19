@@ -1,1 +1,542 @@
-[{"ts": "2026-07-17T13:22:01Z", "total": 10000, "high_confidence": 7063, "score_avg": 70.2}, {"ts": "2026-07-17T17:10:18Z", "total": 10000, "high_confidence": 7134, "score_avg": 70.3}, {"ts": "2026-07-17T20:51:29Z", "total": 10000, "high_confidence": 7196, "score_avg": 70.5}, {"ts": "2026-07-18T02:04:42Z", "total": 10000, "high_confidence": 8030, "score_avg": 71.8}, {"ts": "2026-07-18T06:04:10Z", "total": 10000, "high_confidence": 8091, "score_avg": 71.9}, {"ts": "2026-07-18T09:21:46Z", "total": 10000, "high_confidence": 7120, "score_avg": 71.9}, {"ts": "2026-07-18T13:06:10Z", "total": 10000, "high_confidence": 7150, "score_avg": 72.0}, {"ts": "2026-07-18T16:54:39Z", "total": 10000, "high_confidence": 7181, "score_avg": 71.9}, {"ts": "2026-07-18T20:43:45Z", "total": 10000, "high_confidence": 7344, "score_avg": 72.2}, {"ts": "2026-07-19T02:12:20Z", "total": 10000, "high_confidence": 8579, "score_avg": 75.5}, {"ts": "2026-07-19T06:26:17Z", "total": 10000, "high_confidence": 8596, "score_avg": 75.4}, {"ts": "2026-07-19T09:47:48Z", "total": 10000, "high_confidence": 8570, "score_avg": 75.5}, {"ts": "2026-07-19T13:06:08Z", "total": 10000, "high_confidence": 8548, "score_avg": 75.4}, {"ts": "2026-07-19T16:52:54Z", "total": 10000, "high_confidence": 8548, "score_avg": 75.3}, {"ts": "2026-07-19T20:41:45Z", "total": 10000, "high_confidence": 8553, "score_avg": 75.5}, {"ts": "2026-07-20T02:32:17Z", "total": 10000, "high_confidence": 8293, "score_avg": 75.8}, {"ts": "2026-07-20T06:41:54Z", "total": 10000, "high_confidence": 8298, "score_avg": 75.7}, {"ts": "2026-07-20T10:47:04Z", "total": 10000, "high_confidence": 8254, "score_avg": 75.8}, {"ts": "2026-07-20T13:57:41Z", "total": 10000, "high_confidence": 8216, "score_avg": 76.0}, {"ts": "2026-07-20T17:57:37Z", "total": 10000, "high_confidence": 8202, "score_avg": 76.1}, {"ts": "2026-07-20T21:07:46Z", "total": 10000, "high_confidence": 8219, "score_avg": 76.1}, {"ts": "2026-07-21T02:12:53Z", "total": 10000, "high_confidence": 8229, "score_avg": 76.2}, {"ts": "2026-07-21T06:25:11Z", "total": 10000, "high_confidence": 8206, "score_avg": 76.2}, {"ts": "2026-07-21T10:21:27Z", "total": 10000, "high_confidence": 8565, "score_avg": 76.1}, {"ts": "2026-07-21T13:27:52Z", "total": 10000, "high_confidence": 8616, "score_avg": 76.1}, {"ts": "2026-07-21T17:12:33Z", "total": 10000, "high_confidence": 8760, "score_avg": 76.1}, {"ts": "2026-07-21T21:02:19Z", "total": 10000, "high_confidence": 8824, "score_avg": 76.1}]
+[
+  {
+    "ts": "2026-09-02T08:19:30Z",
+    "total": 10000,
+    "high_confidence": 6643,
+    "score_avg": 79.8
+  },
+  {
+    "ts": "2026-09-02T15:51:23Z",
+    "total": 10000,
+    "high_confidence": 6564,
+    "score_avg": 79.8
+  },
+  {
+    "ts": "2026-09-02T19:10:03Z",
+    "total": 10000,
+    "high_confidence": 6843,
+    "score_avg": 79.9
+  },
+  {
+    "ts": "2026-09-02T22:16:50Z",
+    "total": 10000,
+    "high_confidence": 6864,
+    "score_avg": 79.9
+  },
+  {
+    "ts": "2026-09-03T02:40:27Z",
+    "total": 10000,
+    "high_confidence": 6834,
+    "score_avg": 79.8
+  },
+  {
+    "ts": "2026-09-03T08:30:12Z",
+    "total": 10000,
+    "high_confidence": 7034,
+    "score_avg": 79.9
+  },
+  {
+    "ts": "2026-09-03T15:40:56Z",
+    "total": 10000,
+    "high_confidence": 7102,
+    "score_avg": 79.9
+  },
+  {
+    "ts": "2026-09-03T19:02:43Z",
+    "total": 10000,
+    "high_confidence": 6931,
+    "score_avg": 79.9
+  },
+  {
+    "ts": "2026-09-03T22:10:31Z",
+    "total": 10000,
+    "high_confidence": 6903,
+    "score_avg": 79.9
+  },
+  {
+    "ts": "2026-09-04T02:36:41Z",
+    "total": 10000,
+    "high_confidence": 6897,
+    "score_avg": 79.8
+  },
+  {
+    "ts": "2026-09-04T08:25:08Z",
+    "total": 10000,
+    "high_confidence": 6853,
+    "score_avg": 79.8
+  },
+  {
+    "ts": "2026-09-04T15:39:18Z",
+    "total": 10000,
+    "high_confidence": 6954,
+    "score_avg": 79.9
+  },
+  {
+    "ts": "2026-09-04T18:46:10Z",
+    "total": 10000,
+    "high_confidence": 6472,
+    "score_avg": 79.8
+  },
+  {
+    "ts": "2026-09-04T22:02:20Z",
+    "total": 10000,
+    "high_confidence": 6583,
+    "score_avg": 79.8
+  },
+  {
+    "ts": "2026-09-05T02:37:01Z",
+    "total": 10000,
+    "high_confidence": 6669,
+    "score_avg": 79.7
+  },
+  {
+    "ts": "2026-09-05T07:59:41Z",
+    "total": 10000,
+    "high_confidence": 6523,
+    "score_avg": 79.7
+  },
+  {
+    "ts": "2026-09-05T11:46:36Z",
+    "total": 10000,
+    "high_confidence": 6537,
+    "score_avg": 79.8
+  },
+  {
+    "ts": "2026-09-05T14:26:23Z",
+    "total": 10000,
+    "high_confidence": 6512,
+    "score_avg": 79.8
+  },
+  {
+    "ts": "2026-09-05T17:52:29Z",
+    "total": 10000,
+    "high_confidence": 6369,
+    "score_avg": 79.8
+  },
+  {
+    "ts": "2026-09-05T21:51:10Z",
+    "total": 10000,
+    "high_confidence": 6441,
+    "score_avg": 79.8
+  },
+  {
+    "ts": "2026-09-06T02:34:27Z",
+    "total": 10000,
+    "high_confidence": 6449,
+    "score_avg": 79.8
+  },
+  {
+    "ts": "2026-09-06T08:18:03Z",
+    "total": 10000,
+    "high_confidence": 6409,
+    "score_avg": 79.8
+  },
+  {
+    "ts": "2026-09-06T14:48:27Z",
+    "total": 10000,
+    "high_confidence": 6403,
+    "score_avg": 79.8
+  },
+  {
+    "ts": "2026-09-06T17:57:48Z",
+    "total": 10000,
+    "high_confidence": 7138,
+    "score_avg": 79.9
+  },
+  {
+    "ts": "2026-09-06T21:54:27Z",
+    "total": 10000,
+    "high_confidence": 7515,
+    "score_avg": 80.0
+  },
+  {
+    "ts": "2026-09-07T02:31:53Z",
+    "total": 10000,
+    "high_confidence": 7541,
+    "score_avg": 80.0
+  },
+  {
+    "ts": "2026-09-07T08:51:15Z",
+    "total": 10000,
+    "high_confidence": 8059,
+    "score_avg": 80.0
+  },
+  {
+    "ts": "2026-09-07T17:06:52Z",
+    "total": 10000,
+    "high_confidence": 9058,
+    "score_avg": 80.3
+  },
+  {
+    "ts": "2026-09-07T22:28:25Z",
+    "total": 10000,
+    "high_confidence": 9367,
+    "score_avg": 80.3
+  },
+  {
+    "ts": "2026-09-08T02:45:10Z",
+    "total": 10000,
+    "high_confidence": 9158,
+    "score_avg": 80.3
+  },
+  {
+    "ts": "2026-09-08T08:31:44Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.4
+  },
+  {
+    "ts": "2026-09-08T14:01:08Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.4
+  },
+  {
+    "ts": "2026-09-08T15:53:17Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.4
+  },
+  {
+    "ts": "2026-09-08T17:51:58Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.4
+  },
+  {
+    "ts": "2026-09-08T19:13:01Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.4
+  },
+  {
+    "ts": "2026-09-08T22:18:54Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.4
+  },
+  {
+    "ts": "2026-09-09T02:45:56Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.4
+  },
+  {
+    "ts": "2026-09-09T08:36:34Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.4
+  },
+  {
+    "ts": "2026-09-09T11:27:24Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.4
+  },
+  {
+    "ts": "2026-09-09T15:48:40Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.4
+  },
+  {
+    "ts": "2026-09-09T18:08:45Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.4
+  },
+  {
+    "ts": "2026-09-09T19:03:43Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.4
+  },
+  {
+    "ts": "2026-09-09T22:11:26Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.4
+  },
+  {
+    "ts": "2026-09-10T02:00:07Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.4
+  },
+  {
+    "ts": "2026-09-10T02:51:26Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.4
+  },
+  {
+    "ts": "2026-09-10T08:35:41Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.4
+  },
+  {
+    "ts": "2026-09-10T15:44:15Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.4
+  },
+  {
+    "ts": "2026-09-10T18:53:50Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.4
+  },
+  {
+    "ts": "2026-09-10T22:14:45Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.4
+  },
+  {
+    "ts": "2026-09-11T02:40:42Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.4
+  },
+  {
+    "ts": "2026-09-11T06:22:03Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.4
+  },
+  {
+    "ts": "2026-09-11T06:38:37Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.5
+  },
+  {
+    "ts": "2026-09-11T08:30:27Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.5
+  },
+  {
+    "ts": "2026-09-11T15:46:09Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.5
+  },
+  {
+    "ts": "2026-09-11T18:56:10Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.5
+  },
+  {
+    "ts": "2026-09-11T21:17:00Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.5
+  },
+  {
+    "ts": "2026-09-11T22:10:17Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.5
+  },
+  {
+    "ts": "2026-09-12T02:49:42Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.5
+  },
+  {
+    "ts": "2026-09-12T04:31:46Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.5
+  },
+  {
+    "ts": "2026-09-12T04:46:21Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.5
+  },
+  {
+    "ts": "2026-09-12T08:18:46Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.5
+  },
+  {
+    "ts": "2026-09-13T02:47:29Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.5
+  },
+  {
+    "ts": "2026-09-13T08:43:07Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.5
+  },
+  {
+    "ts": "2026-09-13T15:30:19Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.5
+  },
+  {
+    "ts": "2026-09-13T18:29:17Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.5
+  },
+  {
+    "ts": "2026-09-13T22:02:06Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.6
+  },
+  {
+    "ts": "2026-09-14T03:01:58Z",
+    "total": 10000,
+    "high_confidence": 9922,
+    "score_avg": 80.6
+  },
+  {
+    "ts": "2026-09-14T09:30:11Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.6
+  },
+  {
+    "ts": "2026-09-14T17:30:16Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.6
+  },
+  {
+    "ts": "2026-09-14T22:55:07Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.6
+  },
+  {
+    "ts": "2026-09-15T03:05:02Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.6
+  },
+  {
+    "ts": "2026-09-15T09:10:26Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.6
+  },
+  {
+    "ts": "2026-09-15T16:07:09Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.6
+  },
+  {
+    "ts": "2026-09-15T22:39:52Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.6
+  },
+  {
+    "ts": "2026-09-16T03:03:56Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.6
+  },
+  {
+    "ts": "2026-09-16T09:00:37Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.6
+  },
+  {
+    "ts": "2026-09-16T16:00:48Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.6
+  },
+  {
+    "ts": "2026-09-16T19:28:44Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.6
+  },
+  {
+    "ts": "2026-09-16T22:36:41Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.6
+  },
+  {
+    "ts": "2026-09-17T03:05:04Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.6
+  },
+  {
+    "ts": "2026-09-17T09:07:44Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.6
+  },
+  {
+    "ts": "2026-09-17T16:07:45Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.6
+  },
+  {
+    "ts": "2026-09-17T22:36:45Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.6
+  },
+  {
+    "ts": "2026-09-18T02:52:24Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.6
+  },
+  {
+    "ts": "2026-09-18T08:43:20Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.6
+  },
+  {
+    "ts": "2026-09-18T15:43:43Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.6
+  },
+  {
+    "ts": "2026-09-18T18:50:07Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.6
+  },
+  {
+    "ts": "2026-09-18T22:12:21Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.6
+  },
+  {
+    "ts": "2026-09-19T02:50:45Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.6
+  },
+  {
+    "ts": "2026-09-19T08:28:17Z",
+    "total": 10000,
+    "high_confidence": 10000,
+    "score_avg": 80.6
+  }
+]
