@@ -3,46 +3,58 @@
   <title>SwiftIOC — Newest High-Confidence IOCs</title>
   <link>https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector</link>
   <description>Freshest scored, cross-source-corroborated indicators of compromise.</description>
-  <lastBuildDate>Sat, 19 Sep 2026 15:04:41 +0000</lastBuildDate>
+  <lastBuildDate>Sat, 19 Sep 2026 15:14:16 +0000</lastBuildDate>
+    <item>
+      <title>[80] domain: i8tdljt4[.]pmeelectric[.]org</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClearFake,mac-0x0f14,macos,threatfox</description>
+      <guid isPermaLink="false">2a0b2c76-39e5-55e9-b8b9-17d231268c25</guid>
+      <pubDate>Sat, 19 Sep 2026 15:02:03 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] domain: pmeelectric[.]org</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: 19September2026,ClearFake,Commandline,MacOS,threatfox</description>
+      <guid isPermaLink="false">1710c6cd-779b-55f3-b9dd-d4f2ed159d59</guid>
+      <pubDate>Sat, 19 Sep 2026 15:00:46 +0000</pubDate>
+    </item>
     <item>
       <title>[80] url: hxxp://200[.]115[.]102[.]246:43439/i</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,arm,elf,mirai,Mozi</description>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: 32-bit,Mozi,arm,elf,malware,malware_download,mirai</description>
       <guid isPermaLink="false">3911aed5-7aec-5152-8636-6fd6181ab0ca</guid>
       <pubDate>Sat, 19 Sep 2026 14:50:25 +0000</pubDate>
     </item>
     <item>
       <title>[80] url: hxxp://5[.]175[.]222[.]237/bins/arm</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,elf,mirai,ua-wget</description>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: elf,malware,malware_download,mirai,ua-wget</description>
       <guid isPermaLink="false">be48d4f9-6ea8-5ed2-8871-2b4be2a19a2c</guid>
       <pubDate>Sat, 19 Sep 2026 14:41:25 +0000</pubDate>
     </item>
     <item>
       <title>[80] url: hxxp://5[.]175[.]222[.]237/bins/spc</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,elf,mirai,ua-wget</description>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: elf,malware,malware_download,mirai,ua-wget</description>
       <guid isPermaLink="false">4fb255bd-0b49-5ef5-9441-0e84604ffa40</guid>
       <pubDate>Sat, 19 Sep 2026 14:41:25 +0000</pubDate>
     </item>
     <item>
       <title>[80] url: hxxp://5[.]175[.]222[.]237/bins/x86_64</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,elf,mirai,ua-wget</description>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: elf,malware,malware_download,mirai,ua-wget</description>
       <guid isPermaLink="false">7b0daf05-3bb4-554b-8409-ef7605bf3593</guid>
       <pubDate>Sat, 19 Sep 2026 14:41:25 +0000</pubDate>
     </item>
     <item>
       <title>[80] url: hxxp://194[.]41[.]112[.]119/bins/x86_64</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,elf,mirai,ua-wget</description>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: elf,malware,malware_download,mirai,ua-wget</description>
       <guid isPermaLink="false">d171b56d-cb88-58a4-a363-eb9d8d821b19</guid>
       <pubDate>Sat, 19 Sep 2026 14:40:19 +0000</pubDate>
     </item>
     <item>
       <title>[80] url: hxxp://5[.]175[.]222[.]237/bins/ppc</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,elf,mirai,ua-wget</description>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: elf,malware,malware_download,mirai,ua-wget</description>
       <guid isPermaLink="false">b23e9e2e-9e94-5379-9994-21c87918e0d8</guid>
       <pubDate>Sat, 19 Sep 2026 14:40:19 +0000</pubDate>
     </item>
     <item>
       <title>[80] url: hxxp://123[.]5[.]186[.]254:60822/i</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,elf,mips,Mozi</description>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: 32-bit,Mozi,elf,malware,malware_download,mips</description>
       <guid isPermaLink="false">d98b8b2c-2b38-5551-982c-ccb602928c38</guid>
       <pubDate>Sat, 19 Sep 2026 14:38:24 +0000</pubDate>
     </item>
@@ -54,13 +66,13 @@
     </item>
     <item>
       <title>[80] url: hxxp://45[.]171[.]177[.]193:39869/i</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,arm,elf,mirai,Mozi</description>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: 32-bit,Mozi,arm,elf,malware,malware_download,mirai</description>
       <guid isPermaLink="false">4a4317de-bb39-5f2c-8ac6-aab0121704cf</guid>
       <pubDate>Sat, 19 Sep 2026 14:30:30 +0000</pubDate>
     </item>
     <item>
       <title>[80] url: hxxp://105[.]186[.]69[.]3:50571/i</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,arm,elf,mirai,Mozi</description>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: 32-bit,Mozi,arm,elf,malware,malware_download,mirai</description>
       <guid isPermaLink="false">d8a704a7-7dc5-5371-9e83-0c59d070a40c</guid>
       <pubDate>Sat, 19 Sep 2026 14:20:26 +0000</pubDate>
     </item>
@@ -156,7 +168,7 @@
     </item>
     <item>
       <title>[80] sha256: 2d3c0d6305c349e8a520a40baa6fa330478488479a8af4743e3aee5e3426c426</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,Mirai</description>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: Mirai,malware</description>
       <guid isPermaLink="false">c696f096-0a8f-50f9-875e-62e27469d0a7</guid>
       <pubDate>Sat, 19 Sep 2026 13:48:47 +0000</pubDate>
     </item>
@@ -282,26 +294,14 @@
     </item>
     <item>
       <title>[80] sha256: 54e5b18d3c3d95eb6e03867c2fb536aef8f07c08fbfb48e2ec8282341c2c89b5</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,Mirai</description>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: Mirai,malware</description>
       <guid isPermaLink="false">6edcb4a1-6b49-57b7-9351-c1442c71cbec</guid>
       <pubDate>Sat, 19 Sep 2026 13:17:28 +0000</pubDate>
     </item>
     <item>
       <title>[80] sha256: 764079e50c35ec66fb1c00e773027d781c65351b9105acf918706fe9dc8a2d6e</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,Mirai</description>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: Mirai,malware</description>
       <guid isPermaLink="false">717c9cab-8e56-5e98-9c82-ba71c4553219</guid>
       <pubDate>Sat, 19 Sep 2026 13:17:23 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: 143ec6439377e42d8efcdf547f5919b23f3ef105eadf11517ee3a177b3dbfebe</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
-      <guid isPermaLink="false">88c744ca-eee4-56a1-9512-494c93102621</guid>
-      <pubDate>Sat, 19 Sep 2026 13:17:18 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: 6916ddd21d7a122551bc8c8330c2927419732b66ee34b0d3ddeefabb13c8b2a3</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,Mirai</description>
-      <guid isPermaLink="false">359f72a0-e3bc-56e2-b0f9-b3473544ed4b</guid>
-      <pubDate>Sat, 19 Sep 2026 13:17:12 +0000</pubDate>
     </item>
 </channel></rss>
