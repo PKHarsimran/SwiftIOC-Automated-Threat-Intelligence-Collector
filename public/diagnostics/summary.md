@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-09-20T08:59:40Z_
+_Generated 2026-09-20T15:18:40Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-20T08:59:40Z |
+| Generated | 2026-09-20T15:18:40Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 10152 |
+| Duplicates removed | 9153 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-source overlaps | 970 |
+| Multi-source overlaps | 999 |
 | Score (min / avg / max) | 80 / 80.6 / 96 |
 | High-score indicators (≥80) | 10000 |
-| Corroborated (2+ sources) | 970 |
+| Corroborated (2+ sources) | 999 |
 | Earliest first_seen | 2016-05-11T01:59:46Z |
-| Newest first_seen | 2026-09-20T08:50:29Z |
+| Newest first_seen | 2026-09-20T15:16:30Z |
 
 ## Top indicators by score
 
@@ -39,43 +39,43 @@ _Generated 2026-09-20T08:59:40Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 12185 |
+| blocklist_de_ssh | 11997 |
 | ipsum_level5 | 6191 |
-| greensnow_blocklist | 5902 |
 | binarydefense_banlist | 5004 |
-| nist_nvd_recent | 2166 |
-| malwarebazaar_recent | 1777 |
+| greensnow_blocklist | 4798 |
+| threatfox_export_json | 1826 |
+| nist_nvd_recent | 1809 |
 | cisa_kev | 1716 |
-| spamhaus_drop | 1713 |
-| tor_exit_nodes | 1364 |
+| spamhaus_drop | 1712 |
+| malwarebazaar_recent | 1685 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3831 |
-| sha256 | 3212 |
+| cve | 3807 |
+| sha256 | 3229 |
 | ipv4_cidr | 1712 |
-| url | 519 |
-| ipv4 | 268 |
+| url | 549 |
+| ipv4 | 254 |
 | sha1 | 250 |
-| domain | 166 |
+| domain | 157 |
 | md5 | 42 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| cve | 3831 |
-| malware | 3749 |
-| nvd | 2368 |
+| cve | 3807 |
+| malware | 3798 |
+| nvd | 2344 |
 | exploited-in-the-wild | 1716 |
 | drop | 1712 |
 | spamhaus | 1712 |
-| threatfox | 1397 |
-| high | 806 |
-| Mirai | 650 |
-| medium | 558 |
+| threatfox | 1401 |
+| high | 783 |
+| Mirai | 631 |
+| medium | 568 |
 
 ## Multi-source overlaps
 
