@@ -34,6 +34,10 @@ Changes compare the latest snapshot with its validated baseline. Removed means a
 
 </details>
 
+## Project Wiki
+
+The [SwiftIOC field guide](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki) explains the architecture, analyst workflows, CVE applicability, SPL, operations and security boundaries with diagrams and optional animated walkthroughs. Preparing for an interview? Start with the [interview guide](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Interview-Guide) for a short pitch, demo script and real engineering tradeoffs.
+
 ## Start here
 
 | Your goal | Fastest path |
