@@ -22,6 +22,13 @@ TECHNIQUE = re.compile(r"^T\d{4}(?:\.\d{3})?$", re.I)
 HASH_LENGTH = {"md5": 32, "sha1": 40, "sha256": 64}
 
 
+class APIResponseError(Exception):
+    def __init__(self, status: int, endpoint: str):
+        self.status = status
+        self.endpoint = endpoint
+        super().__init__(f"HTTP {status} from {endpoint}")
+
+
 def _records(value: object, keys: tuple[str, ...] = ()) -> list:
     if isinstance(value, list):
         return value
@@ -159,7 +166,8 @@ def fetch_enrichment(key: str, existing: set[tuple[str, str]], *, session: reque
 
     def get(path: str) -> object:
         response = client.get(BASE_URL + path, headers={"X-API-KEY": key, "Accept": "application/json"}, timeout=25, allow_redirects=False)
-        response.raise_for_status()
+        if not 200 <= response.status_code < 300:
+            raise APIResponseError(response.status_code, path.split("/")[1])
         if len(response.content) > 5_000_000:
             raise ValueError("Ransomware.live response exceeds safety limit")
         return response.json()
@@ -199,9 +207,11 @@ def main() -> int:
             temporary = Path(stream.name)
         temporary.replace(args.output)
         print(f"Ransomware.live enrichment: {len(data['groups'])} groups, {len(data['iocs'])} IOCs, {len(data['cves'])} CVEs")
+    except APIResponseError as error:
+        print(f"::warning::Ransomware.live enrichment unavailable (HTTP {error.status} from {error.endpoint}); retaining previous snapshot")
     except (requests.RequestException, ValueError, TypeError, json.JSONDecodeError) as error:
         # Keep the last good sidecar; do not fail the core feed or print request headers.
-        print(f"Ransomware.live enrichment unavailable ({type(error).__name__}); retaining previous snapshot")
+        print(f"::warning::Ransomware.live enrichment unavailable ({type(error).__name__}); retaining previous snapshot")
     return 0
 
 

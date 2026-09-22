@@ -27,6 +27,7 @@ def test_group_evidence_links_existing_records_without_promoting_candidates(tmp_
 def test_api_uses_key_header_and_never_follows_redirect(monkeypatch):
     class Response:
         content = b"{}"
+        status_code = 200
 
         def __init__(self, payload):
             self.payload = payload
