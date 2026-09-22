@@ -177,15 +177,30 @@ def fetch_enrichment(key: str, existing: set[tuple[str, str]], *, session: reque
     if not names or len(names) > 1000:
         raise ValueError("Missing or unexpectedly large group listing")
     groups = []
+    ioc_successes = 0
+    missing_iocs = 0
     for name in names:
         encoded = quote(name, safe="")
         profile = get(f"/groups/{encoded}")
         if isinstance(profile, dict) and isinstance(profile.get("data"), dict):
             profile = profile["data"]
-        indicators = get(f"/iocs/{encoded}")
+        try:
+            indicators = get(f"/iocs/{encoded}")
+            ioc_successes += 1
+        except APIResponseError as error:
+            if error.status != 404:
+                raise
+            # Some profiled groups have no IOC collection. Preserve their
+            # CVE/TTP evidence instead of discarding the whole snapshot.
+            indicators = {}
+            missing_iocs += 1
         groups.append((name, profile, indicators))
         time.sleep(0.2)
-    return build_enrichment(groups, existing, datetime.now(timezone.utc).isoformat())
+    if not ioc_successes:
+        raise ValueError("No group IOC endpoints were available")
+    result = build_enrichment(groups, existing, datetime.now(timezone.utc).isoformat())
+    result["groups_without_ioc_endpoint"] = missing_iocs
+    return result
 
 
 def main() -> int:
@@ -206,7 +221,7 @@ def main() -> int:
             json.dump(data, stream, ensure_ascii=False, separators=(",", ":"))
             temporary = Path(stream.name)
         temporary.replace(args.output)
-        print(f"Ransomware.live enrichment: {len(data['groups'])} groups, {len(data['iocs'])} IOCs, {len(data['cves'])} CVEs")
+        print(f"Ransomware.live enrichment: {len(data['groups'])} groups, {len(data['iocs'])} IOCs, {len(data['cves'])} CVEs; {data['groups_without_ioc_endpoint']} groups without IOC endpoint")
     except APIResponseError as error:
         print(f"::warning::Ransomware.live enrichment unavailable (HTTP {error.status} from {error.endpoint}); retaining previous snapshot")
     except (requests.RequestException, ValueError, TypeError, json.JSONDecodeError) as error:

@@ -72,3 +72,33 @@ def test_api_failure_keeps_previous_snapshot_and_does_not_log_key(tmp_path, monk
     assert main() == 0
     assert output.read_text(encoding="utf-8") == '{"previous":true}'
     assert "sensitive-test-key" not in capsys.readouterr().out
+
+
+def test_missing_group_ioc_endpoint_keeps_profile_evidence(monkeypatch):
+    class Response:
+        content = b"{}"
+
+        def __init__(self, status, payload):
+            self.status_code = status
+            self.payload = payload
+
+        def json(self):
+            return self.payload
+
+    class Session:
+        def get(self, url, **_kwargs):
+            if url.endswith("/groups"):
+                return Response(200, ["A", "B"])
+            if url.endswith("/groups/A"):
+                return Response(200, {"ttps": ["T1486"], "vulnerabilities": ["CVE-2025-1234"]})
+            if url.endswith("/iocs/A"):
+                return Response(404, {})
+            if url.endswith("/groups/B"):
+                return Response(200, {"ttps": [], "vulnerabilities": []})
+            return Response(200, {"ip": ["1.2.3.4"]})
+
+    monkeypatch.setattr("swiftioc.ransomware_live.time.sleep", lambda _: None)
+    result = fetch_enrichment("key", set(), session=Session())
+    assert result["groups_without_ioc_endpoint"] == 1
+    assert result["cves"][0]["cve_id"] == "CVE-2025-1234"
+    assert result["iocs"][0]["indicator"] == "1.2.3.4"
