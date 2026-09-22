@@ -8,7 +8,8 @@ from swiftioc.ransomware_context import ENDPOINTS, build_context, fetch_context
 def payloads():
     return {
         "/victims/recent": [{"victim": "Private Corp", "website": "private.test", "group": "alpha", "country": "US", "activity": "Health", "discovered": "2026-09-22T00:00:00Z"},
-                            {"victim": "Other", "website": "other.test", "group": "alpha", "country": "CA", "activity": "Finance", "discovered": "2026-09-22T03:00:00Z"}],
+                            {"victim": "Other", "website": "other.test", "group": "alpha", "country": "CA", "activity": "Finance", "discovered": "2026-09-22T03:00:00Z"},
+                            {"victim": "Missing", "group": "unknown", "country": "N/A", "activity": "Not Found", "discovered": "2026-09-22T04:00:00Z"}],
         "/stats": {"stats": {"victims": 10, "groups": 2, "press": 3, "ignored": "x"}},
         "/listsectors": [{"sector": "Health", "count": 4}],
         "/yara": [{"group": "alpha", "count": 2}],
@@ -22,8 +23,9 @@ def test_context_is_aggregate_only():
     data = build_context(payloads(), "2026-09-22T05:00:00+00:00")
     encoded = str(data)
     assert "Private Corp" not in encoded and "private.test" not in encoded and "Secret" not in encoded
-    assert data["activity"]["by_day"] == [{"date": "2026-09-22", "count": 2}]
+    assert data["activity"]["by_day"] == [{"date": "2026-09-22", "count": 3}]
     assert data["activity"]["groups"] == [{"name": "alpha", "count": 2}]
+    assert data["activity"]["sectors"] == [{"name": "Health", "count": 1}, {"name": "Finance", "count": 1}]
     assert data["available"]["yara"] == [{"group": "alpha", "count": 2}]
 
 

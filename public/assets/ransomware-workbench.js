@@ -51,7 +51,7 @@
     timeline.appendChild(el('h3', 'Recent victim reporting'));
     const victims = el('div'); timeline.appendChild(victims); bars(victims, context?.activity?.by_day || [], 'Aggregate activity will appear after the next provider refresh.');
     timeline.appendChild(el('h3', 'Recent cyberattack press reporting'));
-    const press = el('div'); timeline.appendChild(press); bars(press, context?.activity?.press_by_day || [], 'No aggregate press timeline is available yet.');
+    const press = el('div'); timeline.appendChild(press); bars(press, (context?.activity?.press_by_day || []).slice(-10), 'No aggregate press timeline is available yet.');
     bars($('[data-activity-groups]'), context?.activity?.groups || []);
     const combined = [...(context?.activity?.sectors || []).slice(0, 5).map((row) => ({ ...row, name: `Sector · ${row.name}` })), ...(context?.activity?.countries || []).slice(0, 5).map((row) => ({ ...row, name: `Country · ${row.name}` }))];
     bars($('[data-activity-context]'), combined);

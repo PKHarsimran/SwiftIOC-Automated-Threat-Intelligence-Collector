@@ -16,6 +16,7 @@ from swiftioc.ransomware_live import BASE_URL, _records
 
 REFRESH_INTERVAL = timedelta(hours=24)
 ENDPOINTS = ("/victims/recent", "/stats", "/listsectors", "/yara", "/ransomnotes", "/negotiations", "/press/recent")
+PLACEHOLDERS = {"", "-", "n/a", "none", "not found", "null", "unknown"}
 
 
 def _text(item: dict, *keys: str) -> str:
@@ -35,7 +36,25 @@ def _day(value: str) -> str:
 
 def _counts(rows: list[dict], *keys: str, limit: int = 20) -> list[dict]:
     counter = Counter(_text(row, *keys) for row in rows)
-    return [{"name": name, "count": count} for name, count in counter.most_common(limit) if name]
+    return [{"name": name, "count": count} for name, count in counter.most_common() if name.lower() not in PLACEHOLDERS][:limit]
+
+
+def _clean_context(data: dict) -> bool:
+    changed = False
+    for container, keys in ((data.get("activity", {}), ("groups", "countries", "sectors")),
+                            (data, ("sector_catalog",))):
+        if not isinstance(container, dict):
+            continue
+        for key in keys:
+            rows = container.get(key)
+            if not isinstance(rows, list):
+                continue
+            clean = [row for row in rows if isinstance(row, dict) and isinstance(row.get("name"), str)
+                     and row["name"].strip().lower() not in PLACEHOLDERS]
+            if clean != rows:
+                container[key] = clean
+                changed = True
+    return changed
 
 
 def _availability(value: Any, limit: int = 500) -> list[dict]:
@@ -74,7 +93,7 @@ def build_context(payloads: dict[str, Any], generated_at: str) -> dict:
     for row in sectors_raw:
         name = _text(row, "sector", "activity", "name")
         raw_count = row.get("count", row.get("victims", 0))
-        if name:
+        if name and name.lower() not in PLACEHOLDERS:
             try:
                 sectors.append({"name": name, "count": max(0, int(raw_count))})
             except (TypeError, ValueError):
@@ -149,6 +168,8 @@ def main() -> int:
     args = parser.parse_args()
     cached = _cached(args.output)
     if cached:
+        if _clean_context(cached):
+            _write(args.output, cached)
         age = datetime.now(timezone.utc) - datetime.fromisoformat(cached["generated_at"])
         if not args.force_refresh and timedelta(0) <= age < REFRESH_INTERVAL:
             print(f"Ransomware context cache reused ({age.total_seconds() / 3600:.1f}h old); 0 API calls")
