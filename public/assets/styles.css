@@ -3952,3 +3952,8 @@ body:has(.workspace-dock:not([hidden])) .toast { bottom: 6rem; }
 .group-evidence-group { padding: .2rem .4rem; border: 1px solid var(--border-control); border-radius: .4rem; color: var(--accent-soft); font-size: .82rem; }
 .group-evidence-attachment { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; margin: .75rem 0; padding: .65rem; border-left: 3px solid var(--accent); background: var(--card-bg-soft); }
 .group-evidence-attachment small { flex-basis: 100%; color: var(--text-muted); }
+.group-summary .discovery-heading { margin-bottom: 0; }
+.group-summary p { margin: .45rem 0; }
+.group-summary-actions { display: grid; gap: .5rem; flex-shrink: 0; font-size: .82rem; }
+.group-summary-actions > a { color: var(--accent); }
+.group-evidence-attachment.group-evidence-badge { display: inline-block; width: fit-content; padding: .3rem .55rem; border: 1px solid var(--border-soft); border-radius: .4rem; font-size: .78rem; color: var(--accent); }

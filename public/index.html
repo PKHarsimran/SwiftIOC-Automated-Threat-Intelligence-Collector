@@ -46,7 +46,7 @@
       });
     </script>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/styles.css?v=41" />
+    <link rel="stylesheet" href="assets/styles.css?v=42" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -97,7 +97,7 @@
         <div class="nav-links">
           <a href="#ioc-lookup">Lookup</a>
           <a href="#vulnerabilities">CVEs</a>
-          <a href="#group-intel">Ransomware groups</a>
+          <a href="groups.html">Groups</a>
           <a href="#live-preview">IOC feed</a>
           <a href="#discovery">Discover</a>
           <a href="#exports">Downloads</a>
@@ -450,29 +450,16 @@
         </details>
       </section>
 
-      <section class="discovery-desk group-intel-desk" id="group-intel" aria-labelledby="group-intel-heading" data-group-intel-root>
+      <section class="discovery-desk group-intel-desk group-summary" id="group-intel" aria-labelledby="group-intel-heading">
         <div class="discovery-heading">
           <div>
             <p class="eyebrow">Group intelligence / ransomware.live</p>
-            <h2 id="group-intel-heading">Group-linked indicators &amp; CVEs</h2>
-            <p>Explore reported group associations alongside SwiftIOC coverage. These reports are leads to investigate, not proof of current activity or attribution.</p>
+            <h2 id="group-intel-heading">Follow the group evidence</h2>
+            <p data-group-summary role="status">Loading group coverage…</p>
+            <p class="discovery-scope">Explore reported IOCs, CVEs and techniques, or trace shared evidence in the group map.</p>
           </div>
-          <a class="button ghost" href="https://ransomware.live/" target="_blank" rel="noopener noreferrer">Source ↗</a>
+          <div class="group-summary-actions"><a class="button ghost" href="groups.html">Explore groups →</a><a href="groups.html#view=graph">Open evidence map →</a></div>
         </div>
-        <div class="group-intel-controls">
-          <div class="discovery-lenses" role="group" aria-label="Group evidence type">
-            <button type="button" data-group-kind="iocs" aria-pressed="true">Group-linked IOCs</button>
-            <button type="button" data-group-kind="cves" aria-pressed="false">Group-linked CVEs</button>
-          </div>
-          <label>Group <select data-group-filter><option value="">All groups</option></select></label>
-          <label>Coverage <select data-group-coverage><option value="all">All evidence</option><option value="matched">Already in SwiftIOC</option><option value="new">Research candidates</option></select></label>
-          <label>Search <input type="search" data-group-search placeholder="Indicator or CVE" autocomplete="off" /></label>
-        </div>
-        <div class="group-intel-profile" data-group-profile hidden></div>
-        <p class="discovery-status" data-group-status role="status">Loading group evidence…</p>
-        <div class="group-intel-list" data-group-list></div>
-        <button type="button" class="button ghost" data-group-more hidden>Show more</button>
-        <p class="discovery-scope">Source: ransomware.live PRO. A group association is not a direct sighting or a safe basis for blocking. Research candidates are not added to the scored IOC feed automatically.</p>
       </section>
 
       <section class="discovery-desk" id="discovery" aria-labelledby="discovery-heading" data-discovery-root>
@@ -514,6 +501,7 @@
             <p class="panel-subtitle">
               Compare reporting providers and shared behavior tags in the filtered sample. Known adapter aliases are grouped; raw feed names remain in the evidence panel. Shared reporting does not establish a campaign or independent verification. On small screens, scroll the diagram sideways to inspect each indicator.
             </p>
+            <p class="discovery-scope"><a href="groups.html#view=graph">Explore group-linked IOCs, CVEs and techniques in the evidence map →</a></p>
           </div>
           <div class="campaign-controls" aria-label="Campaign graph controls">
             <div class="campaign-control-field">
@@ -1125,10 +1113,11 @@
     </div>
 
     <div class="toast" data-toast role="status" aria-live="polite" aria-atomic="true" hidden></div>
-    <script defer src="assets/dashboard-core.js?v=41"></script>
+    <script defer src="assets/dashboard-core.js?v=42"></script>
     <script defer src="assets/inventory-core.js?v=38"></script>
     <script defer src="assets/inventory.js?v=38"></script>
-    <script defer src="assets/group-intel.js?v=41"></script>
-    <script defer src="assets/dashboard.js?v=41"></script>
+    <script defer src="assets/group-intel-core.js?v=42"></script>
+    <script defer src="assets/group-intel.js?v=42"></script>
+    <script defer src="assets/dashboard.js?v=42"></script>
   </body>
 </html>

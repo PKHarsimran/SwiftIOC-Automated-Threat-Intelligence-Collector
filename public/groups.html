@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#191c19" />
+    <title>Group intelligence — SwiftIOC</title>
+    <meta name="description" content="Explore ransomware group associations with IOCs, CVEs and ATT&CK techniques. Trace shared reporting with the SwiftIOC evidence map." />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="assets/styles.css?v=42" />
+    <link rel="stylesheet" href="assets/groups.css?v=42" />
+  </head>
+  <body data-ioc-root=".">
+    <a class="skip-link" href="#group-content">Skip to group evidence</a>
+    <div class="page-wrapper groups-page">
+      <nav class="top-nav" aria-label="SwiftIOC navigation">
+        <a class="brand" href="index.html"><span class="brand-mark">SwiftIOC</span><span class="brand-tagline">Threat Intelligence</span></a>
+        <div class="nav-links"><a href="index.html#ioc-lookup">Lookup</a><a href="index.html#vulnerabilities">CVEs</a><a href="index.html#live-preview">IOC feed</a><a href="groups.html" aria-current="page">Groups</a></div>
+      </nav>
+      <main id="group-content">
+        <header class="group-page-heading">
+          <div><p class="eyebrow">Ransomware intelligence / ransomware.live</p><h1>Follow the evidence.</h1><p>Connect a group to its reported indicators, vulnerabilities and techniques.</p></div>
+          <a class="button ghost" href="index.html">← Intelligence desk</a>
+        </header>
+        <div class="group-page-status" data-page-status role="status">Loading group evidence…</div>
+        <noscript><p>Enable JavaScript to explore the map, or <a href="group_evidence.json">download the evidence snapshot</a>.</p></noscript>
+        <div data-explorer hidden>
+          <form class="group-picker" data-group-form>
+            <label for="group-choice">Find a group<input id="group-choice" data-group-choice type="search" list="group-suggestions" placeholder="Start typing a group name…" autocomplete="off" spellcheck="false" aria-describedby="group-choice-help" /></label>
+            <datalist id="group-suggestions"></datalist>
+            <button class="button ghost" type="submit">Explore</button>
+            <button class="button ghost" type="button" data-clear-group>All groups</button>
+          </form>
+          <p id="group-choice-help" class="group-small" data-group-help>Select a suggestion to focus the evidence.</p>
+          <div class="group-active" data-active-group></div>
+          <nav class="group-views" aria-label="Group intelligence views">
+            <button type="button" data-view="overview" aria-pressed="true">Overview</button>
+            <button type="button" data-view="cves" aria-pressed="false">CVEs</button>
+            <button type="button" data-view="iocs" aria-pressed="false">IOCs</button>
+            <button type="button" data-view="ttps" aria-pressed="false">Techniques</button>
+            <button type="button" data-view="graph" aria-pressed="false">Evidence map</button>
+          </nav>
+          <section data-panel="overview" aria-label="Group intelligence overview">
+            <div class="group-metrics" data-overview-metrics></div>
+            <div class="group-overview-grid">
+              <section class="group-surface"><h2 data-overview-title>Groups with reported evidence</h2><div class="group-shortlist" data-overview-groups></div></section>
+              <section class="group-surface"><h2>CVEs to investigate</h2><p class="group-small">SwiftIOC matches first. Confirm affected software in the CVE view.</p><div class="group-shortlist" data-overview-cves></div></section>
+            </div>
+          </section>
+          <section data-panel="records" aria-label="Reported evidence" hidden>
+            <div class="group-record-toolbar">
+              <label>Search evidence<input type="search" data-record-search placeholder="Indicator or CVE…" autocomplete="off" /></label>
+              <label data-coverage-label>Coverage<select data-record-coverage><option value="all">All evidence</option><option value="matched">In SwiftIOC</option><option value="new">Research candidates</option></select></label>
+              <label data-type-label hidden>IOC type<select data-record-type><option value="">All types</option></select></label>
+            </div>
+            <p class="group-small" data-record-status role="status"></p>
+            <div class="group-table-wrap"><table class="group-table"><caption class="sr-only">Reported associations from ransomware.live</caption><thead><tr><th scope="col">Evidence</th><th scope="col">Coverage</th><th scope="col">Reported groups</th><th scope="col">Investigate</th></tr></thead><tbody data-record-rows></tbody></table></div>
+            <div class="group-pagination"><button type="button" class="button ghost" data-prev>Previous</button><span data-page-label role="status"></span><button type="button" class="button ghost" data-next>Next</button></div>
+          </section>
+          <section data-panel="graph" aria-labelledby="evidence-map-title" hidden>
+            <div class="group-map-heading"><div><h2 id="evidence-map-title">Trace a reported connection</h2><p class="group-small">Select an evidence node to see other groups linked to that same record. Select a group to pivot.</p></div><button type="button" class="button ghost" data-map-export>Export this map</button></div>
+            <div class="group-map-controls"><label>Map evidence<select data-map-kind><option value="cves">CVEs</option><option value="iocs">IOCs</option><option value="ttps">ATT&amp;CK techniques</option></select></label><label>Selected evidence<select data-map-evidence></select></label></div>
+            <p class="group-small" data-map-status role="status"></p>
+            <div class="group-map-scroll"><svg data-map viewBox="0 0 1000 600" role="group" aria-label="Reported group and evidence relationships"></svg></div>
+            <aside class="group-map-inspector" data-map-inspector aria-label="Selected evidence details"></aside>
+          </section>
+          <details class="group-evidence-notes"><summary>How to read this evidence</summary><p>These are associations reported by ransomware.live. They do not establish current use, local exposure, a shared campaign, or collaboration between groups. Group techniques describe the group’s reported behavior; they are not automatically attributed to each IOC.</p><p>“In SwiftIOC” means an exact record match in the retained feed. Research candidates do not automatically enter scores or blocklists. An empty result does not prove a group has no such activity.</p><p>Source data refreshes daily; SwiftIOC matches are checked each collection. Source: <a href="https://ransomware.live/" target="_blank" rel="noopener noreferrer">ransomware.live</a>. <a href="group_evidence.json">Download derived evidence JSON</a>.</p></details>
+        </div>
+      </main>
+      <footer class="site-footer"><span>SwiftIOC / Open-source threat intelligence</span><a href="index.html">Back to the intelligence desk</a></footer>
+    </div>
+    <script defer src="assets/group-intel-core.js?v=42"></script>
+    <script defer src="assets/group-intel.js?v=42"></script>
+    <script defer src="assets/groups.js?v=42"></script>
+  </body>
+</html>
