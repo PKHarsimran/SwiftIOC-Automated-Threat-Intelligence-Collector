@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-09-22T16:09:01Z_
+_Generated 2026-09-22T22:40:08Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-22T16:09:01Z |
+| Generated | 2026-09-22T22:40:08Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 7272 |
+| Duplicates removed | 7296 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-source overlaps | 1110 |
+| Multi-source overlaps | 1115 |
 | Score (min / avg / max) | 80 / 80.7 / 96 |
 | High-score indicators (≥80) | 10000 |
-| Corroborated (2+ sources) | 1110 |
+| Corroborated (2+ sources) | 1115 |
 | Earliest first_seen | 2016-05-11T01:59:46Z |
-| Newest first_seen | 2026-09-22T15:59:18Z |
+| Newest first_seen | 2026-09-22T22:33:16Z |
 
 ## Top indicators by score
 
@@ -39,43 +39,43 @@ _Generated 2026-09-22T16:09:01Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5509 |
+| blocklist_de_ssh | 5554 |
 | binarydefense_banlist | 5363 |
-| greensnow_blocklist | 5091 |
+| greensnow_blocklist | 5021 |
 | ipsum_level5 | 3875 |
-| cisa_kev | 1717 |
+| nist_nvd_recent | 2200 |
+| cisa_kev | 1721 |
 | spamhaus_drop | 1712 |
-| nist_nvd_recent | 1574 |
-| threatfox_export_json | 1384 |
-| tor_exit_nodes | 1383 |
+| threatfox_export_json | 1680 |
+| malwarebazaar_recent | 1425 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3354 |
-| cve | 2805 |
-| ipv4_cidr | 1711 |
-| url | 1185 |
-| domain | 384 |
+| sha256 | 3382 |
+| cve | 2788 |
+| ipv4_cidr | 1400 |
+| url | 1241 |
+| domain | 597 |
 | sha1 | 271 |
-| ipv4 | 227 |
+| ipv4 | 258 |
 | md5 | 63 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 4357 |
-| cve | 2805 |
-| threatfox | 1947 |
-| exploited-in-the-wild | 1717 |
-| drop | 1711 |
-| spamhaus | 1711 |
-| nvd | 1346 |
-| malware_download | 957 |
-| Mirai | 806 |
-| high | 526 |
+| malware | 4371 |
+| cve | 2788 |
+| threatfox | 2262 |
+| exploited-in-the-wild | 1721 |
+| drop | 1400 |
+| spamhaus | 1400 |
+| nvd | 1329 |
+| malware_download | 937 |
+| Mirai | 757 |
+| high | 510 |
 
 ## Multi-source overlaps
 
