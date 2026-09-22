@@ -1,57 +1,288 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-22T00:53:41Z",
-  "previous_generated_at": "2026-09-22T00:48:09Z",
+  "generated_at": "2026-09-22T01:08:22Z",
+  "previous_generated_at": "2026-09-22T00:53:41Z",
   "baseline_available": true,
   "counts": {
-    "added": 2,
-    "updated": 0,
-    "removed": 2
+    "added": 12,
+    "updated": 2,
+    "removed": 12
   },
   "events": [
     {
       "action": "added",
-      "observed_at": "2026-09-22T00:53:41Z",
+      "observed_at": "2026-09-22T01:08:22Z",
       "current": {
-        "indicator": "hxxp://125[.]42[.]8[.]66:45720/bin[.]sh",
-        "type": "url",
-        "source": "urlhaus_recent_urls",
-        "first_seen": "2026-09-22T00:47:14Z",
-        "last_seen": "2026-09-22T00:53:23Z",
+        "indicator": "CVE-2026-83460",
+        "type": "cve",
+        "source": "nist_nvd_recent",
+        "first_seen": "2026-09-15T20:18:54Z",
+        "last_seen": "2026-09-21T01:16:29Z",
         "confidence": "high",
         "tlp": "CLEAR",
-        "tags": "malware,malware_download,None",
-        "reference": "https://urlhaus.abuse.ch/",
-        "context": "URLhaus: malware_download",
+        "tags": "cve,medium,nvd",
+        "reference": "https://nvd.nist.gov/",
+        "context": "Vulnerability in the Helidon product of Oracle Fusion Middleware (component: LRA).  Supported versions that are affected are 4.0.0-4.5.4. Easily exploitable vulnerability allows unauthenticated attacker with network access via HTTP to compromise Helidon.  Successful attacks of this vulnerability can result in  unauthorized update, insert or delete access to some of Helidon accessible data as well as  unauthorized read access to a subset of Helidon accessible data. CVSS 3.1 Base Score 6.5 (Confidentiality and Integrity impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N).",
         "score": 80,
         "sightings": 1,
-        "vulnerability": {}
+        "vulnerability": {
+          "nvd": {
+            "source": "nist_nvd_recent",
+            "reference": "https://nvd.nist.gov/vuln/detail/CVE-2026-83460",
+            "published_at": "2026-09-15T20:18:54.813",
+            "modified_at": "2026-09-21T01:16:29.510",
+            "status": "Awaiting Analysis",
+            "severity": "medium",
+            "description": "Vulnerability in the Helidon product of Oracle Fusion Middleware (component: LRA).  Supported versions that are affected are 4.0.0-4.5.4. Easily exploitable vulnerability allows unauthenticated attacker with network access via HTTP to compromise Helidon.  Successful attacks of this vulnerability can result in  unauthorized update, insert or delete access to some of Helidon accessible data as well as  unauthorized read access to a subset of Helidon accessible data. CVSS 3.1 Base Score 6.5 (Confidentiality and Integrity impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N).",
+            "configurations": []
+          }
+        }
       }
     },
     {
       "action": "added",
-      "observed_at": "2026-09-22T00:53:41Z",
+      "observed_at": "2026-09-22T01:08:22Z",
       "current": {
-        "indicator": "hxxp://221[.]15[.]189[.]129:41297/bin[.]sh",
-        "type": "url",
-        "source": "urlhaus_recent_urls",
-        "first_seen": "2026-09-22T00:47:14Z",
-        "last_seen": "2026-09-22T00:53:23Z",
+        "indicator": "CVE-2026-83461",
+        "type": "cve",
+        "source": "nist_nvd_recent",
+        "first_seen": "2026-09-15T20:18:54Z",
+        "last_seen": "2026-09-21T20:17:35Z",
         "confidence": "high",
         "tlp": "CLEAR",
-        "tags": "malware,malware_download,None",
-        "reference": "https://urlhaus.abuse.ch/",
-        "context": "URLhaus: malware_download",
+        "tags": "cve,high,nvd",
+        "reference": "https://nvd.nist.gov/",
+        "context": "Vulnerability in the Oracle Mobile Application Server product of Oracle E-Business Suite (component: MWA Terminal Server).  Supported versions that are affected are 12.2.3-12.2.15. Easily exploitable vulnerability allows unauthenticated attacker with network access via TCP to compromise Oracle Mobile Application Server.  Successful attacks of this vulnerability can result in  unauthorized access to critical data or complete access to all Oracle Mobile Application Server accessible data and unauthorized ability to cause a partial denial of service (partial DOS) of Oracle Mobile Application Server. CVSS 3.1 Base Score 8.2 (Confidentiality and Availability impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:L).",
         "score": 80,
         "sightings": 1,
-        "vulnerability": {}
+        "vulnerability": {
+          "nvd": {
+            "source": "nist_nvd_recent",
+            "reference": "https://nvd.nist.gov/vuln/detail/CVE-2026-83461",
+            "published_at": "2026-09-15T20:18:54.927",
+            "modified_at": "2026-09-21T20:17:35.893",
+            "status": "Awaiting Analysis",
+            "severity": "high",
+            "description": "Vulnerability in the Oracle Mobile Application Server product of Oracle E-Business Suite (component: MWA Terminal Server).  Supported versions that are affected are 12.2.3-12.2.15. Easily exploitable vulnerability allows unauthenticated attacker with network access via TCP to compromise Oracle Mobile Application Server.  Successful attacks of this vulnerability can result in  unauthorized access to critical data or complete access to all Oracle Mobile Application Server accessible data and unauthorized ability to cause a partial denial of service (partial DOS) of Oracle Mobile Application Server. CVSS 3.1 Base Score 8.2 (Confidentiality and Availability impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:L).",
+            "configurations": []
+          }
+        }
       }
     },
     {
-      "action": "removed_from_feed",
-      "observed_at": "2026-09-22T00:53:41Z",
-      "reason": "no_longer_in_published_snapshot",
-      "previous": {
+      "action": "added",
+      "observed_at": "2026-09-22T01:08:22Z",
+      "current": {
+        "indicator": "CVE-2026-83465",
+        "type": "cve",
+        "source": "nist_nvd_recent",
+        "first_seen": "2026-09-15T20:18:55Z",
+        "last_seen": "2026-09-21T20:17:36Z",
+        "confidence": "high",
+        "tlp": "CLEAR",
+        "tags": "cve,high,nvd",
+        "reference": "https://nvd.nist.gov/",
+        "context": "Vulnerability in the Oracle Mobile Application Server product of Oracle E-Business Suite (component: MWA Terminal Server).  Supported versions that are affected are 12.2.3-12.2.15. Easily exploitable vulnerability allows unauthenticated attacker with network access via HTTP to compromise Oracle Mobile Application Server.  Successful attacks require human interaction from a person other than the attacker and while the vulnerability is in Oracle Mobile Application Server, attacks may significantly impact additional products (scope change). Successful attacks of this vulnerability can result in unauthorized ability to cause a hang or frequently repeatable crash (complete DOS) of Oracle Mobile Application Server as well as  unauthorized update, insert or delete access to some of Oracle Mobile Application Server accessible data. CVSS 3.1 Base Score 8.2 (Integrity and Availability impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:N/I:L/A:H).",
+        "score": 80,
+        "sightings": 1,
+        "vulnerability": {
+          "nvd": {
+            "source": "nist_nvd_recent",
+            "reference": "https://nvd.nist.gov/vuln/detail/CVE-2026-83465",
+            "published_at": "2026-09-15T20:18:55.363",
+            "modified_at": "2026-09-21T20:17:36.020",
+            "status": "Awaiting Analysis",
+            "severity": "high",
+            "description": "Vulnerability in the Oracle Mobile Application Server product of Oracle E-Business Suite (component: MWA Terminal Server).  Supported versions that are affected are 12.2.3-12.2.15. Easily exploitable vulnerability allows unauthenticated attacker with network access via HTTP to compromise Oracle Mobile Application Server.  Successful attacks require human interaction from a person other than the attacker and while the vulnerability is in Oracle Mobile Application Server, attacks may significantly impact additional products (scope change). Successful attacks of this vulnerability can result in unauthorized ability to cause a hang or frequently repeatable crash (complete DOS) of Oracle Mobile Application Server as well as  unauthorized update, insert or delete access to some of Oracle Mobile Application Server accessible data. CVSS 3.1 Base Score 8.2 (Integrity and Availability impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:N/I:L/A:H).",
+            "configurations": []
+          }
+        }
+      }
+    },
+    {
+      "action": "added",
+      "observed_at": "2026-09-22T01:08:22Z",
+      "current": {
+        "indicator": "CVE-2026-83484",
+        "type": "cve",
+        "source": "nist_nvd_recent",
+        "first_seen": "2026-09-15T20:18:56Z",
+        "last_seen": "2026-09-21T20:17:36Z",
+        "confidence": "high",
+        "tlp": "CLEAR",
+        "tags": "cve,high,nvd",
+        "reference": "https://nvd.nist.gov/",
+        "context": "Vulnerability in the Oracle US Federal Human Resources product of Oracle E-Business Suite (component: Internal Operations).  Supported versions that are affected are 12.2.3-12.2.15. Easily exploitable vulnerability allows low privileged attacker with network access via HTTP to compromise Oracle US Federal Human Resources.  Successful attacks of this vulnerability can result in  unauthorized creation, deletion or modification access to critical data or all Oracle US Federal Human Resources accessible data as well as  unauthorized read access to a subset of Oracle US Federal Human Resources accessible data. CVSS 3.1 Base Score 7.1 (Confidentiality and Integrity impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:H/A:N).",
+        "score": 80,
+        "sightings": 1,
+        "vulnerability": {
+          "nvd": {
+            "source": "nist_nvd_recent",
+            "reference": "https://nvd.nist.gov/vuln/detail/CVE-2026-83484",
+            "published_at": "2026-09-15T20:18:56.147",
+            "modified_at": "2026-09-21T20:17:36.163",
+            "status": "Awaiting Analysis",
+            "severity": "high",
+            "description": "Vulnerability in the Oracle US Federal Human Resources product of Oracle E-Business Suite (component: Internal Operations).  Supported versions that are affected are 12.2.3-12.2.15. Easily exploitable vulnerability allows low privileged attacker with network access via HTTP to compromise Oracle US Federal Human Resources.  Successful attacks of this vulnerability can result in  unauthorized creation, deletion or modification access to critical data or all Oracle US Federal Human Resources accessible data as well as  unauthorized read access to a subset of Oracle US Federal Human Resources accessible data. CVSS 3.1 Base Score 7.1 (Confidentiality and Integrity impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:H/A:N).",
+            "configurations": []
+          }
+        }
+      }
+    },
+    {
+      "action": "added",
+      "observed_at": "2026-09-22T01:08:22Z",
+      "current": {
+        "indicator": "CVE-2026-83485",
+        "type": "cve",
+        "source": "nist_nvd_recent",
+        "first_seen": "2026-09-15T20:18:56Z",
+        "last_seen": "2026-09-21T20:17:36Z",
+        "confidence": "high",
+        "tlp": "CLEAR",
+        "tags": "cve,high,nvd",
+        "reference": "https://nvd.nist.gov/",
+        "context": "Vulnerability in the Oracle Product Hub product of Oracle E-Business Suite (component: Item Catalog).  Supported versions that are affected are 12.2.3-12.2.15. Easily exploitable vulnerability allows low privileged attacker with network access via HTTP to compromise Oracle Product Hub.  While the vulnerability is in Oracle Product Hub, attacks may significantly impact additional products (scope change).  Successful attacks of this vulnerability can result in  unauthorized access to critical data or complete access to all Oracle Product Hub accessible data. CVSS 3.1 Base Score 7.7 (Confidentiality impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N).",
+        "score": 80,
+        "sightings": 1,
+        "vulnerability": {
+          "nvd": {
+            "source": "nist_nvd_recent",
+            "reference": "https://nvd.nist.gov/vuln/detail/CVE-2026-83485",
+            "published_at": "2026-09-15T20:18:56.257",
+            "modified_at": "2026-09-21T20:17:36.290",
+            "status": "Awaiting Analysis",
+            "severity": "high",
+            "description": "Vulnerability in the Oracle Product Hub product of Oracle E-Business Suite (component: Item Catalog).  Supported versions that are affected are 12.2.3-12.2.15. Easily exploitable vulnerability allows low privileged attacker with network access via HTTP to compromise Oracle Product Hub.  While the vulnerability is in Oracle Product Hub, attacks may significantly impact additional products (scope change).  Successful attacks of this vulnerability can result in  unauthorized access to critical data or complete access to all Oracle Product Hub accessible data. CVSS 3.1 Base Score 7.7 (Confidentiality impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N).",
+            "configurations": []
+          }
+        }
+      }
+    },
+    {
+      "action": "added",
+      "observed_at": "2026-09-22T01:08:22Z",
+      "current": {
+        "indicator": "CVE-2026-83488",
+        "type": "cve",
+        "source": "nist_nvd_recent",
+        "first_seen": "2026-09-15T20:18:56Z",
+        "last_seen": "2026-09-21T20:17:36Z",
+        "confidence": "high",
+        "tlp": "CLEAR",
+        "tags": "cve,medium,nvd",
+        "reference": "https://nvd.nist.gov/",
+        "context": "Vulnerability in the Helidon product of Oracle Fusion Middleware (component: helidon-microprofile-security).  Supported versions that are affected are 4.0.0-4.5.4. Easily exploitable vulnerability allows low privileged attacker with network access via HTTP to compromise Helidon.  Successful attacks of this vulnerability can result in  unauthorized update, insert or delete access to some of Helidon accessible data as well as  unauthorized read access to a subset of Helidon accessible data. CVSS 3.1 Base Score 5.4 (Confidentiality and Integrity impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N).",
+        "score": 80,
+        "sightings": 1,
+        "vulnerability": {
+          "nvd": {
+            "source": "nist_nvd_recent",
+            "reference": "https://nvd.nist.gov/vuln/detail/CVE-2026-83488",
+            "published_at": "2026-09-15T20:18:56.593",
+            "modified_at": "2026-09-21T20:17:36.417",
+            "status": "Awaiting Analysis",
+            "severity": "medium",
+            "description": "Vulnerability in the Helidon product of Oracle Fusion Middleware (component: helidon-microprofile-security).  Supported versions that are affected are 4.0.0-4.5.4. Easily exploitable vulnerability allows low privileged attacker with network access via HTTP to compromise Helidon.  Successful attacks of this vulnerability can result in  unauthorized update, insert or delete access to some of Helidon accessible data as well as  unauthorized read access to a subset of Helidon accessible data. CVSS 3.1 Base Score 5.4 (Confidentiality and Integrity impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N).",
+            "configurations": []
+          }
+        }
+      }
+    },
+    {
+      "action": "added",
+      "observed_at": "2026-09-22T01:08:22Z",
+      "current": {
+        "indicator": "CVE-2026-83490",
+        "type": "cve",
+        "source": "nist_nvd_recent",
+        "first_seen": "2026-09-15T20:18:56Z",
+        "last_seen": "2026-09-21T20:17:36Z",
+        "confidence": "high",
+        "tlp": "CLEAR",
+        "tags": "cve,high,nvd",
+        "reference": "https://nvd.nist.gov/",
+        "context": "Vulnerability in the Oracle iRecruitment product of Oracle E-Business Suite (component: Internal Operations).  Supported versions that are affected are 12.2.3-12.2.15. Easily exploitable vulnerability allows low privileged attacker with network access via HTTP to compromise Oracle iRecruitment.  While the vulnerability is in Oracle iRecruitment, attacks may significantly impact additional products (scope change).  Successful attacks of this vulnerability can result in  unauthorized access to critical data or complete access to all Oracle iRecruitment accessible data as well as  unauthorized update, insert or delete access to some of Oracle iRecruitment accessible data. CVSS 3.1 Base Score 8.5 (Confidentiality and Integrity impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:L/A:N).",
+        "score": 80,
+        "sightings": 1,
+        "vulnerability": {
+          "nvd": {
+            "source": "nist_nvd_recent",
+            "reference": "https://nvd.nist.gov/vuln/detail/CVE-2026-83490",
+            "published_at": "2026-09-15T20:18:56.817",
+            "modified_at": "2026-09-21T20:17:36.550",
+            "status": "Undergoing Analysis",
+            "severity": "high",
+            "description": "Vulnerability in the Oracle iRecruitment product of Oracle E-Business Suite (component: Internal Operations).  Supported versions that are affected are 12.2.3-12.2.15. Easily exploitable vulnerability allows low privileged attacker with network access via HTTP to compromise Oracle iRecruitment.  While the vulnerability is in Oracle iRecruitment, attacks may significantly impact additional products (scope change).  Successful attacks of this vulnerability can result in  unauthorized access to critical data or complete access to all Oracle iRecruitment accessible data as well as  unauthorized update, insert or delete access to some of Oracle iRecruitment accessible data. CVSS 3.1 Base Score 8.5 (Confidentiality and Integrity impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:L/A:N).",
+            "configurations": []
+          }
+        }
+      }
+    },
+    {
+      "action": "added",
+      "observed_at": "2026-09-22T01:08:22Z",
+      "current": {
+        "indicator": "CVE-2026-87124",
+        "type": "cve",
+        "source": "nist_nvd_recent",
+        "first_seen": "2026-09-15T20:18:59Z",
+        "last_seen": "2026-09-21T20:17:36Z",
+        "confidence": "high",
+        "tlp": "CLEAR",
+        "tags": "cve,high,nvd",
+        "reference": "https://nvd.nist.gov/",
+        "context": "Vulnerability in the Oracle iRecruitment product of Oracle E-Business Suite (component: Internal Operations).  Supported versions that are affected are 12.2.3-12.2.15. Easily exploitable vulnerability allows low privileged attacker with network access via HTTP to compromise Oracle iRecruitment.  While the vulnerability is in Oracle iRecruitment, attacks may significantly impact additional products (scope change).  Successful attacks of this vulnerability can result in  unauthorized access to critical data or complete access to all Oracle iRecruitment accessible data. CVSS 3.1 Base Score 7.7 (Confidentiality impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N).",
+        "score": 80,
+        "sightings": 1,
+        "vulnerability": {
+          "nvd": {
+            "source": "nist_nvd_recent",
+            "reference": "https://nvd.nist.gov/vuln/detail/CVE-2026-87124",
+            "published_at": "2026-09-15T20:18:59.387",
+            "modified_at": "2026-09-21T20:17:36.933",
+            "status": "Undergoing Analysis",
+            "severity": "high",
+            "description": "Vulnerability in the Oracle iRecruitment product of Oracle E-Business Suite (component: Internal Operations).  Supported versions that are affected are 12.2.3-12.2.15. Easily exploitable vulnerability allows low privileged attacker with network access via HTTP to compromise Oracle iRecruitment.  While the vulnerability is in Oracle iRecruitment, attacks may significantly impact additional products (scope change).  Successful attacks of this vulnerability can result in  unauthorized access to critical data or complete access to all Oracle iRecruitment accessible data. CVSS 3.1 Base Score 7.7 (Confidentiality impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N).",
+            "configurations": []
+          }
+        }
+      }
+    },
+    {
+      "action": "added",
+      "observed_at": "2026-09-22T01:08:22Z",
+      "current": {
+        "indicator": "CVE-2026-87126",
+        "type": "cve",
+        "source": "nist_nvd_recent",
+        "first_seen": "2026-09-15T20:18:59Z",
+        "last_seen": "2026-09-21T20:17:37Z",
+        "confidence": "high",
+        "tlp": "CLEAR",
+        "tags": "cve,high,nvd",
+        "reference": "https://nvd.nist.gov/",
+        "context": "Vulnerability in the Oracle Report Manager product of Oracle E-Business Suite (component: Reports Security).  Supported versions that are affected are 12.2.3-12.2.15. Easily exploitable vulnerability allows low privileged attacker with network access via HTTP to compromise Oracle Report Manager.  Successful attacks of this vulnerability can result in  unauthorized access to critical data or complete access to all Oracle Report Manager accessible data and unauthorized ability to cause a partial denial of service (partial DOS) of Oracle Report Manager. CVSS 3.1 Base Score 7.1 (Confidentiality and Availability impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:L).",
+        "score": 80,
+        "sightings": 1,
+        "vulnerability": {
+          "nvd": {
+            "source": "nist_nvd_recent",
+            "reference": "https://nvd.nist.gov/vuln/detail/CVE-2026-87126",
+            "published_at": "2026-09-15T20:18:59.603",
+            "modified_at": "2026-09-21T20:17:37.083",
+            "status": "Awaiting Analysis",
+            "severity": "high",
+            "description": "Vulnerability in the Oracle Report Manager product of Oracle E-Business Suite (component: Reports Security).  Supported versions that are affected are 12.2.3-12.2.15. Easily exploitable vulnerability allows low privileged attacker with network access via HTTP to compromise Oracle Report Manager.  Successful attacks of this vulnerability can result in  unauthorized access to critical data or complete access to all Oracle Report Manager accessible data and unauthorized ability to cause a partial denial of service (partial DOS) of Oracle Report Manager. CVSS 3.1 Base Score 7.1 (Confidentiality and Availability impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:L).",
+            "configurations": []
+          }
+        }
+      }
+    },
+    {
+      "action": "added",
+      "observed_at": "2026-09-22T01:08:22Z",
+      "current": {
         "indicator": "CVE-2026-87127",
         "type": "cve",
         "source": "nist_nvd_recent",
@@ -63,7 +294,7 @@
         "reference": "https://nvd.nist.gov/",
         "context": "Vulnerability in the Oracle Purchasing product of Oracle E-Business Suite (component: G-Invoicing).  Supported versions that are affected are 12.2.10-12.2.15. Easily exploitable vulnerability allows low privileged attacker with network access via HTTP to compromise Oracle Purchasing.  While the vulnerability is in Oracle Purchasing, attacks may significantly impact additional products (scope change).  Successful attacks of this vulnerability can result in  unauthorized access to critical data or complete access to all Oracle Purchasing accessible data. CVSS 3.1 Base Score 7.7 (Confidentiality impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N).",
         "score": 80,
-        "sightings": 4,
+        "sightings": 1,
         "vulnerability": {
           "nvd": {
             "source": "nist_nvd_recent",
@@ -79,10 +310,9 @@
       }
     },
     {
-      "action": "removed_from_feed",
-      "observed_at": "2026-09-22T00:53:41Z",
-      "reason": "no_longer_in_published_snapshot",
-      "previous": {
+      "action": "added",
+      "observed_at": "2026-09-22T01:08:22Z",
+      "current": {
         "indicator": "CVE-2026-87128",
         "type": "cve",
         "source": "nist_nvd_recent",
@@ -94,7 +324,7 @@
         "reference": "https://nvd.nist.gov/",
         "context": "Vulnerability in the Oracle Hyperion Data Relationship Management product of Oracle Hyperion (component: Access and security).   The supported version that is affected is 11.2.26.0.000. Easily exploitable vulnerability allows unauthenticated attacker with network access via HTTP to compromise Oracle Hyperion Data Relationship Management.  Successful attacks of this vulnerability can result in  unauthorized creation, deletion or modification access to critical data or all Oracle Hyperion Data Relationship Management accessible data as well as  unauthorized access to critical data or complete access to all Oracle Hyperion Data Relationship Management accessible data. CVSS 3.1 Base Score 9.1 (Confidentiality and Integrity impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N).",
         "score": 80,
-        "sightings": 4,
+        "sightings": 1,
         "vulnerability": {
           "nvd": {
             "source": "nist_nvd_recent",
@@ -121,6 +351,451 @@
                 ]
               }
             ]
+          }
+        }
+      }
+    },
+    {
+      "action": "added",
+      "observed_at": "2026-09-22T01:08:22Z",
+      "current": {
+        "indicator": "hxxp://182[.]240[.]197[.]249:56323/i",
+        "type": "url",
+        "source": "urlhaus_recent_urls",
+        "first_seen": "2026-09-22T00:56:19Z",
+        "last_seen": "2026-09-22T01:07:19Z",
+        "confidence": "high",
+        "tlp": "CLEAR",
+        "tags": "malware,malware_download,32-bit,arm,elf,Mozi",
+        "reference": "https://urlhaus.abuse.ch/",
+        "context": "URLhaus: malware_download",
+        "score": 80,
+        "sightings": 1,
+        "vulnerability": {}
+      }
+    },
+    {
+      "action": "updated",
+      "observed_at": "2026-09-22T01:08:22Z",
+      "indicator": "hxxp://125[.]42[.]8[.]66:45720/bin[.]sh",
+      "type": "url",
+      "changes": {
+        "tags": {
+          "from": "malware,malware_download,None",
+          "to": "Mozi,None,malware,malware_download"
+        }
+      },
+      "current": {
+        "indicator": "hxxp://125[.]42[.]8[.]66:45720/bin[.]sh",
+        "type": "url",
+        "source": "urlhaus_recent_urls",
+        "first_seen": "2026-09-22T00:47:14Z",
+        "last_seen": "2026-09-22T01:07:19Z",
+        "confidence": "high",
+        "tlp": "CLEAR",
+        "tags": "Mozi,None,malware,malware_download",
+        "reference": "https://urlhaus.abuse.ch/",
+        "context": "URLhaus: malware_download",
+        "score": 80,
+        "sightings": 2,
+        "vulnerability": {}
+      }
+    },
+    {
+      "action": "updated",
+      "observed_at": "2026-09-22T01:08:22Z",
+      "indicator": "hxxp://221[.]15[.]189[.]129:41297/bin[.]sh",
+      "type": "url",
+      "changes": {
+        "tags": {
+          "from": "malware,malware_download,None",
+          "to": "None,malware,malware_download"
+        }
+      },
+      "current": {
+        "indicator": "hxxp://221[.]15[.]189[.]129:41297/bin[.]sh",
+        "type": "url",
+        "source": "urlhaus_recent_urls",
+        "first_seen": "2026-09-22T00:47:14Z",
+        "last_seen": "2026-09-22T01:07:19Z",
+        "confidence": "high",
+        "tlp": "CLEAR",
+        "tags": "None,malware,malware_download",
+        "reference": "https://urlhaus.abuse.ch/",
+        "context": "URLhaus: malware_download",
+        "score": 80,
+        "sightings": 2,
+        "vulnerability": {}
+      }
+    },
+    {
+      "action": "removed_from_feed",
+      "observed_at": "2026-09-22T01:08:22Z",
+      "reason": "no_longer_in_published_snapshot",
+      "previous": {
+        "indicator": "CVE-2023-5778",
+        "type": "cve",
+        "source": "nist_nvd_recent",
+        "first_seen": "2026-09-18T14:17:14Z",
+        "last_seen": "2026-09-18T17:49:08Z",
+        "confidence": "high",
+        "tlp": "CLEAR",
+        "tags": "cve,high,nvd",
+        "reference": "https://nvd.nist.gov/",
+        "context": "Improper handling of length parameter inconsistency vulnerability in ABB Freelance Controller DCP, ABB Freelance Controller AC700, ABB Freelance Controller AC800, and ABB Freelance Controller AC900.\n\nThis issue affects Freelance Controller DCP: through 2013, 2013 SP1, 2016, 2016 SP1, 2019, and 2019 SP1; Freelance Controller AC700: through 2013, 2013 SP1, 2016, 2016 SP1, 2019, and 2019 SP1; Freelance Controller AC800: through 2013, 2013 SP1, 2016, 2016 SP1, 2019, and 2019 SP1; Freelance Controller AC900: through 2013, 2013 SP1, 2016, 2016 SP1, 2019, and 2019 SP1.",
+        "score": 80,
+        "sightings": 6,
+        "vulnerability": {
+          "nvd": {
+            "source": "nist_nvd_recent",
+            "reference": "https://nvd.nist.gov/vuln/detail/CVE-2023-5778",
+            "published_at": "2026-09-18T14:17:14.870",
+            "modified_at": "2026-09-18T17:49:08.457",
+            "status": "Deferred",
+            "severity": "high",
+            "description": "Improper handling of length parameter inconsistency vulnerability in ABB Freelance Controller DCP, ABB Freelance Controller AC700, ABB Freelance Controller AC800, and ABB Freelance Controller AC900.\n\nThis issue affects Freelance Controller DCP: through 2013, 2013 SP1, 2016, 2016 SP1, 2019, and 2019 SP1; Freelance Controller AC700: through 2013, 2013 SP1, 2016, 2016 SP1, 2019, and 2019 SP1; Freelance Controller AC800: through 2013, 2013 SP1, 2016, 2016 SP1, 2019, and 2019 SP1; Freelance Controller AC900: through 2013, 2013 SP1, 2016, 2016 SP1, 2019, and 2019 SP1.",
+            "configurations": []
+          }
+        }
+      }
+    },
+    {
+      "action": "removed_from_feed",
+      "observed_at": "2026-09-22T01:08:22Z",
+      "reason": "no_longer_in_published_snapshot",
+      "previous": {
+        "indicator": "CVE-2026-65388",
+        "type": "cve",
+        "source": "nist_nvd_recent",
+        "first_seen": "2026-09-16T23:16:54Z",
+        "last_seen": "2026-09-18T17:48:19Z",
+        "confidence": "high",
+        "tlp": "CLEAR",
+        "tags": "cve,high,nvd",
+        "reference": "https://nvd.nist.gov/",
+        "context": "A remote attacker who controls a container registry may be able to direct a client's token request to a host of the attacker's choice, and disclose the victim's registry credentials to that host. This vulnerability is addressed in containerization version 0.41.0.",
+        "score": 80,
+        "sightings": 13,
+        "vulnerability": {
+          "nvd": {
+            "source": "nist_nvd_recent",
+            "reference": "https://nvd.nist.gov/vuln/detail/CVE-2026-65388",
+            "published_at": "2026-09-16T23:16:54.147",
+            "modified_at": "2026-09-18T17:48:19.003",
+            "status": "Awaiting Analysis",
+            "severity": "high",
+            "description": "A remote attacker who controls a container registry may be able to direct a client's token request to a host of the attacker's choice, and disclose the victim's registry credentials to that host. This vulnerability is addressed in containerization version 0.41.0.",
+            "configurations": []
+          }
+        }
+      }
+    },
+    {
+      "action": "removed_from_feed",
+      "observed_at": "2026-09-22T01:08:22Z",
+      "reason": "no_longer_in_published_snapshot",
+      "previous": {
+        "indicator": "CVE-2026-73638",
+        "type": "cve",
+        "source": "nist_nvd_recent",
+        "first_seen": "2026-09-17T22:17:03Z",
+        "last_seen": "2026-09-18T17:49:29Z",
+        "confidence": "high",
+        "tlp": "CLEAR",
+        "tags": "cve,nvd",
+        "reference": "https://nvd.nist.gov/",
+        "context": "Imager versions from 0.45_02 before 1.035 for Perl read outside the EXIF block via unchecked start offsets in tiff_load_ifd.\n\ntiff_load_ifd() validates an IFD entry's data by checking that `entry->offset + entry->size` stays within the EXIF block, and never checks the start offset itself. Where that sum is not the real end of the data, the check passes with the entry starting outside the block.\n\nThrough 1.032 `entry->offset` is a plain int, so on the usual two's-complement implementations an offset with the high bit set converts to negative and the sum can land back inside the block. From 1.033 the field is a size_t and the addition wraps only where size_t is 32 bits. The IFD's own start offset is checked the same way and wraps where unsigned long is 32 bits, which includes 64-bit Windows.\n\nAny caller of Imager->read() on an attacker-supplied image may receive EXIF tags holding bytes from outside the block, or crash the process.",
+        "score": 80,
+        "sightings": 8,
+        "vulnerability": {
+          "nvd": {
+            "source": "nist_nvd_recent",
+            "reference": "https://nvd.nist.gov/vuln/detail/CVE-2026-73638",
+            "published_at": "2026-09-17T22:17:03.640",
+            "modified_at": "2026-09-18T17:49:29.480",
+            "status": "Deferred",
+            "severity": null,
+            "description": "Imager versions from 0.45_02 before 1.035 for Perl read outside the EXIF block via unchecked start offsets in tiff_load_ifd.\n\ntiff_load_ifd() validates an IFD entry's data by checking that `entry->offset + entry->size` stays within the EXIF block, and never checks the start offset itself. Where that sum is not the real end of the data, the check passes with the entry starting outside the block.\n\nThrough 1.032 `entry->offset` is a plain int, so on the usual two's-complement implementations an offset with the high bit set converts to negative and the sum can land back inside the block. From 1.033 the field is a size_t and the addition wraps only where size_t is 32 bits. The IFD's own start offset is checked the same way and wraps where unsigned long is 32 bits, which includes 64-bit Windows.\n\nAny caller of Imager->read() on an attacker-supplied image may receive EXIF tags holding bytes from outside the block, or crash the process.",
+            "configurations": []
+          }
+        }
+      }
+    },
+    {
+      "action": "removed_from_feed",
+      "observed_at": "2026-09-22T01:08:22Z",
+      "reason": "no_longer_in_published_snapshot",
+      "previous": {
+        "indicator": "CVE-2026-73639",
+        "type": "cve",
+        "source": "nist_nvd_recent",
+        "first_seen": "2026-09-17T22:17:03Z",
+        "last_seen": "2026-09-18T17:49:29Z",
+        "confidence": "high",
+        "tlp": "CLEAR",
+        "tags": "cve,nvd",
+        "reference": "https://nvd.nist.gov/",
+        "context": "Imager::File::PNG versions from 1.003 before 1.004 for Perl write past the end of the row buffer reading a PNG with a tRNS transparency chunk in read_direct8.\n\nWith a tRNS chunk, read_direct8() adds an alpha channel to the image it creates but still sizes the row buffer from the original channel count. libpng expands the transparency into that extra channel, so png_read_row() fills one channel more than the buffer holds, at one byte per sample, and writes width bytes past the end of the allocation. Palette images go to read_paletted() and 16-bit images to read_direct16(), which sizes its buffer from png_get_rowbytes() and allocates enough for the expanded row.\n\nThe same reader ships bundled in the Imager distribution.\n\nReading an attacker-supplied PNG through Imager->read() corrupts the heap, which can crash the process.",
+        "score": 80,
+        "sightings": 8,
+        "vulnerability": {
+          "nvd": {
+            "source": "nist_nvd_recent",
+            "reference": "https://nvd.nist.gov/vuln/detail/CVE-2026-73639",
+            "published_at": "2026-09-17T22:17:03.763",
+            "modified_at": "2026-09-18T17:49:29.480",
+            "status": "Deferred",
+            "severity": null,
+            "description": "Imager::File::PNG versions from 1.003 before 1.004 for Perl write past the end of the row buffer reading a PNG with a tRNS transparency chunk in read_direct8.\n\nWith a tRNS chunk, read_direct8() adds an alpha channel to the image it creates but still sizes the row buffer from the original channel count. libpng expands the transparency into that extra channel, so png_read_row() fills one channel more than the buffer holds, at one byte per sample, and writes width bytes past the end of the allocation. Palette images go to read_paletted() and 16-bit images to read_direct16(), which sizes its buffer from png_get_rowbytes() and allocates enough for the expanded row.\n\nThe same reader ships bundled in the Imager distribution.\n\nReading an attacker-supplied PNG through Imager->read() corrupts the heap, which can crash the process.",
+            "configurations": []
+          }
+        }
+      }
+    },
+    {
+      "action": "removed_from_feed",
+      "observed_at": "2026-09-22T01:08:22Z",
+      "reason": "no_longer_in_published_snapshot",
+      "previous": {
+        "indicator": "CVE-2026-75157",
+        "type": "cve",
+        "source": "nist_nvd_recent",
+        "first_seen": "2026-09-18T08:17:01Z",
+        "last_seen": "2026-09-18T17:48:19Z",
+        "confidence": "high",
+        "tlp": "CLEAR",
+        "tags": "cve,nvd",
+        "reference": "https://nvd.nist.gov/",
+        "context": "Apache Airflow's asset queued-events DELETE endpoints checked the caller's Dag-axis permission with `READ` instead of `EDIT`. Any authenticated user who could read a Dag could therefore delete that Dag's queued asset events, silently suppressing asset-triggered scheduling for it — a state-changing action gated on a read-only permission. Deployments are affected whenever asset-triggered scheduling is in use and Dag read access is granted more widely than Dag edit access, which is the normal RBAC arrangement; no special configuration is required. Upgrade to apache-airflow 3.3.2 or later.",
+        "score": 80,
+        "sightings": 8,
+        "vulnerability": {
+          "nvd": {
+            "source": "nist_nvd_recent",
+            "reference": "https://nvd.nist.gov/vuln/detail/CVE-2026-75157",
+            "published_at": "2026-09-18T08:17:01.093",
+            "modified_at": "2026-09-18T17:48:19.003",
+            "status": "Awaiting Analysis",
+            "severity": null,
+            "description": "Apache Airflow's asset queued-events DELETE endpoints checked the caller's Dag-axis permission with `READ` instead of `EDIT`. Any authenticated user who could read a Dag could therefore delete that Dag's queued asset events, silently suppressing asset-triggered scheduling for it — a state-changing action gated on a read-only permission. Deployments are affected whenever asset-triggered scheduling is in use and Dag read access is granted more widely than Dag edit access, which is the normal RBAC arrangement; no special configuration is required. Upgrade to apache-airflow 3.3.2 or later.",
+            "configurations": []
+          }
+        }
+      }
+    },
+    {
+      "action": "removed_from_feed",
+      "observed_at": "2026-09-22T01:08:22Z",
+      "reason": "no_longer_in_published_snapshot",
+      "previous": {
+        "indicator": "CVE-2026-81546",
+        "type": "cve",
+        "source": "nist_nvd_recent",
+        "first_seen": "2026-09-17T02:16:27Z",
+        "last_seen": "2026-09-18T17:49:08Z",
+        "confidence": "high",
+        "tlp": "CLEAR",
+        "tags": "cve,high,nvd",
+        "reference": "https://nvd.nist.gov/",
+        "context": "The Affinity by Canva application before 3.3.0 (September 2026 release) did not perform adequate bounds checking when parsing Affinity document files leading to a stack-based buffer overflow. A threat actor could craft a Affinity document that when opened by a user in Affinity could result in arbitrary code execution.",
+        "score": 80,
+        "sightings": 13,
+        "vulnerability": {
+          "nvd": {
+            "source": "nist_nvd_recent",
+            "reference": "https://nvd.nist.gov/vuln/detail/CVE-2026-81546",
+            "published_at": "2026-09-17T02:16:27.537",
+            "modified_at": "2026-09-18T17:49:08.457",
+            "status": "Deferred",
+            "severity": "high",
+            "description": "The Affinity by Canva application before 3.3.0 (September 2026 release) did not perform adequate bounds checking when parsing Affinity document files leading to a stack-based buffer overflow. A threat actor could craft a Affinity document that when opened by a user in Affinity could result in arbitrary code execution.",
+            "configurations": []
+          }
+        }
+      }
+    },
+    {
+      "action": "removed_from_feed",
+      "observed_at": "2026-09-22T01:08:22Z",
+      "reason": "no_longer_in_published_snapshot",
+      "previous": {
+        "indicator": "CVE-2026-90999",
+        "type": "cve",
+        "source": "nist_nvd_recent",
+        "first_seen": "2026-09-16T16:17:21Z",
+        "last_seen": "2026-09-18T17:49:08Z",
+        "confidence": "high",
+        "tlp": "CLEAR",
+        "tags": "critical,cve,nvd",
+        "reference": "https://nvd.nist.gov/",
+        "context": "Sentry Seer is vulnerable to a multi-stage trust-boundary violation that allows unauthenticated attacker-controlled telemetry to become code that is executed by an agent in a privileged automation environment. An external attacker can submit fabricated Sentry events without having access to the victim’s Sentry account, source repository, or infrastructure.",
+        "score": 80,
+        "sightings": 15,
+        "vulnerability": {
+          "nvd": {
+            "source": "nist_nvd_recent",
+            "reference": "https://nvd.nist.gov/vuln/detail/CVE-2026-90999",
+            "published_at": "2026-09-16T16:17:21.817",
+            "modified_at": "2026-09-18T17:49:08.457",
+            "status": "Deferred",
+            "severity": "critical",
+            "description": "Sentry Seer is vulnerable to a multi-stage trust-boundary violation that allows unauthenticated attacker-controlled telemetry to become code that is executed by an agent in a privileged automation environment. An external attacker can submit fabricated Sentry events without having access to the victim’s Sentry account, source repository, or infrastructure.",
+            "configurations": []
+          }
+        }
+      }
+    },
+    {
+      "action": "removed_from_feed",
+      "observed_at": "2026-09-22T01:08:22Z",
+      "reason": "no_longer_in_published_snapshot",
+      "previous": {
+        "indicator": "CVE-2026-92230",
+        "type": "cve",
+        "source": "nist_nvd_recent",
+        "first_seen": "2026-09-17T19:17:06Z",
+        "last_seen": "2026-09-18T17:48:19Z",
+        "confidence": "high",
+        "tlp": "CLEAR",
+        "tags": "cve,high,nvd",
+        "reference": "https://nvd.nist.gov/",
+        "context": "Apache Karaf's XmlUtils cached XML parser/transformer factories in static ThreadLocal fields on long-lived container threads. Because a ThreadLocal value outlives the OSGi bundle that created it, repeated bundle or feature install, update, or refresh operations can leave successive bundle ClassLoader's pinned in memory and unreachable for garbage collection, leading to unbounded Metaspace growth and eventual denial of service of the Karaf instance.",
+        "score": 80,
+        "sightings": 8,
+        "vulnerability": {
+          "nvd": {
+            "source": "nist_nvd_recent",
+            "reference": "https://nvd.nist.gov/vuln/detail/CVE-2026-92230",
+            "published_at": "2026-09-17T19:17:06.897",
+            "modified_at": "2026-09-18T17:48:19.003",
+            "status": "Awaiting Analysis",
+            "severity": "high",
+            "description": "Apache Karaf's XmlUtils cached XML parser/transformer factories in static ThreadLocal fields on long-lived container threads. Because a ThreadLocal value outlives the OSGi bundle that created it, repeated bundle or feature install, update, or refresh operations can leave successive bundle ClassLoader's pinned in memory and unreachable for garbage collection, leading to unbounded Metaspace growth and eventual denial of service of the Karaf instance.",
+            "configurations": []
+          }
+        }
+      }
+    },
+    {
+      "action": "removed_from_feed",
+      "observed_at": "2026-09-22T01:08:22Z",
+      "reason": "no_longer_in_published_snapshot",
+      "previous": {
+        "indicator": "CVE-2026-92808",
+        "type": "cve",
+        "source": "nist_nvd_recent",
+        "first_seen": "2026-09-16T20:17:49Z",
+        "last_seen": "2026-09-18T17:48:19Z",
+        "confidence": "high",
+        "tlp": "CLEAR",
+        "tags": "cve,nvd",
+        "reference": "https://nvd.nist.gov/",
+        "context": "A server-side request forgery (SSRF) vulnerability exists in the UnifiedLogin service of Altium Enterprise Server. An unauthenticated network attacker can cause the server to issue outbound HTTP requests to a destination of the attacker's choosing, including internal services that are reachable only from the server itself.\n\n\n\n\nOne such internal service exposes server configuration and credential material without authentication, relying only on the request originating locally. Because the forged requests originate from the server process, that check is satisfied. An unauthenticated attacker can therefore retrieve stored credentials and use them to obtain an administrative session, resulting in full compromise of the server and all of its services. Altium 365 cloud deployments are not affected, as the affected endpoint is disabled in cloud mode.",
+        "score": 80,
+        "sightings": 14,
+        "vulnerability": {
+          "nvd": {
+            "source": "nist_nvd_recent",
+            "reference": "https://nvd.nist.gov/vuln/detail/CVE-2026-92808",
+            "published_at": "2026-09-16T20:17:49.117",
+            "modified_at": "2026-09-18T17:48:19.003",
+            "status": "Awaiting Analysis",
+            "severity": null,
+            "description": "A server-side request forgery (SSRF) vulnerability exists in the UnifiedLogin service of Altium Enterprise Server. An unauthenticated network attacker can cause the server to issue outbound HTTP requests to a destination of the attacker's choosing, including internal services that are reachable only from the server itself.\n\n\n\n\nOne such internal service exposes server configuration and credential material without authentication, relying only on the request originating locally. Because the forged requests originate from the server process, that check is satisfied. An unauthenticated attacker can therefore retrieve stored credentials and use them to obtain an administrative session, resulting in full compromise of the server and all of its services. Altium 365 cloud deployments are not affected, as the affected endpoint is disabled in cloud mode.",
+            "configurations": []
+          }
+        }
+      }
+    },
+    {
+      "action": "removed_from_feed",
+      "observed_at": "2026-09-22T01:08:22Z",
+      "reason": "no_longer_in_published_snapshot",
+      "previous": {
+        "indicator": "CVE-2026-92839",
+        "type": "cve",
+        "source": "nist_nvd_recent",
+        "first_seen": "2026-09-17T04:18:10Z",
+        "last_seen": "2026-09-18T17:49:08Z",
+        "confidence": "high",
+        "tlp": "CLEAR",
+        "tags": "cve,medium,nvd",
+        "reference": "https://nvd.nist.gov/",
+        "context": "Canva Desktop before v1.125.0 performed double decoding in the deeplink handler. A threat actor could cause the application to load arbitrary same-origin content under the user’s session.",
+        "score": 80,
+        "sightings": 13,
+        "vulnerability": {
+          "nvd": {
+            "source": "nist_nvd_recent",
+            "reference": "https://nvd.nist.gov/vuln/detail/CVE-2026-92839",
+            "published_at": "2026-09-17T04:18:10.870",
+            "modified_at": "2026-09-18T17:49:08.457",
+            "status": "Deferred",
+            "severity": "medium",
+            "description": "Canva Desktop before v1.125.0 performed double decoding in the deeplink handler. A threat actor could cause the application to load arbitrary same-origin content under the user’s session.",
+            "configurations": []
+          }
+        }
+      }
+    },
+    {
+      "action": "removed_from_feed",
+      "observed_at": "2026-09-22T01:08:22Z",
+      "reason": "no_longer_in_published_snapshot",
+      "previous": {
+        "indicator": "CVE-2026-92932",
+        "type": "cve",
+        "source": "nist_nvd_recent",
+        "first_seen": "2026-09-17T13:17:01Z",
+        "last_seen": "2026-09-18T17:49:29Z",
+        "confidence": "high",
+        "tlp": "CLEAR",
+        "tags": "cve,nvd",
+        "reference": "https://nvd.nist.gov/",
+        "context": "In the MISP sachertortephp library, the Xml::build() static method in lib/Cake/Utility/Xml.php contains a logic error in the conditional that gates network-based XML fetching. The original condition was written as: $options['readFile'] && strpos($input, 'http://') === 0 || strpos($input, 'https://') === 0. Because PHP's && operator has higher precedence than ||, the expression is evaluated as ($options['readFile'] && strpos($input, 'http://') === 0) || strpos($input, 'https://') === 0. As a result, when a caller explicitly sets the readFile option to false to disable file and URL reading, an input string beginning with https:// still satisfies the condition and triggers a network fetch via HttpSocket (configured to follow up to 10 redirects). The http:// branch is correctly gated by the readFile flag, but the https:// branch is not. An attacker who can influence the $input parameter passed to Xml::build() can therefore force the application to issue an outbound HTTPS request to an attacker-controlled or internal URL, even though the caller intended to suppress all remote reads. The fetched response is parsed as XML and may be returned to the caller, enabling information disclosure from internal services or external targets. This constitutes a Server-Side Request Forgery (SSRF) weakness with an information-disclosure impact. The vulnerability requires that the code path in Xml::build() be reachable with attacker-controlled input and that the readFile option be set to false (or the caller expects it to be false).",
+        "score": 80,
+        "sightings": 13,
+        "vulnerability": {
+          "nvd": {
+            "source": "nist_nvd_recent",
+            "reference": "https://nvd.nist.gov/vuln/detail/CVE-2026-92932",
+            "published_at": "2026-09-17T13:17:01.610",
+            "modified_at": "2026-09-18T17:49:29.480",
+            "status": "Deferred",
+            "severity": null,
+            "description": "In the MISP sachertortephp library, the Xml::build() static method in lib/Cake/Utility/Xml.php contains a logic error in the conditional that gates network-based XML fetching. The original condition was written as: $options['readFile'] && strpos($input, 'http://') === 0 || strpos($input, 'https://') === 0. Because PHP's && operator has higher precedence than ||, the expression is evaluated as ($options['readFile'] && strpos($input, 'http://') === 0) || strpos($input, 'https://') === 0. As a result, when a caller explicitly sets the readFile option to false to disable file and URL reading, an input string beginning with https:// still satisfies the condition and triggers a network fetch via HttpSocket (configured to follow up to 10 redirects). The http:// branch is correctly gated by the readFile flag, but the https:// branch is not. An attacker who can influence the $input parameter passed to Xml::build() can therefore force the application to issue an outbound HTTPS request to an attacker-controlled or internal URL, even though the caller intended to suppress all remote reads. The fetched response is parsed as XML and may be returned to the caller, enabling information disclosure from internal services or external targets. This constitutes a Server-Side Request Forgery (SSRF) weakness with an information-disclosure impact. The vulnerability requires that the code path in Xml::build() be reachable with attacker-controlled input and that the readFile option be set to false (or the caller expects it to be false).",
+            "configurations": []
+          }
+        }
+      }
+    },
+    {
+      "action": "removed_from_feed",
+      "observed_at": "2026-09-22T01:08:22Z",
+      "reason": "no_longer_in_published_snapshot",
+      "previous": {
+        "indicator": "CVE-2026-92943",
+        "type": "cve",
+        "source": "nist_nvd_recent",
+        "first_seen": "2026-09-17T20:18:59Z",
+        "last_seen": "2026-09-18T17:48:19Z",
+        "confidence": "high",
+        "tlp": "CLEAR",
+        "tags": "cve,high,nvd",
+        "reference": "https://nvd.nist.gov/",
+        "context": "Improper validation of certificate with host mismatch in the MQTT client TLS connection layer in AWS IoT Device SDK for Python 1.5.3 through 1.6.0 on Python 3.7 and later might allow an adversary-in-the-middle actor to impersonate the AWS IoT Core endpoint, read device telemetry, and inject arbitrary MQTT messages that the device processes as authentic, via a certificate issued for an unrelated hostname by a certificate authority present in the device trust store.\n\n\n\nTo remediate this issue, users should upgrade to version 1.6.1.",
+        "score": 80,
+        "sightings": 8,
+        "vulnerability": {
+          "nvd": {
+            "source": "nist_nvd_recent",
+            "reference": "https://nvd.nist.gov/vuln/detail/CVE-2026-92943",
+            "published_at": "2026-09-17T20:18:59.333",
+            "modified_at": "2026-09-18T17:48:19.003",
+            "status": "Awaiting Analysis",
+            "severity": "high",
+            "description": "Improper validation of certificate with host mismatch in the MQTT client TLS connection layer in AWS IoT Device SDK for Python 1.5.3 through 1.6.0 on Python 3.7 and later might allow an adversary-in-the-middle actor to impersonate the AWS IoT Core endpoint, read device telemetry, and inject arbitrary MQTT messages that the device processes as authentic, via a certificate issued for an unrelated hostname by a certificate authority present in the device trust store.\n\n\n\nTo remediate this issue, users should upgrade to version 1.6.1.",
+            "configurations": []
           }
         }
       }

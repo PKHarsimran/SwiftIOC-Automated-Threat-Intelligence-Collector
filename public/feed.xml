@@ -3,16 +3,22 @@
   <title>SwiftIOC — Newest High-Confidence IOCs</title>
   <link>https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector</link>
   <description>Freshest scored, cross-source-corroborated indicators of compromise.</description>
-  <lastBuildDate>Tue, 22 Sep 2026 00:53:42 +0000</lastBuildDate>
+  <lastBuildDate>Tue, 22 Sep 2026 01:08:23 +0000</lastBuildDate>
+    <item>
+      <title>[80] url: hxxp://182[.]240[.]197[.]249:56323/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,arm,elf,Mozi</description>
+      <guid isPermaLink="false">a468f432-3e9f-5854-b651-54cfa96162ed</guid>
+      <pubDate>Tue, 22 Sep 2026 00:56:19 +0000</pubDate>
+    </item>
     <item>
       <title>[80] url: hxxp://125[.]42[.]8[.]66:45720/bin[.]sh</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: Mozi,None,malware,malware_download</description>
       <guid isPermaLink="false">36536af0-b362-5aaa-b48c-79d707dcb113</guid>
       <pubDate>Tue, 22 Sep 2026 00:47:14 +0000</pubDate>
     </item>
     <item>
       <title>[80] url: hxxp://221[.]15[.]189[.]129:41297/bin[.]sh</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: None,malware,malware_download</description>
       <guid isPermaLink="false">b124c451-b7a8-51f2-b8fc-718d439b8493</guid>
       <pubDate>Tue, 22 Sep 2026 00:47:14 +0000</pubDate>
     </item>
@@ -296,12 +302,6 @@
       <title>[80] ipv4_cidr: 103.12.220.0/22</title>
       <description>Score 80, confidence high, sources: spamhaus_drop, tags: drop,spamhaus</description>
       <guid isPermaLink="false">48ab8aae-2b64-5dcc-98aa-883ef77eefde</guid>
-      <pubDate>Tue, 22 Sep 2026 00:34:56 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] ipv4_cidr: 103.122.223.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: drop,spamhaus</description>
-      <guid isPermaLink="false">c79edf7f-a3c6-54b0-812c-c32b7e48f58f</guid>
       <pubDate>Tue, 22 Sep 2026 00:34:56 +0000</pubDate>
     </item>
 </channel></rss>
