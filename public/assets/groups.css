@@ -4,6 +4,7 @@
 .group-page-heading h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); margin: .2rem 0 .65rem; letter-spacing: -.04em; }
 .group-page-heading p { margin: .4rem 0; }
 .group-page-heading > a { flex-shrink: 0; }
+.group-page-heading .workbench-hero-actions { display: flex; flex-wrap: wrap; gap: .55rem; flex-shrink: 0; }
 .group-small, .group-page-status { color: var(--text-muted); font-size: .82rem; }
 .group-page-status { margin-bottom: 1.5rem; }
 .group-picker { display: flex; gap: .65rem; align-items: end; }

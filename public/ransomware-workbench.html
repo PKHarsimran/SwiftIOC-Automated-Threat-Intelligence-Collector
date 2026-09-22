@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#191c19" />
+  <title>Ransomware intelligence workbench — SwiftIOC</title>
+  <meta name="description" content="Prioritize ransomware evidence, compare groups, assess telemetry coverage, triage indicators and build defensive response packs." />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="assets/styles.css?v=42" />
+  <link rel="stylesheet" href="assets/groups.css?v=44" />
+  <link rel="stylesheet" href="assets/ransomware-workbench.css?v=44" />
+</head>
+<body data-ioc-root=".">
+<a class="skip-link" href="#workbench">Skip to workbench</a>
+<div class="page-wrapper groups-page workbench-page">
+  <nav class="top-nav" aria-label="SwiftIOC navigation">
+    <a class="brand" href="index.html"><span class="brand-mark">SwiftIOC</span><span class="brand-tagline">Threat Intelligence</span></a>
+    <div class="nav-links"><a href="index.html#ioc-lookup">Lookup</a><a href="index.html#vulnerabilities">CVEs</a><a href="index.html#live-preview">IOC feed</a><a href="groups.html">Groups</a><a href="ransomware-workbench.html" aria-current="page">Workbench</a></div>
+  </nav>
+  <main id="workbench">
+    <header class="workbench-hero">
+      <div><p class="eyebrow">Ransomware decision support</p><h1>Turn evidence into the next defensive action.</h1><p>Prioritize, compare, validate coverage, triage evidence and build reviewable response packs.</p></div>
+      <div class="workbench-hero-actions"><button class="button" type="button" data-quick-plan>Build response plan</button><details class="action-menu"><summary class="button ghost">More actions</summary><div><a href="groups.html#view=changes">Review changes</a><a href="groups.html#view=graph">Open evidence map</a><a href="group_evidence.json">Download evidence</a></div></details></div>
+    </header>
+    <div class="group-page-status" data-status role="status">Loading cached intelligence…</div>
+    <noscript><p>Enable JavaScript to use the workbench. The <a href="group_evidence.json">derived evidence</a> remains downloadable.</p></noscript>
+    <div data-app hidden>
+      <section class="workbench-context" aria-label="Workbench scope">
+        <label>Focus group<select data-group><option value="">All groups</option></select></label>
+        <div class="context-summary" data-context-summary></div>
+      </section>
+      <nav class="workbench-tabs" aria-label="Workbench tools">
+        <button type="button" data-tab="radar" aria-pressed="true"><span>Radar</span><small>Activity &amp; changes</small></button>
+        <button type="button" data-tab="priorities" aria-pressed="false"><span>Priorities</span><small>What to review</small></button>
+        <button type="button" data-tab="compare" aria-pressed="false"><span>Compare</span><small>Group DNA</small></button>
+        <button type="button" data-tab="coverage" aria-pressed="false"><span>Coverage</span><small>Telemetry gaps</small></button>
+        <button type="button" data-tab="triage" aria-pressed="false"><span>Triage</span><small>IOC, CVE or group</small></button>
+        <button type="button" data-tab="exposure" aria-pressed="false"><span>Exposure</span><small>Private local check</small></button>
+        <button type="button" data-tab="watchlist" aria-pressed="false"><span>Watchlist</span><small>Your local lens</small></button>
+      </nav>
+
+      <section data-panel="radar" class="workbench-panel">
+        <div class="workbench-grid"><article class="group-surface"><h2>Recent reporting sample</h2><p class="group-small">Aggregate reporting context—not a measure of prevalence or confirmed attacks.</p><div data-activity-chart></div></article><article class="group-surface"><h2>Unusual evidence change</h2><p class="group-small">Compared with the previous local observation window. Baseline needs time to mature.</p><div data-anomalies></div></article></div>
+        <div class="workbench-grid"><article class="group-surface"><h2>Groups in recent reports</h2><div data-activity-groups></div></article><article class="group-surface"><h2>Sector and country radar</h2><div data-activity-context></div></article></div>
+      </section>
+
+      <section data-panel="priorities" class="workbench-panel" hidden>
+        <div class="panel-heading"><div><h2>Explainable review queue</h2><p>Ranks evidence for investigation. It is not a probability of compromise or automatic block decision.</p></div><label>Evidence type<select data-priority-kind><option value="all">All</option><option value="cves">CVEs</option><option value="iocs">IOCs</option></select></label></div>
+        <div class="priority-list" data-priorities></div>
+      </section>
+
+      <section data-panel="compare" class="workbench-panel" hidden>
+        <div class="panel-heading"><div><h2>Group DNA comparison</h2><p>Similarity means shared reporting only. It does not establish shared operators, tooling or attribution.</p></div></div>
+        <div class="group-record-toolbar"><label>Compare with<select data-compare><option value="">Best match</option></select></label></div>
+        <div data-comparison></div>
+      </section>
+
+      <section data-panel="coverage" class="workbench-panel" hidden>
+        <h2>Defensive coverage matrix</h2><p>Select telemetry you actually retain. Settings stay in this browser. “Searchable” still requires correct fields, retention and detections.</p>
+        <fieldset class="telemetry-picker" data-telemetry><legend>Available telemetry</legend></fieldset>
+        <div data-coverage-summary></div><div class="coverage-grid" data-coverage></div>
+      </section>
+
+      <section data-panel="triage" class="workbench-panel" hidden>
+        <h2>Incident triage</h2><p>Enter one exact IOC, CVE, ATT&amp;CK ID or group. SwiftIOC will not guess partial identities.</p>
+        <form class="triage-form" data-triage-form><label>Evidence or group<input data-triage-input placeholder="CVE-2024-40766, 203.0.113.5, or akira" required /></label><button class="button" type="submit">Investigate</button></form>
+        <div data-triage-result></div>
+      </section>
+
+      <section data-panel="exposure" class="workbench-panel" hidden>
+        <h2>Private exposure check</h2><p>Paste CVE IDs or exact indicators from your asset and security inventories. The text is processed in your browser and is never uploaded or saved.</p>
+        <label>Inventory evidence<textarea data-exposure-input rows="6" placeholder="CVE-2024-40766&#10;example.org&#10;203.0.113.5"></textarea></label>
+        <div class="inline-actions"><button class="button" type="button" data-exposure-check>Check locally</button><a class="button ghost" href="index.html#exposure-report">Open product/version inventory report</a></div><div data-exposure-result></div>
+      </section>
+
+      <section data-panel="watchlist" class="workbench-panel" hidden>
+        <h2>Private exposure watchlist</h2><p>Track exact groups, evidence, countries and sectors. Values stay in local browser storage and are never sent to SwiftIOC or ransomware.live.</p>
+        <div class="watch-grid"><label>Groups<textarea data-watch="groups" rows="4" placeholder="akira&#10;clop"></textarea></label><label>CVEs or IOCs<textarea data-watch="evidence" rows="4" placeholder="CVE-2024-40766"></textarea></label><label>Countries<textarea data-watch="countries" rows="4" placeholder="US&#10;CA"></textarea></label><label>Sectors<textarea data-watch="sectors" rows="4" placeholder="Healthcare"></textarea></label></div>
+        <div class="inline-actions"><button class="button" type="button" data-watch-save>Save in this browser</button><button class="button ghost" type="button" data-watch-clear>Clear local watchlist</button></div>
+        <div data-watch-results></div>
+      </section>
+
+      <aside class="workbench-disclaimer"><strong>Decision-support boundaries</strong><p>Ransomware.live records are reported associations. SwiftIOC does not infer compromise, predict attacks, attribute operators, or automatically block evidence. Raw victim records, domains, negotiation chats, ransom notes and press items are not republished here. Review every generated query or detection before use.</p></aside>
+    </div>
+  </main>
+  <footer class="site-footer"><span>SwiftIOC / Open-source threat intelligence</span><a href="groups.html">Explore group evidence</a></footer>
+</div>
+<script defer src="assets/dashboard-core.js?v=42"></script>
+<script defer src="assets/group-intel-core.js?v=43"></script>
+<script defer src="assets/ransomware-workbench-core.js?v=44"></script>
+<script defer src="assets/ransomware-workbench.js?v=44"></script>
+</body>
+</html>

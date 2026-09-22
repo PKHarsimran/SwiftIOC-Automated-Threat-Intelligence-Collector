@@ -9,6 +9,7 @@ on:
       - "tests/**"
       - "public/index.html"
       - "public/groups.html"
+        - "public/ransomware-workbench.html"
       - "public/assets/**"
       - "sources*.yml"
       - "requirements*.txt"
@@ -44,9 +45,10 @@ jobs:
         shell: bash
         run: |
           set -Eeuo pipefail
-          node --test public/assets/dashboard-core.test.js public/assets/inventory-core.test.js public/assets/group-intel-core.test.js
+          node --test public/assets/dashboard-core.test.js public/assets/inventory-core.test.js public/assets/group-intel-core.test.js public/assets/ransomware-workbench-core.test.js
           node --check public/assets/group-intel.js
           node --check public/assets/groups.js
+          node --check public/assets/ransomware-workbench.js
           node --check public/assets/dashboard-core.js
           node --check public/assets/dashboard.js
           node --check public/assets/inventory.js

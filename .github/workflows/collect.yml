@@ -162,6 +162,11 @@ jobs:
           RANSOMWARE_LIVE_API_KEY: ${{ secrets.RANSOMWARE_LIVE_API_KEY }}
         run: python -m swiftioc.ransomware_live --feed "$IOC_DIR/latest.jsonl" --output "$OUT_DIR/group_evidence.json"
 
+      - name: Build aggregate ransomware activity context
+        env:
+          RANSOMWARE_LIVE_API_KEY: ${{ secrets.RANSOMWARE_LIVE_API_KEY }}
+        run: python -m swiftioc.ransomware_context --output "$OUT_DIR/ransomware_context.json"
+
       - name: Summarize IOC outputs
         if: success()
         shell: bash
