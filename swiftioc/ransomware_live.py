@@ -135,6 +135,20 @@ def _existing(path: Path) -> set[tuple[str, str]]:
     return found
 
 
+def _profile_fields(profile: object) -> str:
+    """Schema-only diagnostics; never emit provider values or the API key."""
+    if not isinstance(profile, dict):
+        return type(profile).__name__
+    fields = []
+    for key, value in profile.items():
+        if not isinstance(key, str) or not re.fullmatch(r"[A-Za-z0-9_-]{1,40}", key):
+            continue
+        nested = value[0] if isinstance(value, list) and value else value
+        child_keys = ",".join(k for k in nested if isinstance(k, str) and re.fullmatch(r"[A-Za-z0-9_-]{1,40}", k)) if isinstance(nested, dict) else ""
+        fields.append(f"{key}({type(value).__name__}{':' + child_keys[:120] if child_keys else ''})")
+    return ", ".join(fields[:30])[:900]
+
+
 def build_enrichment(groups: list[tuple[str, object, object]], existing: set[tuple[str, str]], generated_at: str) -> dict:
     iocs: dict[tuple[str, str], set[str]] = {}
     cves: dict[str, set[str]] = {}
@@ -199,6 +213,8 @@ def fetch_enrichment(key: str, existing: set[tuple[str, str]], *, session: reque
     if not ioc_successes:
         raise ValueError("No group IOC endpoints were available")
     result = build_enrichment(groups, existing, datetime.now(timezone.utc).isoformat())
+    if not result["cves"] and not any(group["ttps"] for group in result["groups"]):
+        print(f"::warning::No CVE or ATT&CK IDs parsed from group profiles; first profile fields: {_profile_fields(groups[0][1])}")
     result["groups_without_ioc_endpoint"] = missing_iocs
     return result
 
