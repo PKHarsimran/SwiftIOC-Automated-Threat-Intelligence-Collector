@@ -27,9 +27,12 @@ def _text(item: dict, *keys: str) -> str:
     return ""
 
 
-def _day(value: str) -> str:
+def _day(value: str, reference: datetime) -> str:
     try:
-        return datetime.fromisoformat(value.replace("Z", "+00:00")).date().isoformat()
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        if parsed.date() > (reference + timedelta(days=1)).date():
+            return ""
+        return parsed.date().isoformat()
     except ValueError:
         return ""
 
@@ -53,6 +56,21 @@ def _clean_context(data: dict) -> bool:
                      and row["name"].strip().lower() not in PLACEHOLDERS]
             if clean != rows:
                 container[key] = clean
+                changed = True
+    activity = data.get("activity")
+    try:
+        reference = datetime.fromisoformat(data["generated_at"])
+    except (KeyError, TypeError, ValueError):
+        reference = datetime.now(timezone.utc)
+    if isinstance(activity, dict):
+        for key in ("by_day", "press_by_day"):
+            rows = activity.get(key)
+            if not isinstance(rows, list):
+                continue
+            clean = [row for row in rows if isinstance(row, dict) and isinstance(row.get("date"), str)
+                     and _day(row["date"], reference)]
+            if clean != rows:
+                activity[key] = clean
                 changed = True
     return changed
 
@@ -79,8 +97,9 @@ def _availability(value: Any, limit: int = 500) -> list[dict]:
 def build_context(payloads: dict[str, Any], generated_at: str) -> dict:
     victims = [row for row in _records(payloads.get("/victims/recent"), ("victims",)) if isinstance(row, dict)]
     press = [row for row in _records(payloads.get("/press/recent"), ("press", "cyberattacks")) if isinstance(row, dict)]
-    days = Counter(_day(_text(row, "discovered", "attackdate", "published", "date")) for row in victims)
-    press_days = Counter(_day(_text(row, "date", "published", "discovered")) for row in press)
+    reference = datetime.fromisoformat(generated_at)
+    days = Counter(_day(_text(row, "discovered", "attackdate", "published", "date"), reference) for row in victims)
+    press_days = Counter(_day(_text(row, "date", "published", "discovered"), reference) for row in press)
     stats_value = payloads.get("/stats", {})
     stats = stats_value.get("stats", stats_value) if isinstance(stats_value, dict) else {}
     public_stats = {}

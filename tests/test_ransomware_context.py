@@ -15,7 +15,7 @@ def payloads():
         "/yara": [{"group": "alpha", "count": 2}],
         "/ransomnotes": [{"group": "alpha", "notes": 3}],
         "/negotiations": [{"group": "alpha", "chats": 1}],
-        "/press/recent": [{"title": "Secret", "date": "2026-09-22"}],
+        "/press/recent": [{"title": "Secret", "date": "2026-09-22"}, {"title": "Bad future date", "date": "2027-09-22"}],
     }
 
 
@@ -27,6 +27,7 @@ def test_context_is_aggregate_only():
     assert data["activity"]["groups"] == [{"name": "alpha", "count": 2}]
     assert data["activity"]["sectors"] == [{"name": "Health", "count": 1}, {"name": "Finance", "count": 1}]
     assert data["available"]["yara"] == [{"group": "alpha", "count": 2}]
+    assert data["activity"]["press_by_day"] == [{"date": "2026-09-22", "count": 1}]
 
 
 def test_fetch_uses_seven_bounded_non_redirecting_requests():
