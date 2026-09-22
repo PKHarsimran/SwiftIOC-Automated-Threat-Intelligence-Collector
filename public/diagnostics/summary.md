@@ -1,15 +1,15 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-09-22T00:41:09Z_
+_Generated 2026-09-22T00:48:09Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-22T00:41:09Z |
+| Generated | 2026-09-22T00:48:09Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 9497 |
+| Duplicates removed | 9494 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-source overlaps | 1064 |
@@ -39,14 +39,14 @@ _Generated 2026-09-22T00:41:09Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| greensnow_blocklist | 5922 |
+| greensnow_blocklist | 5919 |
 | ipsum_level5 | 5793 |
 | blocklist_de_ssh | 5607 |
 | binarydefense_banlist | 5363 |
 | threatfox_export_json | 2112 |
 | cisa_kev | 1717 |
 | spamhaus_drop | 1716 |
-| malwarebazaar_recent | 1449 |
+| malwarebazaar_recent | 1446 |
 | tor_exit_nodes | 1378 |
 
 ## Indicator types

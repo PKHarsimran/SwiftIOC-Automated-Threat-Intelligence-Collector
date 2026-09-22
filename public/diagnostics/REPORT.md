@@ -4,11 +4,11 @@
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-22T00:41:09Z |
+| Generated | 2026-09-22T00:48:09Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 9497 |
-| Carried forward | 2669 |
+| Duplicates removed | 9494 |
+| Carried forward | 2672 |
 | Expired (score < 20) | 0 |
 | Aged out (> 30d) | 0 |
 | Pruned over cap (10000) | 32419 |
@@ -29,9 +29,9 @@
 | dshield_block | 20 |
 | et_compromised | 690 |
 | feodo_ipblocklist | 5 |
-| greensnow_blocklist | 5922 |
+| greensnow_blocklist | 5919 |
 | ipsum_level5 | 5793 |
-| malwarebazaar_recent | 1449 |
+| malwarebazaar_recent | 1446 |
 | nist_nvd_recent | 1369 |
 | openphish_feed | 300 |
 | spamhaus_drop | 1716 |
