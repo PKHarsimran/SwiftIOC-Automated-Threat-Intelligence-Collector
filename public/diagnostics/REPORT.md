@@ -4,19 +4,19 @@
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-22T22:52:07Z |
+| Generated | 2026-09-22T22:54:27Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 7301 |
-| Carried forward | 2191 |
+| Duplicates removed | 7298 |
+| Carried forward | 2390 |
 | Expired (score < 20) | 0 |
 | Aged out (> 30d) | 0 |
-| Pruned over cap (10000) | 32055 |
+| Pruned over cap (10000) | 32046 |
 | Stored | 10000 |
 | Score (min / avg / max) | 80 / 80.7 / 96 |
 | High-confidence indicators | 10000 |
 | Earliest first_seen | 2016-05-11T01:59:46Z |
-| Newest first_seen | 2026-09-22T22:51:18Z |
+| Newest first_seen | 2026-09-22T22:53:53Z |
 
 ## Per-source counts
 
@@ -29,10 +29,10 @@
 | dshield_block | 20 |
 | et_compromised | 690 |
 | feodo_ipblocklist | 5 |
-| greensnow_blocklist | 5015 |
+| greensnow_blocklist | 5004 |
 | ipsum_level5 | 3875 |
 | malwarebazaar_recent | 1423 |
-| nist_nvd_recent | 2400 |
+| nist_nvd_recent | 2200 |
 | openphish_feed | 300 |
 | spamhaus_drop | 1712 |
 | sslbl_ja3 | 97 |
@@ -45,10 +45,10 @@
 | Type | Indicators |
 | --- | ---: |
 | sha256 | 3382 |
-| cve | 3024 |
+| cve | 2615 |
+| ipv4_cidr | 1559 |
 | url | 1245 |
-| ipv4_cidr | 1148 |
 | domain | 609 |
 | sha1 | 271 |
-| ipv4 | 258 |
+| ipv4 | 256 |
 | md5 | 63 |
