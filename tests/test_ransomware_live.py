@@ -2,6 +2,7 @@
 import json
 import sys
 from datetime import datetime, timezone
+from typing import cast
 
 import requests
 import pytest
@@ -56,7 +57,7 @@ def test_api_uses_key_header_and_never_follows_redirect(monkeypatch):
 
     monkeypatch.setattr("swiftioc.ransomware_live.time.sleep", lambda _: None)
     session = Session()
-    result = fetch_enrichment("secret", set(), session=session)
+    result = fetch_enrichment("secret", set(), session=cast(requests.Session, session))
     assert session.paths[-1].endswith("/iocs/A%20B")
     assert result["iocs"][0]["in_swiftioc"] is False
 
@@ -102,7 +103,7 @@ def test_missing_group_ioc_endpoint_keeps_profile_evidence(monkeypatch):
             return Response(200, {"ip": ["1.2.3.4"]})
 
     monkeypatch.setattr("swiftioc.ransomware_live.time.sleep", lambda _: None)
-    result = fetch_enrichment("key", set(), session=Session())
+    result = fetch_enrichment("key", set(), session=cast(requests.Session, Session()))
     assert result["groups_without_ioc_endpoint"] == 1
     assert result["cves"][0]["cve_id"] == "CVE-2025-1234"
     assert result["iocs"][0]["indicator"] == "1.2.3.4"
@@ -135,7 +136,7 @@ def test_ioc_group_index_avoids_known_missing_endpoints(monkeypatch):
 
     monkeypatch.setattr("swiftioc.ransomware_live.time.sleep", lambda _: None)
     session = Session()
-    result = fetch_enrichment("key", set(), session=session)
+    result = fetch_enrichment("key", set(), session=cast(requests.Session, session))
     assert result["api_calls"] == 5  # Two indexes, two profiles, one IOC.
     assert not any(path.endswith("/iocs/A") for path in session.paths)
     assert result["groups_without_ioc_endpoint"] == 1
@@ -176,5 +177,5 @@ def test_group_limit_stops_before_per_group_requests():
 
     session = Session()
     with pytest.raises(ValueError, match="large group listing"):
-        fetch_enrichment("key", set(), session=session)
+        fetch_enrichment("key", set(), session=cast(requests.Session, session))
     assert session.calls == 1
