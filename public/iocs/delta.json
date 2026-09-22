@@ -1,282 +1,128 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-22T00:48:09Z",
-  "previous_generated_at": "2026-09-22T00:41:09Z",
+  "generated_at": "2026-09-22T00:53:41Z",
+  "previous_generated_at": "2026-09-22T00:48:09Z",
   "baseline_available": true,
   "counts": {
-    "added": 0,
-    "updated": 10,
-    "removed": 0
+    "added": 2,
+    "updated": 0,
+    "removed": 2
   },
   "events": [
     {
-      "action": "updated",
-      "observed_at": "2026-09-22T00:48:09Z",
-      "indicator": "23f112562b862a9ee6c5d96c698240a483a983864514f5fde64ea040ca711400",
-      "type": "sha256",
-      "changes": {
-        "tags": {
-          "from": "malware,Mirai",
-          "to": "Mirai,malware"
-        }
-      },
+      "action": "added",
+      "observed_at": "2026-09-22T00:53:41Z",
       "current": {
-        "indicator": "23f112562b862a9ee6c5d96c698240a483a983864514f5fde64ea040ca711400",
-        "type": "sha256",
-        "source": "malwarebazaar_recent",
-        "first_seen": "2026-09-21T23:31:04Z",
-        "last_seen": "2026-09-22T00:46:54Z",
-        "confidence": "high",
-        "tlp": "CLEAR",
-        "tags": "Mirai,malware",
-        "reference": "https://bazaar.abuse.ch/",
-        "context": "MalwareBazaar: Mirai",
-        "score": 80,
-        "sightings": 2,
-        "vulnerability": {}
-      }
-    },
-    {
-      "action": "updated",
-      "observed_at": "2026-09-22T00:48:09Z",
-      "indicator": "3463b81a239371a5c9f0cede08620165ea146ae1880d9cd13659221dfc6a715e",
-      "type": "sha256",
-      "changes": {
-        "tags": {
-          "from": "malware,Mirai",
-          "to": "Mirai,malware"
-        }
-      },
-      "current": {
-        "indicator": "3463b81a239371a5c9f0cede08620165ea146ae1880d9cd13659221dfc6a715e",
-        "type": "sha256",
-        "source": "malwarebazaar_recent",
-        "first_seen": "2026-09-22T00:17:21Z",
-        "last_seen": "2026-09-22T00:46:54Z",
-        "confidence": "high",
-        "tlp": "CLEAR",
-        "tags": "Mirai,malware",
-        "reference": "https://bazaar.abuse.ch/",
-        "context": "MalwareBazaar: Mirai",
-        "score": 80,
-        "sightings": 2,
-        "vulnerability": {}
-      }
-    },
-    {
-      "action": "updated",
-      "observed_at": "2026-09-22T00:48:09Z",
-      "indicator": "94e01aa920f692078173a4f756f59af8b45c13986ba07ced70835ca9a5e686c0",
-      "type": "sha256",
-      "changes": {
-        "tags": {
-          "from": "malware,Mirai",
-          "to": "Mirai,malware"
-        }
-      },
-      "current": {
-        "indicator": "94e01aa920f692078173a4f756f59af8b45c13986ba07ced70835ca9a5e686c0",
-        "type": "sha256",
-        "source": "malwarebazaar_recent",
-        "first_seen": "2026-09-21T23:33:04Z",
-        "last_seen": "2026-09-22T00:46:54Z",
-        "confidence": "high",
-        "tlp": "CLEAR",
-        "tags": "Mirai,malware",
-        "reference": "https://bazaar.abuse.ch/",
-        "context": "MalwareBazaar: Mirai",
-        "score": 80,
-        "sightings": 2,
-        "vulnerability": {}
-      }
-    },
-    {
-      "action": "updated",
-      "observed_at": "2026-09-22T00:48:09Z",
-      "indicator": "c42b4047c010a6ad640a4a5ae531a21453d6f7ccedcc42c30c558288e6d8fb66",
-      "type": "sha256",
-      "changes": {
-        "tags": {
-          "from": "malware,Mirai",
-          "to": "Mirai,malware"
-        }
-      },
-      "current": {
-        "indicator": "c42b4047c010a6ad640a4a5ae531a21453d6f7ccedcc42c30c558288e6d8fb66",
-        "type": "sha256",
-        "source": "malwarebazaar_recent",
-        "first_seen": "2026-09-21T23:37:09Z",
-        "last_seen": "2026-09-22T00:46:54Z",
-        "confidence": "high",
-        "tlp": "CLEAR",
-        "tags": "Mirai,malware",
-        "reference": "https://bazaar.abuse.ch/",
-        "context": "MalwareBazaar: Mirai",
-        "score": 80,
-        "sightings": 2,
-        "vulnerability": {}
-      }
-    },
-    {
-      "action": "updated",
-      "observed_at": "2026-09-22T00:48:09Z",
-      "indicator": "dca240a1e18c3e47a86afd23ab89f1139de208db0dfd1bdc045c6f0de4f918ce",
-      "type": "sha256",
-      "changes": {
-        "tags": {
-          "from": "malware,Mirai",
-          "to": "Mirai,malware"
-        }
-      },
-      "current": {
-        "indicator": "dca240a1e18c3e47a86afd23ab89f1139de208db0dfd1bdc045c6f0de4f918ce",
-        "type": "sha256",
-        "source": "malwarebazaar_recent",
-        "first_seen": "2026-09-21T23:37:10Z",
-        "last_seen": "2026-09-22T00:46:54Z",
-        "confidence": "high",
-        "tlp": "CLEAR",
-        "tags": "Mirai,malware",
-        "reference": "https://bazaar.abuse.ch/",
-        "context": "MalwareBazaar: Mirai",
-        "score": 80,
-        "sightings": 2,
-        "vulnerability": {}
-      }
-    },
-    {
-      "action": "updated",
-      "observed_at": "2026-09-22T00:48:09Z",
-      "indicator": "e1af963c4d39fb28bd4660e14164c57263d6864b9d98fd8a200b6244f2854479",
-      "type": "sha256",
-      "changes": {
-        "tags": {
-          "from": "malware,Mirai",
-          "to": "Mirai,malware"
-        }
-      },
-      "current": {
-        "indicator": "e1af963c4d39fb28bd4660e14164c57263d6864b9d98fd8a200b6244f2854479",
-        "type": "sha256",
-        "source": "malwarebazaar_recent",
-        "first_seen": "2026-09-21T23:29:00Z",
-        "last_seen": "2026-09-22T00:46:54Z",
-        "confidence": "high",
-        "tlp": "CLEAR",
-        "tags": "Mirai,malware",
-        "reference": "https://bazaar.abuse.ch/",
-        "context": "MalwareBazaar: Mirai",
-        "score": 80,
-        "sightings": 2,
-        "vulnerability": {}
-      }
-    },
-    {
-      "action": "updated",
-      "observed_at": "2026-09-22T00:48:09Z",
-      "indicator": "hxxp://115[.]235[.]20[.]5:1993/bin[.]sh",
-      "type": "url",
-      "changes": {
-        "tags": {
-          "from": "malware,malware_download,None",
-          "to": "None,malware,malware_download"
-        }
-      },
-      "current": {
-        "indicator": "hxxp://115[.]235[.]20[.]5:1993/bin[.]sh",
+        "indicator": "hxxp://125[.]42[.]8[.]66:45720/bin[.]sh",
         "type": "url",
         "source": "urlhaus_recent_urls",
-        "first_seen": "2026-09-22T00:32:19Z",
-        "last_seen": "2026-09-22T00:46:53Z",
+        "first_seen": "2026-09-22T00:47:14Z",
+        "last_seen": "2026-09-22T00:53:23Z",
         "confidence": "high",
         "tlp": "CLEAR",
-        "tags": "None,malware,malware_download",
+        "tags": "malware,malware_download,None",
         "reference": "https://urlhaus.abuse.ch/",
         "context": "URLhaus: malware_download",
         "score": 80,
-        "sightings": 2,
+        "sightings": 1,
         "vulnerability": {}
       }
     },
     {
-      "action": "updated",
-      "observed_at": "2026-09-22T00:48:09Z",
-      "indicator": "hxxp://210[.]208[.]110[.]130:51661/bin[.]sh",
-      "type": "url",
-      "changes": {
-        "tags": {
-          "from": "malware,malware_download,None",
-          "to": "None,malware,malware_download,mirai"
-        }
-      },
+      "action": "added",
+      "observed_at": "2026-09-22T00:53:41Z",
       "current": {
-        "indicator": "hxxp://210[.]208[.]110[.]130:51661/bin[.]sh",
+        "indicator": "hxxp://221[.]15[.]189[.]129:41297/bin[.]sh",
         "type": "url",
         "source": "urlhaus_recent_urls",
-        "first_seen": "2026-09-22T00:32:18Z",
-        "last_seen": "2026-09-22T00:46:53Z",
+        "first_seen": "2026-09-22T00:47:14Z",
+        "last_seen": "2026-09-22T00:53:23Z",
         "confidence": "high",
         "tlp": "CLEAR",
-        "tags": "None,malware,malware_download,mirai",
+        "tags": "malware,malware_download,None",
         "reference": "https://urlhaus.abuse.ch/",
         "context": "URLhaus: malware_download",
         "score": 80,
-        "sightings": 2,
+        "sightings": 1,
         "vulnerability": {}
       }
     },
     {
-      "action": "updated",
-      "observed_at": "2026-09-22T00:48:09Z",
-      "indicator": "hxxp://42[.]242[.]82[.]154:46226/i",
-      "type": "url",
-      "changes": {
-        "tags": {
-          "from": "malware,malware_download,None",
-          "to": "None,malware,malware_download,mirai"
-        }
-      },
-      "current": {
-        "indicator": "hxxp://42[.]242[.]82[.]154:46226/i",
-        "type": "url",
-        "source": "urlhaus_recent_urls",
-        "first_seen": "2026-09-22T00:32:18Z",
-        "last_seen": "2026-09-22T00:46:53Z",
+      "action": "removed_from_feed",
+      "observed_at": "2026-09-22T00:53:41Z",
+      "reason": "no_longer_in_published_snapshot",
+      "previous": {
+        "indicator": "CVE-2026-87127",
+        "type": "cve",
+        "source": "nist_nvd_recent",
+        "first_seen": "2026-09-15T20:18:59Z",
+        "last_seen": "2026-09-21T20:17:37Z",
         "confidence": "high",
         "tlp": "CLEAR",
-        "tags": "None,malware,malware_download,mirai",
-        "reference": "https://urlhaus.abuse.ch/",
-        "context": "URLhaus: malware_download",
+        "tags": "cve,high,nvd",
+        "reference": "https://nvd.nist.gov/",
+        "context": "Vulnerability in the Oracle Purchasing product of Oracle E-Business Suite (component: G-Invoicing).  Supported versions that are affected are 12.2.10-12.2.15. Easily exploitable vulnerability allows low privileged attacker with network access via HTTP to compromise Oracle Purchasing.  While the vulnerability is in Oracle Purchasing, attacks may significantly impact additional products (scope change).  Successful attacks of this vulnerability can result in  unauthorized access to critical data or complete access to all Oracle Purchasing accessible data. CVSS 3.1 Base Score 7.7 (Confidentiality impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N).",
         "score": 80,
-        "sightings": 2,
-        "vulnerability": {}
+        "sightings": 4,
+        "vulnerability": {
+          "nvd": {
+            "source": "nist_nvd_recent",
+            "reference": "https://nvd.nist.gov/vuln/detail/CVE-2026-87127",
+            "published_at": "2026-09-15T20:18:59.713",
+            "modified_at": "2026-09-21T20:17:37.210",
+            "status": "Undergoing Analysis",
+            "severity": "high",
+            "description": "Vulnerability in the Oracle Purchasing product of Oracle E-Business Suite (component: G-Invoicing).  Supported versions that are affected are 12.2.10-12.2.15. Easily exploitable vulnerability allows low privileged attacker with network access via HTTP to compromise Oracle Purchasing.  While the vulnerability is in Oracle Purchasing, attacks may significantly impact additional products (scope change).  Successful attacks of this vulnerability can result in  unauthorized access to critical data or complete access to all Oracle Purchasing accessible data. CVSS 3.1 Base Score 7.7 (Confidentiality impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N).",
+            "configurations": []
+          }
+        }
       }
     },
     {
-      "action": "updated",
-      "observed_at": "2026-09-22T00:48:09Z",
-      "indicator": "hxxp://60[.]219[.]148[.]208:36759/bin[.]sh",
-      "type": "url",
-      "changes": {
-        "tags": {
-          "from": "malware,malware_download,None",
-          "to": "None,malware,malware_download,mirai"
-        }
-      },
-      "current": {
-        "indicator": "hxxp://60[.]219[.]148[.]208:36759/bin[.]sh",
-        "type": "url",
-        "source": "urlhaus_recent_urls",
-        "first_seen": "2026-09-22T00:32:18Z",
-        "last_seen": "2026-09-22T00:46:53Z",
+      "action": "removed_from_feed",
+      "observed_at": "2026-09-22T00:53:41Z",
+      "reason": "no_longer_in_published_snapshot",
+      "previous": {
+        "indicator": "CVE-2026-87128",
+        "type": "cve",
+        "source": "nist_nvd_recent",
+        "first_seen": "2026-09-15T20:18:59Z",
+        "last_seen": "2026-09-21T18:06:01Z",
         "confidence": "high",
         "tlp": "CLEAR",
-        "tags": "None,malware,malware_download,mirai",
-        "reference": "https://urlhaus.abuse.ch/",
-        "context": "URLhaus: malware_download",
+        "tags": "critical,cve,nvd",
+        "reference": "https://nvd.nist.gov/",
+        "context": "Vulnerability in the Oracle Hyperion Data Relationship Management product of Oracle Hyperion (component: Access and security).   The supported version that is affected is 11.2.26.0.000. Easily exploitable vulnerability allows unauthenticated attacker with network access via HTTP to compromise Oracle Hyperion Data Relationship Management.  Successful attacks of this vulnerability can result in  unauthorized creation, deletion or modification access to critical data or all Oracle Hyperion Data Relationship Management accessible data as well as  unauthorized access to critical data or complete access to all Oracle Hyperion Data Relationship Management accessible data. CVSS 3.1 Base Score 9.1 (Confidentiality and Integrity impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N).",
         "score": 80,
-        "sightings": 2,
-        "vulnerability": {}
+        "sightings": 4,
+        "vulnerability": {
+          "nvd": {
+            "source": "nist_nvd_recent",
+            "reference": "https://nvd.nist.gov/vuln/detail/CVE-2026-87128",
+            "published_at": "2026-09-15T20:18:59.820",
+            "modified_at": "2026-09-21T18:06:01.827",
+            "status": "Analyzed",
+            "severity": "critical",
+            "description": "Vulnerability in the Oracle Hyperion Data Relationship Management product of Oracle Hyperion (component: Access and security).   The supported version that is affected is 11.2.26.0.000. Easily exploitable vulnerability allows unauthenticated attacker with network access via HTTP to compromise Oracle Hyperion Data Relationship Management.  Successful attacks of this vulnerability can result in  unauthorized creation, deletion or modification access to critical data or all Oracle Hyperion Data Relationship Management accessible data as well as  unauthorized access to critical data or complete access to all Oracle Hyperion Data Relationship Management accessible data. CVSS 3.1 Base Score 9.1 (Confidentiality and Integrity impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N).",
+            "configurations": [
+              {
+                "nodes": [
+                  {
+                    "operator": "OR",
+                    "negate": false,
+                    "cpeMatch": [
+                      {
+                        "vulnerable": true,
+                        "criteria": "cpe:2.3:a:oracle:hyperion_data_relationship_management:11.2.26.0.000:*:*:*:*:*:*:*",
+                        "matchCriteriaId": "61A79E17-124B-443C-BD8A-9B066A5FE520"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
       }
     }
   ]

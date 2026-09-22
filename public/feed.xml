@@ -3,7 +3,19 @@
   <title>SwiftIOC — Newest High-Confidence IOCs</title>
   <link>https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector</link>
   <description>Freshest scored, cross-source-corroborated indicators of compromise.</description>
-  <lastBuildDate>Tue, 22 Sep 2026 00:48:10 +0000</lastBuildDate>
+  <lastBuildDate>Tue, 22 Sep 2026 00:53:42 +0000</lastBuildDate>
+    <item>
+      <title>[80] url: hxxp://125[.]42[.]8[.]66:45720/bin[.]sh</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
+      <guid isPermaLink="false">36536af0-b362-5aaa-b48c-79d707dcb113</guid>
+      <pubDate>Tue, 22 Sep 2026 00:47:14 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxp://221[.]15[.]189[.]129:41297/bin[.]sh</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
+      <guid isPermaLink="false">b124c451-b7a8-51f2-b8fc-718d439b8493</guid>
+      <pubDate>Tue, 22 Sep 2026 00:47:14 +0000</pubDate>
+    </item>
     <item>
       <title>[80] ipv4_cidr: 1.10.16.0/20</title>
       <description>Score 80, confidence high, sources: spamhaus_drop, tags: drop,spamhaus</description>
@@ -290,18 +302,6 @@
       <title>[80] ipv4_cidr: 103.122.223.0/24</title>
       <description>Score 80, confidence high, sources: spamhaus_drop, tags: drop,spamhaus</description>
       <guid isPermaLink="false">c79edf7f-a3c6-54b0-812c-c32b7e48f58f</guid>
-      <pubDate>Tue, 22 Sep 2026 00:34:56 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] ipv4_cidr: 103.13.140.0/22</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: drop,spamhaus</description>
-      <guid isPermaLink="false">9b275889-853b-591a-9318-130390adec58</guid>
-      <pubDate>Tue, 22 Sep 2026 00:34:56 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] ipv4_cidr: 103.133.136.0/23</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: drop,spamhaus</description>
-      <guid isPermaLink="false">9a49a0cf-3b55-58e3-836a-2e063e7593fd</guid>
       <pubDate>Tue, 22 Sep 2026 00:34:56 +0000</pubDate>
     </item>
 </channel></rss>
