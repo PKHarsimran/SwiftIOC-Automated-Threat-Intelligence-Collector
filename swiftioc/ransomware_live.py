@@ -108,11 +108,18 @@ def _ioc_pairs(value: object) -> list[tuple[str, str]]:
 
 def _ids(value: object, pattern: re.Pattern) -> list[str]:
     found: set[str] = set()
-    for item in _records(value):
-        candidates = [item] if isinstance(item, str) else [item.get(key) for key in ("id", "cve", "cve_id", "technique_id", "attack_id") if key in item] if isinstance(item, dict) else []
-        for candidate in candidates:
-            if isinstance(candidate, str) and pattern.fullmatch(candidate.strip()):
-                found.add(candidate.strip().upper())
+    pending = [value]
+    visited = 0
+    while pending and visited < 10_000:
+        item = pending.pop()
+        visited += 1
+        if isinstance(item, dict):
+            pending.extend(item.keys())
+            pending.extend(item.values())
+        elif isinstance(item, list):
+            pending.extend(item)
+        elif isinstance(item, str) and pattern.fullmatch(item.strip()):
+            found.add(item.strip().upper())
     return sorted(found)
 
 

@@ -11,7 +11,8 @@ def test_group_evidence_links_existing_records_without_promoting_candidates(tmp_
     feed.write_text('{"type":"ipv4","indicator":"1.2.3.4"}\n'
                     '{"type":"cve","indicator":"CVE-2025-1234"}\n', encoding="utf-8")
     data = build_enrichment([
-        ("Example", {"ttps": [{"id": "T1486"}], "vulnerabilities": ["CVE-2025-1234"]},
+        ("Example", {"ttps": [{"tactic_id": "TA0040", "techniques": [{"technique_id": "T1486"}]}],
+                     "vulnerabilities": [{"CVE": "CVE-2025-1234", "CVSS": 9.8}]},
          {"ip": ["1.2.3.4"], "sha256": ["a" * 64], "email": ["bad@example.org"]}),
         ("Other", {"ttps": [], "vulnerabilities": [{"cve": "CVE-2025-1234"}]},
          [{"type": "ip", "ioc": "1.2.3.4"}]),
