@@ -13,6 +13,7 @@ from pathlib import Path
 from urllib.parse import quote, urlparse
 
 import requests
+from swiftioc.group_history import update_history
 
 BASE_URL = "https://api-pro.ransomware.live"
 REFRESH_INTERVAL = timedelta(hours=24)
@@ -160,7 +161,7 @@ def _profile_fields(profile: object) -> str:
 
 def _cached(path: Path) -> dict | None:
     try:
-        if not path.is_file() or path.stat().st_size > 5_000_000:
+        if not path.is_file() or path.stat().st_size > 25_000_000:
             return None
         data = json.loads(path.read_text(encoding="utf-8"))
         if not isinstance(data, dict) or data.get("schema_version") != 1:
@@ -298,8 +299,9 @@ def main() -> int:
     cached = _cached(args.output)
     if cached:
         try:
-            if _refresh_membership(cached, existing):
-                _write_atomic(args.output, cached)
+            _refresh_membership(cached, existing)
+            update_history(cached, cached)
+            _write_atomic(args.output, cached)
         except ValueError:
             cached = None
         else:
@@ -313,6 +315,7 @@ def main() -> int:
         return 0
     try:
         data = fetch_enrichment(key, existing)
+        update_history(data, cached)
         _write_atomic(args.output, data)
         print(f"Ransomware.live enrichment: {len(data['groups'])} groups, {len(data['iocs'])} IOCs, {len(data['cves'])} CVEs; {data['api_calls']} API calls")
     except APIResponseError as error:

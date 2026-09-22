@@ -21,11 +21,12 @@
   let page = 0;
   let selectedKey = '';
   let currentMap = null;
+  let changeLimit = 30;
   const labels = { iocs: 'IOCs', cves: 'CVEs', ttps: 'ATT&CK techniques' };
   function readLocation() {
     if (location.hash === '#group-content') { render(); return; }
     const p = new URLSearchParams(location.hash.slice(1));
-    state = { view: ['overview', 'cves', 'iocs', 'ttps', 'graph'].includes(p.get('view')) ? p.get('view') : 'overview',
+    state = { view: ['overview', 'changes', 'hunt', 'cves', 'iocs', 'ttps', 'graph'].includes(p.get('view')) ? p.get('view') : 'overview',
       group: model.groups.has(p.get('group')) ? p.get('group') : '', q: (p.get('q') || '').slice(0, 2048),
       coverage: ['matched', 'new'].includes(p.get('coverage')) ? p.get('coverage') : 'all', type: p.get('type') || '',
       mapKind: ['iocs', 'ttps'].includes(p.get('mapKind')) ? p.get('mapKind') : 'cves', evidence: p.get('evidence') || '' };
@@ -55,6 +56,45 @@
   function investigate(record) {
     if (record.kind === 'ttps') return link('ATT&CK ↗', `https://attack.mitre.org/techniques/${record.value.replace('.', '/')}/`, true);
     return link(record.kind === 'cves' ? 'Review CVE →' : 'Check feed →', `index.html#ioc=${encodeURIComponent(record.value)}`);
+  }
+  function evidenceReceipt(record) {
+    const details = el('details'); details.appendChild(el('summary', 'Evidence receipt'));
+    details.appendChild(el('p', `Source: ransomware.live · Provider snapshot: ${model.generatedAt}. ${record.kind === 'ttps' ? 'Group-level behavior only.' : record.matched ? 'Exact type/value match in the retained SwiftIOC feed; not independent corroboration.' : 'Research candidate; not automatically promoted into the feed.'}`, 'group-small'));
+    const names = state.group && record.groups.includes(state.group) ? [state.group] : record.groups;
+    names.forEach((name) => {
+      const observation = core.receipt(model, record, name);
+      const row = el('p', '', 'group-small'); row.appendChild(link(name, `https://ransomware.live/group/${encodeURIComponent(name)}`, true));
+      row.appendChild(document.createTextNode(observation ? ` · First observed locally: ${observation.first_observed} · Last local check: ${observation.last_observed}` : ' · Observation history not available yet.'));
+      details.appendChild(row);
+    });
+    details.appendChild(el('p', 'Local observation dates are not attack dates. This association does not establish current use, local compromise, or independent confirmation.', 'group-small'));
+    return details;
+  }
+  function renderChanges() {
+    const history = model.history;
+    const cutoff = Date.now() - Number($('[data-change-days]').value) * 86400000;
+    const events = (history?.events || []).filter((event) => (!state.group || event.group === state.group) && Date.parse(event.at) >= cutoff).slice().reverse();
+    $('[data-change-status]').textContent = history ? `${events.length} changes in this window. Tracking began ${new Date(history.started_at).toLocaleString()}. History retains up to 90 days / 5,000 events.${history.truncated ? ' Older events were truncated.' : ''}` : 'Observation tracking begins with the next collection. Existing evidence will establish a baseline, not a new-activity alert.';
+    const list = $('[data-change-list]'); list.replaceChildren();
+    const actions = { added: 'Association added', returned: 'Association returned', removed: 'No longer in snapshot', matched: 'Now matches SwiftIOC feed' };
+    events.slice(0, changeLimit).forEach((event) => {
+      const row = el('div', '', 'group-short-row');
+      const description = el('div'); description.append(el('strong', actions[event.action] || event.action), el('p', `${event.value} · ${event.group}`, 'group-small'), el('small', new Date(event.at).toLocaleString()));
+      row.appendChild(description);
+      if (model.groups.has(event.group)) row.appendChild(button('Explore group', () => navigate({ group: event.group, view: 'overview' })));
+      list.appendChild(row);
+    });
+    if (!events.length) list.appendChild(el('p', 'No recorded changes in this selection. This does not establish inactivity.'));
+    $('[data-change-more]').hidden = events.length <= changeLimit;
+  }
+  function renderHunt() {
+    const records = model.byGroup.get(state.group) || [];
+    $('[data-hunt-status]').textContent = state.group ? `${state.group}: ${records.filter((r) => r.kind === 'iocs').length} IOC searches, ${records.filter((r) => r.kind === 'cves').length} CVE checks, ${records.filter((r) => r.kind === 'ttps').length} technique references.` : 'Select a group above to build a focused hunt pack.';
+    $('[data-hunt-download]').disabled = !state.group;
+  }
+  function downloadJson(value, filename) {
+    const href = URL.createObjectURL(new Blob([JSON.stringify(value, null, 2)], { type: 'application/json' }));
+    const a = link('', href); a.download = filename; a.click(); setTimeout(() => URL.revokeObjectURL(href), 1000);
   }
   function renderOverview() {
     const records = state.group ? model.byGroup.get(state.group) : model.records;
@@ -113,6 +153,7 @@
       actions.appendChild(button('Map connection', () => {
         navigate({ view: 'graph', group: state.group || r.groups[0] || '', mapKind: r.kind, evidence: r.key });
       }));
+      actions.appendChild(evidenceReceipt(r));
       row.append(value, el('td', kind === 'ttps' ? 'Group behavior' : r.matched ? 'In SwiftIOC' : 'Research candidate'), groups, actions); body.appendChild(row);
     });
     $('[data-page-label]').textContent = `Page ${pages ? page + 1 : 0} of ${pages}`;
@@ -154,6 +195,7 @@
     const inspector = $('[data-map-inspector]'); inspector.replaceChildren();
     if (graph.selected) {
       inspector.append(el('strong', graph.selected.value), el('p', 'Reported associations from ransomware.live. Shared evidence alone does not establish a campaign or collaboration.', 'group-small'), groupLinks(graph.selected.groups), investigate(graph.selected));
+      inspector.appendChild(evidenceReceipt(graph.selected));
     } else inspector.appendChild(el('p', 'No evidence of this type in the snapshot. Choose another evidence type or group.'));
     $('[data-map-export]').disabled = !graph.selected;
   }
@@ -165,6 +207,8 @@
     document.querySelectorAll('[data-view]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === state.view)));
     document.querySelectorAll('[data-panel]').forEach((panel) => { panel.hidden = panel.dataset.panel !== (['iocs', 'cves', 'ttps'].includes(state.view) ? 'records' : state.view); });
     if (state.view === 'overview') renderOverview();
+    else if (state.view === 'changes') renderChanges();
+    else if (state.view === 'hunt') renderHunt();
     else if (state.view !== 'graph') renderRecords();
   }
   service.ready.then((result) => {
@@ -191,6 +235,15 @@
     $('[data-record-type]').addEventListener('change', (event) => navigate({ type: event.target.value }));
     $('[data-prev]').addEventListener('click', () => { page--; renderRecords(); });
     $('[data-next]').addEventListener('click', () => { page++; renderRecords(); });
+    $('[data-change-days]').addEventListener('change', () => { changeLimit = 30; renderChanges(); });
+    $('[data-change-more]').addEventListener('click', () => { changeLimit += 30; renderChanges(); });
+    $('[data-hunt-download]').addEventListener('click', () => {
+      try {
+        const pack = core.huntPack(model, state.group, $('[data-hunt-index]').value, $('[data-hunt-window]').value, window.SwiftIOCCore.buildSplQuery);
+        downloadJson(pack, `swiftioc-hunt-${state.group.replace(/[^a-z0-9_-]/gi, '_')}.json`);
+        $('[data-hunt-status]').textContent = 'Hunt pack exported. Review the queries and field mappings before use.';
+      } catch (error) { $('[data-hunt-status]').textContent = error.message; }
+    });
     $('[data-map-kind]').addEventListener('change', (event) => navigate({ mapKind: event.target.value }));
     $('[data-map-evidence]').addEventListener('change', (event) => selectEvidence(event.target.value));
     $('[data-map-export]').addEventListener('click', () => {

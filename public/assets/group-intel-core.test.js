@@ -1,6 +1,28 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const core = require('./group-intel-core.js');
+const dashboard = require('./dashboard-core.js');
+
+test('hunt packs preserve provenance, separate techniques, and validate indexes', () => {
+  const model = core.build(fixture());
+  const pack = core.huntPack(model, 'A', '*', '-7d', dashboard.buildSplQuery);
+  assert.match(pack.ioc_hunts[0].spl, /index=\* earliest=-7d/);
+  assert.equal(pack.cve_checklist.length, 1);
+  assert.equal(pack.techniques[0].id, 'T1486');
+  assert.equal(pack.snapshot_at, model.generatedAt);
+  assert.equal(pack.ioc_hunts[0].evidence, null);
+  assert.throws(() => core.huntPack(model, 'A', '* | delete', '-7d', dashboard.buildSplQuery));
+  assert.throws(() => core.huntPack(model, 'missing', '*', '-7d', dashboard.buildSplQuery));
+});
+
+test('receipts are specific to the group and evidence type', () => {
+  const data = fixture();
+  data.evidence_history = { observations: { a: { group: 'A', kind: 'cves', type: 'cve', value: 'CVE-2025-1234', first_observed: '2026-09-22' } } };
+  const model = core.build(data);
+  const cve = model.records.find((r) => r.kind === 'cves');
+  assert.equal(core.receipt(model, cve, 'A').first_observed, '2026-09-22');
+  assert.equal(core.receipt(model, cve, 'B'), null);
+});
 
 const fixture = () => ({ schema_version: 1, generated_at: '2026-09-22T00:00:00Z',
   groups: [{ name: 'A', ttps: ['T1486'] }, { name: 'B', ttps: ['T1486', 'T1059.001'] }, { name: 'C', ttps: [] }],

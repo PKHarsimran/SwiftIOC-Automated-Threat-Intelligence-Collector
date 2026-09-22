@@ -30,7 +30,7 @@
     records.sort((a, b) => Number(b.matched) - Number(a.matched) || b.groups.length - a.groups.length || a.value.localeCompare(b.value));
     const byGroup = new Map([...groups.keys()].map((name) => [name, records.filter((r) => r.groups.includes(name))]));
     const byIdentity = new Map(records.map((r) => [`${r.type}:${identity(r.value, r.type)}`, r]));
-    return { groups, records, byGroup, byIdentity, generatedAt: data.generated_at };
+    return { groups, records, byGroup, byIdentity, generatedAt: data.generated_at, history: data.evidence_history || null };
   }
   function filter(model, { group = '', kind = 'cves', query = '', coverage = 'all', type = '' } = {}) {
     const term = query.trim().toLowerCase();
@@ -47,5 +47,22 @@
     const related = selected ? selected.groups.filter((name) => name !== group) : [];
     return { group, evidence, total: all.length, selected, related: related.slice(0, 8), relatedTotal: related.length };
   }
-  return { build, filter, graph, identity };
+  function receipt(model, record, group) {
+    return Object.values(model.history?.observations || {}).find((item) => item.group === group && item.kind === record.kind && item.type === record.type && item.value === record.value) || null;
+  }
+  function huntPack(model, group, index, earliest, buildSpl) {
+    if (!model.groups.has(group)) throw new Error('Select a group first.');
+    if (!buildSpl({ type: 'ipv4', indicator: '192.0.2.1' }, index, earliest)) throw new Error('Use valid index names, wildcards, or comma-separated indexes.');
+    const records = model.byGroup.get(group);
+    return { schema_version: 1, group, source: 'ransomware.live', source_url: `https://ransomware.live/group/${encodeURIComponent(group)}`,
+      snapshot_at: model.generatedAt, exported_at: new Date().toISOString(), index, earliest,
+      limitations: ['Reported associations do not establish current use or local compromise.', 'Feed matches are not independent corroboration.',
+        'Review field mappings and query cost before running. No results do not prove absence.', 'Techniques describe group behavior, not each IOC. This pack is not an automatic blocklist.'],
+      ioc_hunts: records.filter((r) => r.kind === 'iocs').map((r) => ({ indicator: r.value, type: r.type, in_swiftioc: r.matched,
+        spl: buildSpl({ indicator: r.value, type: r.type }, index, earliest), evidence: receipt(model, r, group) })),
+      cve_checklist: records.filter((r) => r.kind === 'cves').map((r) => ({ cve: r.value, in_swiftioc: r.matched,
+        steps: ['Confirm affected products and versions using authoritative advisories.', 'Check your asset inventory and exposure.', 'Verify remediation and investigate relevant logs.'], evidence: receipt(model, r, group) })),
+      techniques: records.filter((r) => r.kind === 'ttps').map((r) => ({ id: r.value, reference: `https://attack.mitre.org/techniques/${r.value.replace('.', '/')}/`, evidence: receipt(model, r, group) })) };
+  }
+  return { build, filter, graph, identity, receipt, huntPack };
 });
