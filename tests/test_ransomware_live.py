@@ -1,7 +1,10 @@
 """Contract tests for the optional, derived ransomware.live evidence layer."""
+import json
 import sys
+from datetime import datetime, timezone
 
 import requests
+import pytest
 
 from swiftioc.ransomware_live import _existing, build_enrichment, fetch_enrichment, main
 
@@ -103,3 +106,75 @@ def test_missing_group_ioc_endpoint_keeps_profile_evidence(monkeypatch):
     assert result["groups_without_ioc_endpoint"] == 1
     assert result["cves"][0]["cve_id"] == "CVE-2025-1234"
     assert result["iocs"][0]["indicator"] == "1.2.3.4"
+
+
+def test_ioc_group_index_avoids_known_missing_endpoints(monkeypatch):
+    class Response:
+        content = b"{}"
+        status_code = 200
+
+        def __init__(self, payload):
+            self.payload = payload
+
+        def json(self):
+            return self.payload
+
+    class Session:
+        def __init__(self):
+            self.paths = []
+
+        def get(self, url, **_kwargs):
+            self.paths.append(url)
+            if url.endswith("/groups"):
+                return Response(["A", "B"])
+            if url.endswith("/iocs"):
+                return Response({"groups": [{"group": "B"}]})
+            if "/groups/" in url:
+                return Response({"ttps": [], "vulnerabilities": []})
+            return Response({"ip": ["1.2.3.4"]})
+
+    monkeypatch.setattr("swiftioc.ransomware_live.time.sleep", lambda _: None)
+    session = Session()
+    result = fetch_enrichment("key", set(), session=session)
+    assert result["api_calls"] == 5  # Two indexes, two profiles, one IOC.
+    assert not any(path.endswith("/iocs/A") for path in session.paths)
+    assert result["groups_without_ioc_endpoint"] == 1
+
+
+def test_fresh_cache_uses_no_api_calls_but_updates_swiftioc_matches(tmp_path, monkeypatch, capsys):
+    feed = tmp_path / "feed.jsonl"
+    feed.write_text('{"type":"ipv4","indicator":"1.2.3.4"}\n', encoding="utf-8")
+    output = tmp_path / "group_evidence.json"
+    stamp = datetime.now(timezone.utc).isoformat()
+    payload = build_enrichment([("A", {"ttps": [], "vulnerabilities": []}, {"ip": ["1.2.3.4"]})], set(), stamp)
+    output.write_text(json.dumps(payload), encoding="utf-8")
+    monkeypatch.setenv("RANSOMWARE_LIVE_API_KEY", "secret")
+    monkeypatch.setattr(sys, "argv", ["ransomware_live", "--feed", str(feed), "--output", str(output)])
+    monkeypatch.setattr("swiftioc.ransomware_live.fetch_enrichment", lambda *_args, **_kwargs: (_ for _ in ()).throw(AssertionError("API called")))
+    assert main() == 0
+    updated = json.loads(output.read_text(encoding="utf-8"))
+    assert updated["generated_at"] == stamp
+    assert updated["iocs"][0]["in_swiftioc"] is True
+    assert "0 API calls" in capsys.readouterr().out
+
+
+def test_group_limit_stops_before_per_group_requests():
+    class Response:
+        status_code = 200
+        content = b"[]"
+
+        def json(self):
+            return [f"group-{index}" for index in range(501)]
+
+    class Session:
+        def __init__(self):
+            self.calls = 0
+
+        def get(self, _url, **_kwargs):
+            self.calls += 1
+            return Response()
+
+    session = Session()
+    with pytest.raises(ValueError, match="large group listing"):
+        fetch_enrichment("key", set(), session=session)
+    assert session.calls == 1

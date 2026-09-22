@@ -8,13 +8,15 @@ import os
 import re
 import tempfile
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import quote, urlparse
 
 import requests
 
 BASE_URL = "https://api-pro.ransomware.live"
+REFRESH_INTERVAL = timedelta(hours=24)
+MAX_GROUPS = 500  # Hard cap: at most 1,002 requests in one refresh.
 TYPES = {"ip": "ipv4", "ipv4": "ipv4", "ipv6": "ipv6", "domain": "domain", "url": "url",
          "md5": "md5", "sha1": "sha1", "sha256": "sha256"}
 CVE = re.compile(r"^CVE-\d{4}-\d{4,19}$", re.I)
@@ -156,6 +158,52 @@ def _profile_fields(profile: object) -> str:
     return ", ".join(fields[:30])[:900]
 
 
+def _cached(path: Path) -> dict | None:
+    try:
+        if not path.is_file() or path.stat().st_size > 5_000_000:
+            return None
+        data = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(data, dict) or data.get("schema_version") != 1:
+            return None
+        if not all(isinstance(data.get(key), list) for key in ("groups", "iocs", "cves")):
+            return None
+        stamp = datetime.fromisoformat(data["generated_at"])
+        if stamp.tzinfo is None or stamp > datetime.now(timezone.utc) + timedelta(minutes=5):
+            return None
+        return data
+    except (OSError, ValueError, TypeError, KeyError):
+        return None
+
+
+def _refresh_membership(data: dict, existing: set[tuple[str, str]]) -> bool:
+    changed = False
+    for item in data["iocs"]:
+        if not isinstance(item, dict):
+            raise ValueError("Invalid cached IOC record")
+        pair = _normalise_ioc(item.get("type", ""), item.get("indicator")) if isinstance(item.get("type"), str) else None
+        current = pair in existing if pair else False
+        if item.get("in_swiftioc") is not current:
+            item["in_swiftioc"] = current
+            changed = True
+    for item in data["cves"]:
+        if not isinstance(item, dict):
+            raise ValueError("Invalid cached CVE record")
+        cve = item.get("cve_id")
+        current = ("cve", cve.upper()) in existing if isinstance(cve, str) and CVE.fullmatch(cve) else False
+        if item.get("in_swiftioc") is not current:
+            item["in_swiftioc"] = current
+            changed = True
+    return changed
+
+
+def _write_atomic(path: Path, data: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=path.parent, prefix=".group-evidence-", delete=False) as stream:
+        json.dump(data, stream, ensure_ascii=False, separators=(",", ":"))
+        temporary = Path(stream.name)
+    temporary.replace(path)
+
+
 def build_enrichment(groups: list[tuple[str, object, object]], existing: set[tuple[str, str]], generated_at: str) -> dict:
     iocs: dict[tuple[str, str], set[str]] = {}
     cves: dict[str, set[str]] = {}
@@ -184,8 +232,11 @@ def build_enrichment(groups: list[tuple[str, object, object]], existing: set[tup
 
 def fetch_enrichment(key: str, existing: set[tuple[str, str]], *, session: requests.Session | None = None) -> dict:
     client = session or requests.Session()
+    api_calls = 0
 
     def get(path: str) -> object:
+        nonlocal api_calls
+        api_calls += 1
         response = client.get(BASE_URL + path, headers={"X-API-KEY": key, "Accept": "application/json"}, timeout=25, allow_redirects=False)
         if not 200 <= response.status_code < 300:
             raise APIResponseError(response.status_code, path.split("/")[1])
@@ -195,8 +246,13 @@ def fetch_enrichment(key: str, existing: set[tuple[str, str]], *, session: reque
 
     listing = get("/groups")
     names = sorted({_name(item) for item in _records(listing, ("groups",)) if _name(item)})
-    if not names or len(names) > 1000:
+    if not names or len(names) > MAX_GROUPS:
         raise ValueError("Missing or unexpectedly large group listing")
+    ioc_listing = get("/iocs")
+    listed_ioc_groups = {_name(item).casefold() for item in _records(ioc_listing, ("groups", "iocs")) if _name(item)}
+    # If the provider changes the listing shape, use the proven per-group path
+    # rather than silently omitting all IOCs.
+    known_ioc_groups = listed_ioc_groups if listed_ioc_groups.intersection(name.casefold() for name in names) else None
     groups = []
     ioc_successes = 0
     missing_iocs = 0
@@ -205,16 +261,19 @@ def fetch_enrichment(key: str, existing: set[tuple[str, str]], *, session: reque
         profile = get(f"/groups/{encoded}")
         if isinstance(profile, dict) and isinstance(profile.get("data"), dict):
             profile = profile["data"]
-        try:
-            indicators = get(f"/iocs/{encoded}")
-            ioc_successes += 1
-        except APIResponseError as error:
-            if error.status != 404:
-                raise
-            # Some profiled groups have no IOC collection. Preserve their
-            # CVE/TTP evidence instead of discarding the whole snapshot.
+        if known_ioc_groups is not None and name.casefold() not in known_ioc_groups:
             indicators = {}
             missing_iocs += 1
+        else:
+            try:
+                indicators = get(f"/iocs/{encoded}")
+                ioc_successes += 1
+            except APIResponseError as error:
+                if error.status != 404:
+                    raise
+                # A stale IOC listing may reference a group with no collection.
+                indicators = {}
+                missing_iocs += 1
         groups.append((name, profile, indicators))
         time.sleep(0.2)
     if not ioc_successes:
@@ -223,6 +282,7 @@ def fetch_enrichment(key: str, existing: set[tuple[str, str]], *, session: reque
     if not result["cves"] and not any(group["ttps"] for group in result["groups"]):
         print(f"::warning::No CVE or ATT&CK IDs parsed from group profiles; first profile fields: {_profile_fields(groups[0][1])}")
     result["groups_without_ioc_endpoint"] = missing_iocs
+    result["api_calls"] = api_calls
     return result
 
 
@@ -230,21 +290,31 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Build a group-evidence sidecar from ransomware.live PRO")
     parser.add_argument("--feed", type=Path, default=Path("public/iocs/latest.jsonl"))
     parser.add_argument("--output", type=Path, default=Path("public/group_evidence.json"))
+    parser.add_argument("--force-refresh", action="store_true", help="Explicitly bypass the 24-hour provider cache")
     args = parser.parse_args()
+    if not args.feed.exists():
+        raise SystemExit("IOC feed is missing; enrichment cannot run")
+    existing = _existing(args.feed)
+    cached = _cached(args.output)
+    if cached:
+        try:
+            if _refresh_membership(cached, existing):
+                _write_atomic(args.output, cached)
+        except ValueError:
+            cached = None
+        else:
+            age = datetime.now(timezone.utc) - datetime.fromisoformat(cached["generated_at"])
+            if not args.force_refresh and timedelta(0) <= age < REFRESH_INTERVAL:
+                print(f"Ransomware.live cache reused ({age.total_seconds() / 3600:.1f}h old); 0 API calls; SwiftIOC matches checked")
+                return 0
     key = os.environ.get("RANSOMWARE_LIVE_API_KEY", "")
     if not key:
         print("Ransomware.live enrichment skipped: API key not configured")
         return 0
-    if not args.feed.exists():
-        raise SystemExit("IOC feed is missing; enrichment cannot run")
     try:
-        data = fetch_enrichment(key, _existing(args.feed))
-        args.output.parent.mkdir(parents=True, exist_ok=True)
-        with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=args.output.parent, prefix=".group-evidence-", delete=False) as stream:
-            json.dump(data, stream, ensure_ascii=False, separators=(",", ":"))
-            temporary = Path(stream.name)
-        temporary.replace(args.output)
-        print(f"Ransomware.live enrichment: {len(data['groups'])} groups, {len(data['iocs'])} IOCs, {len(data['cves'])} CVEs; {data['groups_without_ioc_endpoint']} groups without IOC endpoint")
+        data = fetch_enrichment(key, existing)
+        _write_atomic(args.output, data)
+        print(f"Ransomware.live enrichment: {len(data['groups'])} groups, {len(data['iocs'])} IOCs, {len(data['cves'])} CVEs; {data['api_calls']} API calls")
     except APIResponseError as error:
         print(f"::warning::Ransomware.live enrichment unavailable (HTTP {error.status} from {error.endpoint}); retaining previous snapshot")
     except (requests.RequestException, ValueError, TypeError, json.JSONDecodeError) as error:
