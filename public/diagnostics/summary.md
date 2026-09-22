@@ -1,12 +1,12 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-09-22T00:38:19Z_
+_Generated 2026-09-22T00:41:09Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-22T00:38:19Z |
+| Generated | 2026-09-22T00:41:09Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
 | Duplicates removed | 9497 |
@@ -46,17 +46,17 @@ _Generated 2026-09-22T00:38:19Z_
 | threatfox_export_json | 2112 |
 | cisa_kev | 1717 |
 | spamhaus_drop | 1716 |
-| malwarebazaar_recent | 1424 |
+| malwarebazaar_recent | 1449 |
 | tor_exit_nodes | 1378 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3322 |
-| sha256 | 3205 |
+| cve | 3293 |
+| sha256 | 3230 |
 | ipv4_cidr | 1715 |
-| url | 866 |
+| url | 870 |
 | domain | 370 |
 | sha1 | 262 |
 | ipv4 | 206 |
@@ -66,16 +66,16 @@ _Generated 2026-09-22T00:38:19Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 4022 |
-| cve | 3322 |
-| nvd | 1863 |
+| malware | 4051 |
+| cve | 3293 |
+| nvd | 1834 |
 | exploited-in-the-wild | 1717 |
 | threatfox | 1715 |
 | drop | 1715 |
 | spamhaus | 1715 |
-| high | 835 |
-| malware_download | 707 |
-| Mirai | 686 |
+| high | 814 |
+| malware_download | 711 |
+| Mirai | 693 |
 
 ## Multi-source overlaps
 

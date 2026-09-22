@@ -4,14 +4,14 @@
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-22T00:38:19Z |
+| Generated | 2026-09-22T00:41:09Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
 | Duplicates removed | 9497 |
 | Carried forward | 2669 |
 | Expired (score < 20) | 0 |
 | Aged out (> 30d) | 0 |
-| Pruned over cap (10000) | 32390 |
+| Pruned over cap (10000) | 32419 |
 | Stored | 10000 |
 | Score (min / avg / max) | 80 / 80.6 / 96 |
 | High-confidence indicators | 10000 |
@@ -31,23 +31,23 @@
 | feodo_ipblocklist | 5 |
 | greensnow_blocklist | 5922 |
 | ipsum_level5 | 5793 |
-| malwarebazaar_recent | 1424 |
+| malwarebazaar_recent | 1449 |
 | nist_nvd_recent | 1369 |
 | openphish_feed | 300 |
 | spamhaus_drop | 1716 |
 | sslbl_ja3 | 97 |
 | threatfox_export_json | 2112 |
 | tor_exit_nodes | 1378 |
-| urlhaus_recent_urls | 705 |
+| urlhaus_recent_urls | 709 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3322 |
-| sha256 | 3205 |
+| cve | 3293 |
+| sha256 | 3230 |
 | ipv4_cidr | 1715 |
-| url | 866 |
+| url | 870 |
 | domain | 370 |
 | sha1 | 262 |
 | ipv4 | 206 |
