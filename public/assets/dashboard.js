@@ -3425,6 +3425,7 @@
       matches.slice(page * pageSize, (page + 1) * pageSize).forEach((item) => {
         const card = document.createElement('article');
         card.className = 'discovery-card vulnerability-card';
+        card.dataset.cveId = item.cve_id;
         card.dataset.exploitation = item.exploitation_status;
         addText(card, 'p', labels[item.exploitation_status], 'vulnerability-evidence');
         addText(card, 'h3', item.cve_id);
@@ -3498,6 +3499,7 @@
         copy.type = 'button';
         copy.addEventListener('click', () => copyOrPrompt(item.cve_id, 'CVE copied.', 'Copy this CVE:'));
         card.appendChild(copy);
+        window.SwiftIOCGroupIntel?.decorate('cve', item.cve_id, card);
         cards.appendChild(card);
       });
     };
@@ -4268,9 +4270,13 @@
       if (!resultBox) return;
       resultBox.hidden = false;
       resultBox.dataset.state = state;
+      delete resultBox.dataset.iocType;
+      delete resultBox.dataset.iocValue;
 
       if (state === 'found' && row) {
         resultBox.innerHTML = '';
+        resultBox.dataset.iocType = row.type;
+        resultBox.dataset.iocValue = row.indicator;
         const scoreClass = confidenceClassFor(row.score ?? row.confidence);
         const head = document.createElement('div');
         head.className = 'lookup-hit-header';
@@ -4367,6 +4373,7 @@
           actions.appendChild(reference);
         }
         resultBox.appendChild(actions);
+        window.SwiftIOCGroupIntel?.decorate(row.type, row.indicator, resultBox);
         return;
       }
 

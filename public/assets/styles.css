@@ -3937,3 +3937,18 @@ body:has(.workspace-dock:not([hidden])) .toast { bottom: 6rem; }
 .investigation-import p { overflow-wrap: anywhere; }
 .investigation-import input::file-selector-button { min-height: 44px; margin-right: .65rem; padding: .5rem .8rem; border: 1px solid var(--border-soft); border-radius: .5rem; background: var(--card-bg-soft); color: var(--accent); font: inherit; cursor: pointer; }
 .investigation-import input:disabled::file-selector-button { opacity: .6; cursor: wait; }
+
+/* Group evidence is a research layer, never a scoring or blocking signal. */
+.group-intel-desk { padding: clamp(1rem, 2.5vw, 1.75rem); border: 1px solid var(--border-soft); border-radius: var(--radius-card); }
+.group-intel-controls { display: flex; flex-wrap: wrap; align-items: end; gap: .75rem; margin: 1rem 0; }
+.group-intel-controls label { display: grid; gap: .3rem; min-width: min(100%, 11rem); }
+.group-intel-controls input, .group-intel-controls select { width: 100%; }
+.group-intel-list { display: grid; gap: .5rem; margin: .75rem 0; }
+.group-evidence-card { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .85rem; padding: .75rem; border: 1px solid var(--border-soft); border-radius: .5rem; background: var(--card-bg-soft); }
+.group-evidence-value { overflow-wrap: anywhere; min-width: 0; }
+.group-evidence-type, .group-evidence-match, .group-evidence-candidate { font-size: .78rem; color: var(--text-muted); }
+.group-evidence-match { color: var(--accent); }
+.group-evidence-groups { display: inline-flex; flex-wrap: wrap; gap: .4rem; }
+.group-evidence-group { padding: .2rem .4rem; border: 1px solid var(--border-control); border-radius: .4rem; color: var(--accent-soft); font-size: .82rem; }
+.group-evidence-attachment { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; margin: .75rem 0; padding: .65rem; border-left: 3px solid var(--accent); background: var(--card-bg-soft); }
+.group-evidence-attachment small { flex-basis: 100%; color: var(--text-muted); }

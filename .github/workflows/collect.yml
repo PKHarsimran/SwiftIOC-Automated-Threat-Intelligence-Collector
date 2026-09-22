@@ -157,6 +157,11 @@ jobs:
       - name: Verify generated detection pack
         run: python -m swiftioc.verify_detections "$OUT_DIR/detections" --json
 
+      - name: Enrich group evidence from ransomware.live PRO
+        env:
+          RANSOMWARE_LIVE_API_KEY: ${{ secrets.RANSOMWARE_LIVE_API_KEY }}
+        run: python -m swiftioc.ransomware_live --feed "$IOC_DIR/latest.jsonl" --output "$OUT_DIR/group_evidence.json"
+
       - name: Summarize IOC outputs
         if: success()
         shell: bash
@@ -197,6 +202,7 @@ jobs:
             public/misp/**
             public/detections/**
             public/collections/**
+            public/group_evidence.json
             public/feed.xml
             public/badge.json
             !public/diagnostics/raw/**

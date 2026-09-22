@@ -58,9 +58,16 @@ The [SwiftIOC field guide](https://github.com/PKHarsimran/SwiftIOC-Automated-Thr
 | **Follow the evidence** | A provider/tag graph groups source aliases, highlights connected records, and exports the displayed graph or selected neighborhood. Click empty graph space or press Escape to clear selection. |
 | **Build a hunt** | Keep up to 50 IOCs in a local investigation queue, generate SPL, and export CSV, JSON, Sigma, or Suricata output where supported. |
 | **Prioritize CVEs** | Review exploitation evidence, dates, remediation, personal product watches, and imported inventory matches. |
+| **Research ransomware groups** | Optionally view group-linked IOCs, CVEs, and ATT&CK techniques reported by ransomware.live PRO, with clear separation from confirmed exploitation and scored feed records. |
 | **Operate the pipeline** | Consume snapshot/delta feeds and inspect source failures, filtering, retention, and volume in diagnostics. |
 
 > **Know what the evidence means.** Scores rank relevance; they are not probabilities. Shared reporting or tags do not establish a campaign or threat actor. A missing IOC or CVE does not prove an asset is safe. SwiftIOC is a collection and investigation tool, not a scanner or a managed detection service.
+
+### Optional ransomware.live PRO enrichment
+
+If you have permission to use ransomware.live PRO, add its key as the GitHub Actions repository secret `RANSOMWARE_LIVE_API_KEY`. The scheduled collector will then query group profiles and group IOCs server-side and publish `public/group_evidence.json`, a normalized evidence sidecar. The key is never embedded in the site or committed. You can also run `python -m swiftioc.ransomware_live --feed public/iocs/latest.jsonl --output public/group_evidence.json` locally with the key in the environment.
+
+The dashboard's **Ransomware groups** view separates group-linked IOCs and CVEs, filters by group and SwiftIOC coverage, and shows reported ATT&CK techniques for a selected group. Matching associations also appear on IOC lookup results and CVE cards. A provider association is a research lead, **not** proof of current use, attribution, or local exposure. Unmatched provider IOCs are labeled research candidates and are not added to SwiftIOC scoring or blocklists automatically. If the key is absent or the API fails, the core feed still works; an earlier evidence snapshot is retained. Confirm that your permission allows publication of this derived sidecar and retain the ransomware.live attribution when redistributing it.
 
 ## How it works
 
