@@ -607,7 +607,7 @@ test('group-linked CVE view and facet use exact published associations without c
 test('vulnerability release uses coordinated new asset cache keys', () => {
   const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
   for (const asset of ['styles.css', 'dashboard-core.js', 'dashboard.js', 'group-intel.js', 'group-intel-core.js']) {
-    assert.ok(html.includes(`assets/${asset}?v=43`));
+    assert.ok(html.includes(`assets/${asset}?v=44`));
   }
 });
 

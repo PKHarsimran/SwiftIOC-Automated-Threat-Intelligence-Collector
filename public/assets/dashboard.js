@@ -3404,6 +3404,8 @@
       const briefById = new Map(briefingEntries.map((entry) => [entry.item.cve_id, entry]));
       const existingIds = new Set(items.map((item) => item.cve_id.toLowerCase()));
       const includeGroupOnlyRecords = view === 'group-linked' || groupOnly.checked || groupFilter.value;
+      root.dataset.vulnerabilityActiveView = view;
+      root.dataset.vulnerabilityGroupMode = String(Boolean(includeGroupOnlyRecords));
       const groupSupplement = includeGroupOnlyRecords ? [...groupEvidence.values()]
         .filter((record) => !existingIds.has(record.value.toLowerCase()))
         .map((record) => ({ cve_id: record.value, title: record.value,
@@ -3439,7 +3441,7 @@
       groupStatus.textContent = groupFailed
         ? 'Group evidence is temporarily unavailable. CISA and NVD vulnerability views still work normally.'
         : !groupModel ? 'Loading the published ransomware.live evidence snapshot…'
-        : `${linkedTotal.toLocaleString()} reported CVEs · ${linkedInCollection.toLocaleString()} also have retained SwiftIOC vulnerability details · Evidence snapshot ${new Date(groupModel.generatedAt).toLocaleString()}. No extra API calls are made when filtering.`;
+        : `${linkedTotal.toLocaleString()} reported CVEs · ${linkedInCollection.toLocaleString()} enriched in SwiftIOC · ${Math.max(0, linkedTotal - linkedInCollection).toLocaleString()} need provider details · Snapshot ${new Date(groupModel.generatedAt).toLocaleString()} · Local filtering uses 0 API calls.`;
       includeRejected.closest('label').hidden = view === 'briefing';
       includeRejected.disabled = loading;
       freshness.hidden = loading || failed || snapshotTime == null || (now - snapshotTime >= 0 && now - snapshotTime <= 86400);
@@ -3505,7 +3507,7 @@
         addText(timeline, 'p', `NVD published: ${day(facts.published)}`);
         if (facts.modified != null) addText(timeline, 'p', `NVD updated: ${day(facts.modified)}`);
         card.appendChild(timeline);
-        if (facts.ransomware) addText(card, 'p', 'CISA: known ransomware campaign use', 'vulnerability-caution');
+        if (facts.ransomware && !showGroupDetails) addText(card, 'p', 'CISA: known ransomware campaign use', 'vulnerability-caution');
         const signals = document.createElement('div');
         signals.className = 'vulnerability-signal-row';
         if (item.exploitation_status === 'known_exploited') addText(signals, 'span', 'CISA KEV', 'vulnerability-signal');
@@ -3516,9 +3518,13 @@
           ? 'Returned association' : groupRecord.recentChange.action === 'added' ? 'New association' : 'New SwiftIOC match', 'vulnerability-signal');
         if (signals.childElementCount) card.appendChild(signals);
         if (showGroupDetails) {
-          const evidence = document.createElement('section');
+          const evidence = document.createElement('details');
           evidence.className = 'vulnerability-group-evidence';
-          addText(evidence, 'h4', 'Ransomware group evidence');
+          const previewGroups = groupRecord.groups.slice(0, 2).join(', ');
+          const remainingGroups = Math.max(0, groupRecord.groups.length - 2);
+          addText(evidence, 'summary', `Group evidence · ${previewGroups}${remainingGroups ? ` +${remainingGroups}` : ''}`);
+          const evidenceBody = document.createElement('div');
+          evidenceBody.className = 'vulnerability-group-evidence-body';
           addText(evidence, 'p', `${groupRecord.groups.length} reported ${groupRecord.groups.length === 1 ? 'group association' : 'group associations'} · ${groupRecord.matched ? 'Exact CVE also exists in SwiftIOC' : 'No exact CVE match in the current SwiftIOC collection'}.`);
           const chips = document.createElement('div');
           chips.className = 'vulnerability-group-chips';
@@ -3538,13 +3544,15 @@
           addText(evidence, 'p', 'Reported association only; this does not establish active exploitation or exposure in your environment.');
           const mapLink = addText(evidence, 'a', 'Open CVE in group evidence map ↗');
           mapLink.href = `groups.html#${new URLSearchParams({ view: 'cves', q: item.cve_id })}`;
+          [...evidence.children].filter((child) => child !== evidence.firstElementChild).forEach((child) => evidenceBody.appendChild(child));
+          evidence.appendChild(evidenceBody);
           card.appendChild(evidence);
         }
         if (facts.rejected) addText(card, 'p', 'Rejected by NVD · review the provider record before acting.', 'vulnerability-caution');
         if (item.exploitation_status === 'known_exploited' && (facts.checked == null || now - facts.checked > 86400)) {
           addText(card, 'p', `Historical KEV evidence · catalog check ${facts.checked == null ? 'unknown' : day(facts.checked)}. Refresh to verify current coverage.`, 'vulnerability-caution');
         }
-        if (kev?.required_action) addText(card, 'p', `CISA action: ${kev.required_action}`, 'vulnerability-action');
+        if (kev?.required_action && !showGroupDetails) addText(card, 'p', `CISA action: ${kev.required_action}`, 'vulnerability-action');
         addText(card, 'p', `Severity: ${nvd?.severity || 'Not supplied'} · ${kev?.product || 'Product not supplied'}${nvd?.status ? ` · NVD: ${nvd.status}` : ''}`, 'vulnerability-meta');
         // Keep long provider descriptions available without making cards unbounded.
         const summary = document.createElement('details');
@@ -3561,11 +3569,13 @@
           ['published_at', 'Published'], ['modified_at', 'Modified'], ['status', 'NVD status'],
           ['severity', 'Severity'], ['description', 'NVD description'],
         ]);
-        addText(card, 'p', `Reporting sources: ${item.sources.join(', ') || 'Not supplied'}`, 'vulnerability-meta');
+        const footer = document.createElement('footer');
+        footer.className = 'vulnerability-card-footer';
+        addText(footer, 'p', `Sources: ${item.sources.join(', ') || 'Not supplied'}`, 'vulnerability-meta');
         if (!kev && !nvd) {
           const reference = safeHttpUrl(item.reference);
           if (reference) {
-            const link = addText(card, 'a', 'Open reporting source ↗', 'vulnerability-meta');
+            const link = addText(footer, 'a', 'Open source ↗', 'vulnerability-meta');
             link.href = reference;
             link.target = '_blank';
             link.rel = 'noopener noreferrer';
@@ -3574,7 +3584,8 @@
         const copy = addText(card, 'button', 'Copy CVE', 'button ghost');
         copy.type = 'button';
         copy.addEventListener('click', () => copyOrPrompt(item.cve_id, 'CVE copied.', 'Copy this CVE:'));
-        card.appendChild(copy);
+        footer.appendChild(copy);
+        card.appendChild(footer);
         if (!showGroupDetails) window.SwiftIOCGroupIntel?.decorate('cve', item.cve_id, card);
         cards.appendChild(card);
       });
