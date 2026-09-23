@@ -46,7 +46,7 @@
       });
     </script>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/styles.css?v=42" />
+    <link rel="stylesheet" href="assets/styles.css?v=43" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -412,10 +412,19 @@
         <div class="discovery-lenses vulnerability-views" role="group" aria-label="Vulnerability view">
           <button type="button" data-vulnerability-view="briefing" aria-pressed="false">My briefing</button>
           <button type="button" data-vulnerability-view="exploited" aria-pressed="true">Known exploited</button>
+          <button type="button" data-vulnerability-view="group-linked" aria-pressed="false">Group-linked CVEs <span data-group-linked-count></span></button>
           <button type="button" data-vulnerability-view="priority" aria-pressed="false">All CVEs · prioritized</button>
           <select data-vulnerability-extra-view aria-label="Additional vulnerability views"><option value="">More views…</option><option value="ransomware">Ransomware evidence</option><option value="kev30">Added to KEV · 30 days</option><option value="published7">Published · 7 days</option><option value="updated7">Updated · 7 days</option></select>
         </div>
         <p class="discovery-scope" data-vulnerability-view-help>Confirmed KEV records only, newest catalog additions first. An empty result means this collection has no matching KEV evidence; other CVEs are available in All CVEs.</p>
+        <div class="vulnerability-group-tools" data-vulnerability-group-tools>
+          <label>Reported ransomware group
+            <select data-vulnerability-group-filter disabled><option value="">All reported groups</option></select>
+          </label>
+          <label class="vulnerability-group-only"><input type="checkbox" data-vulnerability-group-only disabled /> Only show group-linked CVEs in this view</label>
+          <button type="button" class="button ghost" data-vulnerability-group-export disabled>Export filtered group CVEs</button>
+          <p data-vulnerability-group-status role="status">Loading the published ransomware.live evidence snapshot…</p>
+        </div>
         <div class="vulnerability-toolbar">
           <label>Find a vulnerability
             <input type="search" data-vulnerability-search placeholder="CVE, vendor, product, or description" autocomplete="off" />
@@ -1114,11 +1123,11 @@
     </div>
 
     <div class="toast" data-toast role="status" aria-live="polite" aria-atomic="true" hidden></div>
-    <script defer src="assets/dashboard-core.js?v=42"></script>
+    <script defer src="assets/dashboard-core.js?v=43"></script>
     <script defer src="assets/inventory-core.js?v=38"></script>
     <script defer src="assets/inventory.js?v=38"></script>
-    <script defer src="assets/group-intel-core.js?v=42"></script>
-    <script defer src="assets/group-intel.js?v=42"></script>
-    <script defer src="assets/dashboard.js?v=42"></script>
+    <script defer src="assets/group-intel-core.js?v=43"></script>
+    <script defer src="assets/group-intel.js?v=43"></script>
+    <script defer src="assets/dashboard.js?v=43"></script>
   </body>
 </html>

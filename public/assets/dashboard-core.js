@@ -897,17 +897,22 @@
   const filterVulnerabilities = (items, search = '', status = 'all', options = {}) => {
     const query = lower(search).trim();
     const now = options.now ?? Date.now() / 1000;
-    const view = ['exploited', 'ransomware', 'kev30', 'published7', 'updated7'].includes(options.view) ? options.view : 'priority';
+    const view = ['exploited', 'ransomware', 'group-linked', 'kev30', 'published7', 'updated7'].includes(options.view) ? options.view : 'priority';
+    const groupEvidence = options.groupEvidence instanceof Map ? options.groupEvidence : new Map();
+    const selectedGroup = typeof options.group === 'string' ? options.group : '';
     const priority = { known_exploited: 0, reported_exploitation: 1, not_established: 2 };
+    const changePriority = { added: 0, returned: 0, matched: 1 };
     const recent = (time, days) => time != null && now - time <= days * 86400;
     const orderDate = (item, facts) => view === 'updated7' ? facts.modified
       : view === 'published7' ? facts.published
       : item.exploitation_status === 'known_exploited' ? facts.added : facts.published;
-    return items.map((item) => ({ item, facts: vulnerabilityFacts(item, now) })).filter(({ item, facts }) => {
+    return items.map((item) => ({ item, facts: vulnerabilityFacts(item, now), group: groupEvidence.get(lower(item.cve_id)) || null })).filter(({ item, facts, group }) => {
       if (!options.includeRejected && facts.rejected) return false;
       if (status !== 'all' && item.exploitation_status !== status) return false;
       if (view === 'exploited' && item.exploitation_status !== 'known_exploited') return false;
       if (view === 'ransomware' && !facts.ransomware) return false;
+      if ((view === 'group-linked' || options.groupOnly || selectedGroup) && !group) return false;
+      if (selectedGroup && !group.groups?.includes(selectedGroup)) return false;
       if (view === 'kev30' && (item.exploitation_status !== 'known_exploited' || !recent(facts.added, 30))) return false;
       if (view === 'published7' && !recent(facts.published, 7)) return false;
       if (view === 'updated7' && !recent(facts.modified, 7)) return false;
@@ -915,8 +920,11 @@
       const nvd = item.reports?.nvd || {};
       if (/^cve-\d{4}-\d{4,}$/.test(query)) return lower(item.cve_id) === query;
       return !query || lower([item.cve_id, item.title, item.description, kev.vendor,
-        kev.product, kev.description, nvd.description, ...(item.sources || [])].join(' ')).includes(query);
+        kev.product, kev.description, nvd.description, ...(item.sources || []), ...(group?.groups || [])].join(' ')).includes(query);
     }).sort((a, b) => Number(a.facts.rejected) - Number(b.facts.rejected)
+      || (view === 'group-linked' ? (priority[a.item.exploitation_status] ?? 3) - (priority[b.item.exploitation_status] ?? 3) : 0)
+      || (view === 'group-linked' ? (changePriority[a.group?.recentChange?.action] ?? 2) - (changePriority[b.group?.recentChange?.action] ?? 2) : 0)
+      || (view === 'group-linked' ? (b.group?.groups?.length || 0) - (a.group?.groups?.length || 0) : 0)
       || (view === 'priority' ? (priority[a.item.exploitation_status] ?? 3) - (priority[b.item.exploitation_status] ?? 3) : 0)
       || (orderDate(b.item, b.facts) ?? -Infinity) - (orderDate(a.item, a.facts) ?? -Infinity)
       || a.item.cve_id.localeCompare(b.item.cve_id)).map(({ item }) => item);

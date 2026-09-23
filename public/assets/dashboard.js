@@ -3259,11 +3259,18 @@
     const extraView = qs('[data-vulnerability-extra-view]', root);
     const help = qs('[data-vulnerability-view-help]', root);
     const freshness = qs('[data-vulnerability-freshness]', root);
+    const groupFilter = qs('[data-vulnerability-group-filter]', root);
+    const groupOnly = qs('[data-vulnerability-group-only]', root);
+    const groupExport = qs('[data-vulnerability-group-export]', root);
+    const groupStatus = qs('[data-vulnerability-group-status]', root);
+    const groupCount = qs('[data-group-linked-count]', root);
     // Old HTML may remain in an intermediary cache during a deployment.
-    if (!extraView || !includeRejected || !help || !freshness || !views.length || !qs('[data-briefing-form]', root)) return;
+    if (!extraView || !includeRejected || !help || !freshness || !groupFilter || !groupOnly || !groupExport
+      || !groupStatus || !views.length || !qs('[data-briefing-form]', root)) return;
     const viewHelp = {
       briefing: 'Your watched products, with material evidence changes first. Rejected records remain visible for review. Routine timestamp updates do not create alerts.',
       exploited: 'Confirmed KEV records only, newest catalog additions first. An empty result means this collection has no matching KEV evidence; other CVEs are available in All CVEs.',
+      'group-linked': 'CVEs reported by ransomware.live as associated with one or more tracked groups. Associations do not prove current exploitation or local exposure.',
       ransomware: 'CISA KEV records explicitly marked Known for ransomware campaign use. Unknown and unreported values do not qualify.',
       priority: 'Known exploited first (newest KEV additions), then exploitation reports, then other CVEs. Publication dates order each remaining group.',
       kev30: 'Added to CISA KEV in the past 30 days, newest first. Catalog addition is not the date an attack occurred.',
@@ -3288,6 +3295,10 @@
     let page = 0;
     let loading = false;
     let failed = false;
+    let groupModel = null;
+    let groupFailed = false;
+    let groupEvidence = new Map();
+    let lastGroupResults = [];
     const pageSize = 6;
     const addText = (parent, tag, value, className = '') => {
       const element = document.createElement(tag);
@@ -3391,19 +3402,44 @@
       const now = Date.now() / 1000;
       const briefingEntries = dashboardCore.buildBriefing(items, briefing, snapshotTime);
       const briefById = new Map(briefingEntries.map((entry) => [entry.item.cve_id, entry]));
-      const eligible = dashboardCore.filterVulnerabilities(items, search.value, filter.value, { view, includeRejected: view === 'briefing' || includeRejected.checked, now });
+      const existingIds = new Set(items.map((item) => item.cve_id.toLowerCase()));
+      const includeGroupOnlyRecords = view === 'group-linked' || groupOnly.checked || groupFilter.value;
+      const groupSupplement = includeGroupOnlyRecords ? [...groupEvidence.values()]
+        .filter((record) => !existingIds.has(record.value.toLowerCase()))
+        .map((record) => ({ cve_id: record.value, title: record.value,
+          description: 'Reported by ransomware.live, but detailed CISA/NVD evidence is not present in the current retained SwiftIOC vulnerability collection. Verify affected products, versions, severity, and remediation with an authoritative vulnerability record.',
+          exploitation_status: 'not_established', sources: ['ransomware.live'], reports: {},
+          reference: `https://nvd.nist.gov/vuln/detail/${encodeURIComponent(record.value)}`,
+        })) : [];
+      const filterItems = [...items, ...groupSupplement];
+      const eligible = dashboardCore.filterVulnerabilities(filterItems, search.value, filter.value, {
+        view, includeRejected: view === 'briefing' || includeRejected.checked, now,
+        groupEvidence, group: groupFilter.value, groupOnly: groupOnly.checked,
+      });
       const eligibleIds = new Set(eligible.map((item) => item.cve_id));
       lastBriefingResults = !loading && !failed ? briefingEntries.filter((entry) => eligibleIds.has(entry.item.cve_id) && (briefingTriage.value === 'all' || (briefingTriage.value === 'new' ? entry.changes.length > 0 : briefingTriage.value === 'unreviewed' ? ['unreviewed', 'new'].includes(entry.triage) : entry.triage === briefingTriage.value))) : [];
       const matches = view === 'briefing' ? lastBriefingResults.map((entry) => entry.item) : eligible;
+      lastGroupResults = matches.filter((item) => groupEvidence.has(item.cve_id.toLowerCase()));
       updateBriefingControls();
-      const rejectedCount = items.filter((item) => dashboardCore.vulnerabilityFacts(item, now).rejected).length;
+      const rejectedCount = filterItems.filter((item) => dashboardCore.vulnerabilityFacts(item, now).rejected).length;
       views.forEach((button) => {
         button.setAttribute('aria-pressed', String(button.dataset.vulnerabilityView === view));
-        button.disabled = loading;
+        button.disabled = loading || (button.dataset.vulnerabilityView === 'group-linked' && (!groupModel || groupFailed));
       });
       help.textContent = viewHelp[view];
       extraView.value = ['ransomware', 'kev30', 'published7', 'updated7'].includes(view) ? view : '';
       extraView.disabled = loading;
+      const linkedInCollection = items.filter((item) => groupEvidence.has(item.cve_id.toLowerCase())).length;
+      const linkedTotal = groupEvidence.size;
+      if (groupCount) groupCount.textContent = groupModel ? linkedTotal.toLocaleString() : '';
+      groupFilter.disabled = loading || !groupModel || groupFailed;
+      groupOnly.disabled = loading || !groupModel || groupFailed || view === 'group-linked';
+      groupOnly.closest('label').hidden = view === 'group-linked';
+      groupExport.disabled = loading || failed || !lastGroupResults.length;
+      groupStatus.textContent = groupFailed
+        ? 'Group evidence is temporarily unavailable. CISA and NVD vulnerability views still work normally.'
+        : !groupModel ? 'Loading the published ransomware.live evidence snapshot…'
+        : `${linkedTotal.toLocaleString()} reported CVEs · ${linkedInCollection.toLocaleString()} also have retained SwiftIOC vulnerability details · Evidence snapshot ${new Date(groupModel.generatedAt).toLocaleString()}. No extra API calls are made when filtering.`;
       includeRejected.closest('label').hidden = view === 'briefing';
       includeRejected.disabled = loading;
       freshness.hidden = loading || failed || snapshotTime == null || (now - snapshotTime >= 0 && now - snapshotTime <= 86400);
@@ -3421,6 +3457,10 @@
         ? 'Collection unavailable. Refresh to retry; no previous results are displayed.'
         : `${matches.length} of ${items.length} CVEs · ${matches.filter((item) => item.exploitation_status === 'known_exploited').length} matching with CISA KEV evidence${!includeRejected.checked && rejectedCount ? ` · ${rejectedCount} rejected records hidden` : ''} · Snapshot ${generatedAt}${!matches.length ? ' · No matching vulnerabilities.' : ''}`;
       if (view === 'briefing' && !loading && !failed) status.textContent = `${matches.length} watched CVEs in this view · ${lastBriefingResults.filter((entry) => entry.changes.length).length} with new evidence · Snapshot ${generatedAt}${!matches.length ? ' · No matches. Check your watches and filters.' : ''}`;
+      if ((view === 'group-linked' || groupOnly.checked || groupFilter.value) && !loading && !failed && groupModel) {
+        const withoutDetails = matches.filter((item) => !existingIds.has(item.cve_id.toLowerCase())).length;
+        status.textContent = `${matches.length} group-linked CVEs in this view · ${matches.filter((item) => item.exploitation_status === 'known_exploited').length} with CISA KEV evidence · ${withoutDetails} need additional provider details · Group snapshot ${new Date(groupModel.generatedAt).toLocaleString()}${!matches.length ? ' · No matches. Try another group or filter.' : ''}`;
+      }
       if (loading || failed) return;
       matches.slice(page * pageSize, (page + 1) * pageSize).forEach((item) => {
         const card = document.createElement('article');
@@ -3456,6 +3496,8 @@
         const kev = item.reports?.cisa_kev;
         const nvd = item.reports?.nvd;
         const facts = dashboardCore.vulnerabilityFacts(item, now);
+        const groupRecord = groupEvidence.get(item.cve_id.toLowerCase()) || null;
+        const showGroupDetails = groupRecord && (view === 'group-linked' || groupOnly.checked || groupFilter.value);
         const day = (time) => time == null ? 'Unknown / invalid' : new Date(time * 1000).toISOString().slice(0, 10);
         const timeline = document.createElement('div');
         timeline.className = 'vulnerability-dates';
@@ -3464,6 +3506,40 @@
         if (facts.modified != null) addText(timeline, 'p', `NVD updated: ${day(facts.modified)}`);
         card.appendChild(timeline);
         if (facts.ransomware) addText(card, 'p', 'CISA: known ransomware campaign use', 'vulnerability-caution');
+        const signals = document.createElement('div');
+        signals.className = 'vulnerability-signal-row';
+        if (item.exploitation_status === 'known_exploited') addText(signals, 'span', 'CISA KEV', 'vulnerability-signal');
+        if (facts.ransomware) addText(signals, 'span', 'CISA ransomware known', 'vulnerability-signal');
+        if (showGroupDetails) addText(signals, 'span', `Group-linked · ${groupRecord.groups.length}`, 'vulnerability-signal');
+        if (showGroupDetails && groupRecord.matched) addText(signals, 'span', 'SwiftIOC match', 'vulnerability-signal');
+        if (showGroupDetails && groupRecord.recentChange) addText(signals, 'span', groupRecord.recentChange.action === 'returned'
+          ? 'Returned association' : groupRecord.recentChange.action === 'added' ? 'New association' : 'New SwiftIOC match', 'vulnerability-signal');
+        if (signals.childElementCount) card.appendChild(signals);
+        if (showGroupDetails) {
+          const evidence = document.createElement('section');
+          evidence.className = 'vulnerability-group-evidence';
+          addText(evidence, 'h4', 'Ransomware group evidence');
+          addText(evidence, 'p', `${groupRecord.groups.length} reported ${groupRecord.groups.length === 1 ? 'group association' : 'group associations'} · ${groupRecord.matched ? 'Exact CVE also exists in SwiftIOC' : 'No exact CVE match in the current SwiftIOC collection'}.`);
+          const chips = document.createElement('div');
+          chips.className = 'vulnerability-group-chips';
+          groupRecord.groups.forEach((group) => {
+            const link = addText(chips, 'a', group);
+            link.href = window.SwiftIOCGroupIntel.url(group, 'cves');
+            link.title = `Open reported evidence for ${group}`;
+          });
+          evidence.appendChild(chips);
+          const receipts = groupRecord.groups.map((group) => ({ group,
+            receipt: window.SwiftIOCGroupIntel.receipt(groupModel, groupRecord, group),
+          })).filter((entry) => entry.receipt);
+          const first = receipts.map((entry) => Date.parse(entry.receipt.first_observed)).filter(Number.isFinite);
+          const last = receipts.map((entry) => Date.parse(entry.receipt.last_observed)).filter(Number.isFinite);
+          if (first.length || last.length) addText(evidence, 'p', `First observed locally: ${first.length ? new Date(Math.min(...first)).toLocaleString() : 'Unknown'} · Last confirmed in snapshot: ${last.length ? new Date(Math.max(...last)).toLocaleString() : 'Unknown'}.`);
+          if (groupRecord.recentChange) addText(evidence, 'p', `${groupRecord.recentChange.action === 'returned' ? 'Association returned' : groupRecord.recentChange.action === 'added' ? 'Association added' : 'Now matches SwiftIOC'}: ${new Date(groupRecord.recentChange.at).toLocaleString()} (${groupRecord.recentChange.group}).`);
+          addText(evidence, 'p', 'Reported association only; this does not establish active exploitation or exposure in your environment.');
+          const mapLink = addText(evidence, 'a', 'Open CVE in group evidence map ↗');
+          mapLink.href = `groups.html#${new URLSearchParams({ view: 'cves', q: item.cve_id })}`;
+          card.appendChild(evidence);
+        }
         if (facts.rejected) addText(card, 'p', 'Rejected by NVD · review the provider record before acting.', 'vulnerability-caution');
         if (item.exploitation_status === 'known_exploited' && (facts.checked == null || now - facts.checked > 86400)) {
           addText(card, 'p', `Historical KEV evidence · catalog check ${facts.checked == null ? 'unknown' : day(facts.checked)}. Refresh to verify current coverage.`, 'vulnerability-caution');
@@ -3499,7 +3575,7 @@
         copy.type = 'button';
         copy.addEventListener('click', () => copyOrPrompt(item.cve_id, 'CVE copied.', 'Copy this CVE:'));
         card.appendChild(copy);
-        window.SwiftIOCGroupIntel?.decorate('cve', item.cve_id, card);
+        if (!showGroupDetails) window.SwiftIOCGroupIntel?.decorate('cve', item.cve_id, card);
         cards.appendChild(card);
       });
     };
@@ -3576,6 +3652,25 @@
         })),
       }, null, 2), 'swiftioc-personal-cve-briefing.json', 'application/json');
     });
+    groupExport.addEventListener('click', () => {
+      if (!lastGroupResults.length || !groupModel) return;
+      const exported = lastGroupResults.map((item) => {
+        const record = groupEvidence.get(item.cve_id.toLowerCase());
+        return { ...item, ransomware_live: {
+          groups: record.groups, in_swiftioc: record.matched,
+          evidence_label: 'Reported association; current use and local exposure are not established.',
+          recent_change: record.recentChange || null, observations: record.groups.map((group) => ({ group,
+            receipt: window.SwiftIOCGroupIntel.receipt(groupModel, record, group),
+          })),
+        } };
+      });
+      downloadDetection(JSON.stringify({ schema_version: 1, generated_at: new Date().toISOString(),
+        source_snapshot_at: groupModel.generatedAt, filters: { view, group: groupFilter.value || null,
+          only_group_linked: view === 'group-linked' || groupOnly.checked, search: search.value, exploitation: filter.value },
+        limitations: ['Reported group associations do not establish current exploitation or local exposure.',
+          'A SwiftIOC match is an exact collection match, not independent corroboration.'], items: exported,
+      }, null, 2), 'swiftioc-group-linked-cves.json', 'application/json');
+    });
     views.forEach((button) => button.addEventListener('click', () => {
       view = button.dataset.vulnerabilityView;
       if (view === 'briefing' && !briefing.watches.length) briefingSettings.open = true;
@@ -3595,6 +3690,8 @@
       search.focus({ preventScroll: true });
     });
     extraView.addEventListener('change', () => { if (extraView.value) { view = extraView.value; page = 0; render(); } });
+    groupFilter.addEventListener('change', () => { page = 0; render(); });
+    groupOnly.addEventListener('change', () => { page = 0; render(); });
     includeRejected.addEventListener('change', () => { page = 0; render(); });
     // Re-evaluate rolling windows and freshness when an analyst returns to an
     // open tab, without resetting focus or collapsing evidence every minute.
@@ -3603,6 +3700,22 @@
     previous.addEventListener('click', () => { page -= 1; render(); });
     next.addEventListener('click', () => { page += 1; render(); });
     refresh.addEventListener('click', load);
+    window.SwiftIOCGroupIntel?.ready.then((model) => {
+      groupModel = model;
+      const events = Array.isArray(model.history?.events) ? model.history.events : [];
+      groupEvidence = new Map(model.records.filter((record) => record.kind === 'cves').map((record) => {
+        const recentChange = events.filter((event) => event.kind === 'cves' && event.value === record.value
+          && record.groups.includes(event.group) && ['added', 'returned', 'matched'].includes(event.action))
+          .sort((a, b) => Date.parse(b.at) - Date.parse(a.at))[0] || null;
+        return [record.value.toLowerCase(), { ...record, recentChange }];
+      }));
+      const groups = [...new Set([...groupEvidence.values()].flatMap((record) => record.groups))]
+        .sort((a, b) => a.localeCompare(b));
+      groupFilter.replaceChildren(...[['', 'All reported groups'], ...groups.map((group) => [group, group])].map(([value, label]) => {
+        const option = document.createElement('option'); option.value = value; option.textContent = label; return option;
+      }));
+      render();
+    }).catch(() => { groupFailed = true; render(); });
     load();
   };
 

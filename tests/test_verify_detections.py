@@ -78,7 +78,11 @@ def test_verifier_cli_provides_json_and_failure_exit_code(tmp_path):
     assert json.loads(bad.stdout)['valid'] is False
 
 
-@pytest.mark.parametrize('payload', [b' ' * 65537, b'\xff', b'{"schema_version":2,"schema_version":1}', b'[' * 2000 + b']' * 2000])
+@pytest.mark.parametrize(
+    'payload',
+    [b' ' * 65537, b'\xff', b'{"schema_version":2,"schema_version":1}', b'[' * 2000 + b']' * 2000],
+    ids=['oversized', 'invalid-utf8', 'duplicate-key', 'excessive-depth'],
+)
 def test_verifier_reports_malformed_manifests_without_crashing(tmp_path, payload):
     (tmp_path / 'manifest.json').write_bytes(payload)
     result = verify_detection_pack(tmp_path)

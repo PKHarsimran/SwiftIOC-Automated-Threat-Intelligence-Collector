@@ -3463,6 +3463,20 @@ input.lookup-input {
 @media (max-width: 650px) { .vulnerability-toolbar { flex-direction: column; align-items: stretch; } .vulnerability-toolbar label { flex-basis: auto; } }
 
 .vulnerability-views { margin-top: 1.5rem; }
+.vulnerability-views [data-group-linked-count]:not(:empty)::before { content: "· "; }
+.vulnerability-group-tools { display: flex; flex-wrap: wrap; align-items: end; gap: .75rem; margin: .9rem 0 0; padding: .8rem; border: 1px solid var(--border-soft); border-radius: .4rem; background: var(--card-bg-soft); }
+.vulnerability-group-tools label { display: grid; gap: .35rem; color: var(--text-muted); font-size: .78rem; }
+.vulnerability-group-tools select { min-height: 2.7rem; min-width: min(18rem, 100%); padding: .6rem; border: 1px solid var(--border-control); border-radius: .3rem; background: var(--bg-color); color: var(--text-primary); font: inherit; }
+.vulnerability-group-tools .vulnerability-group-only { display: flex; align-items: center; gap: .55rem; min-height: 2.7rem; }
+.vulnerability-group-tools p { flex-basis: 100%; margin: 0; color: var(--text-muted); font-size: .75rem; }
+.vulnerability-group-evidence { margin: .8rem 0; padding: .8rem; border: 1px solid var(--border-soft); border-left: 3px solid var(--accent); border-radius: .3rem; background: var(--card-bg-soft); }
+.vulnerability-group-evidence h4 { margin: 0 0 .45rem; color: var(--text-primary); font-size: .82rem; }
+.vulnerability-group-evidence p { margin: .25rem 0; color: var(--text-muted); font-size: .76rem; line-height: 1.55; overflow-wrap: anywhere; }
+.vulnerability-group-chips { display: flex; flex-wrap: wrap; gap: .35rem; margin: .5rem 0; }
+.vulnerability-group-chips a { padding: .2rem .42rem; border: 1px solid var(--border-control); border-radius: .35rem; color: var(--accent-soft); font-size: .76rem; }
+.vulnerability-signal-row { display: flex; flex-wrap: wrap; gap: .35rem; margin: .5rem 0; }
+.vulnerability-signal { padding: .2rem .42rem; border: 1px solid var(--border-soft); border-radius: 999px; color: var(--text-muted); font-size: .7rem; }
+@media (max-width: 650px) { .vulnerability-group-tools { align-items: stretch; } .vulnerability-group-tools > * { width: 100%; } .vulnerability-group-tools select { min-width: 0; width: 100%; } }
 .vulnerability-dates { padding: 0.6rem 0.8rem; margin-top: 0.9rem; border-left: 2px solid #75b9d2; background: #132739; color: #c0d5e8; font-size: 0.75rem; line-height: 1.6; }
 .vulnerability-dates p { margin: 0.2rem 0; }
 .vulnerability-rejected-control { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #b7c6d8; }

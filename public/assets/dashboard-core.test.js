@@ -587,10 +587,27 @@ test('exploited and ransomware views require explicit evidence and never fall ba
   }
 });
 
+test('group-linked CVE view and facet use exact published associations without changing CISA ransomware evidence', () => {
+  const kev = triageItem('CVE-1900-1234', 'known_exploited', '2026-09-07', '2020-01-01');
+  kev.reports.cisa_kev.ransomware_use = 'Unknown';
+  const broad = triageItem('CVE-1900-1235', 'not_established', null, '2026-09-08');
+  const unrelated = triageItem('CVE-1900-1236', 'not_established', null, '2026-09-08');
+  const evidence = new Map([
+    ['cve-1900-1234', { groups: ['akira'] }],
+    ['cve-1900-1235', { groups: ['akira', 'clop'] }],
+  ]);
+  const options = { view: 'group-linked', groupEvidence: evidence, now: triageNow };
+  assert.deepEqual(core.filterVulnerabilities([unrelated, broad, kev], '', 'all', options), [kev, broad]);
+  assert.deepEqual(core.filterVulnerabilities([unrelated, broad, kev], '', 'all', { ...options, group: 'clop' }), [broad]);
+  assert.deepEqual(core.filterVulnerabilities([unrelated, broad, kev], 'AKIRA', 'all', options), [kev, broad]);
+  assert.deepEqual(core.filterVulnerabilities([unrelated, broad, kev], '', 'all', { view: 'priority', groupOnly: true, groupEvidence: evidence, now: triageNow }), [kev, broad]);
+  assert.deepEqual(core.filterVulnerabilities([kev], '', 'all', { view: 'ransomware', groupEvidence: evidence, now: triageNow }), []);
+});
+
 test('vulnerability release uses coordinated new asset cache keys', () => {
   const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
   for (const asset of ['styles.css', 'dashboard-core.js', 'dashboard.js', 'group-intel.js', 'group-intel-core.js']) {
-    assert.ok(html.includes(`assets/${asset}?v=42`));
+    assert.ok(html.includes(`assets/${asset}?v=43`));
   }
 });
 

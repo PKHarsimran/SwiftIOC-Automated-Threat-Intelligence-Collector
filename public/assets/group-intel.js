@@ -10,6 +10,8 @@
   const pending = new WeakMap();
   window.SwiftIOCGroupIntel = {
     ready, url,
+    cve(model, value) { return model?.byIdentity.get(`cve:${core.identity(value, 'cve')}`) || null; },
+    receipt(model, record, group) { return core.receipt(model, record, group); },
     decorate(type, value, host) {
       const token = {};
       pending.set(host, token);
