@@ -2,16 +2,16 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-09-23T00:05:45Z_
+_Generated 2026-09-23T00:18:55Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-23T00:05:45Z |
+| Generated | 2026-09-23T00:18:55Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 7709 |
+| Duplicates removed | 7750 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-source overlaps | 1115 |
@@ -19,7 +19,7 @@ _Generated 2026-09-23T00:05:45Z_
 | High-score indicators (≥80) | 10000 |
 | Corroborated (2+ sources) | 1115 |
 | Earliest first_seen | 2016-05-11T01:59:46Z |
-| Newest first_seen | 2026-09-23T00:03:49Z |
+| Newest first_seen | 2026-09-23T00:18:09Z |
 
 ## Top indicators by score
 
@@ -41,43 +41,43 @@ _Generated 2026-09-23T00:05:45Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| greensnow_blocklist | 5952 |
-| blocklist_de_ssh | 5583 |
+| greensnow_blocklist | 5964 |
+| blocklist_de_ssh | 5584 |
 | binarydefense_banlist | 5581 |
 | ipsum_level5 | 3875 |
-| nist_nvd_recent | 2535 |
+| nist_nvd_recent | 2400 |
 | cisa_kev | 1721 |
-| threatfox_export_json | 1714 |
+| threatfox_export_json | 1720 |
 | spamhaus_drop | 1712 |
-| malwarebazaar_recent | 1410 |
+| malwarebazaar_recent | 1385 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3181 |
+| sha256 | 3173 |
 | cve | 2579 |
-| ipv4_cidr | 1708 |
+| ipv4_cidr | 1711 |
 | url | 1308 |
-| domain | 632 |
-| sha1 | 271 |
-| ipv4 | 258 |
-| md5 | 63 |
+| domain | 641 |
+| sha1 | 268 |
+| ipv4 | 259 |
+| md5 | 61 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 4229 |
+| malware | 4219 |
 | cve | 2579 |
-| threatfox | 2305 |
+| threatfox | 2312 |
 | exploited-in-the-wild | 1721 |
-| drop | 1708 |
-| spamhaus | 1708 |
+| drop | 1711 |
+| spamhaus | 1711 |
 | nvd | 1120 |
-| malware_download | 996 |
+| malware_download | 994 |
 | Mirai | 695 |
-| mirai | 510 |
+| mirai | 505 |
 
 ## Multi-source overlaps
 
