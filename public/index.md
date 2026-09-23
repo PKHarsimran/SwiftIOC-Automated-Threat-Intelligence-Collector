@@ -2,16 +2,16 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-09-23T19:34:02Z_
+_Generated 2026-09-23T22:38:30Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-23T19:34:02Z |
+| Generated | 2026-09-23T22:38:30Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 8274 |
+| Duplicates removed | 8301 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-source overlaps | 1133 |
@@ -19,7 +19,7 @@ _Generated 2026-09-23T19:34:02Z_
 | High-score indicators (≥80) | 10000 |
 | Corroborated (2+ sources) | 1133 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-09-23T19:32:52Z |
+| Newest first_seen | 2026-09-23T22:37:52Z |
 
 ## Top indicators by score
 
@@ -41,13 +41,13 @@ _Generated 2026-09-23T19:34:02Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 11762 |
+| blocklist_de_ssh | 11706 |
 | binarydefense_banlist | 5581 |
-| greensnow_blocklist | 4869 |
+| greensnow_blocklist | 4831 |
 | ipsum_level5 | 4822 |
-| threatfox_export_json | 4041 |
-| nist_nvd_recent | 2839 |
-| malwarebazaar_recent | 1902 |
+| threatfox_export_json | 3972 |
+| nist_nvd_recent | 2400 |
+| malwarebazaar_recent | 1855 |
 | cisa_kev | 1721 |
 | spamhaus_drop | 1712 |
 
@@ -56,28 +56,28 @@ _Generated 2026-09-23T19:34:02Z_
 | Type | Indicators |
 | --- | ---: |
 | cve | 2543 |
-| sha256 | 2433 |
-| domain | 1923 |
-| ipv4_cidr | 1600 |
-| url | 1016 |
+| sha256 | 2365 |
+| domain | 1920 |
+| ipv4_cidr | 1711 |
+| url | 970 |
 | sha1 | 238 |
-| ipv4 | 217 |
+| ipv4 | 223 |
 | md5 | 30 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3607 |
-| malware | 3088 |
+| threatfox | 3522 |
+| malware | 3062 |
 | cve | 2543 |
 | exploited-in-the-wild | 1721 |
-| drop | 1600 |
-| spamhaus | 1600 |
-| ClickFix | 1352 |
+| drop | 1711 |
+| spamhaus | 1711 |
+| ClickFix | 1333 |
 | nvd | 1085 |
-| Mirai | 869 |
-| malware_download | 657 |
+| Mirai | 803 |
+| malware_download | 638 |
 
 ## Multi-source overlaps
 
