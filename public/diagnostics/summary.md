@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-09-24T16:22:45Z_
+_Generated 2026-09-24T22:57:50Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-24T16:22:45Z |
+| Generated | 2026-09-24T22:57:50Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 8394 |
+| Duplicates removed | 8477 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-source overlaps | 1166 |
+| Multi-source overlaps | 1168 |
 | Score (min / avg / max) | 80 / 80.7 / 96 |
 | High-score indicators (≥80) | 10000 |
-| Corroborated (2+ sources) | 1166 |
+| Corroborated (2+ sources) | 1168 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-09-24T16:21:46Z |
+| Newest first_seen | 2026-09-24T22:57:12Z |
 
 ## Top indicators by score
 
@@ -39,43 +39,43 @@ _Generated 2026-09-24T16:22:45Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 11668 |
+| blocklist_de_ssh | 11626 |
 | binarydefense_banlist | 5786 |
 | ipsum_level5 | 4859 |
-| threatfox_export_json | 4829 |
-| greensnow_blocklist | 4619 |
-| nist_nvd_recent | 3016 |
-| malwarebazaar_recent | 2272 |
-| cisa_kev | 1721 |
+| greensnow_blocklist | 4646 |
+| threatfox_export_json | 4477 |
+| malwarebazaar_recent | 2489 |
+| nist_nvd_recent | 2400 |
+| cisa_kev | 1723 |
 | spamhaus_drop | 1710 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 2991 |
-| domain | 2513 |
-| cve | 2468 |
-| ipv4_cidr | 845 |
-| url | 753 |
+| sha256 | 3083 |
+| cve | 2384 |
+| domain | 2266 |
+| ipv4_cidr | 1110 |
+| url | 714 |
 | sha1 | 230 |
-| ipv4 | 178 |
+| ipv4 | 191 |
 | md5 | 22 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 4106 |
-| malware | 3441 |
-| cve | 2468 |
-| exploited-in-the-wild | 1721 |
-| Mirai | 1284 |
-| ClickFix | 1211 |
+| threatfox | 3798 |
+| malware | 3568 |
+| cve | 2384 |
+| exploited-in-the-wild | 1723 |
+| Mirai | 1400 |
+| ClickFix | 1209 |
+| drop | 1110 |
+| spamhaus | 1110 |
 | etherhiding | 1100 |
 | victim | 1041 |
-| nvd | 1022 |
-| drop | 845 |
 
 ## Multi-source overlaps
 
