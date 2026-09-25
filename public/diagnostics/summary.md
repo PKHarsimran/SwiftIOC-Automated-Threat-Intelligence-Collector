@@ -1,15 +1,15 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-09-24T22:57:50Z_
+_Generated 2026-09-25T03:08:43Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-24T22:57:50Z |
+| Generated | 2026-09-25T03:08:43Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 8477 |
+| Duplicates removed | 9279 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-source overlaps | 1168 |
@@ -17,7 +17,7 @@ _Generated 2026-09-24T22:57:50Z_
 | High-score indicators (≥80) | 10000 |
 | Corroborated (2+ sources) | 1168 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-09-24T22:57:12Z |
+| Newest first_seen | 2026-09-25T03:06:29Z |
 
 ## Top indicators by score
 
@@ -39,13 +39,13 @@ _Generated 2026-09-24T22:57:50Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 11626 |
-| binarydefense_banlist | 5786 |
-| ipsum_level5 | 4859 |
-| greensnow_blocklist | 4646 |
-| threatfox_export_json | 4477 |
-| malwarebazaar_recent | 2489 |
-| nist_nvd_recent | 2400 |
+| blocklist_de_ssh | 11606 |
+| binarydefense_banlist | 5974 |
+| greensnow_blocklist | 5407 |
+| ipsum_level5 | 5065 |
+| threatfox_export_json | 4391 |
+| nist_nvd_recent | 3421 |
+| malwarebazaar_recent | 2624 |
 | cisa_kev | 1723 |
 | spamhaus_drop | 1710 |
 
@@ -53,27 +53,27 @@ _Generated 2026-09-24T22:57:50Z_
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3083 |
-| cve | 2384 |
-| domain | 2266 |
-| ipv4_cidr | 1110 |
-| url | 714 |
+| sha256 | 3095 |
+| cve | 2676 |
+| ipv4_cidr | 1709 |
+| domain | 1387 |
+| url | 702 |
 | sha1 | 230 |
-| ipv4 | 191 |
+| ipv4 | 179 |
 | md5 | 22 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3798 |
-| malware | 3568 |
-| cve | 2384 |
+| malware | 3675 |
+| threatfox | 2800 |
+| cve | 2676 |
 | exploited-in-the-wild | 1723 |
-| Mirai | 1400 |
-| ClickFix | 1209 |
-| drop | 1110 |
-| spamhaus | 1110 |
+| drop | 1709 |
+| spamhaus | 1709 |
+| Mirai | 1534 |
+| nvd | 1230 |
 | etherhiding | 1100 |
 | victim | 1041 |
 
