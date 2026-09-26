@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-09-26T18:56:22Z_
+_Generated 2026-09-26T22:19:31Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-26T18:56:22Z |
+| Generated | 2026-09-26T22:19:31Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 8424 |
+| Duplicates removed | 8416 |
 | Sources reporting | 16 |
 | Indicator types | 7 |
 | Multi-source overlaps | 1226 |
-| Score (min / avg / max) | 80 / 80.7 / 96 |
+| Score (min / avg / max) | 80 / 80.6 / 96 |
 | High-score indicators (≥80) | 10000 |
 | Corroborated (2+ sources) | 1226 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-09-26T18:47:19Z |
+| Newest first_seen | 2026-09-26T21:53:26Z |
 
 ## Top indicators by score
 
@@ -40,23 +40,23 @@ _Generated 2026-09-26T18:56:22Z_
 | --- | ---: |
 | ci_army_list | 15000 |
 | binarydefense_banlist | 6160 |
-| blocklist_de_ssh | 5056 |
-| greensnow_blocklist | 4856 |
+| blocklist_de_ssh | 5057 |
 | ipsum_level5 | 4856 |
-| nist_nvd_recent | 2400 |
+| greensnow_blocklist | 4837 |
+| nist_nvd_recent | 2000 |
 | cisa_kev | 1726 |
 | spamhaus_drop | 1711 |
-| tor_exit_nodes | 1383 |
-| malwarebazaar_recent | 1332 |
+| tor_exit_nodes | 1376 |
+| malwarebazaar_recent | 1367 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 5097 |
-| sha256 | 2442 |
+| cve | 4951 |
+| sha256 | 2534 |
 | ipv4_cidr | 1710 |
-| url | 479 |
+| url | 533 |
 | sha1 | 228 |
 | ipv4 | 24 |
 | md5 | 20 |
@@ -65,16 +65,16 @@ _Generated 2026-09-26T18:56:22Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| cve | 5097 |
-| nvd | 3655 |
-| malware | 2991 |
+| cve | 4951 |
+| nvd | 3509 |
+| malware | 3137 |
 | exploited-in-the-wild | 1726 |
 | drop | 1710 |
 | spamhaus | 1710 |
-| high | 1420 |
-| Mirai | 1164 |
+| high | 1362 |
+| Mirai | 1214 |
 | threatfox | 1108 |
-| medium | 973 |
+| medium | 905 |
 
 ## Multi-source overlaps
 
