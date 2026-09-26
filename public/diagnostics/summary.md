@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-09-26T03:12:45Z_
+_Generated 2026-09-26T09:00:43Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-26T03:12:45Z |
+| Generated | 2026-09-26T09:00:43Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 9162 |
+| Duplicates removed | 9105 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-source overlaps | 1204 |
+| Multi-source overlaps | 1218 |
 | Score (min / avg / max) | 80 / 80.7 / 96 |
 | High-score indicators (≥80) | 10000 |
-| Corroborated (2+ sources) | 1204 |
+| Corroborated (2+ sources) | 1218 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-09-26T03:10:43Z |
+| Newest first_seen | 2026-09-26T08:48:24Z |
 
 ## Top indicators by score
 
@@ -40,42 +40,42 @@ _Generated 2026-09-26T03:12:45Z_
 | --- | ---: |
 | ci_army_list | 15000 |
 | binarydefense_banlist | 6160 |
-| greensnow_blocklist | 5717 |
-| blocklist_de_ssh | 4999 |
+| greensnow_blocklist | 5741 |
+| blocklist_de_ssh | 5020 |
 | ipsum_level5 | 4856 |
-| nist_nvd_recent | 3696 |
-| threatfox_export_json | 3230 |
-| malwarebazaar_recent | 1988 |
+| threatfox_export_json | 2352 |
+| nist_nvd_recent | 2000 |
 | cisa_kev | 1726 |
 | spamhaus_drop | 1710 |
+| malwarebazaar_recent | 1676 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 2953 |
-| sha256 | 2321 |
-| domain | 1948 |
+| cve | 3019 |
+| sha256 | 2480 |
 | ipv4_cidr | 1709 |
-| url | 673 |
+| domain | 1603 |
+| url | 761 |
 | sha1 | 228 |
-| ipv4 | 148 |
+| ipv4 | 180 |
 | md5 | 20 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3281 |
-| cve | 2953 |
-| malware | 2946 |
+| malware | 3091 |
+| threatfox | 3084 |
+| cve | 3019 |
 | exploited-in-the-wild | 1726 |
 | drop | 1709 |
 | spamhaus | 1709 |
-| nvd | 1511 |
-| Mirai | 1100 |
-| etherhiding | 1074 |
-| ClickFix | 874 |
+| nvd | 1577 |
+| Mirai | 1214 |
+| ClickFix | 877 |
+| etherhiding | 719 |
 
 ## Multi-source overlaps
 
