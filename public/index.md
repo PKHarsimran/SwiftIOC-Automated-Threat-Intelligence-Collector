@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-09-26T15:37:24Z_
+_Generated 2026-09-26T18:56:22Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-26T15:37:24Z |
+| Generated | 2026-09-26T18:56:22Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 8543 |
-| Sources reporting | 17 |
-| Indicator types | 8 |
+| Duplicates removed | 8424 |
+| Sources reporting | 16 |
+| Indicator types | 7 |
 | Multi-source overlaps | 1226 |
 | Score (min / avg / max) | 80 / 80.7 / 96 |
 | High-score indicators (≥80) | 10000 |
 | Corroborated (2+ sources) | 1226 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-09-26T15:36:58Z |
+| Newest first_seen | 2026-09-26T18:47:19Z |
 
 ## Top indicators by score
 
@@ -42,42 +42,41 @@ _Generated 2026-09-26T15:37:24Z_
 | --- | ---: |
 | ci_army_list | 15000 |
 | binarydefense_banlist | 6160 |
-| blocklist_de_ssh | 5034 |
-| greensnow_blocklist | 4872 |
+| blocklist_de_ssh | 5056 |
+| greensnow_blocklist | 4856 |
 | ipsum_level5 | 4856 |
-| nist_nvd_recent | 3600 |
-| threatfox_export_json | 2487 |
+| nist_nvd_recent | 2400 |
 | cisa_kev | 1726 |
 | spamhaus_drop | 1711 |
-| malwarebazaar_recent | 1464 |
+| tor_exit_nodes | 1383 |
+| malwarebazaar_recent | 1332 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3094 |
-| sha256 | 2297 |
-| domain | 1727 |
+| cve | 5097 |
+| sha256 | 2442 |
 | ipv4_cidr | 1710 |
-| url | 746 |
+| url | 479 |
 | sha1 | 228 |
-| ipv4 | 178 |
+| ipv4 | 24 |
 | md5 | 20 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3241 |
-| cve | 3094 |
-| malware | 2865 |
+| cve | 5097 |
+| nvd | 3655 |
+| malware | 2991 |
 | exploited-in-the-wild | 1726 |
 | drop | 1710 |
 | spamhaus | 1710 |
-| nvd | 1652 |
-| Mirai | 1060 |
-| ClickFix | 944 |
-| etherhiding | 719 |
+| high | 1420 |
+| Mirai | 1164 |
+| threatfox | 1108 |
+| medium | 973 |
 
 ## Multi-source overlaps
 
