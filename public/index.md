@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-09-26T09:00:43Z_
+_Generated 2026-09-26T15:37:24Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-26T09:00:43Z |
+| Generated | 2026-09-26T15:37:24Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 9105 |
+| Duplicates removed | 8543 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-source overlaps | 1218 |
+| Multi-source overlaps | 1226 |
 | Score (min / avg / max) | 80 / 80.7 / 96 |
 | High-score indicators (≥80) | 10000 |
-| Corroborated (2+ sources) | 1218 |
+| Corroborated (2+ sources) | 1226 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-09-26T08:48:24Z |
+| Newest first_seen | 2026-09-26T15:36:58Z |
 
 ## Top indicators by score
 
@@ -42,41 +42,41 @@ _Generated 2026-09-26T09:00:43Z_
 | --- | ---: |
 | ci_army_list | 15000 |
 | binarydefense_banlist | 6160 |
-| greensnow_blocklist | 5741 |
-| blocklist_de_ssh | 5020 |
+| blocklist_de_ssh | 5034 |
+| greensnow_blocklist | 4872 |
 | ipsum_level5 | 4856 |
-| threatfox_export_json | 2352 |
-| nist_nvd_recent | 2000 |
+| nist_nvd_recent | 3600 |
+| threatfox_export_json | 2487 |
 | cisa_kev | 1726 |
-| spamhaus_drop | 1710 |
-| malwarebazaar_recent | 1676 |
+| spamhaus_drop | 1711 |
+| malwarebazaar_recent | 1464 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3019 |
-| sha256 | 2480 |
-| ipv4_cidr | 1709 |
-| domain | 1603 |
-| url | 761 |
+| cve | 3094 |
+| sha256 | 2297 |
+| domain | 1727 |
+| ipv4_cidr | 1710 |
+| url | 746 |
 | sha1 | 228 |
-| ipv4 | 180 |
+| ipv4 | 178 |
 | md5 | 20 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 3091 |
-| threatfox | 3084 |
-| cve | 3019 |
+| threatfox | 3241 |
+| cve | 3094 |
+| malware | 2865 |
 | exploited-in-the-wild | 1726 |
-| drop | 1709 |
-| spamhaus | 1709 |
-| nvd | 1577 |
-| Mirai | 1214 |
-| ClickFix | 877 |
+| drop | 1710 |
+| spamhaus | 1710 |
+| nvd | 1652 |
+| Mirai | 1060 |
+| ClickFix | 944 |
 | etherhiding | 719 |
 
 ## Multi-source overlaps
