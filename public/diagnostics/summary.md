@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-09-27T16:16:16Z_
+_Generated 2026-09-27T22:46:07Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-27T16:16:16Z |
+| Generated | 2026-09-27T22:46:07Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 8664 |
+| Duplicates removed | 8617 |
 | Sources reporting | 17 |
-| Indicator types | 8 |
-| Multi-source overlaps | 1269 |
+| Indicator types | 9 |
+| Multi-source overlaps | 1278 |
 | Score (min / avg / max) | 80 / 80.7 / 96 |
 | High-score indicators (≥80) | 10000 |
-| Corroborated (2+ sources) | 1269 |
+| Corroborated (2+ sources) | 1278 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-09-27T16:16:01Z |
+| Newest first_seen | 2026-09-27T22:45:49Z |
 
 ## Top indicators by score
 
@@ -39,43 +39,44 @@ _Generated 2026-09-27T16:16:16Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 11780 |
+| blocklist_de_ssh | 11744 |
 | binarydefense_banlist | 6344 |
-| threatfox_export_json | 5357 |
+| threatfox_export_json | 5216 |
 | ipsum_level5 | 5109 |
-| greensnow_blocklist | 4474 |
-| cisa_kev | 1726 |
+| greensnow_blocklist | 4492 |
+| cisa_kev | 1728 |
 | spamhaus_drop | 1711 |
-| nist_nvd_recent | 1575 |
-| tor_exit_nodes | 1358 |
+| tor_exit_nodes | 1355 |
+| nist_nvd_recent | 1270 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| domain | 2780 |
-| cve | 2271 |
-| sha256 | 2183 |
-| ipv4_cidr | 1439 |
-| url | 943 |
+| cve | 3176 |
+| sha256 | 2316 |
+| ipv4_cidr | 1710 |
+| domain | 1481 |
+| url | 893 |
 | sha1 | 223 |
-| ipv4 | 146 |
+| ipv4 | 161 |
+| ja3 | 25 |
 | md5 | 15 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 4370 |
-| malware | 2875 |
-| cve | 2271 |
-| exploited-in-the-wild | 1726 |
-| etherhiding | 1671 |
-| drop | 1439 |
-| spamhaus | 1439 |
-| ClickFix | 998 |
-| Mirai | 928 |
-| nvd | 829 |
+| cve | 3176 |
+| threatfox | 3057 |
+| malware | 2989 |
+| nvd | 1734 |
+| exploited-in-the-wild | 1728 |
+| drop | 1710 |
+| spamhaus | 1710 |
+| Mirai | 1007 |
+| etherhiding | 956 |
+| high | 653 |
 
 ## Multi-source overlaps
 
