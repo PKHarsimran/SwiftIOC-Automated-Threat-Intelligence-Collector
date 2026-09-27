@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-09-27T15:22:11Z_
+_Generated 2026-09-27T16:16:16Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-27T15:22:11Z |
+| Generated | 2026-09-27T16:16:16Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 8653 |
+| Duplicates removed | 8664 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-source overlaps | 1267 |
+| Multi-source overlaps | 1269 |
 | Score (min / avg / max) | 80 / 80.7 / 96 |
 | High-score indicators (≥80) | 10000 |
-| Corroborated (2+ sources) | 1267 |
+| Corroborated (2+ sources) | 1269 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-09-27T15:22:01Z |
+| Newest first_seen | 2026-09-27T16:16:01Z |
 
 ## Top indicators by score
 
@@ -39,43 +39,43 @@ _Generated 2026-09-27T15:22:11Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 11798 |
+| blocklist_de_ssh | 11780 |
 | binarydefense_banlist | 6344 |
-| threatfox_export_json | 6178 |
+| threatfox_export_json | 5357 |
 | ipsum_level5 | 5109 |
-| greensnow_blocklist | 4482 |
+| greensnow_blocklist | 4474 |
 | cisa_kev | 1726 |
 | spamhaus_drop | 1711 |
-| nist_nvd_recent | 1589 |
+| nist_nvd_recent | 1575 |
 | tor_exit_nodes | 1358 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 2766 |
-| domain | 2544 |
-| sha256 | 2491 |
-| url | 928 |
-| ipv4_cidr | 883 |
+| domain | 2780 |
+| cve | 2271 |
+| sha256 | 2183 |
+| ipv4_cidr | 1439 |
+| url | 943 |
 | sha1 | 223 |
-| ipv4 | 150 |
+| ipv4 | 146 |
 | md5 | 15 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 4170 |
-| malware | 3134 |
-| cve | 2766 |
+| threatfox | 4370 |
+| malware | 2875 |
+| cve | 2271 |
 | exploited-in-the-wild | 1726 |
-| etherhiding | 1435 |
-| nvd | 1324 |
-| Mirai | 1100 |
-| ClickFix | 1016 |
-| drop | 883 |
-| spamhaus | 883 |
+| etherhiding | 1671 |
+| drop | 1439 |
+| spamhaus | 1439 |
+| ClickFix | 998 |
+| Mirai | 928 |
+| nvd | 829 |
 
 ## Multi-source overlaps
 
