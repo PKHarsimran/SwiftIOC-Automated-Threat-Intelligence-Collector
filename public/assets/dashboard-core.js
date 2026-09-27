@@ -894,6 +894,88 @@
     ransomware: item.exploitation_status === 'known_exploited' && lower(item.reports?.cisa_kev?.ransomware_use) === 'known',
   });
 
+  const vulnerabilityPriority = (item, group = null, now = Date.now() / 1000) => {
+    const facts = vulnerabilityFacts(item, now);
+    const severity = lower(item.reports?.nvd?.severity);
+    const recentKev = facts.added != null && now - facts.added <= 30 * 86400;
+    const groupCount = Array.isArray(group?.groups) ? group.groups.length : 0;
+    const reasons = [];
+    if (item.exploitation_status === 'known_exploited') reasons.push('CISA KEV known exploitation');
+    else if (item.exploitation_status === 'reported_exploitation') reasons.push('reported exploitation');
+    if (facts.ransomware) reasons.push('CISA ransomware campaign evidence');
+    if (groupCount) reasons.push(`associated with ${groupCount} ransomware ${groupCount === 1 ? 'group' : 'groups'}`);
+    if (recentKev) reasons.push('recently added to KEV');
+    if (['critical', 'high'].includes(severity)) reasons.push(`${severity} NVD severity`);
+    if (facts.rejected) reasons.push('NVD record is rejected');
+    let key = 'context';
+    if (!facts.rejected && item.exploitation_status === 'known_exploited' && (facts.ransomware || groupCount || recentKev)) key = 'act';
+    else if (!facts.rejected && ['known_exploited', 'reported_exploitation'].includes(item.exploitation_status)) key = 'investigate';
+    else if (!facts.rejected && (groupCount || ['critical', 'high'].includes(severity))) key = 'monitor';
+    const labels = { act: 'Act now', investigate: 'Investigate', monitor: 'Monitor', context: 'Context only' };
+    const why = reasons.length ? `${reasons.slice(0, 3).join(', ')}.` : 'No structured exploitation, group, or severity signal is available.';
+    return { key, label: labels[key], why, reasons, recentKev, groupCount };
+  };
+
+  const vulnerabilityTimeline = (item, group = null, observations = [], now = Date.now() / 1000) => {
+    const facts = vulnerabilityFacts(item, now);
+    const events = [];
+    const push = (time, label, source) => { if (time != null && Number.isFinite(time) && time >= 0 && time <= now) events.push({ time, label, source }); };
+    push(facts.published, 'Published by NVD', 'NVD');
+    push(facts.added, 'Added to CISA KEV', 'CISA');
+    push(facts.modified, 'NVD record updated', 'NVD');
+    observations.forEach((entry) => {
+      const first = Date.parse(entry?.receipt?.first_observed) / 1000;
+      const last = Date.parse(entry?.receipt?.last_observed) / 1000;
+      push(first, `First observed for ${entry.group}`, 'ransomware.live snapshot');
+      if (last !== first) push(last, `Last confirmed for ${entry.group}`, 'ransomware.live snapshot');
+    });
+    const changed = Date.parse(group?.recentChange?.at) / 1000;
+    push(changed, `${group?.recentChange?.action || 'Association'}: ${group?.recentChange?.group || 'group'}`, 'SwiftIOC evidence history');
+    return events.sort((a, b) => a.time - b.time || a.label.localeCompare(b.label));
+  };
+
+  const vulnerabilityAggregation = (items) => {
+    const count = (values) => [...values.reduce((map, value) => {
+      if (typeof value === 'string' && value.trim()) map.set(value.trim(), (map.get(value.trim()) || 0) + 1);
+      return map;
+    }, new Map())].map(([name, total]) => ({ name, total }))
+      .sort((a, b) => b.total - a.total || a.name.localeCompare(b.name));
+    return {
+      vendors: count(items.map((item) => item.reports?.cisa_kev?.vendor)),
+      products: count(items.map((item) => item.reports?.cisa_kev?.product)),
+    };
+  };
+
+  // Compare material evidence rather than ingestion dates or routine catalog checks.
+  const vulnerabilityEvidence = (item, group) => ({
+    ...briefingEvidence(item),
+    groups: [...new Set(group?.groups || [])].sort(),
+    matched: Boolean(group?.matched),
+    title: item.title || '', description: item.description || '',
+    vendor: item.reports?.cisa_kev?.vendor || '', product: item.reports?.cisa_kev?.product || '',
+  });
+  const vulnerabilityChanges = (previous, current) => {
+    if (!previous) return ['New to this browser'];
+    const changes = briefingChanges(previous, current);
+    if (JSON.stringify(previous.groups) !== JSON.stringify(current.groups)) changes.push('Group associations changed');
+    if (previous.matched !== current.matched) changes.push('SwiftIOC match changed');
+    if (['title', 'description', 'vendor', 'product'].some((key) => previous[key] !== current[key])) changes.push('Provider details changed');
+    return changes;
+  };
+  const normaliseVulnerabilityView = (state) => {
+    if (!state || typeof state !== 'object' || Array.isArray(state)) return null;
+    const choice = (key, values, fallback) => values.includes(state[key]) ? state[key] : fallback;
+    const str = (key, max) => typeof state[key] === 'string' ? state[key].slice(0, max) : '';
+    return { view: choice('view', ['briefing', 'exploited', 'priority', 'group-linked', 'ransomware', 'kev30', 'published7', 'updated7'], 'priority'),
+      search: str('search', 200), exploitation: choice('exploitation', ['all', 'known_exploited', 'reported_exploitation', 'not_established'], 'all'),
+      group: str('group', 200), groupOnly: state.groupOnly === true, includeRejected: state.includeRejected === true,
+      layout: choice('layout', ['cards', 'table'], 'cards'), tier: choice('tier', ['all', 'act', 'investigate', 'monitor', 'context'], 'all'),
+      severity: choice('severity', ['all', 'critical', 'high', 'medium', 'low', 'unknown'], 'all'),
+      change: choice('change', ['all', 'changed', 'unreviewed', 'reviewed'], 'all'), vendor: str('vendor', 100), product: str('product', 160),
+      comparison: Array.isArray(state.comparison) ? [...new Set(state.comparison.filter((name) => typeof name === 'string' && name.length <= 200))].slice(0, 3) : [],
+      comparisonMode: choice('comparisonMode', ['shared', 'union', 'unique'], 'shared'), briefingTriage: choice('briefingTriage', ['all', 'new', 'unreviewed', 'investigating', 'reviewed'], 'all') };
+  };
+
   const filterVulnerabilities = (items, search = '', status = 'all', options = {}) => {
     const query = lower(search).trim();
     const now = options.now ?? Date.now() / 1000;
@@ -1023,6 +1105,10 @@
     emptyBriefing, normaliseBriefing, matchesWatch, watchKey, briefingEvidence, briefingChanges, seedBriefing, buildBriefing,
     filterVulnerabilities,
     vulnerabilityFacts,
+    vulnerabilityPriority,
+    vulnerabilityTimeline,
+    vulnerabilityAggregation,
+    vulnerabilityEvidence, vulnerabilityChanges, normaliseVulnerabilityView,
     compareRows,
     buildCampaignGraph,
     graphNodeMatches,

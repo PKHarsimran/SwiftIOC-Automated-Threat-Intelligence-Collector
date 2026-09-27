@@ -46,7 +46,7 @@
       });
     </script>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/styles.css?v=44" />
+    <link rel="stylesheet" href="assets/styles.css?v=45" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -439,6 +439,45 @@
           </label>
           <button type="button" class="button ghost" data-vulnerability-refresh>Refresh collection</button>
         </div>
+        <div class="vulnerability-workspace-bar" aria-label="Vulnerability workspace controls">
+          <div class="vulnerability-layout-toggle" role="group" aria-label="Results layout">
+            <button type="button" class="button ghost" data-vulnerability-layout="cards" aria-pressed="true">Cards</button>
+            <button type="button" class="button ghost" data-vulnerability-layout="table" aria-pressed="false">Compact table</button>
+          </div>
+          <details class="vulnerability-tools-menu"><summary>Save &amp; export</summary><div class="vulnerability-tools-content">
+          <button type="button" class="button ghost" data-vulnerability-save-view>Save current view</button>
+          <label class="vulnerability-saved-label"><span class="sr-only">Saved vulnerability views</span>
+            <select data-vulnerability-saved-views aria-label="Saved vulnerability views"><option value="">Saved views…</option></select>
+          </label>
+          <button type="button" class="button ghost" data-vulnerability-delete-view disabled>Delete view</button>
+          <label class="vulnerability-export-label">Export
+            <select data-vulnerability-export-format><option value="json">Analyst JSON</option><option value="csv">CSV</option><option value="markdown">Markdown brief</option><option value="splunk">Splunk lookup</option></select>
+          </label>
+          <button type="button" class="button ghost" data-vulnerability-export-pack disabled>Export results</button>
+          <button type="button" class="button ghost" data-vulnerability-views-export>Back up saved views</button>
+          <label>Import saved views<input type="file" accept=".json,application/json" data-vulnerability-views-import /></label>
+          </div></details>
+          <button type="button" class="button ghost" data-vulnerability-select-page>Select page</button>
+          <p class="vulnerability-meta" data-vulnerability-storage-note role="status"></p>
+        </div>
+        <div class="vulnerability-tier-strip" data-vulnerability-tiers role="group" aria-label="Review priority"></div>
+        <div class="vulnerability-filter-chips" data-vulnerability-filter-chips aria-label="Active filters" hidden></div>
+        <details class="collection-notes vulnerability-analyst-tools">
+          <summary>Analyst tools · compare groups, affected products &amp; shortcuts</summary>
+          <div class="vulnerability-compare-controls">
+            <label>Severity<select data-vulnerability-severity><option value="all">All severities</option><option value="critical">Critical</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option><option value="unknown">Not supplied</option></select></label>
+            <label>Local review<select data-vulnerability-change><option value="all">All records</option><option value="changed">Changed since last visit</option><option value="unreviewed">Needs review</option><option value="reviewed">Reviewed evidence</option></select></label>
+          </div>
+          <div class="vulnerability-insights" data-vulnerability-insights></div>
+          <div class="vulnerability-compare-controls">
+            <label>Compare group A<select data-vulnerability-compare-a disabled><option value="">Choose a group</option></select></label>
+            <label>Compare group B<select data-vulnerability-compare-b disabled><option value="">Choose a group</option></select></label>
+            <label>Group C (optional)<select data-vulnerability-compare-c disabled><option value="">Choose a group</option></select></label>
+            <button type="button" class="button ghost" data-vulnerability-compare disabled>Compare groups</button>
+          </div>
+          <div class="vulnerability-compare-result" data-vulnerability-compare-result aria-live="polite"></div>
+          <p class="discovery-scope">Focus a result to use J/K for navigation, Enter for details, and X for selection. Escape closes details. Priority guides review; check your affected versions before acting.</p>
+        </details>
         <div class="briefing-tools" data-briefing-tools hidden>
           <label>Review status<select data-briefing-triage><option value="all">All watched</option><option value="new">New evidence</option><option value="investigating">Investigating</option><option value="reviewed">Reviewed</option><option value="unreviewed">Not reviewed</option></select></label>
           <button type="button" class="button ghost" data-briefing-export disabled>Export personal briefing</button>
@@ -446,12 +485,26 @@
         <label class="vulnerability-rejected-control"><input type="checkbox" data-vulnerability-include-rejected /> Include NVD rejected records</label>
         <p class="vulnerability-freshness" data-vulnerability-freshness role="status" hidden></p>
         <p class="discovery-status" data-vulnerability-status role="status">Loading the vulnerability collection…</p>
+        <div class="vulnerability-bulk-bar" data-vulnerability-bulk hidden>
+          <strong data-vulnerability-selected-count>0 selected</strong>
+          <button type="button" class="button ghost" data-vulnerability-copy-selected>Copy CVE IDs</button>
+          <button type="button" class="button ghost" data-vulnerability-follow-selected>Follow products</button>
+          <button type="button" class="button ghost" data-vulnerability-review-selected>Mark reviewed</button>
+          <button type="button" class="button ghost" data-vulnerability-unreview-selected>Mark unreviewed</button>
+          <button type="button" class="button ghost" data-vulnerability-export-selected>Export selected</button>
+          <button type="button" class="button ghost" data-vulnerability-clear-selected>Clear selection</button>
+        </div>
         <div class="discovery-cards vulnerability-cards" data-vulnerability-cards></div>
         <div class="vulnerability-pagination">
           <button type="button" class="button ghost" data-vulnerability-prev disabled>Previous</button>
           <span data-vulnerability-page>Page 0 of 0</span>
           <button type="button" class="button ghost" data-vulnerability-next disabled>Next</button>
         </div>
+        <dialog class="vulnerability-drawer" data-vulnerability-drawer aria-labelledby="vulnerability-drawer-title">
+          <header><div><p class="eyebrow">CVE evidence</p><h3 id="vulnerability-drawer-title" data-vulnerability-drawer-title>Vulnerability details</h3></div><button type="button" class="button ghost" data-vulnerability-drawer-close aria-label="Close vulnerability details">Close</button></header>
+          <div class="vulnerability-drawer-body" data-vulnerability-drawer-body></div>
+          <footer><button type="button" class="button ghost" data-vulnerability-drawer-prev>Previous CVE</button><span data-vulnerability-drawer-position></span><button type="button" class="button ghost" data-vulnerability-drawer-next>Next CVE</button></footer>
+        </dialog>
         <p class="discovery-scope">KEV records known exploitation; it does not confirm an attack is happening now.</p>
         <details class="collection-notes">
           <summary>Coverage, evidence &amp; integration notes</summary>
@@ -1123,11 +1176,11 @@
     </div>
 
     <div class="toast" data-toast role="status" aria-live="polite" aria-atomic="true" hidden></div>
-    <script defer src="assets/dashboard-core.js?v=44"></script>
+    <script defer src="assets/dashboard-core.js?v=45"></script>
     <script defer src="assets/inventory-core.js?v=38"></script>
     <script defer src="assets/inventory.js?v=38"></script>
-    <script defer src="assets/group-intel-core.js?v=44"></script>
-    <script defer src="assets/group-intel.js?v=44"></script>
-    <script defer src="assets/dashboard.js?v=44"></script>
+    <script defer src="assets/group-intel-core.js?v=45"></script>
+    <script defer src="assets/group-intel.js?v=45"></script>
+    <script defer src="assets/dashboard.js?v=45"></script>
   </body>
 </html>

@@ -6,6 +6,48 @@ const fs = require('node:fs');
 const path = require('node:path');
 const core = require('./dashboard-core.js');
 
+test('CVE evidence tracks material changes without ingestion-date noise', () => {
+  const item = { cve_id: 'CVE-2026-1000', title: 'Gateway issue', exploitation_status: 'known_exploited',
+    reports: { cisa_kev: { vendor: 'Vendor', product: 'Gateway', required_action: 'Patch', catalog_checked_at: '2026-09-20' }, nvd: { severity: 'high' } } };
+  const before = core.vulnerabilityEvidence(item, { groups: ['beta', 'alpha', 'alpha'], matched: true });
+  const after = core.vulnerabilityEvidence({ ...item, reports: { ...item.reports,
+    cisa_kev: { ...item.reports.cisa_kev, catalog_checked_at: '2026-09-27' } } }, { groups: ['alpha', 'beta'], matched: true });
+  assert.deepEqual(core.vulnerabilityChanges(before, after), []);
+  assert.deepEqual(core.vulnerabilityChanges(null, after), ['New to this browser']);
+  assert.deepEqual(core.vulnerabilityChanges(before, { ...after, groups: ['alpha', 'gamma'], action: 'Mitigate', matched: false }),
+    ['Remediation changed', 'Group associations changed', 'SwiftIOC match changed']);
+  assert.deepEqual(core.vulnerabilityChanges(before, { ...after, description: 'New provider detail' }), ['Provider details changed']);
+});
+
+test('saved CVE views bound imported values and preserve complete comparison scope', () => {
+  assert.equal(core.normaliseVulnerabilityView(null), null);
+  assert.equal(core.normaliseVulnerabilityView([]), null);
+  const view = core.normaliseVulnerabilityView({ view: 'group-linked', layout: 'table', search: 'x'.repeat(250),
+    groupOnly: 'true', includeRejected: true, severity: 'critical', tier: 'act', change: 'reviewed',
+    comparison: ['alpha', 'beta', 'alpha', null, 'gamma', 'delta'], comparisonMode: 'union', unknown: 'drop' });
+  assert.equal(view.search.length, 200);
+  assert.equal(view.groupOnly, false);
+  assert.equal(view.includeRejected, true);
+  assert.equal(view.layout, 'table');
+  assert.equal(view.view, 'group-linked');
+  assert.equal(view.severity, 'critical');
+  assert.equal(view.change, 'reviewed');
+  assert.deepEqual(view.comparison, ['alpha', 'beta', 'gamma']);
+  assert.equal(view.comparisonMode, 'union');
+  assert.equal(view.unknown, undefined);
+  assert.equal(core.normaliseVulnerabilityView({ tier: 'bogus' }).tier, 'all');
+});
+
+test('CVE timeline excludes invalid and future group observations', () => {
+  const now = Date.parse('2026-09-27T12:00:00Z') / 1000;
+  const events = core.vulnerabilityTimeline({ reports: {} }, { recentChange: { at: '2027-01-01', group: 'alpha' } }, [
+    { group: 'alpha', receipt: { first_observed: '2026-09-01', last_observed: '2027-01-01' } },
+    { group: 'beta', receipt: { first_observed: 'invalid', last_observed: '1960-01-01' } },
+  ], now);
+  assert.equal(events.length, 1);
+  assert.equal(events[0].label, 'First observed for alpha');
+});
+
 const defaults = {
   type: 'all',
   source: 'all',
@@ -604,10 +646,42 @@ test('group-linked CVE view and facet use exact published associations without c
   assert.deepEqual(core.filterVulnerabilities([kev], '', 'all', { view: 'ransomware', groupEvidence: evidence, now: triageNow }), []);
 });
 
+test('vulnerability priority explains evidence without treating severity or groups as exploitation proof', () => {
+  const urgent = triageItem('CVE-2026-7001', 'known_exploited', '2026-09-01', '2026-08-01');
+  urgent.reports.cisa_kev.ransomware_use = 'Known';
+  urgent.reports.nvd.severity = 'critical';
+  const monitored = triageItem('CVE-2026-7002', 'not_established', null, '2026-08-01');
+  monitored.reports.nvd.severity = 'high';
+  const rejected = triageItem('CVE-2026-7003', 'known_exploited', '2026-09-01', '2026-08-01', '2026-08-01', 'Rejected');
+  assert.equal(core.vulnerabilityPriority(urgent, { groups: ['akira', 'clop'] }, triageNow).key, 'act');
+  assert.match(core.vulnerabilityPriority(urgent, { groups: ['akira', 'clop'] }, triageNow).why, /CISA KEV known exploitation/);
+  assert.equal(core.vulnerabilityPriority(monitored, { groups: ['akira'] }, triageNow).key, 'monitor');
+  assert.equal(core.vulnerabilityPriority(rejected, { groups: ['akira'] }, triageNow).key, 'context');
+});
+
+test('vulnerability timeline orders provider and reported group observations', () => {
+  const item = triageItem('CVE-2026-7100', 'known_exploited', '2026-09-02', '2026-08-01', '2026-09-04');
+  const events = core.vulnerabilityTimeline(item, { recentChange: { action: 'added', group: 'akira', at: '2026-09-05T00:00:00Z' } }, [
+    { group: 'akira', receipt: { first_observed: '2026-09-03T00:00:00Z', last_observed: '2026-09-06T00:00:00Z' } },
+  ], triageNow);
+  assert.deepEqual(events.map((event) => event.label), [
+    'Published by NVD', 'Added to CISA KEV', 'First observed for akira', 'NVD record updated', 'added: akira', 'Last confirmed for akira',
+  ]);
+});
+
+test('vulnerability aggregation ranks structured vendors and products deterministically', () => {
+  const item = (id, vendor, product) => ({ cve_id: id, reports: { cisa_kev: { vendor, product } } });
+  const result = core.vulnerabilityAggregation([
+    item('CVE-2026-7200', 'Vendor B', 'Product 1'), item('CVE-2026-7201', 'Vendor A', 'Product 1'), item('CVE-2026-7202', 'Vendor B', 'Product 2'),
+  ]);
+  assert.deepEqual(result.vendors, [{ name: 'Vendor B', total: 2 }, { name: 'Vendor A', total: 1 }]);
+  assert.deepEqual(result.products, [{ name: 'Product 1', total: 2 }, { name: 'Product 2', total: 1 }]);
+});
+
 test('vulnerability release uses coordinated new asset cache keys', () => {
   const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
   for (const asset of ['styles.css', 'dashboard-core.js', 'dashboard.js', 'group-intel.js', 'group-intel-core.js']) {
-    assert.ok(html.includes(`assets/${asset}?v=44`));
+    assert.ok(html.includes(`assets/${asset}?v=45`));
   }
 });
 
