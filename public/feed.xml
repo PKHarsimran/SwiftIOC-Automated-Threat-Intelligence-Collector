@@ -3,305 +3,305 @@
   <title>SwiftIOC — Newest High-Confidence IOCs</title>
   <link>https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector</link>
   <description>Freshest scored, cross-source-corroborated indicators of compromise.</description>
-  <lastBuildDate>Sun, 27 Sep 2026 22:46:10 +0000</lastBuildDate>
+  <lastBuildDate>Mon, 28 Sep 2026 03:15:05 +0000</lastBuildDate>
     <item>
-      <title>[80] ipv4_cidr: 45.150.34.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">83a84192-5182-5222-a65c-770fe58755c2</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxp://42[.]180[.]20[.]217:33109/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
+      <guid isPermaLink="false">d0546077-6b03-57c4-9225-c941fa4ce867</guid>
+      <pubDate>Mon, 28 Sep 2026 03:02:14 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.152.149.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">00d57573-fd6d-5727-b16f-84798b5c442c</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxp://210[.]208[.]111[.]100:50311/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,mirai</description>
+      <guid isPermaLink="false">39ef2002-1e48-5adb-9835-17bb696df3c6</guid>
+      <pubDate>Mon, 28 Sep 2026 03:02:13 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.153.34.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">99b430ec-5647-5428-bfc4-e3863ef2650e</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] domain: legalinsider[.]top</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: EtherHide,compromised,threatfox</description>
+      <guid isPermaLink="false">18a325b6-cc41-51f3-ad7d-ec214d68f02a</guid>
+      <pubDate>Mon, 28 Sep 2026 03:01:50 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.154.244.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">ae8df0e1-1500-5bd0-95b7-64c343261975</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] domain: dev[.]vivovojo[.]com</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: EtherHide,compromised,threatfox</description>
+      <guid isPermaLink="false">9a89a666-c25a-5978-82a4-1b4ba1630bb4</guid>
+      <pubDate>Mon, 28 Sep 2026 03:01:49 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.154.98.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">662e5b0a-b883-5023-853a-71ea666828ee</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxp://105[.]186[.]118[.]148:41891/bin[.]sh</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,arm,elf,mirai,Mozi</description>
+      <guid isPermaLink="false">46882708-3283-56d8-8dbb-ef935eab22ef</guid>
+      <pubDate>Mon, 28 Sep 2026 02:58:30 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.156.87.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">343fa3dd-776d-5881-990a-43c3ecfb4755</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxp://122[.]241[.]139[.]131:57387/bin[.]sh</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,mirai</description>
+      <guid isPermaLink="false">ee9b4a97-6d26-54f0-9dc7-331778f6ce2c</guid>
+      <pubDate>Mon, 28 Sep 2026 02:47:15 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.170.247.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">00a96b2b-f6a1-52e2-9816-904a1f3302fb</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxp://222[.]168[.]180[.]83:47073/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,mirai</description>
+      <guid isPermaLink="false">f72e5811-ba6f-591e-a08a-521975e44fb7</guid>
+      <pubDate>Mon, 28 Sep 2026 02:47:13 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.192.178.0/23</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">5d5f6326-1fa6-5e5f-8a80-26209293c24a</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxp://42[.]7[.]239[.]84:54862/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
+      <guid isPermaLink="false">4fc65dc2-f904-51fe-a8da-4aec7ef3e507</guid>
+      <pubDate>Mon, 28 Sep 2026 02:47:13 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.192.211.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">6024a7e6-374e-5baa-bb39-30524b9cd07b</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxp://27[.]202[.]215[.]44:59040/bin[.]sh</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,Mozi</description>
+      <guid isPermaLink="false">50c8719e-e59d-59c3-9d3a-6ce1346c50f6</guid>
+      <pubDate>Mon, 28 Sep 2026 02:33:20 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.197.176.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">6d7f1cdd-9536-5e1b-ad9e-682ad3eef80c</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxp://119[.]183[.]11[.]207:56570/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,Mozi</description>
+      <guid isPermaLink="false">66350acb-b250-57f3-b21a-f985010911be</guid>
+      <pubDate>Mon, 28 Sep 2026 02:32:18 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.197.177.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">7a779480-9dcf-5d22-908b-5a6fd6f1bc0c</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxp://119[.]183[.]11[.]207:56570/bin[.]sh</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,Mozi</description>
+      <guid isPermaLink="false">1aa223fa-ebb2-5326-9809-a6a005951995</guid>
+      <pubDate>Mon, 28 Sep 2026 02:32:16 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.197.178.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">e6453338-677f-5246-a395-a98ae40daa03</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxp://182[.]126[.]177[.]63:38196/bin[.]sh</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,Mozi</description>
+      <guid isPermaLink="false">f2f48f59-9b24-5e9b-ba7e-f52da29a7e0d</guid>
+      <pubDate>Mon, 28 Sep 2026 02:32:15 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.197.179.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">8908107d-426c-5528-889c-f021c240f86b</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxp://200[.]115[.]102[.]246:39943/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,mirai</description>
+      <guid isPermaLink="false">eba921a2-b77a-5f00-81e0-cd49bcc40610</guid>
+      <pubDate>Mon, 28 Sep 2026 02:32:15 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.221.116.0/22</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">bf9f0fe0-d8d7-5c5f-a2e3-a3e75d105d7b</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxp://210[.]208[.]111[.]100:50311/bin[.]sh</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,mirai</description>
+      <guid isPermaLink="false">5a1647e6-cc79-5c8c-8627-8b1a7bfa4aa4</guid>
+      <pubDate>Mon, 28 Sep 2026 02:32:15 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.230.66.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">312dcd17-ccf1-51eb-a14f-7184ace1a0ac</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxp://210[.]208[.]111[.]36:39653/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,mirai</description>
+      <guid isPermaLink="false">b7febcde-9fcc-5fca-880a-9c56a2b79676</guid>
+      <pubDate>Mon, 28 Sep 2026 02:32:15 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.248.88.0/22</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">4c4cc2ff-3482-5549-aca2-c6ce73f75b47</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxp://222[.]142[.]208[.]83:52193/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
+      <guid isPermaLink="false">192f92f8-4083-583c-94a6-288a7c89c082</guid>
+      <pubDate>Mon, 28 Sep 2026 02:32:15 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.3.62.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">762e10d9-dfe1-5234-bdf6-4a00f2b48c5d</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] domain: ft4y9eg8[.]mars303[.]com</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClearFake,mac-0x68dc,macos,threatfox</description>
+      <guid isPermaLink="false">563179da-02ba-5e9b-af0a-3ed3dc05e186</guid>
+      <pubDate>Mon, 28 Sep 2026 02:19:24 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.41.128.0/22</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">7c67af67-897e-56e6-b397-5ddd9e33955f</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] cve: CVE-2026-100893</title>
+      <description>Score 80, confidence high, sources: nist_nvd_recent, tags: cve,high,nvd</description>
+      <guid isPermaLink="false">5e4ef000-e365-5c46-81db-236fa78e5a6b</guid>
+      <pubDate>Mon, 28 Sep 2026 02:17:19 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.42.80.0/20</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">a5b8a070-87c6-5656-99dc-d776207da6bf</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] cve: CVE-2026-100894</title>
+      <description>Score 80, confidence high, sources: nist_nvd_recent, tags: cve,medium,nvd</description>
+      <guid isPermaLink="false">fc1dfe29-86d3-5ab0-afa5-5fa3cb397d51</guid>
+      <pubDate>Mon, 28 Sep 2026 02:17:19 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.56.192.0/23</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">3aabb25b-1f72-56f9-869f-157d402c4b0e</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] cve: CVE-2026-100895</title>
+      <description>Score 80, confidence high, sources: nist_nvd_recent, tags: cve,medium,nvd</description>
+      <guid isPermaLink="false">10ded63d-540a-5210-b867-e6bddc730b6e</guid>
+      <pubDate>Mon, 28 Sep 2026 02:17:19 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.56.194.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">bb5cd270-f54d-56c5-964c-9173be012789</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] cve: CVE-2026-100896</title>
+      <description>Score 80, confidence high, sources: nist_nvd_recent, tags: critical,cve,nvd</description>
+      <guid isPermaLink="false">3b9ac52f-dbbd-59e5-95fc-f7438350b3db</guid>
+      <pubDate>Mon, 28 Sep 2026 02:17:19 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.56.200.0/22</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">f5f3f60f-dfc2-576f-b3f6-190e4b257e33</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] cve: CVE-2026-100897</title>
+      <description>Score 80, confidence high, sources: nist_nvd_recent, tags: cve,medium,nvd</description>
+      <guid isPermaLink="false">4165bf9b-2984-5844-9dc5-b9606a8a0a99</guid>
+      <pubDate>Mon, 28 Sep 2026 02:17:19 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.64.52.0/22</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">16de0422-a760-56b4-90b1-e4b86e145fca</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] cve: CVE-2026-100898</title>
+      <description>Score 80, confidence high, sources: nist_nvd_recent, tags: cve,medium,nvd</description>
+      <guid isPermaLink="false">f970e2d8-df2e-5e74-a0be-c5a6b7ee1815</guid>
+      <pubDate>Mon, 28 Sep 2026 02:17:19 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.64.74.0/23</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">a59cf6a0-0982-5e3c-8cec-e48803bcadf6</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxp://180[.]245[.]43[.]138:37368/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,mirai</description>
+      <guid isPermaLink="false">af2f60f7-88be-5908-8b7f-3fc2571371ad</guid>
+      <pubDate>Mon, 28 Sep 2026 02:16:19 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.65.32.0/22</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">9674ad16-0b3b-55d8-87fb-b415f834699a</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxp://42[.]7[.]239[.]84:54862/bin[.]sh</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
+      <guid isPermaLink="false">ca09ee7b-dadb-59c2-9e2b-bd57376e5a59</guid>
+      <pubDate>Mon, 28 Sep 2026 02:16:19 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.66.117.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">60efa9f1-3d52-5f07-8e27-2ac08fe32fd5</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxp://123[.]5[.]206[.]160:58491/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,Mozi</description>
+      <guid isPermaLink="false">3dc0f55a-4c8a-557b-8667-26c5bad7f42c</guid>
+      <pubDate>Mon, 28 Sep 2026 02:16:18 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.66.118.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">7b9fabeb-3a67-5a6c-9793-fb6bfdf2babb</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxp://222[.]142[.]208[.]83:52193/bin[.]sh</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
+      <guid isPermaLink="false">587be719-2b51-5d9b-9cbe-3f74186a7dc0</guid>
+      <pubDate>Mon, 28 Sep 2026 02:16:18 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.74.10.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">66586f4e-3c78-56a2-bb80-0c7798ec6f50</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxp://115[.]56[.]153[.]58:37038/bin[.]sh</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,mirai</description>
+      <guid isPermaLink="false">13a84320-d305-5e4b-96e2-0ca11db3d2a3</guid>
+      <pubDate>Mon, 28 Sep 2026 02:16:17 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.74.16.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">7ab4e32d-8b7a-573e-8a50-b2d4937ef80f</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxp://210[.]208[.]104[.]156:59622/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,mirai</description>
+      <guid isPermaLink="false">3fb73c37-c98a-505d-8081-a4a380840c18</guid>
+      <pubDate>Mon, 28 Sep 2026 02:16:17 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.74.21.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">d22dd054-c11a-59f1-86a8-436fe3b2c011</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxp://210[.]208[.]110[.]172:50601/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,mirai</description>
+      <guid isPermaLink="false">e860397c-e791-512d-81c5-c7048a6f74b9</guid>
+      <pubDate>Mon, 28 Sep 2026 02:16:17 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.74.3.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">2a888880-fd0d-57ac-8657-457b8e05316a</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] domain: mars303[.]com</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClearFake,threatfox</description>
+      <guid isPermaLink="false">7681cadc-1063-5b36-a086-d1a141e69509</guid>
+      <pubDate>Mon, 28 Sep 2026 02:14:52 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.74.40.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">85a3ec4f-57ea-56e8-ba6f-677f31cccfa1</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxp://222[.]138[.]151[.]196:48342/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,elf,mips,Mozi</description>
+      <guid isPermaLink="false">1430a7fc-67f7-5555-992c-2035802f43e3</guid>
+      <pubDate>Mon, 28 Sep 2026 02:11:26 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.74.47.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">3a8cf27f-1323-5045-b1fc-818bc28e64c9</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxp://196[.]189[.]197[.]131:42095/bin[.]sh</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,mirai</description>
+      <guid isPermaLink="false">9137b138-1704-5080-ba36-216494cf0308</guid>
+      <pubDate>Mon, 28 Sep 2026 02:02:11 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.74.57.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">9fa3cd95-a926-5191-88af-e862bd227246</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxp://219[.]157[.]32[.]59:47986/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,Mozi</description>
+      <guid isPermaLink="false">2ae3f273-10b5-5fe9-a42a-6fcbd044d95a</guid>
+      <pubDate>Mon, 28 Sep 2026 02:02:11 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.74.59.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">36124e45-fe85-5fe2-abd3-8132019aa353</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxps://foundersunfound[.]com/</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClickFix,threatfox</description>
+      <guid isPermaLink="false">3bb64416-544f-5d39-8d87-443625b7e705</guid>
+      <pubDate>Mon, 28 Sep 2026 02:00:45 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.74.61.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">2be96377-8570-5250-b3be-ae4e878d7f50</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxps://techeducate[.]com/</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClickFix,threatfox</description>
+      <guid isPermaLink="false">fd1717cb-f644-51c7-9b39-9a7650a5a2c6</guid>
+      <pubDate>Mon, 28 Sep 2026 02:00:45 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.74.7.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">a24f805f-9c6b-564b-9214-cc85546ee1dd</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] domain: 83ur68yr[.]designphotoshop[.]ir</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClearFake,mac-0xdcf2,macos,threatfox</description>
+      <guid isPermaLink="false">c18539b8-96f1-531b-857e-7172032bd0eb</guid>
+      <pubDate>Mon, 28 Sep 2026 01:50:42 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.80.158.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">968375ad-0e1b-5d42-923c-c70cb5585d6c</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxp://185[.]137[.]62[.]72:64732/bin[.]sh</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
+      <guid isPermaLink="false">be688bd7-78db-510f-ab22-2f7e8778f87b</guid>
+      <pubDate>Mon, 28 Sep 2026 01:47:11 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.80.248.0/23</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">bb9d155b-2079-5fae-9dd0-a957980f8a37</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxp://175[.]165[.]80[.]213:39974/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
+      <guid isPermaLink="false">692cb5ec-cfa4-5c33-a3ea-d39e5996d60b</guid>
+      <pubDate>Mon, 28 Sep 2026 01:46:14 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.80.37.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">e6ae255d-0650-505c-b39a-7256bb5c132e</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] domain: bw1cpcve[.]webtechnica[.]net</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClearFake,mac-0x76c7,macos,threatfox</description>
+      <guid isPermaLink="false">82ee9330-2080-5c0c-87c4-a0286ae6cac6</guid>
+      <pubDate>Mon, 28 Sep 2026 01:44:23 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.83.28.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">abf2f59a-92f3-5c3c-ba68-663ec46a1f4a</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] domain: webtechnica[.]net</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClearFake,threatfox</description>
+      <guid isPermaLink="false">f33f5974-a293-5b57-b9eb-7f26447ba675</guid>
+      <pubDate>Mon, 28 Sep 2026 01:42:05 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.83.31.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">6ccc4693-c01b-5db0-97d6-ea7b1d380196</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxp://115[.]49[.]203[.]127:47705/bin[.]sh</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
+      <guid isPermaLink="false">9a444692-48b3-5932-8edd-3fd22f46c1bc</guid>
+      <pubDate>Mon, 28 Sep 2026 01:32:11 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.87.249.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">8f92e23a-da21-56e4-9e0e-22cf719eaf2b</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxp://202[.]166[.]165[.]60:34244/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,Mozi</description>
+      <guid isPermaLink="false">49a5647a-bbd0-508c-994e-55b8e5058c16</guid>
+      <pubDate>Mon, 28 Sep 2026 01:32:11 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.88.186.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">045f6ac1-c05e-591e-a4d0-77f1fe8a74f1</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxp://112[.]198[.]193[.]5:34375/bin[.]sh</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,arm,elf,mirai,Mozi</description>
+      <guid isPermaLink="false">d19c52ff-7b88-5004-b511-0b5f7a0bc40d</guid>
+      <pubDate>Mon, 28 Sep 2026 01:30:26 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.9.168.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">dbdd775b-160c-5eeb-9f03-8671f0e58f64</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] sha256: 81a9d12af89234da1c9b51996a9c8607a1fd1a4f0d83a394ab49d70452f6fcfa</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,Mirai</description>
+      <guid isPermaLink="false">cb2ad112-ab77-561c-be35-64a77a6d22a4</guid>
+      <pubDate>Mon, 28 Sep 2026 01:28:22 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.91.227.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">53fbae57-a447-5444-8162-2484ca99d455</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] sha256: 8d6900eebd2285296af800a615c4c50dad42cdf4742bdaceafc15d2ffcaefe20</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
+      <guid isPermaLink="false">ce0cc59d-b41a-5445-8a42-abb162075eb4</guid>
+      <pubDate>Mon, 28 Sep 2026 01:26:11 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.92.1.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">ad1d09c4-a03b-57b6-b9ae-53815bf2ed02</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] sha256: cd543fd18b85e702564d6300e58e50f5b6264d444b4ed4b31f4d2d75b8f8c117</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,ConnectWise</description>
+      <guid isPermaLink="false">6a41a7e7-1eef-5744-8410-cf3912014f68</guid>
+      <pubDate>Mon, 28 Sep 2026 01:25:31 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.93.20.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">6293ee23-0b33-506f-8e96-100b01c5a51e</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] url: hxxp://170[.]238[.]123[.]2:47255/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,arm,elf,mirai,Mozi</description>
+      <guid isPermaLink="false">e24b623d-1d63-5e5b-8bd4-05d9d59c1381</guid>
+      <pubDate>Mon, 28 Sep 2026 01:22:12 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.94.31.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">1ed487aa-8b01-5e40-b763-3391e7ca9a28</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] domain: 7jmdnzhw[.]mostbett[.]co</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClearFake,mac-0x0f14,macos,threatfox</description>
+      <guid isPermaLink="false">f24d08ac-f283-5132-ac49-b27af5af3efa</guid>
+      <pubDate>Mon, 28 Sep 2026 01:18:25 +0000</pubDate>
     </item>
     <item>
-      <title>[80] ipv4_cidr: 45.95.82.0/24</title>
-      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
-      <guid isPermaLink="false">94ddf2ed-75aa-5d83-a252-3e928363f37e</guid>
-      <pubDate>Sun, 27 Sep 2026 22:45:49 +0000</pubDate>
+      <title>[80] sha256: 64fb8fc6ecaebce3cc8ccdcc896c57d5355406ebb5a8b124cfd2dd57e07492b9</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,Mirai</description>
+      <guid isPermaLink="false">40d44e26-6315-5660-802c-d17eed530894</guid>
+      <pubDate>Mon, 28 Sep 2026 01:17:54 +0000</pubDate>
     </item>
 </channel></rss>

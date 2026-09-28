@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-09-27T22:46:07Z_
+_Generated 2026-09-28T03:15:03Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-27T22:46:07Z |
+| Generated | 2026-09-28T03:15:03Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 8617 |
+| Duplicates removed | 6593 |
 | Sources reporting | 17 |
-| Indicator types | 9 |
-| Multi-source overlaps | 1278 |
+| Indicator types | 8 |
+| Multi-source overlaps | 1285 |
 | Score (min / avg / max) | 80 / 80.7 / 96 |
 | High-score indicators (≥80) | 10000 |
-| Corroborated (2+ sources) | 1278 |
+| Corroborated (2+ sources) | 1285 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-09-27T22:45:49Z |
+| Newest first_seen | 2026-09-28T03:02:14Z |
 
 ## Top indicators by score
 
@@ -39,44 +39,43 @@ _Generated 2026-09-27T22:46:07Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 11744 |
-| binarydefense_banlist | 6344 |
-| threatfox_export_json | 5216 |
-| ipsum_level5 | 5109 |
-| greensnow_blocklist | 4492 |
+| blocklist_de_ssh | 11755 |
+| greensnow_blocklist | 5389 |
+| threatfox_export_json | 5185 |
+| ipsum_level5 | 4467 |
 | cisa_kev | 1728 |
 | spamhaus_drop | 1711 |
-| tor_exit_nodes | 1355 |
-| nist_nvd_recent | 1270 |
+| tor_exit_nodes | 1356 |
+| malwarebazaar_recent | 1212 |
+| et_compromised | 669 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3176 |
-| sha256 | 2316 |
+| cve | 3108 |
+| sha256 | 2402 |
 | ipv4_cidr | 1710 |
-| domain | 1481 |
-| url | 893 |
-| sha1 | 223 |
+| domain | 1480 |
+| url | 879 |
+| sha1 | 234 |
 | ipv4 | 161 |
-| ja3 | 25 |
-| md5 | 15 |
+| md5 | 26 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| cve | 3176 |
-| threatfox | 3057 |
-| malware | 2989 |
-| nvd | 1734 |
+| cve | 3108 |
+| threatfox | 3073 |
+| malware | 3073 |
 | exploited-in-the-wild | 1728 |
 | drop | 1710 |
 | spamhaus | 1710 |
-| Mirai | 1007 |
+| nvd | 1666 |
+| Mirai | 1079 |
 | etherhiding | 956 |
-| high | 653 |
+| high | 644 |
 
 ## Multi-source overlaps
 
