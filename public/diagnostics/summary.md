@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-09-28T10:26:39Z_
+_Generated 2026-09-28T19:08:42Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-28T10:26:39Z |
+| Generated | 2026-09-28T19:08:42Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 5492 |
+| Duplicates removed | 5962 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-source overlaps | 1316 |
+| Multi-source overlaps | 1328 |
 | Score (min / avg / max) | 80 / 80.7 / 96 |
 | High-score indicators (≥80) | 10000 |
-| Corroborated (2+ sources) | 1316 |
+| Corroborated (2+ sources) | 1328 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-09-28T10:19:35Z |
+| Newest first_seen | 2026-09-28T19:08:16Z |
 
 ## Top indicators by score
 
@@ -39,43 +39,43 @@ _Generated 2026-09-28T10:26:39Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 11821 |
-| threatfox_export_json | 6144 |
+| blocklist_de_ssh | 11800 |
+| threatfox_export_json | 6146 |
+| greensnow_blocklist | 4869 |
 | ipsum_level5 | 4467 |
-| greensnow_blocklist | 3637 |
 | cisa_kev | 1728 |
-| spamhaus_drop | 1711 |
-| tor_exit_nodes | 1355 |
-| malwarebazaar_recent | 1280 |
-| urlhaus_recent_urls | 722 |
+| spamhaus_drop | 1693 |
+| tor_exit_nodes | 1366 |
+| malwarebazaar_recent | 1295 |
+| nist_nvd_recent | 1160 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 2869 |
-| sha256 | 2665 |
-| ipv4_cidr | 1710 |
-| domain | 1389 |
-| url | 967 |
+| sha256 | 2981 |
+| cve | 2524 |
+| ipv4_cidr | 1692 |
+| domain | 1334 |
+| url | 1045 |
 | sha1 | 234 |
-| ipv4 | 140 |
+| ipv4 | 164 |
 | md5 | 26 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 3363 |
-| threatfox | 3053 |
-| cve | 2869 |
+| malware | 3701 |
+| threatfox | 3094 |
+| cve | 2524 |
 | exploited-in-the-wild | 1728 |
-| drop | 1710 |
-| spamhaus | 1710 |
-| nvd | 1427 |
-| Mirai | 1220 |
+| drop | 1692 |
+| spamhaus | 1692 |
+| Mirai | 1402 |
+| nvd | 1082 |
 | etherhiding | 956 |
-| malware_download | 723 |
+| malware_download | 793 |
 
 ## Multi-source overlaps
 
