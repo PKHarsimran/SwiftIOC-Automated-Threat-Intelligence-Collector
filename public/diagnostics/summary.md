@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-09-30T10:14:44Z_
+_Generated 2026-09-30T17:29:34Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-09-30T10:14:44Z |
+| Generated | 2026-09-30T17:29:34Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 5439 |
+| Duplicates removed | 5835 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-source overlaps | 1339 |
+| Multi-source overlaps | 1336 |
 | Score (min / avg / max) | 80 / 80.7 / 96 |
 | High-score indicators (≥80) | 10000 |
-| Corroborated (2+ sources) | 1339 |
+| Corroborated (2+ sources) | 1336 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-09-30T10:05:15Z |
+| Newest first_seen | 2026-09-30T17:28:58Z |
 
 ## Top indicators by score
 
@@ -39,43 +39,43 @@ _Generated 2026-09-30T10:14:44Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5388 |
+| blocklist_de_ssh | 5379 |
+| greensnow_blocklist | 4943 |
 | ipsum_level5 | 4277 |
-| greensnow_blocklist | 3689 |
-| nist_nvd_recent | 2588 |
-| threatfox_export_json | 1914 |
-| cisa_kev | 1729 |
-| spamhaus_drop | 1694 |
-| tor_exit_nodes | 1408 |
-| malwarebazaar_recent | 1318 |
+| nist_nvd_recent | 2800 |
+| threatfox_export_json | 1939 |
+| cisa_kev | 1730 |
+| spamhaus_drop | 1693 |
+| tor_exit_nodes | 1404 |
+| malwarebazaar_recent | 1267 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3328 |
-| cve | 2878 |
-| ipv4_cidr | 1577 |
-| url | 847 |
-| domain | 720 |
-| ipv4 | 401 |
-| sha1 | 199 |
+| sha256 | 3081 |
+| cve | 3057 |
+| ipv4_cidr | 1692 |
+| url | 882 |
+| domain | 690 |
+| ipv4 | 366 |
+| sha1 | 182 |
 | md5 | 50 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 3693 |
-| cve | 2878 |
-| threatfox | 2874 |
-| exploited-in-the-wild | 1729 |
-| drop | 1577 |
-| spamhaus | 1577 |
-| Mirai | 1446 |
-| nvd | 1437 |
-| malware_download | 634 |
-| high | 439 |
+| malware | 3471 |
+| cve | 3057 |
+| threatfox | 2795 |
+| exploited-in-the-wild | 1730 |
+| drop | 1692 |
+| spamhaus | 1692 |
+| nvd | 1619 |
+| Mirai | 1233 |
+| malware_download | 651 |
+| high | 534 |
 
 ## Multi-source overlaps
 
