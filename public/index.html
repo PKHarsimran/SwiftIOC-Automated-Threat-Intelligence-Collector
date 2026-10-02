@@ -46,7 +46,8 @@
       });
     </script>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/styles.css?v=45" />
+    <link rel="stylesheet" href="assets/styles.css?v=46" />
+    <link rel="stylesheet" href="assets/today.css?v=46" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -95,6 +96,7 @@
           <span class="brand-tagline">Threat Intelligence</span>
         </a>
         <div class="nav-links">
+          <a href="#today">Today</a>
           <a href="#ioc-lookup">Lookup</a>
           <a href="#vulnerabilities">CVEs</a>
           <a href="groups.html">Groups</a>
@@ -129,6 +131,25 @@
           </a>
         </div>
       </header>
+
+      <section id="today" class="today-desk" data-today aria-labelledby="today-heading">
+        <header class="today-heading"><div><p class="eyebrow">Your next useful action</p><h2 id="today-heading">Today, in your environment</h2></div><a href="#product-briefing">Manage product watches →</a></header>
+        <p data-today-status role="status">Loading your local briefing…</p>
+        <p data-today-freshness class="today-warning" role="status"></p>
+        <p data-today-setup>Personalize this view with <a href="#product-briefing">product watches</a>, <a href="ransomware-workbench.html#tab=watchlist">group/CVE watches</a>, or <a href="#exposure-report">an inventory import</a>. Country and sector watches remain aggregate context in the workbench, not inferred CVE matches.</p>
+        <div data-today-cards class="today-cards"></div>
+        <details data-today-planner class="today-planner">
+          <summary>What if we patch this? <span>Preview findings and reported group associations</span></summary>
+          <p>A planning aid, not a scanner. Assumes successful remediation of selected CVEs on matching assets; verify applicability and patch success separately.</p>
+          <div class="today-plan-controls"><label>Product or CVE<select data-today-plan-target><option value="">Waiting for data</option></select></label><button type="button" class="button" data-today-plan-add>Add to scenario</button><button type="button" class="button ghost" data-today-plan-clear disabled>Clear scenario</button></div>
+          <div data-today-plan-selected class="today-selected"></div>
+          <div data-today-plan-result role="status"></div>
+          <button type="button" class="button ghost" data-today-plan-export disabled>Export scenario JSON (includes asset IDs)</button>
+        </details>
+        <details class="today-health"><summary>Data coverage &amp; evidence gaps</summary><div data-today-health></div></details>
+        <p data-today-storage class="today-warning" role="status"></p>
+        <noscript>Enable JavaScript for the local briefing and planner. Published feeds remain available below.</noscript>
+      </section>
 
       <details class="analyst-guide">
         <summary>Get started or resume an investigation</summary>
@@ -1176,11 +1197,13 @@
     </div>
 
     <div class="toast" data-toast role="status" aria-live="polite" aria-atomic="true" hidden></div>
-    <script defer src="assets/dashboard-core.js?v=45"></script>
+    <script defer src="assets/dashboard-core.js?v=46"></script>
+    <script defer src="assets/group-intel-core.js?v=46"></script>
+    <script defer src="assets/group-intel.js?v=46"></script>
+    <script defer src="assets/today-core.js?v=46"></script>
+    <script defer src="assets/today.js?v=46"></script>
     <script defer src="assets/inventory-core.js?v=38"></script>
-    <script defer src="assets/inventory.js?v=38"></script>
-    <script defer src="assets/group-intel-core.js?v=45"></script>
-    <script defer src="assets/group-intel.js?v=45"></script>
-    <script defer src="assets/dashboard.js?v=45"></script>
+    <script defer src="assets/inventory.js?v=46"></script>
+    <script defer src="assets/dashboard.js?v=46"></script>
   </body>
 </html>

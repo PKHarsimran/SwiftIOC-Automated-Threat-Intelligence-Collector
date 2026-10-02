@@ -36,6 +36,7 @@
   };
   const rebuild = () => {
     report = assets.length && snapshot ? core.buildReport(assets, snapshot.items, snapshot.generated_at) : null;
+    window.dispatchEvent(new CustomEvent('swiftioc:inventory-report', { detail: report }));
     limit = 20; render();
   };
   window.addEventListener('swiftioc:vulnerability-snapshot', (event) => {

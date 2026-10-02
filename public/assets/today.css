@@ -1,0 +1,36 @@
+.today-desk { margin: 1.5rem 0 2rem; padding: 1.5rem; border: 1px solid var(--border-soft); border-radius: .7rem; background: var(--card-bg-soft); scroll-margin-top: 5rem; }
+.today-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.today-heading h2 { margin: .25rem 0; font-size: 1.5rem; }
+.today-heading a, .today-desk a { color: var(--accent-soft); }
+.today-heading a { font-size: .8rem; }
+.today-desk p { color: var(--text-muted); font-size: .85rem; line-height: 1.6; overflow-wrap: anywhere; }
+.today-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: .8rem; margin: 1.2rem 0; }
+.today-card { display: flex; flex-direction: column; padding: 1.1rem; border: 1px solid var(--border-soft); border-top: 3px solid var(--accent); border-radius: .4rem; background: var(--bg-color); min-width: 0; }
+.today-card h3 { font-size: 1rem; margin: .8rem 0 .3rem; }
+.today-labels { display: flex; flex-wrap: wrap; gap: .5rem; color: var(--accent-soft); font-size: .7rem; text-transform: uppercase; letter-spacing: .04em; }
+.today-card .today-title { color: var(--text-primary); margin: .3rem 0; }
+.today-card ul { padding-left: 1.1rem; color: var(--text-muted); font-size: .8rem; line-height: 1.6; }
+.today-card .today-quality-hint { font-size: .75rem; border-top: 1px solid var(--border-soft); padding-top: .7rem; }
+.today-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: auto; }
+.today-actions .button { font-size: .72rem; padding: .6rem; }
+.today-planner, .today-health { border-top: 1px solid var(--border-soft); padding: 1rem 0; }
+.today-desk summary { cursor: pointer; color: var(--accent-soft); font-size: .88rem; }
+.today-desk summary span { color: var(--text-muted); font-size: .75rem; margin-left: .5rem; }
+.today-plan-controls { display: flex; align-items: end; gap: .7rem; flex-wrap: wrap; }
+.today-plan-controls label { display: grid; gap: .4rem; flex: 1 1 18rem; min-width: 0; color: var(--text-muted); font-size: .8rem; }
+.today-plan-controls select { width: 100%; min-width: 0; min-height: 2.8rem; padding: .5rem; background: var(--bg-color); color: var(--text-primary); border: 1px solid var(--border-control); border-radius: .3rem; }
+.today-selected { display: flex; flex-wrap: wrap; gap: .35rem; max-height: 10rem; overflow: auto; margin-top: .7rem; }
+.today-selected .button { font-size: .72rem; padding: .4rem; }
+.today-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .7rem; margin: 1rem 0; }
+.today-metrics > div { border: 1px solid var(--border-soft); padding: .8rem; border-radius: .4rem; }
+.today-metrics strong, .today-metrics span { display: block; }
+.today-metrics strong { color: var(--accent-soft); font-size: 1.6rem; }
+.today-metrics span { font-size: .75rem; color: var(--text-muted); }
+.today-desk .today-warning { color: #ebcd96; }
+.today-warning:empty { display: none; }
+.today-health .button { margin: .3rem; font-size: .75rem; }
+.today-evidence-profile { border: 1px solid var(--border-soft); border-radius: .4rem; padding: .8rem; margin: 1rem 0; }
+.today-evidence-profile h5 { margin: .8rem 0 .2rem; color: var(--accent-soft); }
+.today-evidence-profile ul { color: var(--text-muted); padding-left: 1rem; line-height: 1.6; font-size: .82rem; }
+@media (max-width: 850px) { .today-cards { grid-template-columns: minmax(0, 1fr); } .today-heading { align-items: start; flex-direction: column; } }
+@media (max-width: 480px) { .today-desk { padding: 1rem; } .today-desk summary span { display: block; margin: .4rem 0 0; } .today-metrics { gap: .35rem; } .today-metrics > div { padding: .5rem; } }

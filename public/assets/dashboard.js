@@ -3421,6 +3421,7 @@
       acknowledgedGroupSnapshot = Date.parse(groupModel.generatedAt);
       try { localStorage.setItem(acknowledgementKey, JSON.stringify({ version: 2, snapshotAt: snapshotTime, groupAt: Date.parse(groupModel.generatedAt), records: acknowledged })); }
       catch { storageNote.textContent = 'Review state is available for this tab only; browser storage is unavailable or full.'; }
+      window.dispatchEvent(new CustomEvent('swiftioc:review-change', { detail: { version: 2, snapshotAt: acknowledgedSnapshot, groupAt: acknowledgedGroupSnapshot, records: acknowledged } }));
       render();
     };
     const addPriority = (parent, item, now) => {
@@ -3614,6 +3615,16 @@
       addReport(drawerBody, 'NVD publication & severity', item.reports?.nvd, [
         ['published_at', 'Published'], ['modified_at', 'Modified'], ['status', 'Status'], ['severity', 'Severity'], ['description', 'NVD description'],
       ]);
+      if (window.SwiftIOCToday) {
+        const profile = window.SwiftIOCToday.evidenceProfile(item, groupModel, snapshotTime == null ? null : new Date(snapshotTime * 1000).toISOString());
+        const quality = document.createElement('section'); quality.className = 'today-evidence-profile';
+        addText(quality, 'h4', 'Evidence quality & limitations');
+        addText(quality, 'p', `Vulnerability snapshot: ${profile.vulnerabilityFreshness} · Group snapshot: ${profile.groupFreshness}. Freshness windows: 48h / 72h; not attack dates.`);
+        profile.claims.forEach((claim) => { addText(quality, 'h5', claim.source); addText(quality, 'p', `${claim.finding} ${claim.boundary}`); });
+        addText(quality, 'p', profile.corroboration);
+        const gaps = document.createElement('ul'); profile.gaps.forEach((gap) => addText(gaps, 'li', gap)); quality.appendChild(gaps);
+        drawerBody.appendChild(quality);
+      }
       if (!item.reports?.cisa_kev && !item.reports?.nvd && safeHttpUrl(item.reference)) {
         const link = addText(drawerBody, 'a', 'Open authoritative CVE record ↗'); link.href = safeHttpUrl(item.reference); link.target = '_blank'; link.rel = 'noopener noreferrer';
       }
@@ -3674,6 +3685,7 @@
       } catch {
         briefingNotice = 'Browser storage is unavailable or full. Changes are kept for this tab only; export your briefing before leaving.';
       }
+      window.dispatchEvent(new CustomEvent('swiftioc:briefing-change', { detail: briefing }));
       return true;
     };
     const updateBriefingControls = () => {
@@ -4183,6 +4195,13 @@
       });
     };
     compareButton.addEventListener('click', compareGroups);
+    window.addEventListener('swiftioc:review-cve', (event) => {
+      if (typeof event.detail !== 'string' || !/^CVE-\d{4}-\d{4,19}$/.test(event.detail) || loading || failed) return;
+      const item = allCurrentItems.find((entry) => entry.cve_id === event.detail);
+      if (!item) return;
+      applyView({ view: groupEvidence.has(item.cve_id.toLowerCase()) ? 'group-linked' : 'priority', search: item.cve_id, layout, includeRejected: true });
+      openDrawer(item);
+    });
     qs('[data-vulnerability-drawer-close]', root).addEventListener('click', () => drawer.close());
     drawerPrevious.addEventListener('click', () => { const index = Number(drawer.dataset.index); if (index > 0) openDrawer(drawerItems[index - 1]); });
     drawerNext.addEventListener('click', () => { const index = Number(drawer.dataset.index); if (index + 1 < drawerItems.length) openDrawer(drawerItems[index + 1]); });
