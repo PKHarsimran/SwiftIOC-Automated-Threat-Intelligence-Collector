@@ -2,13 +2,13 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-10-02T12:45:19Z_
+_Generated 2026-10-02T12:48:29Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-02T12:45:19Z |
+| Generated | 2026-10-02T12:48:29Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
 | Duplicates removed | 4949 |
@@ -19,7 +19,7 @@ _Generated 2026-10-02T12:45:19Z_
 | High-score indicators (≥80) | 10000 |
 | Corroborated (2+ sources) | 1452 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-02T12:39:45Z |
+| Newest first_seen | 2026-10-02T12:48:07Z |
 
 ## Top indicators by score
 
@@ -41,11 +41,11 @@ _Generated 2026-10-02T12:45:19Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| greensnow_blocklist | 4816 |
-| nist_nvd_recent | 4400 |
+| greensnow_blocklist | 4821 |
 | ipsum_level5 | 4372 |
+| nist_nvd_recent | 3200 |
 | blocklist_de_ssh | 2402 |
-| threatfox_export_json | 2322 |
+| threatfox_export_json | 2314 |
 | cisa_kev | 1731 |
 | spamhaus_drop | 1693 |
 | tor_exit_nodes | 1370 |
@@ -55,12 +55,12 @@ _Generated 2026-10-02T12:45:19Z_
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3040 |
+| sha256 | 3038 |
 | cve | 2803 |
-| ipv4_cidr | 1691 |
+| ipv4_cidr | 1692 |
 | url | 1074 |
 | domain | 981 |
-| ipv4 | 236 |
+| ipv4 | 237 |
 | sha1 | 140 |
 | md5 | 35 |
 
@@ -68,14 +68,14 @@ _Generated 2026-10-02T12:45:19Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 3400 |
-| threatfox | 3226 |
+| malware | 3398 |
+| threatfox | 3227 |
 | cve | 2803 |
 | exploited-in-the-wild | 1731 |
-| drop | 1691 |
-| spamhaus | 1691 |
+| drop | 1692 |
+| spamhaus | 1692 |
 | nvd | 1376 |
-| Mirai | 1024 |
+| Mirai | 1022 |
 | ClickFix | 826 |
 | malware_download | 735 |
 
