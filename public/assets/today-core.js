@@ -14,7 +14,9 @@
   function catalog(items, model) {
     const map = new Map(items.map((item) => [item.cve_id, item]));
     for (const record of model?.records || []) if (record.kind === 'cves' && cveId(record.value) && !map.has(record.value)) {
-      map.set(record.value, { cve_id: record.value, title: 'Provider details not retained', exploitation_status: 'not_established', reports: {}, sources: [] });
+      map.set(record.value, { cve_id: record.value, title: record.value,
+        description: 'Reported by ransomware.live, but detailed CISA/NVD evidence is not present in the current retained SwiftIOC vulnerability collection. Verify affected products, versions, severity, and remediation with an authoritative vulnerability record.',
+        exploitation_status: 'not_established', reports: {}, sources: ['ransomware.live'] });
     }
     return [...map.values()];
   }
@@ -99,7 +101,7 @@
         'Unmatched assets and CVEs outside the retained collection remain unassessed.', 'No findings, watchlists, or review states are changed.'] };
   }
   function validBaseline(value) {
-    return value?.version === 1 && Number.isFinite(value.snapshotAt) && value.snapshotAt >= 0 && Number.isFinite(value.groupAt) && value.groupAt >= 0
+    return value?.version === 2 && Number.isFinite(value.snapshotAt) && value.snapshotAt >= 0 && Number.isFinite(value.groupAt) && value.groupAt >= 0
       && value.records && typeof value.records === 'object' && !Array.isArray(value.records) && Object.keys(value.records).length <= 10000
       && Object.entries(value.records).every(([id, evidence]) => cveId(id) && evidence && Array.isArray(evidence.groups)
         && evidence.groups.length <= 1000 && evidence.groups.every((group) => typeof group === 'string' && group.length <= 200));

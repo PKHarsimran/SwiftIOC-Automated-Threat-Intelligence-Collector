@@ -81,6 +81,8 @@ The dashboard's **Today** view connects existing product watches, workbench grou
 
 **Evidence quality & limitations** in the CVE detail drawer separates ransomware.live associations, CISA exploitation evidence, and NVD applicability data. Multiple reports about a CVE do not independently corroborate a named group association. The **Data coverage & evidence gaps** disclosure lists group-linked CVEs lacking provider reports. Collection freshness (48 hours for vulnerabilities, 72 hours for groups) is a UI review policy, not an attack timestamp or provider SLA; retained KEV catalog checks are assessed separately. These tools reuse the existing snapshot request and snapshot events, with no additional ransomware.live API calls.
 
+Today reuses the CVE workspace's existing material-evidence baseline instead of duplicating the provider descriptions in browser storage. First visits seed a baseline quietly; failed group loads do not erase prior associations.
+
 Local browser regression: serve `public/` and run `node scripts/test_today_ui.cjs` with Playwright/Chromium installed. The test uses synthetic snapshots, exercises failure/rollback and mobile states, and verifies inventory privacy. Unit coverage lives in `public/assets/today-core.test.js` and runs in CI.
 
 `ransomware_context.json` contains only derived counts and availability totals. It never publishes victim names, domains, screenshots, press records, ransom notes, negotiations, or raw API responses. It refreshes from seven documented PRO endpoints at most once per 24 hours (about 210 calls/month), while all workbench interactions are static and make zero PRO API calls.

@@ -77,7 +77,7 @@ test('patch scenario deduplicates CVEs and distinguishes assets, findings, uncer
   assert.equal(core.patchPlan(items, null, null, []).inventory_loaded, false);
 });
 test('Today baselines reject malformed records and fingerprints track real group changes', () => {
-  const baseline = { version: 1, snapshotAt: now, groupAt: now, records: { 'CVE-2026-1000': dashboard.vulnerabilityEvidence(items[0], core.recordFor(model, items[0].cve_id)) } };
+  const baseline = { version: 2, snapshotAt: now / 1000, groupAt: now, records: { 'CVE-2026-1000': dashboard.vulnerabilityEvidence(items[0], core.recordFor(model, items[0].cve_id)) } };
   assert.equal(core.validBaseline(baseline), true);
   for (const invalid of [null, {}, { ...baseline, records: [] }, { ...baseline, records: { invalid: {} } }]) assert.equal(Boolean(core.validBaseline(invalid)), false);
   assert.deepEqual(dashboard.vulnerabilityChanges(baseline.records['CVE-2026-1000'], dashboard.vulnerabilityEvidence(items[0], { groups: ['alpha'], matched: true })), ['Group associations changed']);

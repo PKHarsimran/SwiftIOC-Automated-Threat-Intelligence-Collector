@@ -10,10 +10,14 @@
   const button = (parent, text, action) => { const node = add(parent, 'button', text, 'button ghost'); node.type = 'button'; node.addEventListener('click', action); return node; };
   const link = (parent, text, href) => { const node = add(parent, 'a', text); node.href = href; return node; };
   const read = (key) => { try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch { return null; } };
-  const baselineKey = 'swiftioc-today-baseline-v1';
+  // Read before dashboard.js advances its baseline. One shared writer avoids
+  // duplicating megabytes of provider text in quota-limited browser storage.
+  const baselineKey = 'swiftioc-cve-evidence-baseline-v2';
+  // Remove only the redundant derived cache from the initial Today release.
+  try { localStorage.removeItem('swiftioc-today-baseline-v1'); } catch { /* Storage is optional. */ }
   let baseline = read(baselineKey);
   if (!core.validBaseline(baseline)) baseline = null;
-  let snapshot = null, model = null, report = null, groupState = 'loading', newest = 0, stored = false, loaded = false;
+  let snapshot = null, model = null, report = null, groupState = 'loading', newest = 0, loaded = false;
   let watches = dashboard.normaliseBriefing(read('swiftioc-cve-briefing-v1'))?.watches || [];
   let currentItems = [], changes = {}, targets = new Map(), selection = new Set();
   let reviews = read('swiftioc-cve-acknowledged-v2');
@@ -94,23 +98,13 @@
     if (report?.truncated) warnings.push('Inventory report is partial: some assets were not fully assessed.');
     get('freshness').textContent = warnings.join(' ');
     const usable = core.freshness(snapshot.generated_at, now) !== 'unavailable' && core.freshness(model?.generatedAt, now, 72) !== 'unavailable';
-    const canCompare = usable && baseline && time >= baseline.snapshotAt && groupTime >= baseline.groupAt;
+    const canCompare = usable && baseline && time / 1000 >= baseline.snapshotAt && groupTime >= baseline.groupAt;
     changes = {};
     if (canCompare) for (const item of currentItems) {
       const delta = dashboard.vulnerabilityChanges(baseline.records[item.cve_id], evidence(item));
       if (delta.length) changes[item.cve_id] = delta;
     }
-    if (usable && !stored && (!baseline || canCompare) && currentItems.length <= 10000) {
-      const next = { version: 1, snapshotAt: time, groupAt: groupTime, records: Object.fromEntries(currentItems.map((item) => [item.cve_id, evidence(item)])) };
-      try {
-        const latest = read(baselineKey);
-        if (!core.validBaseline(latest) || (time >= latest.snapshotAt && groupTime >= latest.groupAt)) {
-          localStorage.setItem(baselineKey, JSON.stringify(next)); stored = true;
-        }
-      }
-      catch { get('storage').textContent = 'Browser storage unavailable or full: change history cannot be saved. Inventory remains tab-only.'; }
-    }
-    const reviewed = (item) => reviews?.version === 2 && reviews.snapshotAt <= time && reviews.groupAt <= groupTime
+    const reviewed = (item) => reviews?.version === 2 && reviews.snapshotAt <= time / 1000 && reviews.groupAt <= groupTime
       && reviews.records?.[item.cve_id] && dashboard.vulnerabilityChanges(reviews.records[item.cve_id], evidence(item)).length === 0;
     const result = core.recommendations(currentItems, model, { watches, groupWatch: read('swiftioc.ransomwareWatch') || {}, report, changes, reviewed });
     const changedCount = result.ranked.filter((entry) => changes[entry.item.cve_id]).length;
@@ -123,7 +117,7 @@
       add(labels, 'span', entry.reviewed ? 'Reviewed evidence' : 'Suggested review');
       if (changes[entry.item.cve_id]) add(labels, 'span', 'Evidence changed');
       add(card, 'h3', entry.item.cve_id);
-      add(card, 'p', entry.item.title || 'Title not retained', 'today-title');
+      add(card, 'p', entry.item.title && entry.item.title !== entry.item.cve_id ? entry.item.title : 'Provider details not retained', 'today-title');
       const reasons = add(card, 'ul', ''); entry.reasons.slice(0, 4).forEach((reason) => add(reasons, 'li', reason));
       const profile = core.evidenceProfile(entry.item, model, snapshot.generated_at);
       add(card, 'p', profile.hasVersionRules ? 'Applicability rules available; verify against your installed version.' : 'Affected-version verification needed.', 'today-quality-hint');
