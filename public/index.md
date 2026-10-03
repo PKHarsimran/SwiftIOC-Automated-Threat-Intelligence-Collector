@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-10-03T03:29:50Z_
+_Generated 2026-10-03T09:36:46Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-03T03:29:50Z |
+| Generated | 2026-10-03T09:36:46Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3436 |
+| Duplicates removed | 3385 |
 | Sources reporting | 16 |
 | Indicator types | 8 |
-| Multi-source overlaps | 1459 |
+| Multi-source overlaps | 1475 |
 | Score (min / avg / max) | 80 / 80.7 / 96 |
 | High-score indicators (≥80) | 10000 |
-| Corroborated (2+ sources) | 1459 |
+| Corroborated (2+ sources) | 1475 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-03T03:17:14Z |
+| Newest first_seen | 2026-10-03T09:36:29Z |
 
 ## Top indicators by score
 
@@ -34,50 +34,50 @@ _Generated 2026-10-03T03:29:50Z_
 | ipv4: `45[.]17[.]39[.]120` | score 96, 4 sources |
 | ipv4: `45[.]198[.]224[.]184` | score 96, 4 sources |
 | ipv4: `45[.]78[.]201[.]248` | score 96, 4 sources |
-| ipv4: `209[.]126[.]103[.]97` | score 96, 3 sources |
+| ipv4: `209[.]126[.]103[.]97` | score 94, 3 sources |
 
 ## Per-source totals
 
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| greensnow_blocklist | 5627 |
+| greensnow_blocklist | 5533 |
+| threatfox_export_json | 4669 |
 | ipsum_level5 | 3528 |
-| threatfox_export_json | 2839 |
-| nist_nvd_recent | 1889 |
+| nist_nvd_recent | 1799 |
 | cisa_kev | 1733 |
 | spamhaus_drop | 1693 |
-| tor_exit_nodes | 1375 |
-| malwarebazaar_recent | 1174 |
+| tor_exit_nodes | 1379 |
+| malwarebazaar_recent | 1147 |
 | binarydefense_banlist | 1073 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3016 |
-| cve | 2694 |
-| ipv4_cidr | 1613 |
-| domain | 1157 |
-| url | 1101 |
-| ipv4 | 223 |
-| sha1 | 144 |
-| md5 | 52 |
+| sha256 | 2785 |
+| cve | 2455 |
+| domain | 1928 |
+| ipv4_cidr | 1483 |
+| url | 970 |
+| ipv4 | 174 |
+| sha1 | 149 |
+| md5 | 56 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3759 |
-| malware | 3057 |
-| cve | 2694 |
+| threatfox | 4467 |
+| malware | 2734 |
+| cve | 2455 |
 | exploited-in-the-wild | 1733 |
-| drop | 1613 |
-| spamhaus | 1613 |
-| nvd | 1269 |
-| Mirai | 1171 |
-| elf | 1006 |
-| ClickFix | 967 |
+| drop | 1483 |
+| spamhaus | 1483 |
+| etherhiding | 1429 |
+| Mirai | 1077 |
+| nvd | 1030 |
+| elf | 1014 |
 
 ## Multi-source overlaps
 
