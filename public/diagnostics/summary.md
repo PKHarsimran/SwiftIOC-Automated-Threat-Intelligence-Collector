@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-10-04T03:57:54Z_
+_Generated 2026-10-04T10:27:12Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-04T03:57:54Z |
+| Generated | 2026-10-04T10:27:12Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3651 |
+| Duplicates removed | 2820 |
 | Sources reporting | 16 |
 | Indicator types | 8 |
-| Multi-source overlaps | 1401 |
+| Multi-source overlaps | 1404 |
 | Score (min / avg / max) | 80 / 80.7 / 96 |
 | High-score indicators (≥80) | 10000 |
-| Corroborated (2+ sources) | 1401 |
+| Corroborated (2+ sources) | 1404 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-04T03:57:39Z |
+| Newest first_seen | 2026-10-04T10:26:58Z |
 
 ## Top indicators by score
 
@@ -39,26 +39,26 @@ _Generated 2026-10-04T03:57:54Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| greensnow_blocklist | 5405 |
-| threatfox_export_json | 4686 |
+| threatfox_export_json | 4760 |
 | ipsum_level5 | 3731 |
+| greensnow_blocklist | 3128 |
 | cisa_kev | 1733 |
 | spamhaus_drop | 1692 |
 | tor_exit_nodes | 1398 |
 | binarydefense_banlist | 1397 |
-| nist_nvd_recent | 1352 |
-| malwarebazaar_recent | 983 |
+| nist_nvd_recent | 1336 |
+| malwarebazaar_recent | 1044 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3530 |
-| cve | 2255 |
-| domain | 1453 |
-| ipv4_cidr | 1416 |
-| url | 1050 |
-| ipv4 | 189 |
+| sha256 | 3967 |
+| cve | 2261 |
+| domain | 1309 |
+| url | 1198 |
+| ipv4_cidr | 957 |
+| ipv4 | 201 |
 | sha1 | 69 |
 | md5 | 38 |
 
@@ -66,16 +66,16 @@ _Generated 2026-10-04T03:57:54Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 4561 |
-| malware | 2835 |
-| cve | 2255 |
-| Mirai | 1817 |
-| elf | 1777 |
+| threatfox | 4706 |
+| malware | 3146 |
+| cve | 2261 |
+| Mirai | 2108 |
+| elf | 2058 |
 | exploited-in-the-wild | 1733 |
-| drop | 1416 |
-| spamhaus | 1416 |
+| malware_download | 985 |
 | etherhiding | 978 |
-| nvd | 830 |
+| drop | 957 |
+| spamhaus | 957 |
 
 ## Multi-source overlaps
 
