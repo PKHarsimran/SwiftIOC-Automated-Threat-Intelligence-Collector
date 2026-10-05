@@ -2,16 +2,16 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-10-05T11:06:50Z_
+_Generated 2026-10-05T15:49:20Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-05T11:06:50Z |
+| Generated | 2026-10-05T15:49:20Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3321 |
+| Duplicates removed | 4290 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-source overlaps | 1689 |
@@ -19,7 +19,7 @@ _Generated 2026-10-05T11:06:50Z_
 | High-score indicators (≥80) | 10000 |
 | Corroborated (2+ sources) | 1689 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-05T10:57:59Z |
+| Newest first_seen | 2026-10-05T15:40:24Z |
 
 ## Top indicators by score
 
@@ -29,11 +29,11 @@ _Generated 2026-10-05T11:06:50Z_
 | ipv4: `94[.]154[.]43[.]60` | score 96, 5 sources |
 | ipv4: `114[.]111[.]53[.]214` | score 96, 4 sources |
 | ipv4: `165[.]154[.]162[.]74` | score 96, 4 sources |
+| ipv4: `165[.]154[.]227[.]8` | score 96, 4 sources |
 | ipv4: `45[.]17[.]39[.]120` | score 96, 4 sources |
 | ipv4: `45[.]198[.]224[.]184` | score 96, 4 sources |
 | ipv4: `45[.]78[.]201[.]248` | score 96, 4 sources |
-| ipv4: `103[.]176[.]64[.]36` | score 95, 4 sources |
-| ipv4: `165[.]154[.]227[.]8` | score 93, 4 sources |
+| ipv4: `103[.]176[.]64[.]36` | score 93, 4 sources |
 | sha256: `01b5a60b54ff4a0f670e39a6d567f02bc69338ccfae2d679a17ed09247e284e6` | score 88, 2 sources |
 
 ## Per-source totals
@@ -41,43 +41,43 @@ _Generated 2026-10-05T11:06:50Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| greensnow_blocklist | 4400 |
-| threatfox_export_json | 4179 |
+| greensnow_blocklist | 4640 |
+| threatfox_export_json | 4231 |
 | ipsum_level5 | 3531 |
+| blocklist_de_ssh | 1757 |
 | cisa_kev | 1734 |
 | binarydefense_banlist | 1677 |
 | spamhaus_drop | 1641 |
-| tor_exit_nodes | 1383 |
-| malwarebazaar_recent | 1137 |
-| urlhaus_recent_urls | 889 |
+| tor_exit_nodes | 1360 |
+| malwarebazaar_recent | 1127 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 4317 |
-| cve | 2075 |
-| ipv4_cidr | 1691 |
-| url | 1060 |
-| domain | 541 |
-| ipv4 | 171 |
-| md5 | 74 |
-| sha1 | 71 |
+| sha256 | 4471 |
+| cve | 2020 |
+| ipv4_cidr | 1640 |
+| url | 1003 |
+| domain | 492 |
+| ipv4 | 182 |
+| md5 | 108 |
+| sha1 | 84 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 4434 |
-| malware | 3155 |
-| elf | 2393 |
-| Mirai | 2365 |
-| cve | 2103 |
+| threatfox | 4579 |
+| malware | 3116 |
+| elf | 2512 |
+| Mirai | 2497 |
+| cve | 2048 |
 | exploited-in-the-wild | 1734 |
-| drop | 1691 |
-| spamhaus | 1691 |
-| malware_download | 892 |
-| nvd | 650 |
+| drop | 1640 |
+| spamhaus | 1640 |
+| malware_download | 834 |
+| nvd | 595 |
 
 ## Multi-source overlaps
 
