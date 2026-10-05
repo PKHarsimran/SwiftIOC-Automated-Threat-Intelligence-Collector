@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-10-04T22:40:34Z_
+_Generated 2026-10-05T03:42:48Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-04T22:40:34Z |
+| Generated | 2026-10-05T03:42:48Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 2775 |
+| Duplicates removed | 3656 |
 | Sources reporting | 16 |
 | Indicator types | 8 |
-| Multi-source overlaps | 1417 |
-| Score (min / avg / max) | 80 / 80.7 / 96 |
+| Multi-source overlaps | 1586 |
+| Score (min / avg / max) | 80 / 80.9 / 96 |
 | High-score indicators (≥80) | 10000 |
-| Corroborated (2+ sources) | 1417 |
+| Corroborated (2+ sources) | 1586 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-04T22:40:20Z |
+| Newest first_seen | 2026-10-05T03:33:13Z |
 
 ## Top indicators by score
 
@@ -32,50 +32,50 @@ _Generated 2026-10-04T22:40:34Z_
 | ipv4: `45[.]17[.]39[.]120` | score 96, 4 sources |
 | ipv4: `45[.]198[.]224[.]184` | score 96, 4 sources |
 | ipv4: `45[.]78[.]201[.]248` | score 96, 4 sources |
-| sha256: `0345370e70311cfab06adb18c67785c3f8377f35a66b54d0619d620434165373` | score 88, 2 sources |
+| sha256: `01b5a60b54ff4a0f670e39a6d567f02bc69338ccfae2d679a17ed09247e284e6` | score 88, 2 sources |
 
 ## Per-source totals
 
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| threatfox_export_json | 4830 |
-| greensnow_blocklist | 4274 |
-| ipsum_level5 | 3731 |
+| greensnow_blocklist | 5197 |
+| threatfox_export_json | 4930 |
+| ipsum_level5 | 3531 |
 | cisa_kev | 1734 |
 | spamhaus_drop | 1692 |
-| binarydefense_banlist | 1397 |
-| tor_exit_nodes | 1384 |
-| malwarebazaar_recent | 978 |
-| urlhaus_recent_urls | 864 |
+| binarydefense_banlist | 1677 |
+| tor_exit_nodes | 1382 |
+| malwarebazaar_recent | 962 |
+| urlhaus_recent_urls | 870 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3918 |
-| cve | 1901 |
+| sha256 | 3756 |
+| cve | 1942 |
 | ipv4_cidr | 1691 |
-| domain | 1264 |
-| url | 1010 |
-| ipv4 | 185 |
-| sha1 | 26 |
-| md5 | 5 |
+| domain | 1279 |
+| url | 1029 |
+| ipv4 | 184 |
+| sha1 | 70 |
+| md5 | 49 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 4675 |
-| malware | 2816 |
-| Mirai | 2206 |
-| elf | 2165 |
-| cve | 1901 |
+| threatfox | 4777 |
+| malware | 2843 |
+| elf | 2115 |
+| Mirai | 2036 |
+| cve | 1942 |
 | exploited-in-the-wild | 1734 |
 | drop | 1691 |
 | spamhaus | 1691 |
 | etherhiding | 977 |
-| malware_download | 852 |
+| malware_download | 861 |
 
 ## Multi-source overlaps
 
@@ -90,6 +90,6 @@ _Generated 2026-10-04T22:40:34Z_
 | ipv4: 45[.]17[.]39[.]120 | blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
 | ipv4: 45[.]198[.]224[.]184 | blocklist_de_ssh, et_compromised, ipsum_level5, threatfox_export_json |
 | ipv4: 45[.]78[.]201[.]248 | blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
-| ipv4: 209[.]126[.]103[.]97 | ci_army_list, ipsum_level5, threatfox_export_json |
+| cve: CVE-2008-4128 | cisa_kev, nist_nvd_recent |
 
 For more detail see [diagnostics/REPORT.md](diagnostics/REPORT.md) and the machine-readable feeds in [iocs/](iocs/).
