@@ -85,11 +85,23 @@ const assert = require('node:assert/strict');
         const rect = el.getBoundingClientRect();
         return { left: rect.left, right: rect.right, height: rect.height };
       }));
-      for (const link of links) {
-        assert.ok(link.left >= 0 && link.right <= width, `Navigation clipped at ${width}px`);
+      for (const [index, link] of links.entries()) {
         assert.ok(link.height >= 44, 'Navigation touch target too short');
+        if (width > 820) assert.ok(link.left >= 0 && link.right <= width, `Navigation clipped at ${width}px`);
+        else {
+          await page.locator('.nav-links a').nth(index).evaluate((element) => element.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'instant' }));
+          const visible = await page.locator('.nav-links a').nth(index).evaluate((element) => {
+            const linkBox = element.getBoundingClientRect(), navBox = element.parentElement.getBoundingClientRect();
+            return linkBox.left >= navBox.left - 1 && linkBox.right <= navBox.right + 1;
+          });
+          assert.ok(visible, `Navigation link ${index + 1} cannot be reached at ${width}px`);
+        }
       }
     }
+    await page.locator('.nav-links a[href="#today"]').click();
+    await page.waitForFunction(() => document.querySelector('.nav-links a[href="#today"]')?.getAttribute('aria-current') === 'location');
+    await page.locator('.nav-links a[href="#vulnerabilities"]').click();
+    await page.waitForFunction(() => document.querySelector('.nav-links a[href="#vulnerabilities"]')?.getAttribute('aria-current') === 'location');
     await page.locator('.analyst-guide > summary').click();
     await page.locator('.analyst-guide a[href="#product-briefing"]').click();
     await page.waitForFunction(() => document.querySelector('[data-briefing-settings]').open);

@@ -5334,6 +5334,23 @@
   // Fragment lookup uses IDs, not CSS selectors: malformed/shared IOC fragments
   // cannot throw or accidentally select another element.
   const initialiseSectionNavigation = () => {
+    const sectionLinks = qsa('.top-nav .nav-links a[href^="#"]')
+      .map((link) => ({ link, target: document.getElementById(link.hash.slice(1)) }))
+      .filter(({ target }) => target);
+    let navFrame = 0;
+    const highlightSection = () => {
+      navFrame = 0;
+      const threshold = document.querySelector('.top-nav')?.getBoundingClientRect().height + 32 || 96;
+      const reached = sectionLinks.filter(({ target }) => target.getBoundingClientRect().top <= threshold)
+        .sort((a, b) => b.target.getBoundingClientRect().top - a.target.getBoundingClientRect().top)[0];
+      sectionLinks.forEach(({ link }) => {
+        if (link === reached?.link) link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
+      });
+    };
+    const scheduleHighlight = () => { if (!navFrame) navFrame = window.requestAnimationFrame(highlightSection); };
+    window.addEventListener('scroll', scheduleHighlight, { passive: true });
+    window.addEventListener('resize', scheduleHighlight, { passive: true });
     const reveal = () => {
       let id;
       try { id = decodeURIComponent(window.location.hash.slice(1)); }
@@ -5352,13 +5369,14 @@
       }
       if (opened) window.requestAnimationFrame(() => target.scrollIntoView({ block: 'start' }));
     };
-    window.addEventListener('hashchange', reveal);
+    window.addEventListener('hashchange', () => { reveal(); scheduleHighlight(); });
     // Clicking the same hash again must also reopen a manually closed tool.
     document.addEventListener('click', (event) => {
       const link = event.target.closest('a[href^="#"]');
       if (link && link.hash === window.location.hash) reveal();
     });
     reveal();
+    scheduleHighlight();
   };
 
   /* ==========================================================================

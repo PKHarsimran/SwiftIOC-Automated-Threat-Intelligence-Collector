@@ -49,6 +49,14 @@ test('Today matches exact products, groups and CVEs without broad personal guess
   assert.equal(core.recommendations(items, model, { groupWatch: { countries: 'US' } }).personal, false);
   assert.equal(core.recommendations(items, model).ranked.some((r) => r.item.cve_id === 'CVE-2026-3000'), false);
 });
+test('collection highlights surface recent KEV additions ahead of equally reported older CVEs', () => {
+  const older = { ...items[0], cve_id: 'CVE-2020-1000', reports: { cisa_kev: { date_added: '2020-01-01' } } };
+  const recent = { ...items[0], cve_id: 'CVE-2026-9999', reports: { cisa_kev: { date_added: '2026-10-01' } } };
+  const result = core.recommendations([older, recent], null, {}, now);
+  assert.equal(result.top[0].item.cve_id, recent.cve_id);
+  assert.ok(result.top[0].reasons.includes('Added to CISA KEV in the last 30 days'));
+  assert.ok(!result.top[1].reasons.includes('Added to CISA KEV in the last 30 days'));
+});
 const report = { snapshot_generated_at: date, truncated: true, findings: [
   { cve_id: 'CVE-2026-1000', status: 'version-match', asset: { id: 'a', exposure: 'internet', importance: 'critical' } },
   { cve_id: 'CVE-2026-1000', status: 'needs-verification', asset: { id: 'b' } },

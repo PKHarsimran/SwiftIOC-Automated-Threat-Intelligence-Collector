@@ -4113,3 +4113,49 @@ body:has(.workspace-dock:not([hidden])) .toast { bottom: 6rem; }
   .vulnerability-drawer { width: 100vw; }
   .vulnerability-tier-strip .button { flex: 1 1 auto; }
 }
+
+/* Final pass: clearer navigation, calmer controls, and more legible evidence. */
+.top-nav .nav-links a[aria-current="location"] {
+  color: var(--accent-soft);
+  background: var(--accent-subtle);
+  box-shadow: inset 0 -2px 0 var(--accent);
+  text-decoration: none;
+}
+.top-nav .nav-links a[aria-current="location"]:hover { background: #384432; }
+.vulnerability-card .vulnerability-title { font-size: .91rem; }
+.vulnerability-card .vulnerability-meta,
+.vulnerability-card > .vulnerability-dates p,
+.vulnerability-priority p,
+.vulnerability-group-preview { font-size: .8rem; }
+.vulnerability-table { font-size: .8rem; }
+.vulnerability-table td, .vulnerability-table th { padding: .75rem; }
+.vulnerability-card-footer .button { min-height: 2.75rem; font-size: .8rem; }
+.vulnerability-desk .vulnerability-card:hover { border-color: var(--border-strong); }
+.vulnerability-desk .vulnerability-card:focus-visible { outline: 3px solid var(--focus-color); outline-offset: 3px; }
+@media (max-width: 820px) {
+  .top-nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    flex-direction: column;
+    align-items: stretch;
+    gap: .25rem;
+    padding: .45rem 0 .3rem;
+  }
+  .top-nav .nav-links {
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+    max-width: 100%;
+    gap: .2rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+  }
+  .top-nav .nav-links a { flex: 0 0 auto; }
+  [id] { scroll-margin-top: 6.5rem; }
+  .page-header { margin: 1.25rem 0 .85rem; }
+  .page-header-subtitle { margin-bottom: .5rem; }
+}

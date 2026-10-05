@@ -23,7 +23,6 @@
   let reviews = read('swiftioc-cve-acknowledged-v2');
   const evidence = (item) => dashboard.vulnerabilityEvidence(item, core.recordFor(model, item.cve_id));
   const openCve = (id) => {
-    location.hash = 'vulnerabilities';
     window.dispatchEvent(new CustomEvent('swiftioc:review-cve', { detail: id }));
   };
   function renderPlan() {
@@ -108,7 +107,7 @@
       && reviews.records?.[item.cve_id] && dashboard.vulnerabilityChanges(reviews.records[item.cve_id], evidence(item)).length === 0;
     const result = core.recommendations(currentItems, model, { watches, groupWatch: read('swiftioc.ransomwareWatch') || {}, report, changes, reviewed });
     const changedCount = result.ranked.filter((entry) => changes[entry.item.cve_id]).length;
-    get('status').textContent = `${result.personal ? 'Personal briefing' : 'Collection highlights — not yet personalized'} · ${result.ranked.length} CVEs in scope · ${canCompare ? `${changedCount} changed since your previous visit` : baseline ? 'Change comparison paused: incomplete or older snapshots' : 'First visit establishes your change baseline'}.`;
+    get('status').textContent = `${result.personal ? 'Personal briefing' : 'Collection highlights — not yet personalized'} · ${canCompare ? `${changedCount} changed since your previous visit` : baseline ? 'Change comparison paused: incomplete or older snapshots' : 'First visit establishes your change baseline'}.`;
     get('setup').hidden = result.personal;
     if (!result.top.length) add(get('cards'), 'p', 'No retained CVEs match your current watches or inventory findings. Check collection coverage; this does not establish safety.');
     for (const entry of result.top) {

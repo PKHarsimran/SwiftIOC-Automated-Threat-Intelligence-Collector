@@ -47,7 +47,7 @@
       ],
       corroboration: 'Independent corroboration of the group association is not established. Feed matches and repeated snapshots are not independent sources.' };
   }
-  function recommendations(items, model, { watches = [], groupWatch = {}, report = null, changes = {}, reviewed = () => false } = {}) {
+  function recommendations(items, model, { watches = [], groupWatch = {}, report = null, changes = {}, reviewed = () => false } = {}, now = Date.now()) {
     const tokens = (value) => new Set(typeof value === 'string' ? value.split(/[\n,]+/).map((v) => v.trim().toLowerCase()).filter(Boolean) : []);
     const groups = tokens(groupWatch.groups), evidence = tokens(groupWatch.evidence);
     const findingMap = new Map();
@@ -69,12 +69,16 @@
       const relevant = score > 0;
       if (item.exploitation_status === 'known_exploited') { reasons.push('Known exploitation evidence'); score += 20; }
       if (record?.groups.length) { reasons.push(`${record.groups.length} reported group associations`); score += 10; }
-      if (changes[item.cve_id]?.length) { reasons.push(changes[item.cve_id].join('; ')); score += 15; }
+      const kevAdded = Date.parse(kev?.date_added);
+      if (Number.isFinite(kevAdded) && kevAdded <= now && now - kevAdded <= 30 * DAY) {
+        reasons.push('Added to CISA KEV in the last 30 days'); score += 35;
+      }
+      if (changes[item.cve_id]?.length) { reasons.unshift(changes[item.cve_id].join('; ')); score += 15; }
       if (findings.some((f) => f.asset.exposure === 'internet')) { reasons.push('User-marked internet exposure'); score += 20; }
       if (findings.some((f) => f.asset.importance === 'critical')) { reasons.push('User-marked critical asset'); score += 10; }
-      return { item, reasons, score, relevant, reviewed: reviewed(item), findings };
+      return { item, reasons, score, relevant, reviewed: reviewed(item), findings, kevAdded: Number.isFinite(kevAdded) && kevAdded <= now ? kevAdded : 0 };
     }).filter((entry) => (!personal || entry.relevant) && (entry.item.reports?.nvd?.status || '').toLowerCase() !== 'rejected')
-      .sort((a, b) => Number(a.reviewed) - Number(b.reviewed) || b.score - a.score || a.item.cve_id.localeCompare(b.item.cve_id));
+      .sort((a, b) => Number(a.reviewed) - Number(b.reviewed) || b.score - a.score || b.kevAdded - a.kevAdded || a.item.cve_id.localeCompare(b.item.cve_id));
     return { personal, ranked, top: ranked.slice(0, 3) };
   }
   function patchPlan(items, model, report, selected) {

@@ -30,6 +30,8 @@ const path = require('node:path');
     await page.waitForFunction(() => document.querySelector('[data-today-health]').textContent.includes('2 group-linked'));
     assert.match(await today.locator('[data-today-status]').innerText(), /not yet personalized/);
     assert.equal(groupRequests.length, 1, 'Today reuses the shared group snapshot request');
+    await today.locator('.today-card').first().scrollIntoViewIfNeeded();
+    const beforeReview = await page.evaluate(() => scrollY);
     await today.locator('.today-card').first().getByRole('button', { name: 'Review evidence' }).click();
     const drawer = page.locator('[data-vulnerability-drawer]');
     assert.equal(await drawer.isVisible(), true);
@@ -40,6 +42,8 @@ const path = require('node:path');
       await page.screenshot({ path: path.join(process.env.SCREENSHOT_DIR, 'today-evidence-desktop.png') });
     }
     await drawer.getByRole('button', { name: 'Close vulnerability details' }).click();
+    assert.equal(await page.evaluate(() => location.hash), '', 'Closing the drawer returns to Today instead of changing sections');
+    assert.ok(Math.abs((await page.evaluate(() => scrollY)) - beforeReview) < 100, 'Review keeps the reader near their briefing');
     await page.evaluate(() => {
       const state = { version: 1, watches: [{ vendor: 'Vendor', product: 'Gateway', ready: true }], records: {}, snapshotAt: null };
       localStorage.setItem('swiftioc-cve-briefing-v1', JSON.stringify(state));
