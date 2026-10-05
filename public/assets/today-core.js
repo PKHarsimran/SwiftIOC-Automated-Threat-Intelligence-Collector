@@ -11,26 +11,35 @@
     const time = Date.parse(value);
     return !Number.isFinite(time) || time < 0 || time > now ? 'unavailable' : now - time > hours * 3600000 ? 'stale' : 'current';
   }
-  function catalog(items, model) {
+  function catalog(items, model, signals = null) {
     const map = new Map(items.map((item) => [item.cve_id, item]));
     for (const record of model?.records || []) if (record.kind === 'cves' && cveId(record.value) && !map.has(record.value)) {
       map.set(record.value, { cve_id: record.value, title: record.value,
         description: 'Reported by ransomware.live, but detailed CISA/NVD evidence is not present in the current retained SwiftIOC vulnerability collection. Verify affected products, versions, severity, and remediation with an authoritative vulnerability record.',
         exploitation_status: 'not_established', reports: {}, sources: ['ransomware.live'] });
     }
-    return [...map.values()];
+    return [...map.values()].map((item) => {
+      const signal = signals?.items?.[item.cve_id];
+      if (!signal) return item;
+      const official = signal.official_cve;
+      const missingDetails = !item.reports?.nvd && !item.reports?.cisa_kev;
+      return { ...item, signals: signal,
+        description: missingDetails && official?.description ? official.description : item.description,
+        title: missingDetails && official?.description ? official.description.slice(0, 110) : item.title };
+    });
   }
   const recordFor = (model, id) => model?.byIdentity.get(`cve:${id.toLowerCase()}`) || null;
   function evidenceProfile(item, model, snapshotAt, now = Date.now()) {
     const record = recordFor(model, item.cve_id);
     const kev = item.reports?.cisa_kev, nvd = item.reports?.nvd;
+    const official = item.signals?.official_cve, epss = item.signals?.epss;
     const groups = record?.groups || [];
     const receipts = Object.values(model?.history?.observations || {}).filter((entry) => entry.kind === 'cves'
       && entry.value === item.cve_id && entry.present === true && groups.includes(entry.group)
       && Number.isFinite(Date.parse(entry.last_observed)) && Date.parse(entry.last_observed) >= 0 && Date.parse(entry.last_observed) <= now);
     const hasVersionRules = Array.isArray(nvd?.configurations) && nvd.configurations.length > 0;
     const gaps = [];
-    if (!kev && !nvd) gaps.push('Provider vulnerability details are missing from this retained collection.');
+    if (!kev && !nvd && !official) gaps.push('Provider vulnerability details are missing from this retained collection.');
     if (!hasVersionRules) gaps.push('No structured NVD applicability rules retained; verify affected versions with the vendor.');
     if (!kev?.required_action) gaps.push('No CISA remediation text retained; consult the vendor advisory.');
     if (kev && freshness(kev.catalog_checked_at, now) !== 'current') gaps.push('The KEV catalog-check timestamp is stale or missing; a fresh collection timestamp alone does not revalidate membership.');
@@ -44,6 +53,8 @@
         { source: 'ransomware.live', finding: groups.length ? `Reports associations with ${groups.length} groups.` : model ? 'No group association in this snapshot.' : 'Group evidence unavailable.', boundary: 'Reported association; current use and attribution are not established.' },
         { source: 'CISA KEV', finding: kev ? 'Retained KEV report available.' : 'No KEV report retained.', boundary: 'Exploitation evidence does not independently confirm the named group association.' },
         { source: 'NVD', finding: nvd ? `Vulnerability report retained${hasVersionRules ? ' with applicability rules' : ''}.` : 'No NVD report retained.', boundary: 'Descriptions and severity are not proof of exploitation or local exposure.' },
+        { source: 'Official CVE record', finding: official ? `Published record available${official.cisa_ssvc ? ' with CISA SSVC decision points' : ''}.` : 'No official CVE detail retained in this sidecar.', boundary: 'A CVE record or proof-of-concept label alone does not establish current exploitation or affected local assets.' },
+        { source: 'FIRST EPSS', finding: epss ? `${Math.round(epss.probability * 1000) / 10}% estimated 30-day exploitation probability.` : 'No EPSS score retained.', boundary: 'Forecast of observed exploitation activity, not a severity score, current exploitation finding or local risk score.' },
       ],
       corroboration: 'Independent corroboration of the group association is not established. Feed matches and repeated snapshots are not independent sources.' };
   }
@@ -68,6 +79,10 @@
       if (evidence.has(item.cve_id.toLowerCase())) { reasons.push('CVE is on your workbench watchlist'); score += 40; }
       const relevant = score > 0;
       if (item.exploitation_status === 'known_exploited') { reasons.push('Known exploitation evidence'); score += 20; }
+      const epss = item.signals?.epss?.probability;
+      if (Number.isFinite(epss) && epss >= 0.2 && item.exploitation_status !== 'known_exploited') {
+        reasons.push(`EPSS forecast: ${Math.round(epss * 100)}% chance of observed exploitation in 30 days`); score += 10;
+      }
       if (record?.groups.length) { reasons.push(`${record.groups.length} reported group associations`); score += 10; }
       const kevAdded = Date.parse(kev?.date_added);
       if (Number.isFinite(kevAdded) && kevAdded <= now && now - kevAdded <= 30 * DAY) {
@@ -80,6 +95,13 @@
     }).filter((entry) => (!personal || entry.relevant) && (entry.item.reports?.nvd?.status || '').toLowerCase() !== 'rejected')
       .sort((a, b) => Number(a.reviewed) - Number(b.reviewed) || b.score - a.score || b.kevAdded - a.kevAdded || a.item.cve_id.localeCompare(b.item.cve_id));
     return { personal, ranked, top: ranked.slice(0, 3) };
+  }
+  function nextStep(entry) {
+    if (entry.findings.some((finding) => finding.status === 'version-match')) return 'Verify the reported affected version on the matched asset, then apply the vendor remediation and rescan.';
+    if (entry.findings.length) return 'Check affected versions against the vendor advisory; the inventory match alone is not confirmed exposure.';
+    if (entry.item.reports?.cisa_kev) return 'Check whether the affected product is deployed, then follow the vendor and CISA remediation guidance.';
+    if (entry.item.signals?.official_cve?.affected?.length) return 'Compare the official CVE affected-product details with your inventory; applicability is not yet established.';
+    return 'Check the authoritative CVE and vendor advisory before drawing an exposure conclusion.';
   }
   function patchPlan(items, model, report, selected) {
     const ids = new Set(selected);
@@ -110,5 +132,5 @@
       && Object.entries(value.records).every(([id, evidence]) => cveId(id) && evidence && Array.isArray(evidence.groups)
         && evidence.groups.length <= 1000 && evidence.groups.every((group) => typeof group === 'string' && group.length <= 200));
   }
-  return { freshness, catalog, recordFor, productKey, evidenceProfile, recommendations, patchPlan, validBaseline, DAY };
+  return { freshness, catalog, recordFor, productKey, evidenceProfile, recommendations, nextStep, patchPlan, validBaseline, DAY };
 });

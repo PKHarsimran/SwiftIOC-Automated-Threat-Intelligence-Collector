@@ -55,7 +55,10 @@ def parse_dt(s: Optional[str]) -> Optional[datetime]:
     if not s:
         return None
     try:
-        dt: datetime = dtparser.parse(s)  # explicit annotation: dateutil's stub return type is unreliable here
+        parsed = dtparser.parse(s)
+        if not isinstance(parsed, datetime):
+            return None
+        dt = parsed
     except Exception:
         return None
     # A naive result (no tzinfo) means the source string had no offset/Z

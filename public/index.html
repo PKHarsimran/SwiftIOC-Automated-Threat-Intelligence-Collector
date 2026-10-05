@@ -417,6 +417,13 @@
           <div data-inventory-results class="inventory-results"></div>
           <button type="button" class="button ghost" data-inventory-more hidden>Show more findings</button>
         </details>
+        <details class="collection-notes inventory-desk" data-sbom-root>
+          <summary>Software components · optional SBOM review</summary>
+          <p>Import a CycloneDX or SPDX JSON SBOM in this tab. Parsing stays local. Only if you choose “Check with OSV” will package URLs and versions be sent directly from your browser to OSV.dev; SwiftIOC does not receive or save the SBOM.</p>
+          <div class="inventory-actions"><label>SBOM JSON <input type="file" accept=".json,application/json" data-sbom-file /></label><button type="button" class="button" data-sbom-check disabled>Check with OSV (sends package IDs)</button><button type="button" class="button ghost" data-sbom-clear disabled>Clear SBOM</button></div>
+          <p data-sbom-status role="status">Import a supported SBOM to begin. No match is not proof of safety.</p>
+          <div data-sbom-results class="inventory-results"></div>
+        </details>
         <details class="collection-notes briefing-settings" data-briefing-settings>
           <summary id="product-briefing">Personal briefing · follow vendors &amp; products</summary>
           <p>Match exact CISA vendor and product fields. NVD-only records without these fields cannot be matched. Watches stay in this browser; a product match does not confirm your installed version is affected.</p>
@@ -1199,12 +1206,14 @@
 
     <div class="toast" data-toast role="status" aria-live="polite" aria-atomic="true" hidden></div>
     <script defer src="assets/dashboard-core.js?v=48"></script>
-    <script defer src="assets/group-intel-core.js?v=48"></script>
+    <script defer src="assets/group-intel-core.js?v=50"></script>
     <script defer src="assets/group-intel.js?v=48"></script>
-    <script defer src="assets/today-core.js?v=48"></script>
-    <script defer src="assets/today.js?v=49"></script>
+    <script defer src="assets/today-core.js?v=50"></script>
+    <script defer src="assets/today.js?v=50"></script>
     <script defer src="assets/inventory-core.js?v=38"></script>
     <script defer src="assets/inventory.js?v=46"></script>
-    <script defer src="assets/dashboard.js?v=49"></script>
+    <script defer src="assets/sbom-core.js?v=1"></script>
+    <script defer src="assets/sbom.js?v=1"></script>
+    <script defer src="assets/dashboard.js?v=50"></script>
   </body>
 </html>

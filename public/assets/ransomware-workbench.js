@@ -6,10 +6,14 @@
   const link = (text, href) => { const node = el('a', text); node.href = href; return node; };
   const workbench = window.SwiftIOCRansomwareWorkbench;
   const groupCore = window.SwiftIOCGroupCore;
-  let model; let context; let state = { tab: 'radar', group: '' };
+  let model; let context; let guidance; let state = { tab: 'radar', group: '' };
   const telemetry = ['endpoint', 'identity', 'network', 'dns', 'proxy', 'email', 'cloud'];
   const readLocal = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } };
   const writeLocal = (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch { return false; } };
+  const decisionKey = 'swiftioc.candidateDecisions.v1';
+  let candidateDecisions = readLocal(decisionKey, {});
+  if (!candidateDecisions || typeof candidateDecisions !== 'object' || Array.isArray(candidateDecisions)) candidateDecisions = {};
+  let priorityLimit = 30;
   const selectedTelemetry = () => [...document.querySelectorAll('[data-telemetry] input:checked')].map((input) => input.value);
   function navigate(change, replace = false) {
     state = { ...state, ...change }; render();
@@ -60,16 +64,47 @@
     anomalies.slice(0, 8).forEach((item) => { const row = el('div', '', 'group-short-row'); row.append(button(item.group, () => navigate({ group: item.group, tab: 'priorities' })), el('span', `${item.count} changes / 7d${item.ratio ? ` · ${item.ratio}× baseline` : ' · no earlier baseline'}`, 'group-small')); host.appendChild(row); });
   }
   function renderPriorities() {
-    const kind = $('[data-priority-kind]').value; const records = state.group ? model.byGroup.get(state.group) : model.records;
-    const ranked = records.filter((r) => r.kind !== 'ttps' && (kind === 'all' || r.kind === kind)).map((record) => ({ record, ...workbench.priority(record, model), quality: workbench.quality(record, model) })).sort((a, b) => b.score - a.score || b.record.groups.length - a.record.groups.length || a.record.value.localeCompare(b.record.value));
+    const kind = $('[data-priority-kind]').value, observable = $('[data-priority-observable]').value;
+    const records = state.group ? model.byGroup.get(state.group) : model.records;
+    const ranked = records.filter((r) => r.kind !== 'ttps' && (kind === 'all' || r.kind === kind
+      || (kind === 'candidates' && r.kind === 'iocs' && !r.matched))
+      && (r.kind !== 'iocs' || observable === 'all' || (observable === 'network' ? ['ipv4', 'ipv6', 'domain', 'url'].includes(r.type) : ['md5', 'sha1', 'sha256'].includes(r.type))))
+      .map((record) => ({ record, ...workbench.priority(record, model), quality: workbench.quality(record, model) }))
+      .sort((a, b) => b.score - a.score || b.record.groups.length - a.record.groups.length || a.record.value.localeCompare(b.record.value));
     const host = $('[data-priorities]'); host.replaceChildren();
-    ranked.slice(0, 30).forEach((item) => {
-      const card = el('article', '', 'priority-card'); const body = el('div'); body.append(el('h3', item.record.value), el('p', `${item.record.type} · ${item.record.groups.length} reported group links · ${item.record.matched ? 'in SwiftIOC' : 'research candidate'} · evidence quality ${item.quality.score}/100`, 'group-small'));
+    const coverage = workbench.coverageSummary(model);
+    $('[data-priority-summary]').textContent = `${ranked.length} in this view · ${coverage.candidates} IOC candidates lack an exact retained-feed match · ${coverage.feedIocMatches} exact IOC matches · ${coverage.feedCveMatches}/${coverage.reportedCves} group CVEs retained. ${coverage.groupsWithoutIocCollection === null ? 'Group IOC collection coverage unavailable.' : `${coverage.groupsWithoutIocCollection} groups have no IOC collection available in this snapshot.`} An unmatched value is not a negative finding.`;
+    $('[data-priority-more]').hidden = ranked.length <= priorityLimit;
+    $('[data-priority-more]').textContent = `Show more (${Math.min(30, ranked.length - priorityLimit)} of ${ranked.length - priorityLimit} remaining)`;
+    ranked.slice(0, priorityLimit).forEach((item) => {
+      const card = el('article', '', 'priority-card'); const body = el('div'); body.append(el('h3', item.record.value), el('p', `${item.record.type} · ${item.record.groups.slice(0, 3).join(', ')}${item.record.groups.length > 3 ? ` +${item.record.groups.length - 3}` : ''} · ${item.record.matched ? 'in SwiftIOC' : 'research candidate'} · traceability ${item.quality.score}/100`, 'group-small'));
+      if (item.record.kind === 'iocs') {
+        const receipt = groupCore.receipt(model, item.record, item.record.groups[0]);
+        body.appendChild(el('p', receipt ? `Locally observed in provider snapshots: ${receipt.first_observed || 'first date unavailable'} to ${receipt.last_observed || 'last date unavailable'}. This is not a dated attack sighting.` : 'No local first/last observation receipt available.', 'group-small'));
+      }
       const details = el('details'); details.append(el('summary', 'Why this score'), el('ul'));
       item.reasons.forEach((reason) => details.lastChild.appendChild(el('li', reason))); body.appendChild(details);
       const quality = el('details'); quality.append(el('summary', 'Evidence-quality receipt'), el('p', item.quality.meaning, 'group-small'), el('ul'));
       item.quality.reasons.forEach((reason) => quality.lastChild.appendChild(el('li', reason))); body.appendChild(quality);
       const actions = el('div'); actions.appendChild(button('Triage evidence', () => { $('[data-triage-input]').value = item.record.value; navigate({ tab: 'triage' }); renderTriage(workbench.triage(model, item.record.value)); }));
+      if (item.record.kind === 'iocs' && !item.record.matched) {
+        const key = item.record.key;
+        const local = candidateDecisions[key];
+        const recorded = local?.at && Number.isFinite(Date.parse(local.at)) ? ` (${new Date(local.at).toLocaleString()})` : '';
+        body.appendChild(el('p', local?.status === 'observed' ? `Your local decision${recorded}: observed in your telemetry. This does not verify actor attribution or alter the public feed.`
+          : local?.status === 'dismissed' ? `Your local decision${recorded}: dismissed for this investigation.` : 'Suggested next step: hunt the exact value in your telemetry, then record what you actually observed.', 'group-small'));
+        actions.appendChild(button('Observed in my logs', () => {
+          candidateDecisions[key] = { status: 'observed', at: new Date().toISOString() };
+          if (!writeLocal(decisionKey, candidateDecisions)) $('[data-status]').textContent = 'Browser storage unavailable; local decision lasts only this session.';
+          renderPriorities();
+        }));
+        actions.appendChild(button('Dismiss locally', () => {
+          candidateDecisions[key] = { status: 'dismissed', at: new Date().toISOString() };
+          if (!writeLocal(decisionKey, candidateDecisions)) $('[data-status]').textContent = 'Browser storage unavailable; local decision lasts only this session.';
+          renderPriorities();
+        }));
+        if (local) actions.appendChild(button('Clear decision', () => { delete candidateDecisions[key]; writeLocal(decisionKey, candidateDecisions); renderPriorities(); }));
+      }
       card.append(el('div', String(item.score), 'priority-score'), body, actions); host.appendChild(card);
     });
   }
@@ -99,7 +134,23 @@
       try { download(workbench.responsePack(model, state.group, '*', '-7d', window.SwiftIOCCore), `swiftioc-response-${state.group.replace(/[^a-z0-9_-]/gi, '_')}.json`); }
       catch (error) { $('[data-status]').textContent = error.message; }
     }, 'button'));
-    rows.forEach((row) => { const card = el('div', '', 'coverage-card'); card.dataset.status = row.status; card.append(el('strong', row.technique), el('p', row.status === 'unmapped' ? 'Manual telemetry mapping required' : `${row.status === 'searchable' ? 'Potentially searchable' : 'Coverage gap'} · ${row.required.join(', ')}`, 'group-small')); host.appendChild(card); });
+    rows.forEach((row) => {
+      const card = el('div', '', 'coverage-card'); card.dataset.status = row.status;
+      card.append(el('strong', row.technique), el('p', row.status === 'unmapped' ? 'Manual telemetry mapping required' : `${row.status === 'searchable' ? 'Potentially searchable' : 'Broad telemetry gap'} · ${row.required.join(', ')}`, 'group-small'));
+      const entry = guidance?.techniques?.[row.technique];
+      const source = link('Open MITRE technique and detection guidance ↗', entry?.technique_url || `https://attack.mitre.org/techniques/${row.technique.replace('.', '/')}/`);
+      source.target = '_blank'; source.rel = 'noopener noreferrer'; card.appendChild(source);
+      if (entry?.strategies?.length) {
+        const details = el('details'); details.appendChild(el('summary', `${entry.strategies.length} MITRE detection strategies`));
+        entry.strategies.forEach((strategy) => {
+          const section = el('div'); const anchor = link(`${strategy.id} · ${strategy.name} ↗`, strategy.url); anchor.target = '_blank'; anchor.rel = 'noopener noreferrer'; section.appendChild(anchor);
+          const analytics = strategy.analytics || [];
+          if (analytics.length) section.appendChild(el('p', analytics.map((item) => `${item.id}: ${(item.platforms || []).join('/') || 'platform unspecified'} · ${(item.log_sources || []).join(', ') || 'check strategy for required logs'}`).join(' | '), 'group-small'));
+          details.appendChild(section);
+        }); card.appendChild(details);
+      } else card.appendChild(el('p', 'No published strategy mapped in this cached guidance; inspect MITRE manually. This is not a detection verdict.', 'group-small'));
+      host.appendChild(card);
+    });
   }
   function renderTriage(result = null) {
     const host = $('[data-triage-result]'); if (result === null) return;
@@ -136,8 +187,10 @@
   Promise.all([
     fetch('group_evidence.json', { cache: 'no-cache' }).then((response) => { if (!response.ok) throw new Error('Evidence unavailable'); return response.json(); }),
     fetch('ransomware_context.json', { cache: 'no-cache' }).then((response) => response.ok ? response.json() : null).catch(() => null),
-  ]).then(([evidence, activity]) => {
+    fetch('attack_guidance.json', { cache: 'no-cache' }).then((response) => response.ok ? response.json() : null).catch(() => null),
+  ]).then(([evidence, activity, detectionGuidance]) => {
     model = groupCore.build(evidence); context = activity;
+    guidance = detectionGuidance?.schema_version === 1 && Date.parse(detectionGuidance.generated_at) <= Date.now() ? detectionGuidance : null;
     const contextReady = context && Date.parse(context.generated_at) >= Date.parse('2025-01-01T00:00:00Z');
     $('[data-status]').textContent = `Evidence ${new Date(model.generatedAt).toLocaleString()} · ${contextReady ? `aggregate activity ${new Date(context.generated_at).toLocaleString()}` : 'activity aggregate pending first refresh'} · browser tools make no API calls.`;
     const selector = $('[data-group]'); [...model.groups.keys()].sort().forEach((name) => { const option = el('option', name); option.value = name; selector.appendChild(option); });
@@ -148,7 +201,13 @@
     window.addEventListener('popstate', readLocation); window.addEventListener('hashchange', readLocation);
     document.querySelectorAll('[data-tab]').forEach((node) => node.addEventListener('click', () => navigate({ tab: node.dataset.tab })));
     selector.addEventListener('change', (event) => navigate({ group: event.target.value }));
-    $('[data-priority-kind]').addEventListener('change', renderPriorities); $('[data-compare]').addEventListener('change', renderCompare);
+    $('[data-priority-kind]').addEventListener('change', () => { priorityLimit = 30; renderPriorities(); });
+    $('[data-priority-observable]').addEventListener('change', () => { priorityLimit = 30; renderPriorities(); });
+    $('[data-compare]').addEventListener('change', renderCompare);
+    $('[data-priority-more]').addEventListener('click', () => { priorityLimit += 30; renderPriorities(); });
+    $('[data-candidate-export]').addEventListener('click', () => download({ schema_version: 1, source: 'browser-local analyst decisions',
+      group_snapshot_at: model.generatedAt, exported_at: new Date().toISOString(), decisions: candidateDecisions,
+      limitation: 'A local observation or dismissal is user supplied, not confirmation of ransomware-group attribution or a published feed update.' }, 'swiftioc-candidate-decisions.json'));
     $('[data-quick-plan]').addEventListener('click', () => { const group = state.group || [...model.groups.keys()].sort((a, b) => model.byGroup.get(b).length - model.byGroup.get(a).length)[0]; navigate({ group, tab: 'coverage' }); });
     $('[data-triage-form]').addEventListener('submit', (event) => { event.preventDefault(); renderTriage(workbench.triage(model, $('[data-triage-input]').value)); });
     $('[data-exposure-check]').addEventListener('click', () => renderExposure(workbench.exposure(model, $('[data-exposure-input]').value)));

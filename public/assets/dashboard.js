@@ -3336,6 +3336,8 @@
     let vendorFilter = '';
     let productFilter = '';
     let allCurrentItems = [];
+    let publicCveSignals = null;
+    const signalFor = (id) => publicCveSignals?.items?.[id] || null;
     let drawerItems = [];
     let baseline = null;
     let acknowledged = {};
@@ -3530,6 +3532,7 @@
           product: item.reports?.cisa_kev?.product || '', severity: item.reports?.nvd?.severity || '',
           exploitation_status: item.exploitation_status, priority: priority.label, why: priority.why,
           groups: record?.groups || [], sources: item.sources || [], reports: item.reports || {}, description: item.description || '',
+          public_signals: signalFor(item.cve_id),
           vulnerability_snapshot: snapshotTime == null ? '' : new Date(snapshotTime * 1000).toISOString(), group_snapshot: groupModel?.generatedAt || '',
           observations: observationsFor(record), timeline: dashboardCore.vulnerabilityTimeline(item, record, observationsFor(record)),
           reviewed: isReviewed(item), changes: isNewSinceVisit(item) ? dashboardCore.vulnerabilityChanges(baseline.records[item.cve_id], evidenceFor(item)) : [],
@@ -3573,6 +3576,7 @@
     const buildDrawer = (item) => {
       const facts = dashboardCore.vulnerabilityFacts(item);
       const record = groupEvidence.get(item.cve_id.toLowerCase()) || null;
+      const publicSignal = signalFor(item.cve_id);
       const observations = observationsFor(record);
       drawerTitle.textContent = item.cve_id;
       drawerBody.replaceChildren();
@@ -3593,6 +3597,20 @@
       if (facts.rejected) addText(drawerBody, 'p', 'Rejected NVD record: review the provider record before acting.', 'vulnerability-caution');
       addText(drawerBody, 'h4', 'Description'); addText(drawerBody, 'p', item.description || 'No description supplied.');
       if (item.reports?.cisa_kev?.required_action) { addText(drawerBody, 'h4', 'CISA required action'); addText(drawerBody, 'p', item.reports.cisa_kev.required_action); }
+      if (publicSignal) {
+        const external = document.createElement('section'); external.className = 'today-evidence-profile';
+        addText(external, 'h4', 'Additional public CVE signals');
+        if (publicSignal.epss) addText(external, 'p', `FIRST EPSS: ${(publicSignal.epss.probability * 100).toFixed(1)}% estimated chance of observed exploitation activity in the next 30 days (${(publicSignal.epss.percentile * 100).toFixed(1)} percentile). Forecast only—not current exploitation, severity or local risk.`);
+        const official = publicSignal.official_cve;
+        if (official) {
+          addText(external, 'p', `Official CVE record: ${official.status || 'status unavailable'}${official.updated_at ? ` · updated ${official.updated_at}` : ''}. ${(official.affected || []).slice(0, 5).map((part) => [part.vendor, part.product].filter(Boolean).join(' / ')).filter(Boolean).join('; ') || 'Affected-product details not supplied.'}`);
+          const versions = (official.affected || []).slice(0, 5).flatMap((part) => (part.versions || []).slice(0, 4).map((version) => `${[part.vendor, part.product].filter(Boolean).join(' / ')}: ${version.status || 'status unknown'} ${version.version || ''}${version.lessThan ? ` to <${version.lessThan}` : ''}${version.lessThanOrEqual ? ` to ≤${version.lessThanOrEqual}` : ''}`));
+          if (versions.length) addText(external, 'p', `Reported version statements (verify conditions with vendor): ${versions.join('; ')}`);
+          if (official.cisa_ssvc?.options) addText(external, 'p', `CISA SSVC: ${Object.entries(official.cisa_ssvc.options).map(([key, value]) => `${key} ${value}`).join(' · ')}. This is a separate CISA assessment, not confirmation of the named-group report.`);
+          const officialLink = addText(external, 'a', 'Open official CVE record ↗'); officialLink.href = safeHttpUrl(official.source_url) || `https://www.cve.org/CVERecord?id=${encodeURIComponent(item.cve_id)}`; officialLink.target = '_blank'; officialLink.rel = 'noopener noreferrer';
+        }
+        drawerBody.appendChild(external);
+      }
       addText(drawerBody, 'h4', 'Evidence timeline');
       const timeline = document.createElement('ol'); timeline.className = 'vulnerability-timeline';
       dashboardCore.vulnerabilityTimeline(item, record, observations).forEach((event) => {
@@ -3733,8 +3751,8 @@
       root.dataset.vulnerabilityGroupMode = String(Boolean(includeGroupOnlyRecords));
       const groupSupplement = [...groupEvidence.values()]
         .filter((record) => !existingIds.has(record.value.toLowerCase()))
-        .map((record) => ({ cve_id: record.value, title: record.value,
-          description: 'Reported by ransomware.live, but detailed CISA/NVD evidence is not present in the current retained SwiftIOC vulnerability collection. Verify affected products, versions, severity, and remediation with an authoritative vulnerability record.',
+        .map((record) => ({ cve_id: record.value, title: signalFor(record.value)?.official_cve?.description?.slice(0, 110) || record.value,
+          description: signalFor(record.value)?.official_cve?.description || 'Reported by ransomware.live, but detailed CISA/NVD evidence is not present in the current retained SwiftIOC vulnerability collection. Verify affected products, versions, severity, and remediation with an authoritative vulnerability record.',
           exploitation_status: 'not_established', sources: ['ransomware.live'], reports: {},
           reference: `https://nvd.nist.gov/vuln/detail/${encodeURIComponent(record.value)}`,
         }));
@@ -4285,6 +4303,12 @@
       render();
       reviewLinkedCve();
     }).catch(() => { groupFailed = true; render(); });
+    fetch(resolveIocUrl('cve_signals.json'), { cache: 'no-cache' }).then((response) => response.ok ? response.json() : null).then((data) => {
+      const age = Date.now() - Date.parse(data?.generated_at);
+      if (data?.schema_version === 1 && data.items && typeof data.items === 'object' && Number.isFinite(age) && age >= 0 && age <= 72 * 3600000) {
+        publicCveSignals = data; render();
+      }
+    }).catch(() => { /* Public enrichment is optional. */ });
     load();
   };
 

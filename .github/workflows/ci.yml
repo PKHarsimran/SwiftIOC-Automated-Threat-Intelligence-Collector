@@ -45,7 +45,7 @@ jobs:
         shell: bash
         run: |
           set -Eeuo pipefail
-          node --test public/assets/dashboard-core.test.js public/assets/inventory-core.test.js public/assets/group-intel-core.test.js public/assets/ransomware-workbench-core.test.js public/assets/today-core.test.js
+          node --test public/assets/dashboard-core.test.js public/assets/inventory-core.test.js public/assets/group-intel-core.test.js public/assets/ransomware-workbench-core.test.js public/assets/today-core.test.js public/assets/sbom-core.test.js
           node --check public/assets/today.js
           node --check public/assets/group-intel.js
           node --check public/assets/groups.js
@@ -54,6 +54,8 @@ jobs:
           node --check public/assets/dashboard.js
           node --check public/assets/inventory.js
           node --check public/assets/inventory-core.js
+          node --check public/assets/sbom-core.js
+          node --check public/assets/sbom.js
 
       - name: Set up Python
         uses: actions/setup-python@v7

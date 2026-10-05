@@ -167,6 +167,12 @@ jobs:
           RANSOMWARE_LIVE_API_KEY: ${{ secrets.RANSOMWARE_LIVE_API_KEY }}
         run: python -m swiftioc.ransomware_context --output "$OUT_DIR/ransomware_context.json"
 
+      - name: Refresh public CVE signals
+        run: python -m swiftioc.cve_signals --feed "$IOC_DIR/latest.jsonl" --groups "$OUT_DIR/group_evidence.json" --output "$OUT_DIR/cve_signals.json"
+
+      - name: Refresh ATT&CK detection guidance
+        run: python -m swiftioc.attack_guidance --groups "$OUT_DIR/group_evidence.json" --output "$OUT_DIR/attack_guidance.json"
+
       - name: Summarize IOC outputs
         if: success()
         shell: bash
@@ -208,6 +214,8 @@ jobs:
             public/detections/**
             public/collections/**
             public/group_evidence.json
+            public/cve_signals.json
+            public/attack_guidance.json
             public/feed.xml
             public/badge.json
             !public/diagnostics/raw/**

@@ -23,7 +23,9 @@
     const groupPoints = Math.min(25, record.groups.length * 5);
     score += groupPoints; reasons.push(`${record.groups.length} reported group association${record.groups.length === 1 ? '' : 's'} (+${groupPoints})`);
     if (record.kind === 'cves') { score += 10; reasons.push('CVE supports exposure review (+10)'); }
-    const recent = historyEvents(model).some((event) => event.kind === record.kind && event.type === record.type && event.value === record.value && now - Date.parse(event.at) <= 30 * DAY && ['added', 'returned', 'matched'].includes(event.action));
+    const recent = historyEvents(model).some((event) => event.kind === record.kind && event.type === record.type && event.value === record.value
+      && Number.isFinite(Date.parse(event.at)) && now - Date.parse(event.at) >= 0 && now - Date.parse(event.at) <= 30 * DAY
+      && ['added', 'returned', 'matched'].includes(event.action));
     if (recent) { score += 20; reasons.push('Locally observed change in the last 30 days (+20)'); }
     if (record.groups.length > 1) { score += 5; reasons.push('Shared reported evidence; attribution needs care (+5)'); }
     score = Math.min(100, score);
@@ -36,6 +38,14 @@
     if (observed) { score += 20; reasons.push('Local first/last observation receipt available (+20)'); }
     else reasons.push('Local observation receipt is not available yet (+0)');
     return { score, reasons, meaning: 'Evidence completeness and traceability—not truth, attribution confidence, or compromise probability.' };
+  }
+  function coverageSummary(model) {
+    const iocs = model.records.filter((record) => record.kind === 'iocs');
+    const cves = model.records.filter((record) => record.kind === 'cves');
+    return { groups: model.groups.size, reportedIocs: iocs.length, feedIocMatches: iocs.filter((record) => record.matched).length,
+      candidates: iocs.filter((record) => !record.matched).length, reportedCves: cves.length,
+      feedCveMatches: cves.filter((record) => record.matched).length,
+      groupsWithoutIocCollection: model.groupsWithoutIocCollection };
   }
   const setFor = (model, group, kind) => new Set((model.byGroup.get(group) || []).filter((r) => r.kind === kind).map((r) => `${r.type}:${r.value}`));
   const intersection = (a, b) => [...a].filter((value) => b.has(value)).length;
@@ -135,5 +145,5 @@
       countries: (context?.activity?.countries || []).filter((r) => countries.has(r.name.toLowerCase())),
       sectors: (context?.activity?.sectors || []).filter((r) => sectors.has(r.name.toLowerCase())) };
   }
-  return { priority, quality, similarities, coverage, groupSignals, anomalies, triage, exposure, detectionDraft, responsePack, watchMatches, TELEMETRY };
+  return { priority, quality, coverageSummary, similarities, coverage, groupSignals, anomalies, triage, exposure, detectionDraft, responsePack, watchMatches, TELEMETRY };
 });

@@ -30,7 +30,8 @@
     records.sort((a, b) => Number(b.matched) - Number(a.matched) || b.groups.length - a.groups.length || a.value.localeCompare(b.value));
     const byGroup = new Map([...groups.keys()].map((name) => [name, records.filter((r) => r.groups.includes(name))]));
     const byIdentity = new Map(records.map((r) => [`${r.type}:${identity(r.value, r.type)}`, r]));
-    return { groups, records, byGroup, byIdentity, generatedAt: data.generated_at, history: data.evidence_history || null };
+    return { groups, records, byGroup, byIdentity, generatedAt: data.generated_at, history: data.evidence_history || null,
+      groupsWithoutIocCollection: Number.isInteger(data.groups_without_ioc_endpoint) ? data.groups_without_ioc_endpoint : null };
   }
   function filter(model, { group = '', kind = 'cves', query = '', coverage = 'all', type = '' } = {}) {
     const term = query.trim().toLowerCase();

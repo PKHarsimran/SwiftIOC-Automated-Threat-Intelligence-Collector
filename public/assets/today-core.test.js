@@ -26,6 +26,17 @@ test('catalog preserves provider records and adds exact unmatched group CVEs', (
   assert.equal(all[3].cve_id, 'CVE-2026-9000');
   assert.equal(all[3].exploitation_status, 'not_established');
 });
+test('public CVE signals enrich missing details without turning a forecast into exploitation evidence', () => {
+  const signals = { items: { 'CVE-2026-9000': { epss: { probability: .35, percentile: .98 },
+    official_cve: { description: 'Official affected-product description', affected: [{ vendor: 'A', product: 'B' }],
+      cisa_ssvc: { options: { Exploitation: 'poc' } } } } } };
+  const missing = core.catalog(items, model, signals).find((item) => item.cve_id === 'CVE-2026-9000');
+  assert.equal(missing.exploitation_status, 'not_established');
+  assert.equal(missing.description, 'Official affected-product description');
+  const profile = core.evidenceProfile(missing, model, date, now);
+  assert.match(profile.claims.find((claim) => claim.source === 'FIRST EPSS').boundary, /not a severity score/);
+  assert.match(core.nextStep({ item: missing, findings: [] }), /official CVE/);
+});
 test('evidence profile separates claims and never promotes feed matches to corroboration', () => {
   const profile = core.evidenceProfile(items[0], model, date, now);
   assert.equal(profile.receipts, 1);

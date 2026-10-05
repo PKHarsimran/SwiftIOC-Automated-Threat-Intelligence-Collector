@@ -16,6 +16,19 @@ test('priority is explainable and never exceeds 100', () => {
   assert.equal(result.score, 65); assert.ok(result.reasons.length >= 3);
 });
 
+test('coverage summary separates unmatched IOC candidates from CVE retention', () => {
+  const summary = core.coverageSummary(fixture());
+  assert.equal(summary.candidates, 1);
+  assert.equal(summary.feedIocMatches, 1);
+  assert.equal(summary.feedCveMatches, 1);
+});
+
+test('future provider change cannot boost candidate priority', () => {
+  const model = fixture(); const candidate = model.records.find((row) => row.kind === 'iocs' && !row.matched);
+  model.history.events[0].at = '2027-01-01T00:00:00Z';
+  assert.equal(core.priority(candidate, model, Date.parse('2026-09-22T00:00:00Z')).reasons.some((reason) => reason.includes('last 30 days')), false);
+});
+
 test('quality measures traceability rather than truth or attribution', () => {
   const model = fixture(); const cve = model.records.find((r) => r.kind === 'cves'); const result = core.quality(cve, model);
   assert.equal(result.score, 80); assert.match(result.meaning, /not truth|not.*truth/i);

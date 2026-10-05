@@ -17,7 +17,7 @@
   try { localStorage.removeItem('swiftioc-today-baseline-v1'); } catch { /* Storage is optional. */ }
   let baseline = read(baselineKey);
   if (!core.validBaseline(baseline)) baseline = null;
-  let snapshot = null, model = null, report = null, groupState = 'loading', newest = 0, loaded = false;
+  let snapshot = null, model = null, report = null, signals = null, signalState = 'loading', groupState = 'loading', newest = 0, loaded = false;
   let watches = dashboard.normaliseBriefing(read('swiftioc-cve-briefing-v1'))?.watches || [];
   let currentItems = [], changes = {}, targets = new Map(), targetChoices = [], selection = new Set();
   let targetSnapshot = null, targetModel = null;
@@ -112,13 +112,15 @@
       get('status').textContent = loaded ? 'Vulnerability data unavailable or older than the last loaded snapshot. Refresh the CVE collection below; no missing data is treated as safe.' : 'Waiting for the published vulnerability snapshot…';
       renderPlan(); return;
     }
-    currentItems = core.catalog(snapshot.items, model);
     const now = Date.now(), time = Date.parse(snapshot.generated_at), groupTime = Date.parse(model?.generatedAt);
+    const usableSignals = signals && core.freshness(signals.generated_at, now, 72) === 'current' ? signals : null;
+    currentItems = core.catalog(snapshot.items, model, usableSignals);
     const warnings = [];
     if (core.freshness(snapshot.generated_at, now) === 'stale') warnings.push('The vulnerability snapshot is over 48 hours old.');
     if (!model) warnings.push(`Group evidence ${groupState}; group-based suggestions and change comparison are incomplete.`);
     else if (core.freshness(model.generatedAt, now, 72) === 'stale') warnings.push('The group snapshot is over 72 hours old; associations may have changed.');
     if (report?.truncated) warnings.push('Inventory report is partial: some assets were not fully assessed.');
+    if (!usableSignals) warnings.push(`Public CVE signals ${signalState}; EPSS and official-record enrichment are omitted from this briefing.`);
     get('freshness').textContent = warnings.join(' ');
     const usable = core.freshness(snapshot.generated_at, now) !== 'unavailable' && core.freshness(model?.generatedAt, now, 72) !== 'unavailable';
     const canCompare = usable && baseline && time / 1000 >= baseline.snapshotAt && groupTime >= baseline.groupAt;
@@ -144,6 +146,10 @@
       const reasons = add(card, 'ul', ''); entry.reasons.slice(0, 4).forEach((reason) => add(reasons, 'li', reason));
       const profile = core.evidenceProfile(entry.item, model, snapshot.generated_at);
       add(card, 'p', profile.hasVersionRules ? 'Applicability rules available; verify against your installed version.' : 'Affected-version verification needed.', 'today-quality-hint');
+      add(card, 'p', `Next check: ${core.nextStep(entry)}`, 'today-quality-hint');
+      const sourceDetails = add(card, 'details', ''); add(sourceDetails, 'summary', 'Evidence and limits');
+      for (const claim of profile.claims) add(sourceDetails, 'p', `${claim.source}: ${claim.finding} ${claim.boundary}`);
+      if (profile.gaps.length) add(sourceDetails, 'p', `Still unknown: ${profile.gaps.join(' ')}`);
       const actions = add(card, 'div', '', 'today-actions');
       button(actions, 'Review evidence', () => openCve(entry.item.cve_id));
       button(actions, 'Try patch scenario', () => { selection.add(entry.item.cve_id); get('planner').open = true; renderPlan(); get('planner').scrollIntoView({ block: 'start' }); });
@@ -151,6 +157,7 @@
     const health = get('health');
     add(health, 'p', `Vulnerability snapshot: ${snapshot.generated_at} · ${core.freshness(snapshot.generated_at)} (48-hour freshness window).`);
     add(health, 'p', `Group snapshot: ${model?.generatedAt || groupState} · ${core.freshness(model?.generatedAt, now, 72)} (72-hour freshness window).`);
+    add(health, 'p', `Public CVE signals: ${usableSignals?.generated_at || signalState} · ${usableSignals ? `${currentItems.filter((item) => item.signals?.epss).length} displayed CVEs have EPSS; ${currentItems.filter((item) => item.signals?.official_cve).length} have official CVE details` : 'not used while unavailable or stale'}. EPSS is a forecast, not a confirmed exploitation finding.`);
     const groupItems = currentItems.filter((item) => core.recordFor(model, item.cve_id)?.groups.length);
     const missing = groupItems.filter((item) => !item.reports?.cisa_kev && !item.reports?.nvd);
     add(health, 'p', `${snapshot.items.length} retained CVEs · ${model ? `${groupItems.length} group-linked CVEs · ${missing.length} group-linked CVEs missing retained provider reports` : 'group coverage unavailable'}.`);
@@ -184,6 +191,13 @@
     model = core.freshness(data.generatedAt, Date.now(), 72) === 'unavailable' ? null : data;
     groupState = model ? 'available' : 'invalid timestamp'; render();
   }).catch(() => { groupState = 'unavailable'; render(); });
+  fetch('cve_signals.json', { cache: 'no-cache' }).then((response) => {
+    if (!response.ok) throw new Error('CVE signals unavailable');
+    return response.json();
+  }).then((data) => {
+    if (data?.schema_version !== 1 || !data.items || typeof data.items !== 'object' || !Number.isFinite(Date.parse(data.generated_at))) throw new Error('Invalid CVE signals');
+    signals = data; signalState = core.freshness(data.generated_at, Date.now(), 72); render();
+  }).catch(() => { signalState = 'unavailable'; render(); });
   get('plan-add').addEventListener('click', () => {
     for (const id of targets.get(get('plan-target').value) || []) selection.add(id);
     renderPlan();

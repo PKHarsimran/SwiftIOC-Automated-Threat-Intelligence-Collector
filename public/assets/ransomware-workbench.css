@@ -30,6 +30,7 @@
 .priority-score { display: grid; place-items: center; width: 58px; height: 58px; border: 1px solid var(--accent); border-radius: 50%; color: var(--accent); font-size: 1.1rem; }
 .priority-card h3 { margin: .1rem 0 .3rem; font-size: .95rem; overflow-wrap: anywhere; }
 .priority-card details { color: var(--text-muted); font-size: .8rem; }
+.priority-card > :last-child { display: flex; flex-wrap: wrap; gap: .45rem; max-width: 210px; }
 .compare-score { display: grid; grid-template-columns: 150px 1fr; gap: 1rem; align-items: center; margin: 1rem 0; }
 .compare-score strong { font-size: 2rem; color: var(--accent); }
 .dna-grid, .coverage-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; }

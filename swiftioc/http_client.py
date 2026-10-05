@@ -55,8 +55,10 @@ def build_session() -> requests.Session:
     from requests.adapters import HTTPAdapter
 
     s = requests.Session()
+    # Some urllib3 stub versions omit Retry.__init__'s supported keywords.
+    retry_factory: Any = Retry
     adapter = HTTPAdapter(
-        max_retries=Retry(
+        max_retries=retry_factory(
             # A single flaky/rate-limiting source (public threat feeds and
             # shared CI-runner IP ranges do not mix well) must not be able to
             # stall the whole run for minutes: worst case here is ~4 attempts

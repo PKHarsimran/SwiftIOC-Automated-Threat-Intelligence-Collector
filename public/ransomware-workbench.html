@@ -9,7 +9,7 @@
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="assets/styles.css?v=49" />
   <link rel="stylesheet" href="assets/groups.css?v=44" />
-  <link rel="stylesheet" href="assets/ransomware-workbench.css?v=44" />
+  <link rel="stylesheet" href="assets/ransomware-workbench.css?v=47" />
 </head>
 <body data-ioc-root=".">
 <a class="skip-link" href="#workbench">Skip to workbench</a>
@@ -46,8 +46,9 @@
       </section>
 
       <section data-panel="priorities" class="workbench-panel" hidden>
-        <div class="panel-heading"><div><h2>Explainable review queue</h2><p>Ranks evidence for investigation. It is not a probability of compromise or automatic block decision.</p></div><label>Evidence type<select data-priority-kind><option value="all">All</option><option value="cves">CVEs</option><option value="iocs">IOCs</option></select></label></div>
-        <div class="priority-list" data-priorities></div>
+        <div class="panel-heading"><div><h2>Explainable review queue</h2><p>Group-reported IOCs begin as research candidates, not confirmed detections or a blocklist. Local decisions never change the published feed.</p></div><label>Evidence type<select data-priority-kind><option value="candidates">Unmatched IOC candidates</option><option value="iocs">All IOCs</option><option value="cves">CVEs</option><option value="all">All</option></select></label><label>IOC type<select data-priority-observable><option value="all">All IOC types</option><option value="network">IP, domain or URL</option><option value="hash">File hashes</option></select></label></div>
+        <p data-priority-summary class="group-small"></p><div class="priority-list" data-priorities></div>
+        <div class="inline-actions"><button type="button" class="button ghost" data-priority-more hidden>Show more</button><button type="button" class="button ghost" data-candidate-export>Export local decisions</button></div>
       </section>
 
       <section data-panel="compare" class="workbench-panel" hidden>
@@ -57,7 +58,7 @@
       </section>
 
       <section data-panel="coverage" class="workbench-panel" hidden>
-        <h2>Defensive coverage matrix</h2><p>Select telemetry you actually retain. Settings stay in this browser. “Searchable” still requires correct fields, retention and detections.</p>
+        <h2>Defensive coverage matrix</h2><p>Select telemetry you actually retain. Settings stay in this browser. Broad telemetry matches are only a starting point; review the linked MITRE detection strategies and their exact log requirements, then test a detection locally.</p>
         <fieldset class="telemetry-picker" data-telemetry><legend>Available telemetry</legend></fieldset>
         <div data-coverage-summary></div><div class="coverage-grid" data-coverage></div>
       </section>
@@ -87,8 +88,8 @@
   <footer class="site-footer"><span>SwiftIOC / Open-source threat intelligence</span><a href="groups.html">Explore group evidence</a></footer>
 </div>
 <script defer src="assets/dashboard-core.js?v=42"></script>
-<script defer src="assets/group-intel-core.js?v=43"></script>
-<script defer src="assets/ransomware-workbench-core.js?v=44"></script>
-<script defer src="assets/ransomware-workbench.js?v=45"></script>
+<script defer src="assets/group-intel-core.js?v=50"></script>
+<script defer src="assets/ransomware-workbench-core.js?v=46"></script>
+<script defer src="assets/ransomware-workbench.js?v=47"></script>
 </body>
 </html>

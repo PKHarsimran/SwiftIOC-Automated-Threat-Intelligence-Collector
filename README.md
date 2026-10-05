@@ -52,9 +52,10 @@ The same CVE may contain separate CISA KEV and NVD reports. Different CVE IDs re
 | --- | --- | --- |
 | **IOC feed and lookup** | Find raw or defanged values; inspect score, tags, source IDs, and dates; create a browser-local investigation queue. | A match is not a verified malicious event in your logs. |
 | **Workspace and SPL** | Turn up to 50 selected observables into configurable Splunk search text or portable exports. `index=*`, wildcard, and comma-separated index scopes are supported. | It does not execute a search or know your field mappings; review cost and query semantics before running it. |
-| **CVE workspace and Today** | Review exploitation evidence, product watches, material changes, group associations, and a hypothetical patch scenario. | It does not scan hosts, prove affected versions, or measure real risk reduction. |
+| **CVE workspace and Today** | Review exploitation evidence, official CVE details, EPSS forecasts, product watches, material changes, group associations, and a hypothetical patch scenario. | EPSS is not known exploitation or a local risk score; the site does not scan hosts or prove affected versions. |
 | **Local exposure report** | Compare an imported asset list with retained CISA product evidence and supported NVD applicability rules. | Product or version matches still need vendor/scanner verification. Inventory stays in the current tab. |
-| **Groups and Workbench** | Explore permitted ransomware.live associations, changes, priority explanations, telemetry gaps, and draft response packs. | Group links do not prove current use, attribution, local exposure, or a shared campaign. |
+| **SBOM review** | Import CycloneDX or SPDX JSON and optionally query exact package versions against OSV. | The SBOM stays in the tab until you explicitly send package IDs/versions to OSV; no match does not mean safe. |
+| **Groups and Workbench** | Explore permitted ransomware.live associations, IOC research candidates, coverage gaps, MITRE detection guidance, and draft response packs. | Group links do not prove current use, attribution, local exposure, or a shared campaign. |
 
 The browser keeps queue and watch preferences locally when storage is available. Export work you need to keep or share. Imported inventory is held in tab memory, not uploaded or saved to browser storage; exported scenarios may contain asset IDs, so review them before sharing.
 
@@ -103,6 +104,8 @@ The paths below are relative to `public/` locally or the [published site](https:
 | [`iocs/delta.json`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/iocs/delta.json) | Changes against the last validated snapshot; one collection interval, not a permanent event queue. |
 | [`iocs/high_confidence.jsonl`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/iocs/high_confidence.jsonl) | Score-threshold or multi-source subset for review, not automatic blocking. |
 | [`group_evidence.json`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/group_evidence.json) / [`ransomware_context.json`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/ransomware_context.json) | Derived group associations and aggregate context when permitted PRO enrichment is configured. |
+| [`cve_signals.json`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/cve_signals.json) | Cached daily FIRST EPSS lookup for retained/group CVEs and bounded official CVE/CISA SSVC details for group-linked CVEs. No PRO calls. |
+| [`attack_guidance.json`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/attack_guidance.json) | Bounded MITRE ATT&CK technique-to-detection-strategy and analytic references, refreshed at most weekly. No PRO calls. |
 | `detections/`, `misp/`, `iocs/stix2.json`, `feed.xml` | Draft detections and interoperability outputs; validate before deployment. |
 | [`diagnostics/run.json`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/diagnostics/run.json) / `diagnostics/collection-attempt.json` | Published run and latest quality-check attempt; compare timestamps and status. |
 
@@ -113,6 +116,8 @@ Start with a full snapshot, then consume Delta only while its previous-generatio
 The core collector and site work without a PRO key. If you have permission to use and publish derived ransomware.live data, store the key in the repository secret `RANSOMWARE_LIVE_API_KEY`; never place it in source files or browser code. The collector caches provider responses for at least 24 hours, rechecks SwiftIOC membership between provider refreshes, and publishes only normalized associations and aggregate context. Browser views use those static sidecars and make **zero PRO API calls**. The group collector also has a hard cap on groups to prevent an unexpectedly large request burst.
 
 Provider associations are research leads. Unmatched provider IOCs are labeled **research candidates**, not silently added to scores or blocklists. See [Ransomware intelligence](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Ransomware-Intelligence) for data flow, call-budget behavior, UI meanings, and limitations.
+
+The Workbench shows exact feed overlap and explicitly labels groups for which no IOC collection is available. Analysts can record local “observed in my logs” or dismissal decisions and export them; those decisions never change the public feed or prove group attribution. The separate EPSS, CVE, and ATT&CK sidecars use public sources and consume **zero ransomware.live PRO calls**.
 
 ## Trust and project boundaries
 

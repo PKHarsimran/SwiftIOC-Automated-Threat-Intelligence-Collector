@@ -680,8 +680,9 @@ test('vulnerability aggregation ranks structured vendors and products determinis
 
 test('page references current asset cache keys', () => {
   const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
-  for (const [asset, version] of Object.entries({ 'styles.css': 49, 'today.css': 49, 'today.js': 49,
-    'dashboard.js': 49, 'dashboard-core.js': 48, 'group-intel.js': 48, 'group-intel-core.js': 48 })) {
+  for (const [asset, version] of Object.entries({ 'styles.css': 49, 'today.css': 49, 'today.js': 50,
+    'today-core.js': 50, 'dashboard.js': 50, 'dashboard-core.js': 48, 'group-intel.js': 48,
+    'group-intel-core.js': 50, 'sbom-core.js': 1, 'sbom.js': 1 })) {
     assert.ok(html.includes(`assets/${asset}?v=${version}`));
   }
 });

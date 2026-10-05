@@ -23,6 +23,10 @@ Both sidecars have a 24-hour provider refresh interval. A scheduled four-hour co
 
 The browser fetches only published JSON. Searching, filtering, graphing, and building draft response packs make **no PRO API calls**. This is why adding more browser views does not consume the provider quota.
 
+The Workbench's candidate view lists group-reported IOCs without an exact retained-feed match. It shows coverage counts, local first/last observation receipts, and an optional browser-local decision (“observed in my logs” or “dismissed”). A decision can be exported, but does not promote an IOC into the published feed or validate attribution. A group with no available IOC collection is **unknown coverage**, not proof that the group has no IOCs. The page shows more records in bounded batches instead of hiding everything beyond the first 30.
+
+Separate public-source sidecars add CVE signals and detection guidance: `cve_signals.json` uses FIRST's daily EPSS CSV and bounded official CVE lookups; `attack_guidance.json` uses MITRE ATT&CK STIX at most weekly to connect group-level techniques with published detection strategies, analytics, platforms, and log-source examples. Neither sidecar calls ransomware.live. These sources describe different claims and should not be treated as independent confirmation of a named-group association.
+
 ## Interpret a group association
 
 | Label or field | Meaning | What it cannot establish |

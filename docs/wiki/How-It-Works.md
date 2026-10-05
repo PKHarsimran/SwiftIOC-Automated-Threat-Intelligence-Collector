@@ -1,6 +1,6 @@
 # How SwiftIOC works, end to end
 
-SwiftIOC has a **producer** (the Python collector) and a **consumer** (the static website or your security tool). They communicate through published files. There is no per-visitor Python API, database account, or direct browser connection to a feed provider.
+SwiftIOC has a **producer** (the Python collector) and a **consumer** (the static website or your security tool). They communicate through published files. There is no per-visitor Python API or database account. The optional, explicitly initiated SBOM check is an exception: your browser contacts OSV.dev directly with selected package identities and versions.
 
 ```mermaid
 flowchart LR
@@ -45,7 +45,9 @@ The production [collection workflow](https://github.com/PKHarsimran/SwiftIOC-Aut
 | IOC lookup, feed, graph, discovery | `iocs/dashboard.jsonl`, source/run summaries, and related static outputs | Filters and a local investigation queue. |
 | CVE workspace and Today | `collections/vulnerabilities.json` plus group evidence when available | Product watches, review state, material-change baseline, and temporary patch scenarios. |
 | Exposure report | Retained CVE collection | Imported inventory in **current-tab memory**; it is not uploaded or saved to local storage. |
-| Groups and Ransomware Workbench | `group_evidence.json` and `ransomware_context.json` | Group/telemetry/watch preferences in the browser when storage is available. |
+| SBOM review | Local CycloneDX/SPDX JSON; OSV only after explicit check | SBOM in **current-tab memory**; package URLs/versions sent directly to OSV.dev only on request. |
+| Groups and Ransomware Workbench | `group_evidence.json`, `ransomware_context.json`, and `attack_guidance.json` | Group/telemetry/watch and candidate-decision preferences in the browser when storage is available. |
+| Public CVE signals | `cve_signals.json` | Daily EPSS and bounded official CVE/CISA SSVC detail, kept separate from KEV/NVD/group claims. |
 
 The site generates SPL and other exports locally. It does not run searches in your SIEM. Some exports can contain your selected indicators or asset IDs; inspect them before sharing. Local preferences do not synchronize between devices or survive blocked/cleared browser storage.
 
