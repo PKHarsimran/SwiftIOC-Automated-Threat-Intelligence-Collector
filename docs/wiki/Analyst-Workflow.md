@@ -22,6 +22,17 @@ Start with a question: “Have we seen this observable?” or “Does this explo
 7. **Hunt or export.** Configure the live workspace SPL for your index, time range and field names. Copy/download the query, or export selected evidence in an appropriate format.
 8. **Validate in your environment.** Correlate with assets, user activity and expected traffic before escalation or enforcement.
 
+## Choose the next tool from the evidence
+
+| Starting question | Next move |
+| --- | --- |
+| “What does this IOC connect to?” | Inspect its provider/source evidence and the bounded graph, then check related values against your own telemetry. |
+| “Is this CVE relevant to our software?” | Open the CVE detail, follow an exact product if useful, and compare an on-demand inventory report. The [CVE guide](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/CVE-and-Exposure) explains uncertainty and the Today patch scenario. |
+| “Which group was reported with this record?” | Open [Groups](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/groups.html) for association receipts and changes. A feed match is not independent confirmation. |
+| “How could we investigate this group?” | Open the [Ransomware Workbench](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/ransomware-workbench.html) for exact triage, coverage, comparison, and draft response packs. Choose a focus group deliberately; rankings are review order, not attribution. |
+
+The main page, Groups, and Workbench read published snapshots. They do not query ransomware.live or your SIEM on each click. See [How it works](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/How-It-Works) for the producer/consumer boundary.
+
 ## Resume and recover
 
 The queue holds up to **50 indicators**. Export JSON to keep a portable investigation copy. “Resume a saved investigation” imports up to **500 KB**, merges with the queue, preserves existing evidence for duplicates and rejects invalid/over-capacity input without partially changing the queue.
@@ -53,4 +64,4 @@ Next: [CVE review](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Inte
 ---
 [Wiki home](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki) · [Interview guide](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Interview-Guide) · [Documentation map](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Reference-and-Glossary)
 
-*Reviewed against main at `2725dbf9` on 21 September 2026. Live feed counts change between collections.*
+*For current feed counts and timestamps, check the published diagnostics.*

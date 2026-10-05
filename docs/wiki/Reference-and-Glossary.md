@@ -11,7 +11,9 @@ Paths are under the configured output directory (usually `public/`). Some genera
 | `iocs/high_confidence.csv`, `.jsonl` | Score-threshold or multi-source subset. |
 | `iocs/delta.json`, `.jsonl` | Latest snapshot comparison: envelope and event stream. |
 | `iocs/stix2.json` | STIX 2.1 bundle; CVEs use vulnerability objects. |
-| `collections/` | Separate observable and vulnerability collections. |
+| `collections/observables.jsonl`, `collections/vulnerabilities.json` | Separate non-CVE observables and CVEs with structured provider reports. Generated files may be absent from a fresh clone. |
+| `group_evidence.json` | Optional normalized ransomware.live group–IOC–CVE–technique associations, exact retained-feed matches, and local observation history. |
+| `ransomware_context.json` | Optional aggregate activity and availability context; no raw victim or negotiation records. |
 | `misp/` | MISP event feed and manifest. |
 | `detections/` | Sigma, Suricata, RPZ and verification manifest. |
 | `diagnostics/run.json` | Published run statistics and baseline metadata. |
@@ -51,6 +53,8 @@ See [Operations](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intell
 | NVD | Vulnerability metadata including severity and applicability information. |
 | CPE | Structured product identity used in applicability criteria. |
 | CVSS | Severity scoring; not proof of exploitation or local exposure. |
+| Reported group association | Provider link between a group and a CVE/IOC or group-level technique; not proof of current use or local exposure. |
+| Research candidate | Provider-reported value with no exact match in SwiftIOC's retained feed; not automatically scored or blocked. |
 | Defang / refang | Make a value less likely to be opened accidentally / restore its ordinary spelling for matching. |
 | Provenance | Where evidence came from and the context/timestamps supporting it. |
 | Source / provider | An adapter/feed identifier / the organization or reporting entity behind feeds. |
@@ -85,4 +89,4 @@ Wiki images in this edition use immutable repository-commit URLs so removing a f
 ---
 [Wiki home](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki) · [Interview guide](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Interview-Guide) · [Documentation map](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Reference-and-Glossary)
 
-*Reviewed against main at `2725dbf9` on 21 September 2026. Live feed counts change between collections.*
+*For current feed counts and timestamps, check the published diagnostics.*

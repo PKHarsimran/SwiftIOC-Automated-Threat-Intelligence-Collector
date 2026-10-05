@@ -61,9 +61,9 @@ Delta schema version 1 contains generation timestamps, `baseline_available`, cou
 
 The baseline requires a usable previous JSONL snapshot whose loaded record count agrees with previous diagnostics. Missing/corrupt data must not turn every current record into a false “new” alert. Loaded baselines remain immutable during rescoring so genuine decay updates and removal payloads preserve their prior values.
 
-**Implementation:** [model](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/2725dbf95fe719b45e6d4e2d50d1952b2b34784f/swiftioc/models.py), [scoring](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/2725dbf95fe719b45e6d4e2d50d1952b2b34784f/swiftioc/scoring.py), [Delta](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/2725dbf95fe719b45e6d4e2d50d1952b2b34784f/swiftioc/writers.py).
+**Implementation:** [model](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/main/swiftioc/models.py), [scoring](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/main/swiftioc/scoring.py), [Delta](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/main/swiftioc/writers.py).
 
 ---
 [Wiki home](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki) · [Interview guide](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Interview-Guide) · [Documentation map](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Reference-and-Glossary)
 
-*Reviewed against main at `2725dbf9` on 21 September 2026. Live feed counts change between collections.*
+*For current feed counts and timestamps, check the published diagnostics.*

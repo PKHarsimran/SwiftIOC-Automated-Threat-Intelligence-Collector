@@ -17,7 +17,7 @@ flowchart LR
 
 The HTTP layer bounds redirect chains to five hops, streams responses under a 100 MiB limit, and retries selected transient failures. Cross-origin redirects strip known sensitive headers including NVD `apiKey`, Authorization and Cookie. Redirect destinations must resolve to public addresses; internal/link-local/loopback targets are rejected.
 
-Configured initial source URLs are trusted and are not checked by the redirect validator. DNS validation is not a substitute for network egress policy or a sandbox. The response cap is per response, not a guarantee on total process memory. Inspect [http_client.py](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/2725dbf95fe719b45e6d4e2d50d1952b2b34784f/swiftioc/http_client.py) before treating these controls as a complete SSRF defense.
+Configured initial source URLs are trusted and are not checked by the redirect validator. DNS validation is not a substitute for network egress policy or a sandbox. The response cap is per response, not a guarantee on total process memory. Inspect [http_client.py](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/main/swiftioc/http_client.py) before treating these controls as a complete SSRF defense.
 
 ## Collected credential handling
 
@@ -25,11 +25,13 @@ Phishing URLs can contain third-party credentials. Their appearance in a feed do
 
 Whole-record omission preserves meaning: deleting only the key could create an unobserved URL, and replacing it with a domain could widen a detection. Omission counters explain the count difference. The safeguard is targeted, not a comprehensive secret scanner; standalone writer callers must filter their own inputs.
 
-Do not test an exposed key or paste it into public discussions. Removing it from current output does not revoke it or erase old commits/artifacts/forks. Follow [SECURITY.md](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/2725dbf95fe719b45e6d4e2d50d1952b2b34784f/SECURITY.md) for ownership, revocation and reporting guidance. Raw capture is unsanitized and must stay private.
+Do not test an exposed key or paste it into public discussions. Removing it from current output does not revoke it or erase old commits/artifacts/forks. Follow [SECURITY.md](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/main/SECURITY.md) for ownership, revocation and reporting guidance. Raw capture is unsanitized and must stay private.
 
 ## Browser state and exported data
 
 The dashboard fetches public feeds but does not upload your investigation queue or asset inventory. Queue/watches/review state can persist in local storage. Inventory and undo state are memory-only. A downloaded report can include local asset identifiers and evidence, so handle the export according to your environment's policy.
+
+Optional ransomware.live PRO access runs in the collector, not the browser. Store `RANSOMWARE_LIVE_API_KEY` as a secret/environment variable; never place it in a public artifact. `group_evidence.json` contains derived associations and observations; `ransomware_context.json` contains aggregate counts/availability, not raw victim records, negotiation content, ransom notes, screenshots or press items. Publication still depends on provider permission and attribution. Workbench exposure text is processed locally, while watch preferences can be saved in browser storage.
 
 Browser-local storage is not encrypted case management. Other users of the same browser profile or compromised page execution can access it. Avoid storing secrets in notes/identifiers, and export/clear state deliberately on shared machines. Shared URLs may expose query terms when you choose to share them.
 
@@ -46,4 +48,4 @@ Use [private vulnerability reporting](https://github.com/PKHarsimran/SwiftIOC-Au
 ---
 [Wiki home](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki) · [Interview guide](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Interview-Guide) · [Documentation map](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Reference-and-Glossary)
 
-*Reviewed against main at `2725dbf9` on 21 September 2026. Live feed counts change between collections.*
+*For current feed counts and timestamps, check the published diagnostics.*

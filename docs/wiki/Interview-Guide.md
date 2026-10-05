@@ -4,13 +4,13 @@ Use these as practice material, then describe the work you personally understand
 
 ## A 30-second explanation
 
-> SwiftIOC is a Python collector and static threat-intelligence dashboard. It normalizes public feeds into attributed IOC and CVE records, maintains a scored and bounded snapshot, and helps an analyst turn that evidence into an investigation or portable hunt. The design emphasizes explainability: provenance stays with each record, exploitation evidence is separated from severity, and failed quality checks can preserve the previous publication.
+> SwiftIOC is a Python collector and static threat-intelligence dashboard. It normalizes public feeds into attributed IOC and CVE records, maintains a scored and bounded snapshot, and helps an analyst turn that evidence into an investigation or portable hunt. Optional, cached ransomware.live data adds reported group context without exposing an API key in the browser. The design emphasizes explainability: provenance stays with each record, different claims stay separate, and failed quality checks can preserve the previous publication.
 
 ## A two-minute explanation
 
 1. **Problem:** analysts receive different feed formats and need to preserve meaning, freshness and provenance while building a focused working set.
 2. **Architecture:** source adapters emit one model; Python filters, merges, scores and publishes files. The browser reads those files without a backend API.
-3. **Analyst value:** lookup, provider/tag pivots, a local queue, mapped SPL and detection exports help move from a report to a testable hypothesis. CVEs have a separate evidence/applicability workflow.
+3. **Analyst value:** lookup, provider/tag pivots, a local queue, mapped SPL and detection exports help move from a report to a testable hypothesis. CVEs have a separate evidence/applicability workflow; optional group reporting is labeled as a research association rather than confirmation.
 4. **Reliability:** quality rejection keeps the previous feed; validated baselines prevent alert floods; copies preserve historical state during rescoring; deterministic exports and SID reservations support consumers.
 5. **Tradeoff:** simple static deployment limits collaborative cases and real-time enrichment. The next step would be coherent versioned publication and measured feed-quality/performance targets, not just more animations.
 
@@ -37,8 +37,9 @@ Explain **identity**, **failure behavior** and **trust boundaries** while drawin
 | 0:40–1:30 | Pick a retained observable, inspect provenance, then use a graph pivot. | Relationships are investigative evidence, not attribution. |
 | 1:30–2:20 | Queue two supported IOCs, open Workspace, configure SPL. | Queries depend on real field mappings; the browser does not execute them. |
 | 2:20–3:15 | Open Known exploited CVEs and review dates/action. | KEV exploitation differs from NVD severity and new publication. |
-| 3:15–4:10 | Import a synthetic inventory using the UI sample. | Version applicability has uncertainty; no match is not a safety verdict. |
-| 4:10–5:00 | Show one regression test and a quality-rejection path. | Correctness and recovery are product features. |
+| 3:15–4:00 | Import a synthetic inventory using the UI sample and open Today's patch scenario. | Version applicability and hypothetical remediation have uncertainty; no match is not a safety verdict. |
+| 4:00–4:30 | Open a reported group/CVE receipt if PRO sidecars are available. | Provider association, KEV exploitation and local exposure are different claims; browser views cost no PRO calls. |
+| 4:30–5:00 | Show one regression test and a quality-rejection path. | Correctness and recovery are product features. |
 
 Use synthetic assets and the current retained feed. If live data is unavailable, explain the failure state or use the repository's fixture-based tests; do not present invented results as live findings.
 
@@ -91,4 +92,4 @@ Next: [Architecture](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-In
 ---
 [Wiki home](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki) · [Interview guide](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Interview-Guide) · [Documentation map](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Reference-and-Glossary)
 
-*Reviewed against main at `2725dbf9` on 21 September 2026. Live feed counts change between collections.*
+*For current feed counts and timestamps, check the published diagnostics.*

@@ -8,7 +8,7 @@ ruff check .
 pyright
 python -m swiftioc --self-test
 pytest -q
-node --test public/assets/dashboard-core.test.js public/assets/inventory-core.test.js
+node --test public/assets/dashboard-core.test.js public/assets/inventory-core.test.js public/assets/group-intel-core.test.js public/assets/ransomware-workbench-core.test.js public/assets/today-core.test.js
 ```
 
 Python 3.10+ is the project target. Frontend tests require Node.js. On Windows, use the corresponding executables under `.venv\Scripts\` if the environment is not activated.
@@ -44,6 +44,8 @@ node scripts/test_personal_briefing.cjs
 node scripts/test_inventory_ui.cjs
 node scripts/test_investigation_spl.cjs
 node scripts/test_investigation_import.cjs
+node scripts/test_today_ui.cjs
+node scripts/test_cve_workspace_ui.cjs
 ```
 
 Use `BASE_URL` for another local server and `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` for an existing Chromium executable. Fixtures keep tests repeatable without depending on live threat data.
@@ -59,6 +61,8 @@ Use `BASE_URL` for another local server and `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH
 - Cross-origin redirects: parser credentials must not follow the redirect.
 - Rejected quality run: preserve published outputs and diagnostics baseline.
 - SID disappearance/reappearance: preserve historical collision reservations.
+- Group/CVE links: a reported CVE must open CVE evidence, including a group-only research candidate.
+- Today planner: a large catalog must remain searchable without thousands of dropdown options or lost selection.
 
 ## Frontend maintenance
 
@@ -68,9 +72,9 @@ Keep pure transformations in core modules and DOM behavior in UI modules. Valida
 
 Edit SPL sources and `scripts/build_splunk_guide.py`, then regenerate with `python scripts/build_splunk_guide.py`. Text output uses UTF-8. Keep Wiki source copies under `docs/wiki/` and publish their changes to GitHub Wiki separately; a repository PR does not automatically update the Wiki repository.
 
-See [CONTRIBUTING.md](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/2725dbf95fe719b45e6d4e2d50d1952b2b34784f/CONTRIBUTING.md), [CI](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/2725dbf95fe719b45e6d4e2d50d1952b2b34784f/.github/workflows/ci.yml) and [reference upkeep](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Reference-and-Glossary).
+See [CONTRIBUTING.md](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/main/CONTRIBUTING.md), [CI](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/main/.github/workflows/ci.yml) and [reference upkeep](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Reference-and-Glossary).
 
 ---
 [Wiki home](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki) · [Interview guide](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Interview-Guide) · [Documentation map](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Reference-and-Glossary)
 
-*Reviewed against main at `2725dbf9` on 21 September 2026. Live feed counts change between collections.*
+*For current feed counts and timestamps, check the published diagnostics.*

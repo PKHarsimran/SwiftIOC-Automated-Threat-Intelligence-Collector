@@ -1,245 +1,66 @@
 # SwiftIOC
 
-**Collect threat intelligence. Understand the evidence. Take a focused working set into your security tools.**
+**Collect threat intelligence, keep the evidence attached, and turn a small working set into something you can investigate.**
 
-SwiftIOC is an open-source **Python collector and browser dashboard** for indicators of compromise (IOCs) and vulnerability reports. An IOC is an observable—such as an IP address, domain, URL, or file hash—that can help an analyst investigate suspicious activity.
+SwiftIOC is an open-source Python collector and static web dashboard. It gathers indicators of compromise (IOCs) and vulnerability reports from configured sources, normalizes them, publishes downloadable feeds, and gives analysts tools to review the evidence. You can [use the live dashboard](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/) without installing anything or creating an account.
 
-A CVE ID identifies a publicly cataloged vulnerability; an IOC identifies something to look for in telemetry. The collector turns public feeds into consistent files. The dashboard makes those files searchable and helps you move from a suspicious indicator or exploited CVE to evidence, a shortlist, and a usable export.
-
-**[Try the live dashboard](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/) · [Known exploited CVEs](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/#vulnerabilities) · [Splunk hunt library](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/splunk/) · [Collection diagnostics](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/diagnostics/summary.html)**
+An **IOC** is a value to look for in telemetry, such as an IP address, domain, URL, or file hash. A **CVE** identifies a vulnerability in software. A CVE is not automatically an IOC, and neither kind of record proves that your environment is compromised.
 
 [![CI](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/ci.yml)
-[![CodeQL](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/codeql.yml)
 [![Collection](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/collect.yml/badge.svg?branch=main)](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/collect.yml)
-[![License](https://img.shields.io/github/license/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector?color=bfcc9b&labelColor=252d24)](LICENSE)
+[![CodeQL](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/codeql.yml)
+[![License](https://img.shields.io/github/license/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector)](LICENSE)
+[![Retained snapshot and collection time](https://img.shields.io/endpoint?url=https%3A%2F%2Fharsim.ca%2FSwiftIOC-Automated-Threat-Intelligence-Collector%2Fbadge.json&label=Snapshot&cacheSeconds=3600)](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/diagnostics/run.json)
 
-### Live snapshot
+Badges can be cached; the linked diagnostics give the actual collection time and source status. Counts describe the **retained snapshot**, not a complete upstream catalog.
 
-[![Retained snapshot count and collection timestamp](https://img.shields.io/endpoint?url=https%3A%2F%2Fharsim.ca%2FSwiftIOC-Automated-Threat-Intelligence-Collector%2Fbadge.json&label=Snapshot&color=bfcc9b&labelColor=252d24&cacheSeconds=3600)](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/diagnostics/run.json)
+## Choose your starting point
 
-[![Observables](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fharsim.ca%2FSwiftIOC-Automated-Threat-Intelligence-Collector%2Fdiagnostics%2Frun.json&query=%24.collections.observables&label=Observables&color=5cabb4&labelColor=252d24&cacheSeconds=3600)](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/diagnostics/run.json)
-[![CVEs](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fharsim.ca%2FSwiftIOC-Automated-Threat-Intelligence-Collector%2Fdiagnostics%2Frun.json&query=%24.collections.vulnerabilities&label=CVEs&color=ad94c4&labelColor=252d24&cacheSeconds=3600)](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/diagnostics/run.json)
-[![Known exploited](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fharsim.ca%2FSwiftIOC-Automated-Threat-Intelligence-Collector%2Fdiagnostics%2Frun.json&query=%24.collections.known_exploited&label=Known+exploited&color=e9b565&labelColor=252d24&cacheSeconds=3600)](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/diagnostics/run.json)
-
-These badges read the published data; counts are **retained records, not complete upstream catalogs**. “Known exploited” means CISA Known Exploited Vulnerabilities (KEV) evidence, not an attack happening right now. Badges may be cached; use the linked diagnostics for timestamps and source failures.
-
-<details>
-<summary><strong>What changed in the latest collection?</strong></summary>
-
-[![Added](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fharsim.ca%2FSwiftIOC-Automated-Threat-Intelligence-Collector%2Fdiagnostics%2Frun.json&query=%24.delta_counts.added&label=Added&color=86b98e&labelColor=252d24&cacheSeconds=3600)](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/diagnostics/run.json)
-[![Updated](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fharsim.ca%2FSwiftIOC-Automated-Threat-Intelligence-Collector%2Fdiagnostics%2Frun.json&query=%24.delta_counts.updated&label=Updated&color=81b4c5&labelColor=252d24&cacheSeconds=3600)](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/diagnostics/run.json)
-[![Removed](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fharsim.ca%2FSwiftIOC-Automated-Threat-Intelligence-Collector%2Fdiagnostics%2Frun.json&query=%24.delta_counts.removed&label=Removed&color=cba28d&labelColor=252d24&cacheSeconds=3600)](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/diagnostics/run.json)
-
-Changes compare the latest snapshot with its validated baseline. Removed means absent from the retained feed, not safe. A first run has no historical alert flood. [Read the change feed](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/iocs/delta.json) or learn [how to consume it](#consume-changes-safely).
-
-</details>
-
-## Project Wiki
-
-The [SwiftIOC field guide](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki) explains the architecture, analyst workflows, CVE applicability, SPL, operations and security boundaries with diagrams and optional animated walkthroughs. Preparing for an interview? Start with the [interview guide](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Interview-Guide) for a short pitch, demo script and real engineering tradeoffs.
-
-## Start here
-
-| Your goal | Fastest path |
+| I want to… | Start here |
 | --- | --- |
-| Investigate an IP, domain, URL, or hash | [Open the dashboard](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/); no installation or account needed. |
-| Work through exploited vulnerabilities | [CVE briefing](#cve-briefing), with optional product watches and a local exposure report. |
-| Hunt selected IOCs in Splunk | [Investigation workspace](#investigation-workspace): queue → configure → copy SPL. |
-| Run the collector yourself | [Quick start](#quick-start) for macOS, Linux, Windows, or Docker. |
-| Connect a SIEM or threat intelligence platform | [Feeds and integrations](#feeds-and-integrations). |
-| Add a source or contribute a fix | [Source configuration](#source-configuration) and [Development](#development). |
+| Check an IP, domain, URL, or hash | [IOC lookup](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/#ioc-lookup) → inspect sources and dates → add useful records to the investigation queue. |
+| Review exploited vulnerabilities | [CVE workspace](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/#vulnerabilities) → read CISA/NVD evidence → optionally follow a product or compare a local inventory. |
+| Research ransomware-group reporting | [Groups](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/groups.html) for reported links; [Workbench](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/ransomware-workbench.html) for triage, coverage, comparison, and response drafts. |
+| Use data in another tool | [Feed map](#published-files) and [integration guide](integrations/README.md). |
+| Run or change the collector | [Local setup](#run-it-locally) and the [wiki installation guide](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Installation). |
 
-## What you can do
+New to the project? Read the wiki's [How it works](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/How-It-Works) for a record-by-record walkthrough, or use the [wiki home](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki) to choose an analyst, maintainer, or developer path.
 
-| Workflow | What SwiftIOC provides |
-| --- | --- |
-| **Look up and triage** | Search ordinary or defanged IOCs, then filter by type, source, age, and score. Defanging replaces characters such as `.` with `[.]` so an indicator is less likely to be opened accidentally. |
-| **Find leads** | Discovery lenses surface recent sightings and uncommon investigative tags while excluding known feed-name aliases. |
-| **Follow the evidence** | A provider/tag graph groups source aliases, highlights connected records, and exports the displayed graph or selected neighborhood. Click empty graph space or press Escape to clear selection. |
-| **Build a hunt** | Keep up to 50 IOCs in a local investigation queue, generate SPL, and export CSV, JSON, Sigma, or Suricata output where supported. |
-| **Prioritize CVEs** | Review exploitation evidence, dates, remediation, personal product watches, and imported inventory matches. |
-| **Research ransomware groups** | Optionally view group-linked IOCs, CVEs, and ATT&CK techniques reported by ransomware.live PRO, with clear separation from confirmed exploitation and scored feed records. |
-| **Operate the pipeline** | Consume snapshot/delta feeds and inspect source failures, filtering, retention, and volume in diagnostics. |
-
-> **Know what the evidence means.** Scores rank relevance; they are not probabilities. Shared reporting or tags do not establish a campaign or threat actor. A missing IOC or CVE does not prove an asset is safe. SwiftIOC is a collection and investigation tool, not a scanner or a managed detection service.
-
-### Optional ransomware.live PRO enrichment
-
-If you have permission to use ransomware.live PRO, add its key as the GitHub Actions repository secret `RANSOMWARE_LIVE_API_KEY`. The scheduled collector publishes `public/group_evidence.json`, a normalized evidence sidecar. The key is never embedded in the site or committed. Provider data is refreshed at most once every 24 hours; intervening four-hour runs use **zero PRO API calls** while still rechecking which IOCs and CVEs are in SwiftIOC. The refresh uses the provider's IOC-group index to skip groups without IOC collections, and refuses an unexpectedly large group listing instead of spending an unbounded number of calls. With the current 401 groups and 161 IOC collections, a refresh is approximately 564 requests, or about 17,000 in 30 days. You can run `python -m swiftioc.ransomware_live --feed public/iocs/latest.jsonl --output public/group_evidence.json` locally with the key in the environment; `--force-refresh` explicitly bypasses the cache when needed.
-
-The dashboard links to a dedicated **Groups** page (`groups.html`) with searchable group selection, an overview, and paginated IOC, CVE and ATT&CK technique tables. Matching associations appear as compact badges on IOC lookup results and CVE cards. The **Evidence map** focuses on one group and one record type: select a record to see other groups reported with that same record, then pivot to a group or export the displayed nodes and links. It shows at most 12 evidence nodes and 8 related groups with explicit coverage counts; any table record can open its connection in the map. Views and selected map records can be shared by copying the page URL. All these interactions read the published JSON and spend no PRO API calls.
-
-The **Changes** view tracks locally observed additions, returns, removals and new feed matches, with a baseline on first collection (not a flood of false new-activity alerts). History retains up to 90 days and 5,000 events; missing associations never mean safe or inactive. **Evidence receipts** distinguish provider snapshot time from local first-observed and last-check times. Feed matches are not independent corroboration. **Hunt pack** exports a group-scoped JSON containing type-aware SPL searches (including `index=*`, wildcard and multi-index scopes), CVE review checklists, ATT&CK references and receipts. Queries require field-mapping and cost review; nothing runs automatically, and candidates are not promoted to blocklists. History is stored inside the existing evidence snapshot, so no additional provider requests are needed.
-
-The dedicated **Ransomware Workbench** (`ransomware-workbench.html`) adds an explainable priority queue, group-DNA comparisons, telemetry coverage gaps, exact-match incident triage, a browser-only exposure check and watchlist, infrastructure churn, change-burst detection, aggregate sector/country radar, and multi-format defensive response packs. Scores are review ordering—not compromise probabilities. Similarity is not attribution. Generated SPL, KQL, Sigma and Suricata content is explicitly marked as a draft requiring local field, cost, SID and false-positive review. Private inputs and watchlists stay in the browser.
-
-### Today briefing and patch scenarios
-
-The dashboard's **Today** view connects existing product watches, workbench group/CVE watches, and the current tab's inventory report. It proposes up to three CVE reviews with explicit reasons; without personal context it is labeled collection highlights. Country and sector watches stay aggregate reporting context and are not used to infer CVE applicability. Rejected NVD records are excluded from suggestions. Reviewed evidence ranks after unreviewed evidence. Material evidence changes are compared against a browser-local baseline; routine ingestion timestamps do not produce change alerts, and missing or older snapshots cannot overwrite that baseline.
-
-**What if we patch this?** simulates remediation of selected CVEs or every retained CVE for an exact vendor/product pair. It separates asset counts from findings, NVD version-rule matches from findings needing verification, and excludes outside-range findings. The scenario lists associated groups and their other reported CVEs; it does not claim risk reduction, successful patching, or neutralization of a group. A truncated inventory report is explicitly labeled. Scenarios do not change review state or findings. Exported scenario JSON contains asset IDs: review it before sharing. Inventory is never stored in localStorage, uploaded, or included in the evidence-change baseline.
-
-**Evidence quality & limitations** in the CVE detail drawer separates ransomware.live associations, CISA exploitation evidence, and NVD applicability data. Multiple reports about a CVE do not independently corroborate a named group association. The **Data coverage & evidence gaps** disclosure lists group-linked CVEs lacking provider reports. Collection freshness (48 hours for vulnerabilities, 72 hours for groups) is a UI review policy, not an attack timestamp or provider SLA; retained KEV catalog checks are assessed separately. These tools reuse the existing snapshot request and snapshot events, with no additional ransomware.live API calls.
-
-Today reuses the CVE workspace's existing material-evidence baseline instead of duplicating the provider descriptions in browser storage. First visits seed a baseline quietly; failed group loads do not erase prior associations.
-
-Local browser regression: serve `public/` and run `node scripts/test_today_ui.cjs` with Playwright/Chromium installed. The test uses synthetic snapshots, exercises failure/rollback and mobile states, and verifies inventory privacy. Unit coverage lives in `public/assets/today-core.test.js` and runs in CI.
-
-`ransomware_context.json` contains only derived counts and availability totals. It never publishes victim names, domains, screenshots, press records, ransom notes, negotiations, or raw API responses. It refreshes from seven documented PRO endpoints at most once per 24 hours (about 210 calls/month), while all workbench interactions are static and make zero PRO API calls.
-
-A provider association is a research lead, **not** proof of current use, attribution, or local exposure. Group techniques are not automatically attributed to each IOC, and shared evidence does not establish a shared campaign. Unmatched provider IOCs are labeled research candidates and are not added to SwiftIOC scoring or blocklists automatically. If the key is absent or the API fails, the core feed still works; an earlier evidence snapshot is retained. Confirm that your permission allows publication of this derived sidecar and retain the ransomware.live attribution when redistributing it.
-
-## How it works
-
-Two parts, one file-based interface: **Python collects and publishes; the browser reads and investigates.** The dashboard needs no Python API, database server, or account system.
+## How the pieces fit
 
 ```mermaid
 flowchart LR
-    A[Configured API and RSS feeds] --> B[Python collector]
-    B --> C[Normalize and deduplicate]
-    P[Previous snapshot] --> D[Merge, score and retain]
-    C --> D
-    D --> E[Observable and CVE collections]
-    D --> F[Exports, changes and diagnostics]
-    E --> G[Static dashboard]
-    F --> G
-    F --> H[Your security tools]
+  A[Configured public feeds] --> B[Python collection and normalization]
+  B --> C[Quality checks, scoring, and retention]
+  C --> D[Published static files]
+  D --> E[Browser dashboard]
+  D --> F[Your SIEM or other tools]
+  G[Optional permitted ransomware.live PRO data] --> H[Cached group/context sidecars]
+  H --> E
 ```
 
-1. **Fetch:** YAML selects sources and parsers; diagnostics record failures and returned volumes.
-2. **Normalize:** turn different formats into a shared indicator model, remove configured false positives, and deduplicate by `(type, indicator)`.
-3. **Maintain:** with `--persist-feed`, carry forward prior records, preserve history, rescore aging evidence, and apply retention limits. Without it, the output uses the current collection.
-4. **Publish:** write separate observable and CVE collections, compatibility feeds, change events, and diagnostics.
+1. **Collect.** YAML configuration selects feeds and parsers. The collector fetches them, records source failures, normalizes values, filters configured false positives, and merges identical `(type, indicator)` records while retaining provenance.
+2. **Decide what to publish.** Quality gates can reject a bad collection without replacing the previous feed. With `--persist-feed`, prior records can carry forward, age, and be rescored. Score and retention settings bound the published set.
+3. **Write files.** The collector produces separate observable and CVE collections, compatibility feeds, a one-run change feed, detection drafts, and diagnostics. GitHub Actions normally collects every four hours and deploys the resulting `public/` tree. A schedule is not a freshness guarantee; check [run diagnostics](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/diagnostics/summary.html).
+4. **Investigate in the browser.** The site fetches published files. It does not need a Python API server or an account. Lookup, filters, graph pivots, workbench tools, SPL generation, and local inventory comparison do not call upstream providers on each click.
 
-Reports about the **same CVE** share one record with separate provider evidence. **Different CVE IDs remain separate**, even if they share a product, source, or tag. CVEs describe vulnerabilities; observables are values you can match against telemetry.
+The same CVE may contain separate CISA KEV and NVD reports. Different CVE IDs remain different records even when they name the same product. Source counts and scores help order review; they are **not** proof of independent corroboration, attack attribution, or compromise.
 
-The graph groups known aliases under their reporting provider: several abuse.ch exports do not count as independent providers. Aggregate/context feeds such as IPsum and Tor are distinguished from reporting providers. The graph is a bounded sample and can omit relationships.
+## What the site helps you do
 
-<a id="investigation-queue-spl"></a>
+| Area | What it does | What it does **not** do |
+| --- | --- | --- |
+| **IOC feed and lookup** | Find raw or defanged values; inspect score, tags, source IDs, and dates; create a browser-local investigation queue. | A match is not a verified malicious event in your logs. |
+| **Workspace and SPL** | Turn up to 50 selected observables into configurable Splunk search text or portable exports. `index=*`, wildcard, and comma-separated index scopes are supported. | It does not execute a search or know your field mappings; review cost and query semantics before running it. |
+| **CVE workspace and Today** | Review exploitation evidence, product watches, material changes, group associations, and a hypothetical patch scenario. | It does not scan hosts, prove affected versions, or measure real risk reduction. |
+| **Local exposure report** | Compare an imported asset list with retained CISA product evidence and supported NVD applicability rules. | Product or version matches still need vendor/scanner verification. Inventory stays in the current tab. |
+| **Groups and Workbench** | Explore permitted ransomware.live associations, changes, priority explanations, telemetry gaps, and draft response packs. | Group links do not prove current use, attribution, local exposure, or a shared campaign. |
 
-## Investigation workspace
+The browser keeps queue and watch preferences locally when storage is available. Export work you need to keep or share. Imported inventory is held in tab memory, not uploaded or saved to browser storage; exported scenarios may contain asset IDs, so review them before sharing.
 
-```mermaid
-flowchart TD
-    A[Find an IOC in the dashboard] --> B[Add it to the investigation queue]
-    B --> C[Set Splunk index, time range and event fields]
-    C --> D{Valid settings and at least one supported IOC?}
-    D -->|Yes| E[Copy or download the generated SPL]
-    D -->|No| F[Correct settings or change the queue]
-    F --> C
-    E --> G[Validate and run in your own Splunk]
-```
+## Run it locally
 
-The browser builds the query; it does not connect to or run searches in Splunk. Unsupported queued records are disclosed and excluded from the query.
-
-1. **Queue indicators** while browsing the feed, lookup results, or graph.
-2. **Open Workspace** from the floating shortcut. **Back to results** returns to your earlier scroll position.
-3. **Configure the live SPL (Splunk search):** choose an index and time range, then expand **Map event fields** if your logs use names such as `source.ip`.
-4. **Copy or export:** the query updates with the queue and lists every matching queued IOC in each result. Other export buttons produce the selected working set.
-5. **Recover mistakes:** **Undo last change** restores the prior queue after an addition, import, removal, or clear, including its order and generated SPL.
-
-**CVE-only queues show a software-verification checklist instead of SPL controls.** Use **Review evidence** beside a queued CVE to search for its exact ID across all statuses, including rejected records. CVE IDs are excluded from IOC SPL; mixed queues still generate searches for supported observables. Use the exposure report to compare installed vendor/product/version evidence, then confirm applicability with vendor guidance or scanner results. Splunk can support this only when your own inventory or scanner telemetry is available.
-
-The dashboard’s **Get started or resume an investigation** guide links directly to IOC lookup, CVE evidence, the exposure report and product watches.
-
-**Resume saved work:** choose **Export JSON** in Workspace. Later, open **Get started or resume an investigation → Resume a saved investigation** and select that file (up to 500 KB). Import merges with your current queue, preserves existing evidence for duplicates, and keeps URL paths case-sensitive. Invalid or over-capacity files leave the queue unchanged. One Undo restores the entire previous queue; duplicate-only imports preserve your existing Undo step. Files are read locally and are not uploaded.
-
-The queue holds **50 indicators**. It reports save failures, offers **Retry save**, and shows remaining capacity. Export your work before leaving if storage is unavailable. Undo retains one step in page memory and resets on reload.
-
-<details>
-<summary><strong>Supported SPL, field mapping, and privacy details</strong></summary>
-
-SPL supports IPs/CIDRs, exact DNS domains, full URLs, and MD5/SHA-1/SHA-256 hashes. Unsupported records are listed; no supported IOCs or invalid settings disables query export. Use `*` for every index, a wildcard such as `security_*`, or a comma-separated index list. Use extracted, single-valued fields; field names must start with a letter or underscore and use letters, numbers, underscores, or dots.
-
-Hunt settings stay in memory until reload; queue changes preserve them. Generated searches must be validated in your Splunk deployment. For full-feed matching, use the [lookup-based Splunk library](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/splunk/).
-
-| Data | Where it stays |
-| --- | --- |
-| Investigation queue | This browser's local storage when saving succeeds; no account/device sync. |
-| Undo and SPL settings | Current page memory, cleared on reload. |
-| Product watches and review state | This browser's local storage when available. |
-| Imported asset inventory | Current tab memory only; not uploaded or saved to local storage. |
-
-The dashboard fetches public feeds; it does not upload your queue or inventory. Exported files contain the working set or inventory report you requested and should be handled accordingly.
-
-</details>
-
-## CVE briefing
-
-The vulnerability view starts with **Known exploited** when no products are watched. **All CVEs** broadens coverage, while additional views focus on ransomware evidence, recent KEV additions, and recent publication or updates. These dates answer different questions: an old CVE newly added to KEV is not a newly disclosed vulnerability.
-
-<details>
-<summary><strong>How to choose a CVE workflow</strong></summary>
-
-```mermaid
-flowchart TD
-    A[Open the retained CVE collection] --> B{What do you need?}
-    B -->|Exploitation evidence| C[Known exploited: CISA KEV records]
-    B -->|Product tracking| D[My briefing: exact vendor and product watches]
-    B -->|Asset and version review| E[Exposure report: import local inventory]
-    C --> F[Review evidence, dates and required action]
-    D --> F
-    E --> G[Version match, needs verification, or outside reported range]
-    F --> H[Investigate and prioritize in your environment]
-    G --> H
-```
-
-KEV inclusion is evidence of known exploitation. An NVD severity score describes severity, not proof of exploitation. Inventory matching is an evidence comparison; it does not scan your assets. All three paths use the retained collection.
-
-</details>
-
-**My briefing** supports up to 20 product watches and makes that collection personal:
-
-1. Add an exact vendor, optionally narrowed to an exact product, from the structured CISA fields.
-2. The first matching valid snapshot establishes a baseline without flagging every historical CVE as new.
-3. Return to see records **new to your watched collection** and material evidence changes, such as exploitation status, ransomware use, severity, required action, or a due date.
-4. Mark an item **Investigating** or **Reviewed**, and export the filtered briefing as JSON with provider reports and triage state.
-
-A routine poll timestamp does not create a new evidence alert. Rejected records remain visible in the watched briefing when needed to explain a status change; other views hide them by default. Invalid or out-of-order snapshots cannot advance the briefing baseline. The browser retains at most 5,000 baseline records; narrow vendor/product watches if the interface reports this limit.
-
-Watchlists and review state stay in this browser's local storage. There is no account sync or automatic notification service; blocked storage limits persistence to the current tab. Product matching uses available CISA vendor/product fields, so an NVD-only record without those fields cannot match a watch. Coverage is limited to the retained collection. For explicit asset/version checks, use the local exposure report below; neither view is a complete vulnerability assessment.
-
-## Local exposure report
-
-Import a JSON inventory in the CVE section to compare up to **200 assets / 500 KB** against retained CISA and NVD evidence. Results distinguish **version match**, **needs verification**, and **outside reported range**. This is an on-demand evidence comparison, not a scan.
-
-<details>
-<summary><strong>Inventory format, version matching, and report limits</strong></summary>
-
-Open **Exposure report** in the CVE section, download the sample JSON, replace
-its example values, and import your inventory. Up to 200 assets and 500 KB are
-accepted. Inventory stays in memory in the current tab: it is not uploaded,
-saved to local storage, or shared with other users. Export the report before
-closing the tab if you need to retain it.
-
-Each asset needs a unique `id`, `vendor`, and `product`. Supply `version` for
-version checks, `exposure` (`internet`, `internal`, or `unknown`), and
-`importance` (`critical` or `standard`) for prioritization. These are your
-assertions, not scan results. Optional `cpe_vendor` and `cpe_product` must use
-explicit NVD CPE identifiers; `cpe_part` defaults to `a` (application), with
-`o` (operating system) and `h` (hardware) also supported. Display names are not
-automatically translated into CPE identities.
-
-The report distinguishes **version match**, **needs verification**, and
-**outside reported range**. Simple NVD applicability rules support exact
-versions and dotted-numeric inclusive/exclusive boundaries. Complex platform
-conditions, missing evidence, and unsupported version ordering remain uncertain.
-CISA-only product matches cannot confirm affected versions. Older snapshots
-without NVD configurations still support product-level review; a new collection
-run supplies applicability evidence when NVD provides it.
-
-Reports include provider evidence, matching reasons, remediation, the snapshot
-timestamp, and assets without a retained match. No match is not a safety verdict.
-The display paginates findings; exports include the whole calculated report,
-up to a disclosed 10,000-finding limit. Failed, future, or out-of-order snapshot
-refreshes disable the report until usable evidence returns. This first version
-is an on-demand assessment, not a scanner, SBOM parser, or change-alert service.
-
-</details>
-
-## Quick start
-
-Requires **Python 3.10+** and Git. Run these commands from a terminal.
+You need Git and **Python 3.10+**. Browsing the [hosted site](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/) needs neither. These commands collect your own snapshot and then serve the existing frontend over HTTP.
 
 ### macOS or Linux
 
@@ -255,8 +76,7 @@ python -m swiftioc --sources sources.yml --out-dir public --persist-feed --max-a
 python -m http.server 8765 --directory public
 ```
 
-<details>
-<summary id="windows-powershell"><strong>Windows PowerShell commands</strong></summary>
+### Windows PowerShell
 
 ```powershell
 git clone https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector.git
@@ -269,293 +89,50 @@ Copy-Item sources.example.yml sources.yml
 .\.venv\Scripts\python.exe -m http.server 8765 --directory public
 ```
 
+Open [http://localhost:8765](http://localhost:8765). The collection step makes network requests and can take time; the self-test does not. Generated `public/collections/` files may be absent from a fresh clone until collection runs. Do not open `index.html` directly as a local file. Read `public/diagnostics/REPORT.md` and `public/diagnostics/run.json` if data is missing. For Docker, fork deployment, and detailed recovery steps, use [Installation](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Installation) and [Operations](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Operations-and-Troubleshooting).
 
-</details>
+## Published files
 
-Open **[localhost:8765](http://localhost:8765)**. Stop the local server with `Ctrl+C`. The collection command makes network requests and can take time; inspect `public/diagnostics/REPORT.md` if a source fails or a collection is empty.
+The paths below are relative to `public/` locally or the [published site](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/). The compact dashboard preview is **not** the full retained feed.
 
-The repository supplies the dashboard HTML and assets in `public/`. The collector writes data into that directory; choosing a different `--out-dir` does not copy the frontend there. Run collection before expecting generated CVE and observable collections to be available locally. `swiftioc` and `python -m swiftioc` are equivalent after installation.
-
-<details>
-<summary id="docker"><strong>Run the collector with Docker</strong></summary>
-
-```bash
-docker build -t swiftioc .
-docker volume create swiftioc-data
-docker run --rm -v swiftioc-data:/data swiftioc
-```
-
-This runs the collector once and keeps output in a named volume. The default command enables persistence, a 30-day age limit, and a 10,000-record cap. The image's health check runs built-in assertions; it is not a feed-freshness check. The container does not serve the dashboard.
-
-To use your configuration on macOS or Linux:
-
-```bash
-docker run --rm -v "$PWD/sources.yml:/app/sources.yml:ro" -v swiftioc-data:/data swiftioc
-```
-
-</details>
-
-## Feeds and integrations
-
-**[Splunk hunt library](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/splunk/)** — copy-ready SPL for source/destination IPs, exact DNS domains, SHA-256 hashes, and exact URLs, with lookup preparation and field-mapping instructions.
-
-Paths below are relative to the published site or your `--out-dir`.
-
-| Output | Contents and intended use |
+| Path | Use |
 | --- | --- |
-| [`collections/observables.jsonl`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/collections/observables.jsonl) | Non-CVE indicators for matching against telemetry. |
-| [`collections/vulnerabilities.json`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/collections/vulnerabilities.json) | One record per CVE with separate provider reports and exploitation evidence. |
-| [`iocs/latest.jsonl`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/iocs/latest.jsonl) | Full retained snapshot, including CVEs; also available as CSV, TSV, and JSON. |
-| [`iocs/high_confidence.jsonl`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/iocs/high_confidence.jsonl) | Threshold/multi-source subset; also available as CSV. |
-| `iocs/dashboard.jsonl` | Compact dashboard preview, default 1,000 rows; not the full feed. |
-| [`iocs/delta.json`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/iocs/delta.json) and `delta.jsonl` | Additions, removals, and material updates since the previous validated snapshot. |
-| `iocs/stix2.json` | STIX 2.1 bundle for compatible tooling. |
-| `iocs/taxii2-envelope.json` | Static TAXII 2.1 envelope; this is not a TAXII API server. |
-| [`misp/manifest.json`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/misp/manifest.json) and event files | MISP feed for repeatable imports. |
-| `detections/` | Generated detection packs; review and adapt to your environment. |
-| [`feed.xml`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/feed.xml) | RSS feed for recent high-confidence records. |
-| `diagnostics/run.json` and `diagnostics/REPORT.md` | Machine-readable source/run results and a readable report. |
-| `badge.json` | Live snapshot count and update timestamp for Shields endpoint badges. |
+| [`collections/observables.jsonl`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/collections/observables.jsonl) | Non-CVE values for telemetry matching. |
+| [`collections/vulnerabilities.json`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/collections/vulnerabilities.json) | One retained record per CVE, with separate provider reports. |
+| [`iocs/latest.jsonl`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/iocs/latest.jsonl) | Full retained compatibility snapshot, including CVEs. CSV/TSV/JSON variants are also written. |
+| [`iocs/delta.json`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/iocs/delta.json) | Changes against the last validated snapshot; one collection interval, not a permanent event queue. |
+| [`iocs/high_confidence.jsonl`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/iocs/high_confidence.jsonl) | Score-threshold or multi-source subset for review, not automatic blocking. |
+| [`group_evidence.json`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/group_evidence.json) / [`ransomware_context.json`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/ransomware_context.json) | Derived group associations and aggregate context when permitted PRO enrichment is configured. |
+| `detections/`, `misp/`, `iocs/stix2.json`, `feed.xml` | Draft detections and interoperability outputs; validate before deployment. |
+| [`diagnostics/run.json`](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/diagnostics/run.json) / `diagnostics/collection-attempt.json` | Published run and latest quality-check attempt; compare timestamps and status. |
 
-### Consume changes safely
+Start with a full snapshot, then consume Delta only while its previous-generation checkpoint matches yours. If you miss an interval, reconcile with the full snapshot. `removed_from_feed` means absent from SwiftIOC's retained set, **not** benign. See [SPL and integrations](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/SPL-and-Integrations), [Detection packs](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Detection-Packs), and the [complete output map](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Reference-and-Glossary).
 
-Start with the full snapshot for initial synchronization, then poll the delta feed. When the previous snapshot is unavailable or invalid, the current run establishes a new baseline without emitting a historical additions flood. The browser's personal briefing baseline is separate from this collector baseline.
+## Optional ransomware.live enrichment
 
-<details>
-<summary><strong>How the collector decides which changes to publish</strong></summary>
+The core collector and site work without a PRO key. If you have permission to use and publish derived ransomware.live data, store the key in the repository secret `RANSOMWARE_LIVE_API_KEY`; never place it in source files or browser code. The collector caches provider responses for at least 24 hours, rechecks SwiftIOC membership between provider refreshes, and publishes only normalized associations and aggregate context. Browser views use those static sidecars and make **zero PRO API calls**. The group collector also has a hard cap on groups to prevent an unexpectedly large request burst.
 
-```mermaid
-flowchart TD
-    A[Current retained snapshot] --> B{Valid previous baseline?}
-    B -->|No| C[Publish snapshot with no historical change events]
-    B -->|Yes| D{Where is this IOC key present?}
-    D -->|Current only| E[Added]
-    D -->|Previous only| F[Removed from feed]
-    D -->|Both| G{Tracked evidence or material score changed?}
-    G -->|Yes| H[Updated]
-    G -->|No| I[No change event]
-```
+Provider associations are research leads. Unmatched provider IOCs are labeled **research candidates**, not silently added to scores or blocklists. See [Ransomware intelligence](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Ransomware-Intelligence) for data flow, call-budget behavior, UI meanings, and limitations.
 
-Keys combine indicator type and value. Removed events use the action `removed_from_feed` in the JSON feed. Material score changes cross a score band or move by at least five points. Changes to source, confidence, tags or provider evidence can also produce updates; the routine KEV catalog poll timestamp alone cannot. Changes cover one collection interval, so a consumer that misses runs should reconcile with the full snapshot.
+## Trust and project boundaries
 
-</details>
+- A high score ranks review relevance, not a probability of maliciousness. Multiple source IDs may come from one provider; graph aliases do not change the score.
+- CISA KEV is evidence of known exploitation, not evidence that your asset is exposed. NVD applicability data can be incomplete or conditional.
+- A missing record, empty search, or removed Delta event does not prove safety. The retained feed is bounded by lookback, filtering, decay, and capacity.
+- Detection files and SPL are drafts. Validate mappings, syntax, false positives, cost, and local policy before use.
+- Provider terms and attribution still apply. See [Security and privacy](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Security-and-Privacy) and [SECURITY.md](SECURITY.md).
 
-An `added` event means new to the retained feed; it does not prove the indicator was just created. A `removed` event means absent from the current snapshot, not benign. Material score and vulnerability-report changes produce `updated` events; a changed polling timestamp alone does not. A delta describes one collection interval, so consumers that miss runs should reconcile against the full snapshot.
+## Documentation and development
 
-### Verify a detection pack before loading it
+The [wiki](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki) is the detailed handbook: [How it works](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/How-It-Works), [Analyst workflow](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Analyst-Workflow), [CVE and exposure](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/CVE-and-Exposure), [Ransomware intelligence](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Ransomware-Intelligence), [Operations](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Operations-and-Troubleshooting), and the [CLI/glossary](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Reference-and-Glossary). Reviewable wiki source copies live in [`docs/wiki/`](docs/wiki/); the GitHub wiki is a separate repository and must also be published when those files change.
 
-Download the complete `detections/` directory from a collection artifact, then run:
-
-```bash
-python -m swiftioc.verify_detections ./detections
-# For automation: JSON result, exit 0 on success or 1 on verification failure
-python -m swiftioc.verify_detections ./detections --json
-```
-
-Schema-version 2 manifests list SHA-256 checksums and byte sizes for the generated Sigma, Suricata, RPZ, SID registry and README files. Verification detects missing or modified files and stale managed Sigma rules left over from another pack; it rejects symlinks and unsupported manifest paths. Older packs need regeneration. The collection workflow verifies packs before publishing them.
-
-Checksums establish consistency with the manifest you supplied, **not publisher authenticity or detection correctness**. Obtain the manifest from a trusted source and still validate rule syntax and local mappings before deployment. Unrelated files outside the managed set are not checked.
-
-When generating successive packs locally, retain `detections/suricata/sid-registry.json` so assigned Suricata IDs remain reserved even if an IOC disappears and returns. Deleting that state, or generating on a fresh runner without restoring it, loses collision history. The pack writer uses UTF-8 with consistent line endings so verification also works on Windows.
-
-See [integration examples](integrations/README.md) for Splunk, Elastic Security, Microsoft Sentinel, and detection guidance. For retained Git history, [build_history_index.py](scripts/build_history_index.py) and [ioc_timeline.py](scripts/ioc_timeline.py) support indicator timeline investigations.
-
-## Source configuration
-
-Copy and edit [sources.example.yml](sources.example.yml). Local `sources.yml` is Git-ignored; when it is absent, the collector falls back to the example configuration.
-
-```yaml
-apis:
-  - name: cisa_kev
-    kind: json
-    parse: kev
-    url: https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json
-    reference: https://www.cisa.gov/known-exploited-vulnerabilities-catalog
-
-  - name: nist_nvd_recent
-    kind: json
-    parse: nvd
-    url: https://services.nvd.nist.gov/rest/json/cves/2.0/?resultsPerPage=200
-    reference: https://nvd.nist.gov/
-    options:
-      api_key_env: NVD_API_KEY
-```
-
-The optional NVD setting reads the key from the named environment variable. Keep credentials out of committed YAML. Feed availability, authentication requirements, and rate limits depend on the provider; consult diagnostics rather than assuming every configured source succeeded.
-
-Included adapters cover CISA KEV, NVD, abuse.ch feeds, OpenPhish, Spamhaus DROP, SANS ISC/DShield, blocklist.de, GreenSnow, CINS Army, Tor exits, Emerging Threats, Binary Defense, and IPsum. Some are aggregate or contextual sources: membership in a Tor exit list alone does not establish malicious behavior.
-
-Set the global lookback with `--window-hours HOURS` (default 48); a top-level YAML `window_hours` does not override the CLI. Use `options:` for parser-specific arguments, `--source-window name=HOURS` for a per-source lookback, or `parse: universal` for supported JSON, CSV, and text feeds without a dedicated adapter. Custom Python parsers use `parse: my_package.parsers:parse_feed`. RSS extraction is also supported, but blog summaries often contain no usable indicators. See [CONTRIBUTING.md](CONTRIBUTING.md) for parser development.
-
-## Scoring and retention
-
-Scores combine confidence, source identifiers, and age. Retention limits determine what survives in the published snapshot; they do not measure the size of upstream catalogs.
-
-<details>
-<summary><strong>Score formula, half-lives, and retention priorities</strong></summary>
-
-Scores help rank records; they are not a probability of maliciousness. The current collector starts with a confidence base, adds a source-identifier bonus, and applies exponential decay since `last_seen`:
-
-```text
-base = low: 40, medium: 60, high: 80
-bonus = 8 per additional source identifier, capped at 16
-score = round((base + bonus) × 0.5 ^ (age / half-life)), bounded to 0–100
-```
-
-The bonus counts source identifiers, **not verified independent providers**. Provider grouping in the graph is a separate presentation step and does not change that score.
-
-| Indicator type | Score half-life |
-| --- | --- |
-| URL, IPv4, IPv6 | 7 days |
-| Domain | 14 days |
-| CIDR, JA3/JA3S, email | 30 days |
-| Bitcoin address | 90 days |
-| File hash | 180 days |
-| CVE | 365 days |
-
-For example, a high-confidence IP from two source identifiers starts at 88 and decays to 44 after seven days without a newer sighting. Source observation timestamps do not necessarily describe attacks happening at that time.
-
-`--persist-feed` carries forward records not seen in the latest fetch. `--min-score` (default 20), `--max-age-days`, and `--max-store` control expiry and capacity. Age and storage limits are off by default; the quick-start command and Docker example enable them explicitly. When capped, non-rejected KEV records checked within 24 hours take priority, ordered by newest KEV addition, then other records compete by score and recency. Age/score expiry and finite capacity still limit coverage.
-
-The `high_confidence` feed includes records at or above the threshold (default 80) **or with at least two source identifiers**. Review provenance, age, and local context before using any feed for blocking. Use the observable collection when an integration must exclude CVE IDs.
-
-</details>
-
-## Running continuously
-
-The repository's [collection workflow](.github/workflows/collect.yml) is scheduled every four hours and can be run manually. It collects data, persists the feed, writes diagnostics and summaries, and publishes the site. Scheduled execution can be delayed; check the latest run and data timestamps instead of treating the schedule as a freshness guarantee.
-
-For your own fork:
-
-1. Review the source configuration and collection flags in the workflow.
-2. Enable GitHub Actions and configure GitHub Pages to deploy through Actions.
-3. Set your own public URL with `--site-url` where appropriate and configure any required provider credentials as secrets.
-4. Run collection manually, inspect diagnostics, and confirm the generated collections load on your published site.
-
-For a workstation, server, or another CI system, schedule the collector command from the quick start. Keep the output directory between runs for persistence and deltas, and prevent overlapping runs against the same directory. Publishing `public/` serves both the existing frontend and generated files.
-
-### Check the collection, not just the website
-
-An available static site can still contain stale data. Individual sources can fail while collection succeeds unless failure guardrails are configured. Use source diagnostics and the collection workflow status together. Options include `--fail-on-empty name`, `--fail-if-stale name=HOURS` (based on newest `first_seen`), and `--warn-if-volume-drop name=PERCENT`. Save raw responses with `--save-raw-dir` outside the published directory when investigating parser failures. The workflow keeps raw captures outside public artifacts. Collected Google-key-shaped records are omitted from exports and Delta; see [collected-credential handling](SECURITY.md#collected-credentials-and-secret-scanning-alerts) for scope and historical-alert guidance.
-
-Required-source checks run **before** replacing feed exports. If `--fail-on-empty`, `--fail-if-stale`, or `--fail-if-volume-drop` fails, the collector exits with code 1 and retains the published snapshot and its `diagnostics/run.json` Delta baseline. The separate `diagnostics/collection-attempt.json` reports attempted source counts, per-source newest timestamps, fetch failures and rejection reasons. Its `accepted` status means quality checks passed, not that every later write or deployment completed; check the process/workflow result too. Failed GitHub Actions runs retain this report in the diagnostics artifact.
-
-For example, require a nonempty URLhaus result and reject a drop of 50% or more:
-
-```bash
-python -m swiftioc --sources sources.yml --out-dir public \
-  --fail-on-empty urlhaus_recent_urls \
-  --fail-if-volume-drop urlhaus_recent_urls=50
-```
-
-The volume check rejects a drop of **at least** the configured percentage (1–100), compared with the last published run under comparable source settings. It skips comparisons when no positive baseline exists and lists those sources in `volume_baseline_missing`; an unknown source name fails. Rejected attempts never become the next volume baseline. A volume drop can be legitimate, so choose thresholds for each source's normal behavior.
-
-Freshness checks use each source's newest valid, non-future `first_seen` **before** cross-source deduplication, persistence, scoring and retention. They measure recent entries, not HTTP availability or the provider's poll time; configure them only where that distinction fits the feed. Hours must be 1–876000. These checks protect against rejected collections, not every disk failure: individual exports remain atomic, but the output directory is not a transactional snapshot.
-
-Generate the readable IOC summary manually with:
-
-```bash
-python scripts/summarize_iocs.py --diag public/diagnostics/run.json --ioc-jsonl public/iocs/latest.jsonl
-```
-
-### Troubleshooting
-
-| Symptom | Check |
-| --- | --- |
-| Local dashboard cannot load data | Serve `public/` over HTTP and run collection first; do not open `index.html` as a local file. |
-| CVEs are unavailable in a fresh checkout | Generate `collections/vulnerabilities.json`; generated collections may not be committed. |
-| A source has no results | Read its diagnostics for HTTP errors, rate limits, parser problems, or a genuinely empty window. |
-| Fewer records than the upstream catalog | Check lookback, filtering, score expiry, age limits, and the storage cap. |
-| My watched product has no CVEs | Check exact vendor/product spelling and whether the retained records have structured CISA fields. |
-| Review state disappears | Check browser storage settings; local state does not follow you to another browser or device. |
-| The graph shows fewer providers than raw feeds | Known aliases share a provider; context/aggregate feeds and sampling are handled separately. |
-
-## CLI reference
-
-Run `python -m swiftioc --help` for the installed version's options.
-
-<details>
-<summary>Expand collection, retention, diagnostics, and export options</summary>
-
-| Flag | Purpose |
-| --- | --- |
-| `--out-dir PATH` | Directory where artifacts are written (`public/` by default). |
-| `--sources PATH` | YAML configuration (`sources.yml`, falls back to `sources.example.yml`). |
-| `--window-hours N` | Global lookback window in hours. |
-| `--skip-rss` | Disable RSS processing entirely. |
-| `--max-per-source N` | Cap the number of indicators taken from each source. |
-| `--max-workers N` | Number of sources fetched concurrently (default `8`; use `1` to disable threading). |
-| `--no-fp-filter` | Disable bogon / false-positive filtering (keep private IPs, `example.com`, etc.). |
-| `--persist-feed` | Living feed: merge the previously published `latest.jsonl`, decay scores by age, expire stale entries. |
-| `--min-score N` | Expire indicators whose decayed score falls below `N` (default `20`). |
-| `--high-confidence-score N` | Score at/above which an indicator enters the curated `high_confidence` feed (default `80`; multi-source indicators always qualify). |
-| `--max-age-days N` | Retention (off by default): drop indicators whose `last_seen` is older than `N` days. |
-| `--max-store N` | Retention (off by default): keep at most `N`; non-rejected KEV entries checked within 24 hours take priority (newest catalog additions first), then other records by score/recency. |
-| `--dashboard-rows N` | Rows in the compact `dashboard.jsonl` the web dashboard downloads (default `1000`). |
-| `--site-url URL` | Public site URL used as the RSS `<link>` (override for forks/custom domains). |
-| `--rss-limit N` | Number of items in `feed.xml` (default `50`). |
-| `--no-misp-feed` | Disable writing the MISP feed directory. |
-| `--urlhaus-status {any,online,offline}` | Filter URLhaus indicators by status. |
-| `--source-window name=N` | Override the lookback window for specific sources. |
-| `--grace-on-404 name` | Treat HTTP 404 for listed sources as a non-fatal empty result. |
-| `--fail-on-empty name…` | Fail the run if any listed sources return zero indicators. |
-| `--fail-if-stale name=N` | Fail when the newest `first_seen` from `name` is older than `N` hours. |
-| `--warn-if-volume-drop name=N` | Warn when a source returns at least `N` percent fewer rows than the prior run. |
-| `--save-raw-dir PATH` | Persist raw feed responses for later inspection. |
-| `--diag-json PATH` | Write diagnostics JSON (defaults to `<out-dir>/diagnostics/run.json`). |
-| `--report PATH` | Write Markdown run report (defaults to `<out-dir>/diagnostics/REPORT.md`). |
-| `--ua-file PATH` | Provide a custom user-agent pool (one UA per line). |
-| `--ci-safe` | Convenience flag for CI runs (JSON logs, ensures diagnostics dirs, tolerates missing RSS dependency; raw capture stays disabled unless an explicit `--save-raw-dir` is supplied). |
-| `--self-test` | Execute built-in assertions without fetching feeds. |
-| `-v/--verbose` | Increase console logging (`-vv` for debug). |
-| `--log-file PATH` | Send logs to a file. |
-| `--log-format {text,json}` | Choose console/file log format. |
-| `--log-file-level LEVEL` | Control the file log level (default `DEBUG`). |
-
-</details>
-
-## Development
-
-| Directory | Responsibility |
-| --- | --- |
-| [`swiftioc/`](swiftioc/) | Python CLI, HTTP handling, parsers, scoring, and writers. |
-| [`public/`](public/) | Static dashboard and generated outputs; browser logic lives in `assets/`. |
-| [`tests/`](tests/) | Offline Python regression tests. |
-| [`scripts/`](scripts/) | Browser tests, documentation generators, and operational helpers. |
-| [`.github/workflows/`](.github/workflows/) | CI, collection, publishing, signing, and maintenance. |
-
-Frontend tests also require Node.js.
-
-After the quick-start installation, use the activated virtual environment on macOS/Linux. On Windows, replace `python` with `.\.venv\Scripts\python.exe` and run `ruff`, `pyright`, and `pytest` from `.venv\Scripts\`; Node commands are unchanged.
+The Python code is in [`swiftioc/`](swiftioc/), the static site and generated files are in [`public/`](public/), and offline tests are in [`tests/`](tests/). Run `python -m swiftioc --help` for current CLI flags. To check a development environment:
 
 ```bash
 python -m pip install -r requirements-dev.txt
-ruff check .
-pyright
 python -m swiftioc --self-test
-pytest -q
-node --test public/assets/dashboard-core.test.js public/assets/inventory-core.test.js
+python -m pytest -q
+node --test public/assets/dashboard-core.test.js public/assets/inventory-core.test.js public/assets/group-intel-core.test.js public/assets/ransomware-workbench-core.test.js public/assets/today-core.test.js
 ```
 
-Python tests mock network calls. The frontend core suite checks data logic with Node.js. For browser regressions, install Playwright and serve the site:
-
-```bash
-npm install --no-save --package-lock=false playwright
-npx playwright install chromium
-python -m http.server 8765 --directory public
-```
-
-In a second terminal:
-
-```bash
-node scripts/test_vulnerability_ui.cjs
-node scripts/test_dashboard_layout.cjs
-node scripts/test_personal_briefing.cjs
-node scripts/test_inventory_ui.cjs
-node scripts/test_investigation_spl.cjs
-node scripts/test_investigation_import.cjs
-```
-
-These suites use synthetic fixtures to exercise filtering, refresh failures, mobile layout, personal briefing state, and provider graph behavior. Set `BASE_URL` for a different local server or `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` for an existing Chromium browser.
-
-Read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting a parser or feature. Report vulnerabilities through [SECURITY.md](SECURITY.md). SwiftIOC is distributed under the [MIT license](LICENSE); upstream feeds retain their own terms and attribution requirements.
+Browser tests use Playwright with synthetic snapshots; see [Development and testing](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Development-and-Testing). Read [CONTRIBUTING.md](CONTRIBUTING.md) before contributing. SwiftIOC is MIT-licensed; upstream feed rights remain with their providers.

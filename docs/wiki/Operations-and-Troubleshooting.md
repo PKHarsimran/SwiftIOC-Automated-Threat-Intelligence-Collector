@@ -11,6 +11,8 @@ The repository collection workflow is scheduled every four hours and supports ma
 5. Run collection manually and inspect diagnostics before relying on the schedule.
 6. Confirm the generated CVE/observable collections and detection files are present on the deployed site.
 
+Optional ransomware.live PRO enrichment requires permission to use and publish derived data plus the `RANSOMWARE_LIVE_API_KEY` secret. Do not add the key to YAML or the public tree. The group and aggregate-context collectors use independent 24-hour caches; intervening scheduled runs can reuse each sidecar with zero provider calls. A full refresh does consume calls, so reserve `--force-refresh` for a deliberate recovery. The group collector caps the provider listing at 500 groups and retains the last good sidecar if an API request fails. See [Ransomware intelligence](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Ransomware-Intelligence) for the exact data boundary.
+
 For another scheduler, preserve the output directory between runs and prevent simultaneous writers. Collection and history workflows share a concurrency group because both update main. History builds a compact summary from Git; signing is a separate workflow. See the [workflow directory](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/tree/main/.github/workflows) for current triggers and permissions.
 
 ## Quality gates before publication
@@ -51,6 +53,7 @@ On quality rejection, the command exits with code 1 without replacing feed expor
 | Detection verification fails | Missing files, sizes/hashes, registry state. | Recover a coherent pack and rerun verification. |
 | Signature mismatch | Feed and bundle may be from different generations. | Fetch a coherent pair and verify; do not bypass. |
 | Queue/review state disappears | Browser storage permission or different profile. | Use exported JSON; retry storage if appropriate. |
+| Groups/Workbench evidence appears older than the core feed | Sidecar `generated_at`, 24-hour provider cache, key permissions, and collection warnings. | Distinguish intentional cache reuse from API failure; core-feed freshness does not date provider associations. |
 
 ## Inspect raw responses privately
 
@@ -62,9 +65,9 @@ python -m swiftioc --sources sources.yml --out-dir public --save-raw-dir _privat
 
 Raw responses are not sanitized. `--ci-safe` does not implicitly enable capture. CI and collection keep captures outside the public tree and exclude legacy raw paths from uploaded public artifacts. Public diagnostics can still contain operational source context; review what your custom adapters log.
 
-**Implementation:** [quality checks](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/2725dbf95fe719b45e6d4e2d50d1952b2b34784f/swiftioc/quality.py), [CLI](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/2725dbf95fe719b45e6d4e2d50d1952b2b34784f/swiftioc/cli.py), [collection workflow](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/2725dbf95fe719b45e6d4e2d50d1952b2b34784f/.github/workflows/collect.yml).
+**Implementation:** [quality checks](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/main/swiftioc/quality.py), [CLI](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/main/swiftioc/cli.py), [collection workflow](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/main/.github/workflows/collect.yml).
 
 ---
 [Wiki home](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki) · [Interview guide](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Interview-Guide) · [Documentation map](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Reference-and-Glossary)
 
-*Reviewed against main at `2725dbf9` on 21 September 2026. Live feed counts change between collections.*
+*For current feed counts and timestamps, check the published diagnostics.*

@@ -24,7 +24,7 @@ The newer quick action can search CVE-like fields or raw CVE text. **That only f
 
 Matching semantics matter. Network ranges need CIDR matching. Exact domains are not arbitrary substring matches. URL paths/query components may be case-sensitive. Missing event fields or transformations in your logging pipeline can cause false negatives. The quick search is broader than the mapped workspace query; do not describe them as equivalent.
 
-[Open the hunt library](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/splunk/). Query sources and their page generator live in [public/splunk](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/tree/main/public/splunk) and [scripts/build_splunk_guide.py](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/2725dbf95fe719b45e6d4e2d50d1952b2b34784f/scripts/build_splunk_guide.py).
+[Open the hunt library](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/splunk/). Query sources and their page generator live in [public/splunk](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/tree/main/public/splunk) and [scripts/build_splunk_guide.py](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/main/scripts/build_splunk_guide.py).
 
 ## Snapshot and Delta consumers
 
@@ -43,15 +43,15 @@ Delta is the latest comparison, not an indefinitely retained message queue. A co
 
 Use `(type, indicator)` as the upsert/delete key while preserving URL identity. `added` and `updated` carry `current`; `removed_from_feed` carries `previous`. Removal withdraws an IOC from this working set, not from every security control or investigation automatically.
 
-Elastic and Sentinel require your own ingestion/mapping process; the repository provides [integration starters](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/2725dbf95fe719b45e6d4e2d50d1952b2b34784f/integrations/README.md), not a managed connector. MISP and STIX exports offer other interoperability paths. The TAXII-formatted envelope is a file, not a TAXII API service.
+Elastic and Sentinel require your own ingestion/mapping process; the repository provides [integration starters](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/main/integrations/README.md), not a managed connector. MISP and STIX exports offer other interoperability paths. The TAXII-formatted envelope is a file, not a TAXII API service.
 
 ## Verify before consuming
 
-Canonical feeds can have Sigstore bundles from the signing workflow. Download the exact matching feed/bundle generation and verify using the identity/issuer policy documented in the [integration guide](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/2725dbf95fe719b45e6d4e2d50d1952b2b34784f/integrations/README.md). Signing is a separate workflow, so independently fetching mutable “latest” files can produce a temporary mismatch. Retry a coherent generation; never bypass a failed verification as if it had passed.
+Canonical feeds can have Sigstore bundles from the signing workflow. Download the exact matching feed/bundle generation and verify using the identity/issuer policy documented in the [integration guide](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/main/integrations/README.md). Signing is a separate workflow, so independently fetching mutable “latest” files can produce a temporary mismatch. Retry a coherent generation; never bypass a failed verification as if it had passed.
 
 Detection-pack checksums serve a different purpose: [pack consistency verification](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Detection-Packs) is not publisher authentication.
 
 ---
 [Wiki home](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki) · [Interview guide](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Interview-Guide) · [Documentation map](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Reference-and-Glossary)
 
-*Reviewed against main at `2725dbf9` on 21 September 2026. Live feed counts change between collections.*
+*For current feed counts and timestamps, check the published diagnostics.*

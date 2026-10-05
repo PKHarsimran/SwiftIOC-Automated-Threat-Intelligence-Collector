@@ -15,7 +15,7 @@ The following are proposals, not shipped features. Prioritize reliability and an
 
 ## A distinctive product direction
 
-An **explainable evidence-change briefing** would build on the current Delta, product watches and queue. Instead of saying “this score changed,” it could show which provider evidence changed, why an asset moved in priority, which prior decision used the old evidence, and what the analyst should verify next.
+The current **Today briefing** already combines product/group watches, inventory relevance and material CVE evidence changes in a local browser view. A more ambitious **case-linked evidence-change briefing** could connect a changed provider claim to the exact asset finding, prior analyst decision and next verification step. That would go beyond today's local suggestions and exported scenarios.
 
 That requires reliable generation identity, evidence versioning and explicit uncertainty first. Treat this as a direction to validate with analysts, not a claim that the feature is unique in the market.
 
@@ -46,4 +46,4 @@ Commercial readiness also involves licensing/terms, support ownership, documente
 ---
 [Wiki home](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki) · [Interview guide](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Interview-Guide) · [Documentation map](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Reference-and-Glossary)
 
-*Reviewed against main at `2725dbf9` on 21 September 2026. Live feed counts change between collections.*
+*For current feed counts and timestamps, check the published diagnostics.*

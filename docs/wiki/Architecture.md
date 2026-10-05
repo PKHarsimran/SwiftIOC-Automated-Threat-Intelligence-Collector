@@ -22,6 +22,8 @@ flowchart TB
   L --> M[Static hosting]
   M --> N[Browser dashboard]
   M --> O[External security tools]
+  R[Permitted ransomware.live PRO access] --> S[Cached derived group and aggregate sidecars]
+  S --> M
 ```
 
 This diagram shows the publication boundary: source quality checks occur before sensitive-record filtering, persistence and retention. Therefore, source ingestion counts can be larger than final exported counts. A quality-pass result does not guarantee that all later disk writes or deployment succeeded.
@@ -39,9 +41,12 @@ This diagram shows the publication boundary: source quality checks occur before 
 | `quality.py` / `publication.py` | Required-source checks and targeted sensitive-data filtering. |
 | `writers.py` / `collections.py` | Formats, separate observable/CVE collections, Delta, atomic file writes. |
 | `detections.py` / `verify_detections.py` | Detection compilation and offline artifact consistency verification. |
+| `ransomware_live.py` / `ransomware_context.py` / `group_history.py` | Optional, cached provider enrichment; group association history and privacy-minimized aggregate context. |
 | `public/assets/dashboard-core.js` | Pure browser data logic, graph model, searches, workspace transformations. |
 | `public/assets/dashboard.js` | DOM, fetching, controls, rendering, local workspace state. |
 | `public/assets/inventory-core.js` / `inventory.js` | Applicability comparison and exposure-report UI. |
+| `public/assets/today-core.js` / `today.js` | Personalized review suggestions and hypothetical patch scenarios over published snapshots. |
+| `public/assets/group-intel*`, `groups.js`, `ransomware-workbench*` | Static group evidence, receipts, comparisons, coverage and response-draft interfaces. |
 
 ## One record's lifecycle
 
@@ -72,9 +77,9 @@ sequenceDiagram
 
 Writers use temporary files and replacement so a reader does not see a half-written individual file. **The whole directory is not one transaction.** A disk error between files can leave different generations. Current baseline validation checks usable row counts against diagnostics; it is not a cryptographic identity check. Immutable generation directories with a single manifest switch are a useful future improvement.
 
-**Read the implementation:** [CLI](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/2725dbf95fe719b45e6d4e2d50d1952b2b34784f/swiftioc/cli.py), [collection](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/2725dbf95fe719b45e6d4e2d50d1952b2b34784f/swiftioc/collect.py), [writers](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/2725dbf95fe719b45e6d4e2d50d1952b2b34784f/swiftioc/writers.py).
+**Read the implementation:** [CLI](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/main/swiftioc/cli.py), [collection](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/main/swiftioc/collect.py), [writers](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/main/swiftioc/writers.py).
 
 ---
 [Wiki home](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki) · [Interview guide](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Interview-Guide) · [Documentation map](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Reference-and-Glossary)
 
-*Reviewed against main at `2725dbf9` on 21 September 2026. Live feed counts change between collections.*
+*For current feed counts and timestamps, check the published diagnostics.*

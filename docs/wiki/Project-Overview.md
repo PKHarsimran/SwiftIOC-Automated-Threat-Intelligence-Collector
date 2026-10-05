@@ -8,6 +8,7 @@ SwiftIOC provides a small, inspectable path from those inputs to a working inves
 - A living feed can carry forward prior observations, apply relevance decay and retain a bounded snapshot.
 - Static files expose the result in human- and machine-readable formats.
 - A browser dashboard provides lookup, relationship pivots, vulnerability review, a local investigation queue and portable hunt output.
+- With permitted PRO access, separate static sidecars add reported ransomware-group associations and aggregate context without making browser API calls.
 
 ```mermaid
 flowchart LR
@@ -40,21 +41,18 @@ flowchart LR
 
 ## Current scope and limits
 
-SwiftIOC is not an endpoint scanner, a complete vulnerability database, a TAXII server, or a managed SOC. It has no shared case database, account synchronization or role-based workspace access. Graph edges represent shared reporting/tags, not established campaign attribution. Source-count scoring does not verify that providers are independent.
+SwiftIOC is not an endpoint scanner, a complete vulnerability database, a TAXII server, or a managed SOC. It has no shared case database, account synchronization or role-based workspace access. Graph edges represent shared reporting/tags, not established campaign attribution. Source-count scoring does not verify that providers are independent. Named ransomware-group associations are reported leads, not proof of current exploitation or local compromise.
 
 The production collection configuration uses a four-hour schedule, 30-day age retention and a 10,000-record cap. Those are configured operating choices, not throughput claims or a freshness SLA. The compact preview defaults to 1,000 records. Always state which sample or collection a count describes.
 
-## Recent changes this guide includes
+## Continue from here
 
-- September 19: compact IOC action menus and type-aware quick SPL searches.
-- September 16 consolidation: current lint/type checks and private raw-capture behavior, including no implicit raw capture from `--ci-safe`.
-- Publication quality gates preserve the previous feed on configured rejection.
-- Credential-shaped collected records are omitted before exports, including prior records used by Delta.
-- Detection packs have consistency verification and persistent Suricata SID reservations.
-
-See [the current README](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/blob/main/README.md) and [code history](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/commits/main) for changes after this guide's review date.
+- [How it works](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/How-It-Works) follows one record from source to static files and browser use.
+- [Analyst workflow](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Analyst-Workflow) shows which page to use for an IOC, CVE, or reported group.
+- [Ransomware intelligence](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Ransomware-Intelligence) explains optional PRO sidecars and evidence limits.
+- [The README](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector#readme) is the shortest path to using or running the project.
 
 ---
 [Wiki home](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki) · [Interview guide](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Interview-Guide) · [Documentation map](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Reference-and-Glossary)
 
-*Reviewed against main at `2725dbf9` on 21 September 2026. Live feed counts change between collections.*
+*For current feed counts and timestamps, check the published diagnostics.*

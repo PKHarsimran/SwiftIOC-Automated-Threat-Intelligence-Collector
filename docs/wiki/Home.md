@@ -1,61 +1,36 @@
 # SwiftIOC field guide
 
-**From a public threat report to an explainable analyst decision.**
+**From a public threat report to a reviewable analyst decision.**
 
-SwiftIOC combines a Python threat-intelligence collector with a static browser dashboard. It turns different public feeds into consistent, attributed records, maintains a bounded living snapshot, and helps analysts investigate observables and prioritize vulnerability evidence.
+SwiftIOC has two halves: a Python collector turns configured feeds into attributed, bounded files; a static website lets people investigate those files. It separates IOC telemetry leads, CVE exploitation evidence, product applicability, and optional ransomware-group reporting instead of treating them as the same claim.
 
-[Open the dashboard](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/) · [Browse the code](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector) · [Prepare for an interview](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Interview-Guide)
-
-[![Collection status](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/collect.yml/badge.svg?branch=main)](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/collect.yml)
-[![CI status](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/actions/workflows/ci.yml)
-[![Retained snapshot](https://img.shields.io/endpoint?url=https%3A%2F%2Fharsim.ca%2FSwiftIOC-Automated-Threat-Intelligence-Collector%2Fbadge.json&label=Snapshot&cacheSeconds=3600)](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/diagnostics/run.json)
-
-Badges describe the published snapshot and workflow status, not complete upstream coverage or guaranteed freshness. Check their linked timestamps and diagnostics.
+[Open the live dashboard](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/) · [Read the project README](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector#readme) · [Check collection diagnostics](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/diagnostics/summary.html)
 
 ![Five-stage pipeline: collect, normalize, validate, maintain, publish.](https://raw.githubusercontent.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/76421f9f4d7a5e007ec2990debf715cd3eefebe3/docs/wiki/assets/pipeline.png)
 
-<details>
-<summary>Play the animated pipeline walkthrough</summary>
+The diagram is a summary; [How SwiftIOC works](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/How-It-Works) follows a record through each stage and explains where failures, browser state, and optional PRO data fit.
 
-![Animated walkthrough highlighting collection, normalization, quality validation, persistence and publication in sequence.](https://raw.githubusercontent.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/76421f9f4d7a5e007ec2990debf715cd3eefebe3/docs/wiki/assets/pipeline.gif)
+## Pick the route that matches your question
 
-The same explanation is available as the static diagram above and in [Architecture](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Architecture). Animation is optional; no step relies on motion alone.
-
-</details>
-
-## Choose your path
-
-| You are here to… | Read in this order |
+| If you want to… | Read this path |
 | --- | --- |
-| Understand the project in five minutes | [Overview](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Project-Overview) → [Architecture](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Architecture) |
-| Investigate threat intelligence | [Analyst walkthrough](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Analyst-Workflow) → [Graph and discovery](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Graph-and-Discovery) → [SPL and integrations](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/SPL-and-Integrations) |
-| Prioritize vulnerabilities | [CVE and exposure guide](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/CVE-and-Exposure) |
-| Run your own collector | [Installation](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Installation) → [Sources](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Sources-and-Parsers) → [Operations](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Operations-and-Troubleshooting) |
-| Explain the engineering in an interview | [Interview guide](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Interview-Guide) → [Data and scoring](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Data-and-Scoring) → [Security](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Security-and-Privacy) |
-| Extend the project | [Development](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Development-and-Testing) → [Roadmap](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Roadmap-and-Tradeoffs) |
+| Understand the whole system | [How it works](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/How-It-Works) → [Architecture](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Architecture) → [Data and scoring](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Data-and-Scoring). |
+| Investigate an IOC | [Analyst workflow](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Analyst-Workflow) → [Graph and discovery](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Graph-and-Discovery) → [SPL and integrations](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/SPL-and-Integrations). |
+| Review vulnerabilities or your assets | [CVE and exposure](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/CVE-and-Exposure) → [Ransomware intelligence](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Ransomware-Intelligence) if group reporting matters. |
+| Run your own copy | [Installation](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Installation) → [Sources and parsers](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Sources-and-Parsers) → [Operations](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Operations-and-Troubleshooting). |
+| Extend or assess the project | [Development and testing](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Development-and-Testing) → [Security and privacy](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Security-and-Privacy) → [Roadmap and tradeoffs](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Roadmap-and-Tradeoffs). |
+| Explain the engineering | [Interview guide](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Interview-Guide), with the [reference and glossary](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Reference-and-Glossary) alongside it. |
 
-## The complete handbook
+## A useful mental model
 
-1. [Project overview](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Project-Overview): problem, audience, capabilities, boundaries.
-2. [Installation](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Installation): macOS, Linux, Windows, Docker, first run.
-3. [Architecture](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Architecture): code map, pipeline, trust boundaries, failure paths.
-4. [Sources and parsers](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Sources-and-Parsers): configuration, collection, extension points.
-5. [Data and scoring](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Data-and-Scoring): identity, timestamps, decay, retention, Delta.
-6. [Analyst workflow](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Analyst-Workflow): investigation from lookup to saved evidence.
-7. [CVE and exposure](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/CVE-and-Exposure): exploitation, watches, inventory, uncertainty.
-8. [Graph and discovery](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Graph-and-Discovery): relationships, provider aliases, bounded views.
-9. [SPL and integrations](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/SPL-and-Integrations): hunts, snapshots, Delta consumers, signatures.
-10. [Detection packs](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Detection-Packs): Sigma, Suricata, RPZ, stable identifiers, verification.
-11. [Operations and troubleshooting](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Operations-and-Troubleshooting): scheduling, quality gates, recovery.
-12. [Security and privacy](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Security-and-Privacy): publication filtering, credentials, browser state.
-13. [Development and testing](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Development-and-Testing): checks, fixtures, frontend maintenance.
-14. [Interview guide](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Interview-Guide): pitches, demo script, design questions, bug-fix stories.
-15. [Roadmap and tradeoffs](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Roadmap-and-Tradeoffs): credible next steps and how to measure them.
-16. [Reference and glossary](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Reference-and-Glossary): CLI, outputs, terminology, documentation upkeep.
+1. **Published evidence is a bounded snapshot.** It reflects configured sources, their successes and failures, lookback, scoring, and retention—not every possible threat or vulnerability.
+2. **A browser match is a lead.** The site does not scan your systems or search your SIEM. Queue, watch, and inventory features help you make a local working set and draft a query or review.
+3. **Different claims stay separate.** CISA KEV confirms known exploitation of a CVE in general; NVD describes severity and applicability; ransomware.live may report a group association; your own asset and telemetry data establish local relevance.
 
-**Start with one distinction:** an IOC is a value to investigate in telemetry; a CVE identifies a vulnerability. Neither a feed match nor a high score is proof that your system is compromised.
+No match is not proof of safety. A high score is not a compromise probability. Shared reporting is not attribution.
 
----
-[Wiki home](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki) · [Interview guide](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Interview-Guide) · [Documentation map](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Reference-and-Glossary)
+## Other guides
 
-*Reviewed against main at `2725dbf9` on 21 September 2026. Live feed counts change between collections.*
+[Detection packs](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Detection-Packs) explains generated Sigma/Suricata/RPZ drafts and verification. [Project overview](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Project-Overview) explains audience and scope. The [reference and glossary](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Reference-and-Glossary) maps outputs and CLI options. The sidebar lists every page.
+
+This wiki is published from reviewable copies in the main repository's [`docs/wiki/`](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/tree/main/docs/wiki). The wiki itself is a separate Git repository, so both copies need updating when behavior changes. Live feed counts and source timestamps belong in [diagnostics](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/diagnostics/summary.html), not in a static guide.
