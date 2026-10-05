@@ -46,8 +46,8 @@
       });
     </script>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/styles.css?v=48" />
-    <link rel="stylesheet" href="assets/today.css?v=48" />
+    <link rel="stylesheet" href="assets/styles.css?v=49" />
+    <link rel="stylesheet" href="assets/today.css?v=49" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -141,7 +141,8 @@
         <details data-today-planner class="today-planner">
           <summary>What if we patch this? <span>Preview findings and reported group associations</span></summary>
           <p>A planning aid, not a scanner. Assumes successful remediation of selected CVEs on matching assets; verify applicability and patch success separately.</p>
-          <div class="today-plan-controls"><label>Product or CVE<select data-today-plan-target><option value="">Waiting for data</option></select></label><button type="button" class="button" data-today-plan-add>Add to scenario</button><button type="button" class="button ghost" data-today-plan-clear disabled>Clear scenario</button></div>
+          <div class="today-plan-controls"><label>Find a product or CVE<input type="search" data-today-plan-search placeholder="Search product, CVE ID, or title" autocomplete="off" spellcheck="false" aria-describedby="today-plan-count"></label><label>Matching targets<select data-today-plan-target><option value="">Waiting for data</option></select></label><button type="button" class="button" data-today-plan-add>Add to scenario</button><button type="button" class="button ghost" data-today-plan-clear disabled>Clear scenario</button></div>
+          <p id="today-plan-count" data-today-plan-count class="today-plan-count" role="status">Search to narrow the available targets.</p>
           <div data-today-plan-selected class="today-selected"></div>
           <div data-today-plan-result role="status"></div>
           <button type="button" class="button ghost" data-today-plan-export disabled>Export scenario JSON (includes asset IDs)</button>
@@ -1201,9 +1202,9 @@
     <script defer src="assets/group-intel-core.js?v=48"></script>
     <script defer src="assets/group-intel.js?v=48"></script>
     <script defer src="assets/today-core.js?v=48"></script>
-    <script defer src="assets/today.js?v=48"></script>
+    <script defer src="assets/today.js?v=49"></script>
     <script defer src="assets/inventory-core.js?v=38"></script>
     <script defer src="assets/inventory.js?v=46"></script>
-    <script defer src="assets/dashboard.js?v=48"></script>
+    <script defer src="assets/dashboard.js?v=49"></script>
   </body>
 </html>

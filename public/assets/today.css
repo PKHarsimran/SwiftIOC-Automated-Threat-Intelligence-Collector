@@ -18,7 +18,9 @@
 .today-desk summary span { color: var(--text-muted); font-size: .75rem; margin-left: .5rem; }
 .today-plan-controls { display: flex; align-items: end; gap: .7rem; flex-wrap: wrap; }
 .today-plan-controls label { display: grid; gap: .4rem; flex: 1 1 18rem; min-width: 0; color: var(--text-muted); font-size: .8rem; }
-.today-plan-controls select { width: 100%; min-width: 0; min-height: 2.8rem; padding: .5rem; background: var(--bg-color); color: var(--text-primary); border: 1px solid var(--border-control); border-radius: .3rem; }
+.today-plan-controls select, .today-plan-controls input { width: 100%; min-width: 0; min-height: 2.8rem; padding: .5rem; background: var(--bg-color); color: var(--text-primary); border: 1px solid var(--border-control); border-radius: .3rem; }
+.today-plan-controls :is(select, input):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.today-desk .today-plan-count { margin: .55rem 0 0; font-size: .76rem; }
 .today-selected { display: flex; flex-wrap: wrap; gap: .35rem; max-height: 10rem; overflow: auto; margin-top: .7rem; }
 .today-selected .button { font-size: .72rem; padding: .4rem; }
 .today-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .7rem; margin: 1rem 0; }

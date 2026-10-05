@@ -3643,6 +3643,7 @@
       drawerPosition.textContent = `${index + 1} of ${drawerItems.length}`;
       drawerPrevious.disabled = index === 0; drawerNext.disabled = index + 1 >= drawerItems.length;
       drawer.dataset.index = String(index);
+      drawer.dataset.cveId = item.cve_id;
       if (!drawer.open) drawer.showModal();
       drawerBody.scrollTop = 0;
     };
@@ -4038,6 +4039,7 @@
           detail: !failed && snapshotTime <= Date.now() / 1000 ? { items, generated_at: new Date(snapshotTime * 1000).toISOString() } : null,
         }));
         render();
+        reviewLinkedCve();
       }
     };
     briefingForm.addEventListener('submit', (event) => {
@@ -4199,9 +4201,17 @@
       if (typeof event.detail !== 'string' || !/^CVE-\d{4}-\d{4,19}$/.test(event.detail) || loading || failed) return;
       const item = allCurrentItems.find((entry) => entry.cve_id === event.detail);
       if (!item) return;
+      if (drawer.open) drawer.close();
       applyView({ view: groupEvidence.has(item.cve_id.toLowerCase()) ? 'group-linked' : 'priority', search: item.cve_id, layout, includeRejected: true });
       openDrawer(item);
     });
+    const reviewLinkedCve = () => {
+      const match = /^#cve=(CVE-\d{4}-\d{4,19})$/i.exec(window.location.hash);
+      if (match && !loading && !failed && (!drawer.open || drawer.dataset.cveId !== match[1].toUpperCase())) {
+        window.dispatchEvent(new CustomEvent('swiftioc:review-cve', { detail: match[1].toUpperCase() }));
+      }
+    };
+    window.addEventListener('hashchange', reviewLinkedCve);
     qs('[data-vulnerability-drawer-close]', root).addEventListener('click', () => drawer.close());
     drawerPrevious.addEventListener('click', () => { const index = Number(drawer.dataset.index); if (index > 0) openDrawer(drawerItems[index - 1]); });
     drawerNext.addEventListener('click', () => { const index = Number(drawer.dataset.index); if (index + 1 < drawerItems.length) openDrawer(drawerItems[index + 1]); });
@@ -4273,6 +4283,7 @@
       });
       compareButton.disabled = false;
       render();
+      reviewLinkedCve();
     }).catch(() => { groupFailed = true; render(); });
     load();
   };

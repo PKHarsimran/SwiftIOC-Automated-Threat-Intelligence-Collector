@@ -4115,13 +4115,15 @@ body:has(.workspace-dock:not([hidden])) .toast { bottom: 6rem; }
 }
 
 /* Final pass: clearer navigation, calmer controls, and more legible evidence. */
-.top-nav .nav-links a[aria-current="location"] {
+.top-nav .nav-links a[aria-current="location"],
+.top-nav .nav-links a[aria-current="page"] {
   color: var(--accent-soft);
   background: var(--accent-subtle);
   box-shadow: inset 0 -2px 0 var(--accent);
   text-decoration: none;
 }
-.top-nav .nav-links a[aria-current="location"]:hover { background: #384432; }
+.top-nav .nav-links a[aria-current="location"]:hover,
+.top-nav .nav-links a[aria-current="page"]:hover { background: #384432; }
 .vulnerability-card .vulnerability-title { font-size: .91rem; }
 .vulnerability-card .vulnerability-meta,
 .vulnerability-card > .vulnerability-dates p,
@@ -4158,4 +4160,8 @@ body:has(.workspace-dock:not([hidden])) .toast { bottom: 6rem; }
   [id] { scroll-margin-top: 6.5rem; }
   .page-header { margin: 1.25rem 0 .85rem; }
   .page-header-subtitle { margin-bottom: .5rem; }
+}
+@media (max-width: 480px) {
+  .top-nav .nav-links a { padding-inline: .35rem; }
+  .top-nav .nav-links a:first-child { padding-left: 0; }
 }

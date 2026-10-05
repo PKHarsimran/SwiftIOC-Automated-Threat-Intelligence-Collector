@@ -678,10 +678,11 @@ test('vulnerability aggregation ranks structured vendors and products determinis
   assert.deepEqual(result.products, [{ name: 'Product 1', total: 2 }, { name: 'Product 2', total: 1 }]);
 });
 
-test('vulnerability release uses coordinated new asset cache keys', () => {
+test('page references current asset cache keys', () => {
   const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
-  for (const asset of ['styles.css', 'dashboard-core.js', 'dashboard.js', 'group-intel.js', 'group-intel-core.js']) {
-    assert.ok(html.includes(`assets/${asset}?v=48`));
+  for (const [asset, version] of Object.entries({ 'styles.css': 49, 'today.css': 49, 'today.js': 49,
+    'dashboard.js': 49, 'dashboard-core.js': 48, 'group-intel.js': 48, 'group-intel-core.js': 48 })) {
+    assert.ok(html.includes(`assets/${asset}?v=${version}`));
   }
 });
 

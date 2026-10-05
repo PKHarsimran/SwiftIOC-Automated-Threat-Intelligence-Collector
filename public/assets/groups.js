@@ -55,7 +55,8 @@
   }
   function investigate(record) {
     if (record.kind === 'ttps') return link('ATT&CK ↗', `https://attack.mitre.org/techniques/${record.value.replace('.', '/')}/`, true);
-    return link(record.kind === 'cves' ? 'Review CVE →' : 'Check feed →', `index.html#ioc=${encodeURIComponent(record.value)}`);
+    return link(record.kind === 'cves' ? 'Review CVE →' : 'Check feed →',
+      `index.html#${record.kind === 'cves' ? 'cve' : 'ioc'}=${encodeURIComponent(record.value)}`);
   }
   function evidenceReceipt(record) {
     const details = el('details'); details.appendChild(el('summary', 'Evidence receipt'));

@@ -19,14 +19,17 @@
   if (!core.validBaseline(baseline)) baseline = null;
   let snapshot = null, model = null, report = null, groupState = 'loading', newest = 0, loaded = false;
   let watches = dashboard.normaliseBriefing(read('swiftioc-cve-briefing-v1'))?.watches || [];
-  let currentItems = [], changes = {}, targets = new Map(), selection = new Set();
+  let currentItems = [], changes = {}, targets = new Map(), targetChoices = [], selection = new Set();
+  let targetSnapshot = null, targetModel = null;
   let reviews = read('swiftioc-cve-acknowledged-v2');
   const evidence = (item) => dashboard.vulnerabilityEvidence(item, core.recordFor(model, item.cve_id));
   const openCve = (id) => {
     window.dispatchEvent(new CustomEvent('swiftioc:review-cve', { detail: id }));
   };
   function renderPlan() {
-    const host = get('plan-result'), chips = get('plan-selected'); host.replaceChildren(); chips.replaceChildren();
+    const host = get('plan-result'), chips = get('plan-selected');
+    const openDetails = new Set([...host.querySelectorAll('details[open] summary')].map((node) => node.textContent));
+    host.replaceChildren(); chips.replaceChildren();
     for (const id of selection) button(chips, `Remove ${id}`, () => { selection.delete(id); renderPlan(); });
     const plan = core.patchPlan(currentItems, model, report, [...selection]);
     get('plan-clear').disabled = !selection.size;
@@ -45,10 +48,12 @@
       add(host, 'p', `${plan.asset_ids.length} assets · ${plan.version_rule_matches} version-rule matches · ${plan.needs_verification} findings still need applicability verification. ${plan.outside_range_excluded} outside-range findings excluded.`);
       if (plan.inventory_truncated) add(host, 'p', 'Partial inventory report: findings were truncated. These counts do not cover every imported asset.', 'today-warning');
       const details = add(host, 'details', ''); add(details, 'summary', 'Assets in this scenario (private to this tab)');
+      details.open = openDetails.has(details.querySelector('summary').textContent);
       add(details, 'p', plan.asset_ids.join(', ') || 'No matching pending findings. No match does not mean safe.');
     }
     if (model) {
       const details = add(host, 'details', ''); add(details, 'summary', `${plan.groups.length} groups reported with the selected CVEs`);
+      details.open = openDetails.has(details.querySelector('summary').textContent);
       const list = add(details, 'ul', '');
       for (const entry of plan.groups) {
         const row = add(list, 'li', '');
@@ -59,9 +64,24 @@
     add(host, 'p', plan.scenario, 'today-warning');
     add(host, 'p', 'This does not measure risk reduction or neutralize a group. Verify vendor remediation and rescan assets. Inventory stays in this tab; exports include asset IDs.');
   }
+  function paintTargets() {
+    const select = get('plan-target'), previous = select.value;
+    const query = get('plan-search').value.trim().toLocaleLowerCase();
+    const matching = query ? targetChoices.filter((choice) => choice.search.includes(query)) : targetChoices;
+    const shown = matching.slice(0, 80);
+    select.replaceChildren();
+    const empty = add(select, 'option', matching.length ? 'Choose a matching target' : 'No matching targets'); empty.value = '';
+    shown.forEach((choice) => { add(select, 'option', choice.label).value = choice.key; });
+    if (shown.some((choice) => choice.key === previous)) select.value = previous;
+    get('plan-count').textContent = matching.length > shown.length
+      ? `Showing ${shown.length} of ${matching.length} targets. Search to narrow the list.`
+      : `${matching.length} matching ${matching.length === 1 ? 'target' : 'targets'}.`;
+    get('plan-add').disabled = !snapshot || !select.value;
+  }
   function renderTargets() {
-    targets = new Map(); const select = get('plan-target'); select.replaceChildren();
-    const empty = add(select, 'option', 'Choose a product or CVE'); empty.value = '';
+    if (snapshot === targetSnapshot && model === targetModel) return;
+    targetSnapshot = snapshot; targetModel = model;
+    targets = new Map(); targetChoices = [];
     const products = new Map();
     for (const item of currentItems) {
       const kev = item.reports?.cisa_kev;
@@ -70,20 +90,24 @@
       if (!products.has(key)) products.set(key, { name: `${kev.vendor} / ${kev.product}`, ids: [] });
       products.get(key).ids.push(item.cve_id);
     }
-    const productGroup = add(select, 'optgroup', ''); productGroup.label = 'Products — all retained CVEs for this product';
-    [...products.values()].sort((a, b) => a.name.localeCompare(b.name)).forEach((product, index) => {
-      const key = `p:${index}`; targets.set(key, product.ids);
-      add(productGroup, 'option', `${product.name} (${product.ids.length} CVEs)`).value = key;
+    [...products.entries()].sort((a, b) => a[1].name.localeCompare(b[1].name)).forEach(([key, product]) => {
+      const value = `p:${key}`; targets.set(value, product.ids);
+      const label = `Product · ${product.name} (${product.ids.length} CVEs)`;
+      targetChoices.push({ key: value, label, search: label.toLocaleLowerCase() });
     });
-    const cveGroup = add(select, 'optgroup', ''); cveGroup.label = 'Individual CVEs';
     [...currentItems].filter((item) => (item.reports?.nvd?.status || '').toLowerCase() !== 'rejected').sort((a, b) => a.cve_id.localeCompare(b.cve_id)).forEach((item) => {
-      targets.set(item.cve_id, [item.cve_id]); add(cveGroup, 'option', `${item.cve_id} · ${(item.title || 'Title unavailable').slice(0, 90)}`).value = item.cve_id;
+      targets.set(item.cve_id, [item.cve_id]);
+      const label = `CVE · ${item.cve_id} · ${(item.title || 'Title unavailable').slice(0, 90)}`;
+      targetChoices.push({ key: item.cve_id, label, search: `${item.cve_id} ${item.title || ''}`.toLocaleLowerCase() });
     });
-    selection = new Set([...selection].filter((id) => currentItems.some((item) => item.cve_id === id)));
+    const eligible = new Set([...targets.keys()].filter((key) => key.startsWith('CVE-')));
+    selection = new Set([...selection].filter((id) => eligible.has(id)));
+    paintTargets();
   }
   function render() {
     get('cards').replaceChildren(); get('health').replaceChildren();
-    get('plan-target').disabled = get('plan-add').disabled = !snapshot;
+    get('plan-target').disabled = get('plan-search').disabled = !snapshot;
+    get('plan-add').disabled = !snapshot || !get('plan-target').value;
     if (!snapshot) {
       get('status').textContent = loaded ? 'Vulnerability data unavailable or older than the last loaded snapshot. Refresh the CVE collection below; no missing data is treated as safe.' : 'Waiting for the published vulnerability snapshot…';
       renderPlan(); return;
@@ -164,6 +188,8 @@
     for (const id of targets.get(get('plan-target').value) || []) selection.add(id);
     renderPlan();
   });
+  get('plan-search').addEventListener('input', paintTargets);
+  get('plan-target').addEventListener('change', () => { get('plan-add').disabled = !get('plan-target').value; });
   get('plan-clear').addEventListener('click', () => { selection.clear(); renderPlan(); });
   get('plan-export').addEventListener('click', () => {
     if (!snapshot || !selection.size) return;
