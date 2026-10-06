@@ -53,6 +53,19 @@ test('map caps clutter, reports totals, and includes an explicitly selected reco
   assert.equal(graph.selected.value, selected.value);
   assert.ok(graph.evidence.includes(selected));
 });
+
+test('map shows bounded exact cross-group links for every displayed record', () => {
+  const data = fixture();
+  data.cves.push({ cve_id: 'CVE-2025-5678', groups: ['A', 'C'], in_swiftioc: false });
+  const model = core.build(data);
+  const scene = core.graph(model, 'A', 'cves');
+  assert.deepEqual(scene.visibleGroups, ['B', 'C']);
+  assert.equal(scene.links.length, 4);
+  assert.deepEqual(scene.links.filter((edge) => edge.group === 'C').map((edge) => edge.evidence),
+    [model.records.find((r) => r.value === 'CVE-2025-5678').key]);
+  assert.ok(scene.links.every((edge) => model.groups.has(edge.group) && scene.evidence.some((r) => r.key === edge.evidence)));
+  assert.equal(core.graph(model, 'missing', 'cves').links.length, 0);
+});
 test('unknown groups and empty evidence do not invent connections', () => {
   const graph = core.graph(core.build(fixture()), 'missing', 'cves');
   assert.equal(graph.total, 0);

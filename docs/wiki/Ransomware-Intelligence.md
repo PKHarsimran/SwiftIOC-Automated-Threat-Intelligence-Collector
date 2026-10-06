@@ -52,6 +52,12 @@ For CVEs, CISA KEV says exploitation is known in general; ransomware.live suppli
 | “Does my evidence list have an exact association?” | Workbench → Exposure or Watchlist. Inputs stay in the browser; product/version applicability belongs in the dashboard's separate inventory report. |
 | “What can I take into my own tools?” | Groups → Hunt pack or Workbench → response pack. Review generated SPL/KQL/Sigma/Suricata mappings, cost, IDs, and false positives before use. Nothing runs automatically. |
 
+### Read the group evidence map
+
+In **Groups → Evidence map**, choose CVEs, IOCs, or ATT&CK techniques. The map draws direct reported group-to-record links, with distinct styling for exact SwiftIOC feed matches and research candidates. Click a record for its source receipt and investigation link, or click a related group to pivot. Switch between evidence lanes and a constellation, drag to pan or untangle nodes, and use the zoom/fit controls. On small screens the map opens near the selected record; pan to explore the rest.
+
+The view intentionally shows at most 12 records and 10 other groups at once. Its status line gives the full totals; search can bring a specific record outside the initial sample into the map. Dense maps show focus-group and selected-record links by default; hover a node to trace its links or turn on **All links**. **Export map data** writes all direct links among the currently displayed nodes, even if some lines are visually hidden to reduce clutter, with snapshot and scope labels. The expandable connection list supports reading the same displayed evidence without the canvas. Visual distance, shared records, and line crossings are not scores or evidence that groups collaborate. The graph is rendered locally from the published snapshot, so interacting with it uses no additional PRO calls.
+
 The workbench radar is an **aggregate reporting sample**, not a prevalence estimate or forecast. `ransomware_context.json` does not publish victim names, victim domains, screenshots, press records, ransom notes, negotiation chats, or raw API responses. Country/sector watches are context only; they do not infer CVE applicability for a user's assets.
 
 ## What stays private

@@ -46,7 +46,20 @@
     if (requested && !evidence.includes(requested)) evidence[evidence.length - 1] = requested;
     const selected = evidence.find((r) => r.key === selectedKey) || evidence[0] || null;
     const related = selected ? selected.groups.filter((name) => name !== group) : [];
-    return { group, evidence, total: all.length, selected, related: related.slice(0, 8), relatedTotal: related.length };
+    const counts = new Map();
+    evidence.forEach((record) => record.groups.forEach((name) => {
+      if (name !== group) counts.set(name, (counts.get(name) || 0) + 1);
+    }));
+    const selectedGroups = new Set(related);
+    const visibleGroups = [...counts.keys()].sort((a, b) =>
+      Number(selectedGroups.has(b)) - Number(selectedGroups.has(a)) ||
+      counts.get(b) - counts.get(a) || a.localeCompare(b)
+    ).slice(0, 10);
+    const visibleSet = new Set(visibleGroups);
+    const links = evidence.flatMap((record) => [group, ...record.groups.filter((name) => name !== group && visibleSet.has(name))]
+      .map((name) => ({ group: name, evidence: record.key, relationship: 'reported_association' })));
+    return { group, evidence, total: all.length, selected, related: related.slice(0, 8), relatedTotal: related.length,
+      visibleGroups, visibleGroupsTotal: counts.size, links };
   }
   function receipt(model, record, group) {
     return Object.values(model.history?.observations || {}).find((item) => item.group === group && item.kind === record.kind && item.type === record.type && item.value === record.value) || null;

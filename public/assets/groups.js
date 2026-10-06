@@ -17,10 +17,15 @@
     return node;
   };
   let model;
-  let state = { view: 'overview', group: '', q: '', coverage: 'all', type: '', mapKind: 'cves' };
+  let state = { view: 'overview', group: '', q: '', coverage: 'all', type: '', mapKind: 'cves', layout: 'lanes' };
   let page = 0;
   let selectedKey = '';
   let currentMap = null;
+  let mapCy = null;
+  let mapSceneKey = '';
+  let mapHover = '';
+  let mapAllLinks = false;
+  let renderedMapLayout = '';
   let changeLimit = 30;
   const labels = { iocs: 'IOCs', cves: 'CVEs', ttps: 'ATT&CK techniques' };
   function readLocation() {
@@ -29,7 +34,8 @@
     state = { view: ['overview', 'changes', 'hunt', 'cves', 'iocs', 'ttps', 'graph'].includes(p.get('view')) ? p.get('view') : 'overview',
       group: model.groups.has(p.get('group')) ? p.get('group') : '', q: (p.get('q') || '').slice(0, 2048),
       coverage: ['matched', 'new'].includes(p.get('coverage')) ? p.get('coverage') : 'all', type: p.get('type') || '',
-      mapKind: ['iocs', 'ttps'].includes(p.get('mapKind')) ? p.get('mapKind') : 'cves', evidence: p.get('evidence') || '' };
+      mapKind: ['iocs', 'ttps'].includes(p.get('mapKind')) ? p.get('mapKind') : 'cves',
+      layout: p.get('layout') === 'orbit' ? 'orbit' : 'lanes', evidence: p.get('evidence') || '' };
     page = 0; selectedKey = state.evidence;
     render();
   }
@@ -167,15 +173,110 @@
   function selectEvidence(key, focus = false) {
     selectedKey = key; state.evidence = key; renderGraph();
     history.replaceState(null, '', `#${new URLSearchParams(Object.entries(state).filter(([, value]) => value))}`);
-    if (focus) $('[data-map]').querySelector(`.map-node.is-selected[data-kind="${state.mapKind}"]`)?.focus();
+    if (focus && !mapCy) $('[data-map]').querySelector(`.map-node.is-selected[data-kind="${state.mapKind}"]`)?.focus();
   }
-  function renderGraph() {
-    if (!state.group) state.group = [...model.groups.keys()].sort((a, b) => core.filter(model, { group: b, kind: state.mapKind }).length - core.filter(model, { group: a, kind: state.mapKind }).length)[0] || '';
-    const graph = core.graph(model, state.group, state.mapKind, selectedKey); currentMap = graph; selectedKey = graph.selected?.key || '';
-    $('[data-map-kind]').value = state.mapKind;
-    const choice = $('[data-map-evidence]'); choice.replaceChildren();
-    graph.evidence.forEach((r) => { const option = el('option', r.value); option.value = r.key; choice.appendChild(option); }); choice.value = selectedKey; choice.disabled = !graph.selected;
-    $('[data-map-status]').textContent = `Showing ${graph.evidence.length} of ${graph.total} ${labels[state.mapKind]} for ${state.group}. ${graph.related.length} of ${graph.relatedTotal} other groups shown for the selected record. ${graph.total > 12 ? 'Use the evidence table for all records.' : ''}`;
+  function mapPositions(graph, layout) {
+    const positions = new Map();
+    positions.set(`group:${graph.group}`, layout === 'orbit' ? { x: 0, y: 0 } : { x: -310, y: 0 });
+    graph.evidence.forEach((record, index) => {
+      if (layout === 'orbit') {
+        const angle = -Math.PI / 2 + index * 2 * Math.PI / Math.max(graph.evidence.length, 1);
+        positions.set(record.key, { x: Math.cos(angle) * 260, y: Math.sin(angle) * 260 });
+      } else positions.set(record.key, { x: 0, y: (index - (graph.evidence.length - 1) / 2) * 58 });
+    });
+    graph.visibleGroups.forEach((name, index) => {
+      if (layout === 'orbit') {
+        const angle = -Math.PI / 2 + (index + 0.5) * 2 * Math.PI / Math.max(graph.visibleGroups.length, 1);
+        positions.set(`group:${name}`, { x: Math.cos(angle) * 510, y: Math.sin(angle) * 510 });
+      } else positions.set(`group:${name}`, { x: 330, y: (index - (graph.visibleGroups.length - 1) / 2) * 62 });
+    });
+    return positions;
+  }
+  function spotlightMap() {
+    if (!mapCy) return;
+    mapCy.elements().removeClass('is-muted is-linked is-current is-concealed');
+    const active = mapCy.getElementById(mapHover || selectedKey);
+    if (!active.length) return;
+    const neighborhood = active.closedNeighborhood();
+    if (currentMap?.links.length > 40 && !mapAllLinks) {
+      const focusEdges = mapCy.edges().filter((edge) => edge.source().data('focus') === 1);
+      mapCy.edges().difference(focusEdges.union(active.connectedEdges())).addClass('is-concealed');
+    }
+    if (mapHover) mapCy.elements().difference(neighborhood).addClass('is-muted');
+    neighborhood.addClass('is-linked');
+    active.addClass('is-current');
+  }
+  function applyMapLayout(graph) {
+    if (!mapCy) return;
+    const positions = mapPositions(graph, state.layout);
+    mapCy.layout({ name: 'preset', positions: (node) => positions.get(node.id()) || node.position(),
+      animate: !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,
+      animationDuration: 380, fit: true, padding: 46 }).run();
+    renderedMapLayout = state.layout;
+  }
+  function renderCanvasMap(graph) {
+    const host = $('[data-map-canvas]');
+    if (typeof window.cytoscape !== 'function' || !document.createElement('canvas').getContext) {
+      host.hidden = true; $('.group-map-scroll').hidden = false; return false;
+    }
+    const sceneKey = JSON.stringify([graph.group, graph.evidence.map((r) => r.key), graph.visibleGroups, graph.links]);
+    host.hidden = false;
+    $('.group-map-scroll').hidden = true;
+    if (mapCy && mapSceneKey === sceneKey) {
+      if (renderedMapLayout !== state.layout) applyMapLayout(graph);
+      spotlightMap(); return true;
+    }
+    mapCy?.destroy(); mapCy = null; mapSceneKey = ''; mapHover = '';
+    const positions = mapPositions(graph, state.layout);
+    const groupNode = (name, focus) => ({ data: { id: `group:${name}`, kind: 'group', name, label: name, focus: focus ? 1 : 0 }, position: positions.get(`group:${name}`) });
+    const elements = [groupNode(graph.group, true), ...graph.visibleGroups.map((name) => groupNode(name, false)),
+      ...graph.evidence.map((record) => ({ data: { id: record.key, kind: 'evidence', key: record.key, label: record.value,
+        shortLabel: record.value.length > 27 ? `${record.value.slice(0, 24)}…` : record.value,
+        matched: record.matched ? 1 : 0 }, position: positions.get(record.key) })),
+      ...graph.links.map((edge, index) => ({ data: { id: `link:${index}`, source: `group:${edge.group}`, target: edge.evidence } }))];
+    try {
+      mapCy = window.cytoscape({ container: host, elements, layout: { name: 'preset', fit: true, padding: 46 },
+        minZoom: .3, maxZoom: 3, wheelSensitivity: .16, boxSelectionEnabled: false,
+        style: [
+          { selector: 'node', style: { 'label': 'data(label)', 'font-family': 'system-ui, sans-serif', 'font-size': 14,
+            'font-weight': 600, 'color': '#f4f7f0', 'text-valign': 'center', 'text-halign': 'center',
+            'text-wrap': 'ellipsis', 'text-max-width': 155, 'text-outline-width': 0,
+            'shape': 'round-rectangle', 'width': 170, 'height': 44, 'border-width': 2,
+            'background-color': '#26352f', 'border-color': '#9cb19a' } },
+          { selector: 'node[kind = "group"]', style: { 'width': 154, 'height': 52, 'background-color': '#3c3030', 'border-color': '#d8ad86' } },
+          { selector: 'node[focus = 1]', style: { 'background-color': '#75513b', 'border-color': '#ffce9c', 'border-width': 3 } },
+          { selector: 'node[kind = "evidence"]', style: { 'label': 'data(shortLabel)', 'background-color': '#27362f', 'border-color': '#a9b6a3' } },
+          { selector: 'node[matched = 1]', style: { 'background-color': '#134c4a', 'border-color': '#5ce1cd' } },
+          { selector: 'edge', style: { 'curve-style': 'bezier', 'line-color': '#8ca59a', 'width': 1.8, 'opacity': .32 } },
+          { selector: 'edge.is-concealed', style: { 'opacity': 0 } },
+          { selector: 'edge.is-linked', style: { 'line-color': '#91ecdb', 'width': 3, 'opacity': .88 } },
+          { selector: 'node.is-linked', style: { 'opacity': 1 } },
+          { selector: 'node.is-current', style: { 'border-color': '#fff0bf', 'border-width': 4, 'shadow-blur': 18,
+            'shadow-color': '#eac07e', 'shadow-opacity': .55 } },
+          { selector: '.is-muted', style: { 'opacity': .12 } },
+        ] });
+      mapSceneKey = sceneKey;
+      renderedMapLayout = state.layout;
+      mapCy.on('mouseover', 'node', (event) => { mapHover = event.target.id(); spotlightMap(); host.title = event.target.data('label'); });
+      mapCy.on('mouseout', 'node', () => { mapHover = ''; spotlightMap(); host.removeAttribute('title'); });
+      mapCy.on('tap', 'node', (event) => {
+        const node = event.target.data();
+        if (node.kind === 'evidence') selectEvidence(node.key);
+        else if (node.name !== state.group) selectGroup(node.name);
+      });
+      if (window.matchMedia?.('(max-width: 700px)').matches && mapCy.zoom() < .72) {
+        mapCy.zoom(.8);
+        mapCy.center(mapCy.getElementById(selectedKey));
+      }
+      spotlightMap();
+      return true;
+    } catch (error) {
+      mapCy?.destroy(); mapCy = null; mapSceneKey = '';
+      host.hidden = true; $('.group-map-scroll').hidden = false;
+      return false;
+    }
+  }
+  function renderFallbackMap(graph) {
     const svg = $('[data-map]'); svg.replaceChildren();
     const height = Math.max(330, graph.evidence.length * 44 + 100, graph.related.length * 44 + 100); svg.setAttribute('viewBox', `0 0 1000 ${height}`);
     svg.setAttribute('aria-label', `Reported associations: ${state.group}, ${graph.evidence.length} ${labels[state.mapKind]}, and ${graph.related.length} other groups`);
@@ -193,21 +294,63 @@
     node(20, height / 2 - 17, state.group, true, () => navigate({ view: 'overview' }), 'group');
     graph.evidence.forEach((r, index) => node(360, 60 + index * 44, r.value, r.key === selectedKey, () => selectEvidence(r.key, true), r.kind));
     graph.related.forEach((name, index) => node(750, height / 2 + (index - (graph.related.length - 1) / 2) * 44 - 17, name, false, () => selectGroup(name), 'group'));
+  }
+  function renderMapRelationships(graph) {
+    const host = $('[data-map-relationships]'); host.replaceChildren();
+    graph.evidence.forEach((record) => {
+      const row = el('div', '', 'group-map-relationship-row');
+      row.appendChild(button(record.value, () => selectEvidence(record.key), 'group-link-button'));
+      const shown = record.groups.filter((name) => name === graph.group || graph.visibleGroups.includes(name));
+      row.appendChild(el('span', `${record.matched ? 'In SwiftIOC' : 'Research candidate'} · Reported for ${shown.join(', ')}${record.groups.length > shown.length ? ` · +${record.groups.length - shown.length} outside this map` : ''}`, 'group-small'));
+      host.appendChild(row);
+    });
+  }
+  function updateMapSearch() {
+    const input = $('[data-map-search]'), host = $('[data-map-results]');
+    const term = input.value.trim().toLowerCase().replaceAll('[.]', '.');
+    host.replaceChildren(); host.hidden = !term;
+    if (!term || !model || state.view !== 'graph') return;
+    const matches = core.filter(model, { group: state.group, kind: state.mapKind })
+      .filter((record) => record.value.toLowerCase().replaceAll('[.]', '.').includes(term)).slice(0, 8);
+    matches.forEach((record) => host.appendChild(button(`${record.value} · ${record.matched ? 'In SwiftIOC' : 'Research candidate'}`,
+      () => { input.value = ''; host.hidden = true; selectEvidence(record.key); }, 'group-map-result')));
+    if (!matches.length) host.appendChild(el('p', 'No matching record for this group and evidence type.', 'group-small'));
+  }
+  function renderGraph() {
+    if (!state.group) state.group = [...model.groups.keys()].sort((a, b) => core.filter(model, { group: b, kind: state.mapKind }).length - core.filter(model, { group: a, kind: state.mapKind }).length)[0] || '';
+    const graph = core.graph(model, state.group, state.mapKind, selectedKey); currentMap = graph; selectedKey = graph.selected?.key || '';
+    $('[data-map-kind]').value = state.mapKind;
+    $('[data-map-layout]').value = state.layout;
+    const choice = $('[data-map-evidence]'); choice.replaceChildren();
+    graph.evidence.forEach((r) => { const option = el('option', r.value); option.value = r.key; choice.appendChild(option); }); choice.value = selectedKey; choice.disabled = !graph.selected;
+    const denseMap = graph.links.length > 40;
+    $('[data-map-all-links-wrap]').hidden = !denseMap;
+    $('[data-map-all-links]').checked = mapAllLinks;
+    $('[data-map-status]').textContent = `Showing ${graph.evidence.length} of ${graph.total} ${labels[state.mapKind]}, ${graph.visibleGroups.length} of ${graph.visibleGroupsTotal} other groups, and ${graph.links.length} direct reported links for ${state.group}. ${graph.total > 12 ? 'Find a specific record above or use the evidence table for all records. ' : ''}${denseMap && !mapAllLinks ? 'To reduce clutter, only the focus-group and selected-record lines are shown; hover a node or choose All links to reveal more. ' : ''}Layout and proximity do not imply collaboration.`;
+    if (!renderCanvasMap(graph)) renderFallbackMap(graph);
+    renderMapRelationships(graph);
+    updateMapSearch();
     const inspector = $('[data-map-inspector]'); inspector.replaceChildren();
     if (graph.selected) {
-      inspector.append(el('strong', graph.selected.value), el('p', 'Reported associations from ransomware.live. Shared evidence alone does not establish a campaign or collaboration.', 'group-small'), groupLinks(graph.selected.groups), investigate(graph.selected));
+      inspector.append(el('span', 'Selected evidence', 'group-map-inspector-kicker'), el('strong', graph.selected.value),
+        el('p', `${graph.selected.matched ? 'Exact match in the retained SwiftIOC feed' : 'Research candidate'} · ${graph.selected.groups.length} reported group${graph.selected.groups.length === 1 ? '' : 's'}. A shared record is not proof of collaboration or current use.`, 'group-small'),
+        groupLinks(graph.selected.groups), investigate(graph.selected));
       inspector.appendChild(evidenceReceipt(graph.selected));
     } else inspector.appendChild(el('p', 'No evidence of this type in the snapshot. Choose another evidence type or group.'));
     $('[data-map-export]').disabled = !graph.selected;
   }
   function render() {
-    if (state.view === 'graph') renderGraph();
+    if (state.view === 'graph' && !state.group && model) {
+      state.group = [...model.groups.keys()].sort((a, b) => core.filter(model, { group: b, kind: state.mapKind }).length - core.filter(model, { group: a, kind: state.mapKind }).length)[0] || '';
+    }
     $('[data-group-choice]').value = state.group;
     const active = $('[data-active-group]'); active.replaceChildren();
     active.append(el('h2', state.group || 'All groups'), el('span', 'Reported associations · current use is not established', 'group-small'));
     document.querySelectorAll('[data-view]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === state.view)));
     document.querySelectorAll('[data-panel]').forEach((panel) => { panel.hidden = panel.dataset.panel !== (['iocs', 'cves', 'ttps'].includes(state.view) ? 'records' : state.view); });
-    if (state.view === 'overview') renderOverview();
+    if (state.view !== 'graph' && mapCy) { mapCy.destroy(); mapCy = null; mapSceneKey = ''; }
+    if (state.view === 'graph') renderGraph();
+    else if (state.view === 'overview') renderOverview();
     else if (state.view === 'changes') renderChanges();
     else if (state.view === 'hunt') renderHunt();
     else if (state.view !== 'graph') renderRecords();
@@ -245,13 +388,37 @@
         $('[data-hunt-status]').textContent = 'Hunt pack exported. Review the queries and field mappings before use.';
       } catch (error) { $('[data-hunt-status]').textContent = error.message; }
     });
-    $('[data-map-kind]').addEventListener('change', (event) => navigate({ mapKind: event.target.value }));
+    $('[data-map-kind]').addEventListener('change', (event) => { $('[data-map-search]').value = ''; navigate({ mapKind: event.target.value }); });
+    $('[data-map-search]').addEventListener('input', updateMapSearch);
     $('[data-map-evidence]').addEventListener('change', (event) => selectEvidence(event.target.value));
+    $('[data-map-all-links]').addEventListener('change', (event) => { mapAllLinks = event.target.checked; renderGraph(); });
+    $('[data-map-layout]').addEventListener('change', (event) => {
+      state.layout = event.target.value === 'orbit' ? 'orbit' : 'lanes';
+      history.replaceState(null, '', `#${new URLSearchParams(Object.entries(state).filter(([, value]) => value))}`);
+      if (mapCy && currentMap) applyMapLayout(currentMap);
+      else renderGraph();
+    });
+    $('[data-map-fit]').addEventListener('click', () => mapCy?.fit(undefined, 46));
+    for (const [selector, factor] of [['[data-map-zoom-in]', 1.25], ['[data-map-zoom-out]', .8]]) {
+      $(selector).addEventListener('click', () => {
+        if (!mapCy) return;
+        const host = $('[data-map-canvas]');
+        mapCy.zoom({ level: Math.max(.3, Math.min(3, mapCy.zoom() * factor)),
+          renderedPosition: { x: host.clientWidth / 2, y: host.clientHeight / 2 } });
+      });
+    }
     $('[data-map-export]').addEventListener('click', () => {
       if (!currentMap) return;
-      const nodes = [{ id: `group:${currentMap.group}`, type: 'group', value: currentMap.group }, ...currentMap.evidence.map((r) => ({ id: r.key, type: r.type, value: r.value })), ...currentMap.related.map((name) => ({ id: `group:${name}`, type: 'group', value: name }))];
-      const edges = [...currentMap.evidence.map((r) => ({ from: `group:${currentMap.group}`, to: r.key })), ...currentMap.related.map((name) => ({ from: `group:${name}`, to: currentMap.selected.key }))];
-      const blob = new Blob([JSON.stringify({ source: 'ransomware.live', generated_at: model.generatedAt, relationship: 'reported association', nodes, edges }, null, 2)], { type: 'application/json' });
+      const nodes = [{ id: `group:${currentMap.group}`, type: 'group', value: currentMap.group },
+        ...currentMap.evidence.map((r) => ({ id: r.key, type: r.type, value: r.value, in_swiftioc: r.matched })),
+        ...currentMap.visibleGroups.map((name) => ({ id: `group:${name}`, type: 'group', value: name }))];
+      const edges = currentMap.links.map((edge) => ({ from: `group:${edge.group}`, to: edge.evidence,
+        relationship: edge.relationship }));
+      const blob = new Blob([JSON.stringify({ schema_version: 1, source: 'ransomware.live', generated_at: model.generatedAt,
+        scope: 'displayed-evidence-map', selected_evidence: currentMap.selected?.key || null,
+        limits: { evidence: 12, other_groups: 10 },
+        caveat: 'These are reported group-to-record associations. Layout, proximity and shared records do not establish current use, local exposure, collaboration or campaign attribution.',
+        nodes, edges }, null, 2)], { type: 'application/json' });
       const href = URL.createObjectURL(blob); const a = link('', href); a.download = 'swiftioc-group-map.json'; a.click(); setTimeout(() => URL.revokeObjectURL(href), 1000);
     });
   }).catch(() => { $('[data-page-status]').textContent = 'Group evidence could not be loaded. Reload this page to try again, or return to the intelligence desk.'; });
