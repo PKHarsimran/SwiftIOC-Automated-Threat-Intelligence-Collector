@@ -38,6 +38,8 @@ An unknown source in required checks fails. Choose thresholds from observed sour
 - `diagnostics/run.json` describes the published run and acts as the next baseline.
 - `diagnostics/collection-attempt.json` records quality-check acceptance/rejection, attempted counts, source failures and reasons. “Accepted” means the quality phase passed, not that all later writes or deployment finished.
 
+`source_coverage` in the attempt and successful-run JSON distinguishes `failed`, `empty`, `truncated` (local per-source cap), and `collected`. The dashboard health banner counts the first three as issues, and the diagnostics page lists each state. `collected` means records returned within the configured window; it does **not** certify complete upstream pagination or a comprehensive provider catalog. A gracefully tolerated failure is still shown as failed coverage.
+
 On quality rejection, the command exits with code 1 without replacing feed exports or their baseline. The attempt report remains available locally/in failed-run artifacts. Individual output files are atomic; the full directory is not transactional. For publication write failures, inspect both process status and output generation consistency.
 
 ## Troubleshooting decision table

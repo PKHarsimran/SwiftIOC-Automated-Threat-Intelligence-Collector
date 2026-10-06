@@ -15,9 +15,9 @@ In this illustrative graph, Observable 2 is reported by two providers and shares
 
 ## Provider names must mean something
 
-Raw names such as `threatfox_export_json` describe ingestion adapters. The dashboard groups known aliases into readable providers. Multiple abuse.ch exports do not become multiple independent providers merely because they have different adapter names. Aggregate/context feeds are distinguished from direct reporting providers.
+Raw names such as `threatfox_export_json` describe ingestion adapters. Both dashboard provenance and collector scoring group shipped aliases into reporting publishers. Multiple abuse.ch exports count as one reporting group; aggregate/context feeds add no corroboration bonus. Unknown custom feeds remain distinct names until mapped, not verified independent observers.
 
-Provider grouping affects graph presentation. The Python scoring bonus still counts source identifiers; do not describe it as verified provider independence. Known feed-name tags, including aliases such as ThreatFox and CINS, are excluded from uncommon-tag investigative leads.
+The graph and Python scorer use the same shipped publisher families, but raw source names remain available for audit. Neither view proves that distinct publishers observed an indicator independently. Known feed-name tags, including aliases such as ThreatFox and CINS, are excluded from uncommon-tag investigative leads.
 
 ## Explore a cluster
 
@@ -40,7 +40,7 @@ Layout remixing changes presentation, not evidence. Node selection, highlighting
 
 | Lens | What it surfaces | What it does not establish |
 | --- | --- | --- |
-| Cross-source | Multiple distinct named sources; up to six ranked leads. | Verified independence of those sources. |
+| Cross-group | At least two distinct reporting groups in the loaded preview, with raw feed names shown separately; up to six ranked leads. Known aliases from one publisher count once, while aggregate and context feeds do not add a group. | Verified independent observation by those publishers. Unmapped custom feed names retain separate identities until mapped. |
 | Recent sightings | Valid last-seen time within 24 hours; future times excluded. | A new attack or first discovery. |
 | Uncommon tags | Nongeneric investigative tags on at most three distinct indicators in the filtered sample. | Global rarity across the internet or all retained feeds. |
 

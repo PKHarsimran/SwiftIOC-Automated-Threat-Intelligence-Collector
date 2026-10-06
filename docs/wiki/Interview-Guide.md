@@ -49,7 +49,7 @@ Use synthetic assets and the current retained feed. If live data is unavailable,
 
 **How do you deduplicate without losing information?** Use `(type, indicator)` identity after type-aware normalization, merge provenance and preserve temporal/evidence fields. Do not lowercase a whole URL. Different CVE IDs remain distinct while provider reports for the same ID combine.
 
-**What does an 88 score mean?** With high confidence and two source identifiers, the heuristic starts at 80+8 and decays by indicator-specific age. It ranks relevance; it is not an 88% probability. Source identifiers are not verified independent providers.
+**What does an 88 score mean?** With high confidence and two distinct reporting groups, the heuristic starts at 80+8 and decays by indicator-specific age. It ranks relevance; it is not an 88% probability. Publisher grouping is conservative but does not prove independent observation.
 
 **How do you know a CVE is exploited?** CISA KEV evidence supports that statement. NVD severity alone does not. Asset applicability needs product/version/configuration evidence and local verification; SwiftIOC does not scan endpoints.
 

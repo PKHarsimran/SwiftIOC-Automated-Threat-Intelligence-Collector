@@ -18,7 +18,7 @@ Different CVE IDs stay separate. The same CVE can combine multiple provider repo
 
 ```text
 base = 40 (low), 60 (medium), 80 (high); unrecognized confidence uses 50
-bonus = min(8 × additional source identifiers, 16)
+bonus = min(8 × additional reporting groups, 16)
 score = clamp(round((base + bonus) × 0.5 ^ (age_hours / half_life_hours)), 0, 100)
 ```
 
@@ -35,7 +35,7 @@ Age comes from `last_seen`, with negative age clamped to zero. Missing/unparseab
 
 ![Two illustrative curves start at 88; IP and URL relevance halves every seven days, domain relevance every fourteen days.](https://raw.githubusercontent.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/76421f9f4d7a5e007ec2990debf715cd3eefebe3/docs/wiki/assets/score-decay.png)
 
-Example: a high-confidence IP from two source identifiers starts at 88, becomes 44 after seven days without a newer sighting, then 22 after fourteen. This is a transparent ranking heuristic, **not a calibrated probability**. The bonus counts source identifiers, not verified independent providers; graph provider grouping is separate.
+Example: a high-confidence IP from two distinct reporting groups starts at 88, becomes 44 after seven days without a newer sighting, then 22 after fourteen. This is a transparent ranking heuristic, **not a calibrated probability**. Shipped aliases from one publisher, such as URLhaus and ThreatFox, count once; aggregate IPsum and the Tor exit directory add no reporting-group bonus. Unmapped custom feeds retain distinct source-name identities until their provenance is reviewed. Even two mapped publishers do not prove independent observations.
 
 ## Persistence and retention
 
@@ -43,7 +43,7 @@ With `--persist-feed`, re-observed records inherit history while prior-only reco
 
 When capacity is exceeded, non-rejected KEV records whose catalog evidence was checked within 24 hours receive priority, newest KEV additions first. Remaining priority uses score, source count and stable recency tie-breaks. Age/score expiry happens before the cap, so KEV prioritization does not imply a complete KEV catalog.
 
-The high-confidence subset includes score ≥80 by default **or** at least two source identifiers. Corroborated older records may therefore enter it below 80. It is a review set, not a guarantee of safe blocking.
+The high-confidence subset requires at least one reporting group and includes score ≥80 by default **or** at least two reporting groups. Multi-group older records may therefore enter it below 80. It is a review set, not a guarantee of safe blocking. Dashboard samples expose the raw feed names and the collector's score factors expose reporting groups and excluded aggregate/context sources.
 
 ## SOC Delta
 

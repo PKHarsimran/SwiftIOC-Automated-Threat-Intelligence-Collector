@@ -6,7 +6,7 @@
     <title>SwiftIOC — Free Live IOC Feed: Scored Malicious IPs, Domains, URLs &amp; Hashes</title>
     <meta
       name="description"
-      content="Free, open-source threat intelligence feed of the latest malicious IPs, domains, URLs, and file hashes — scored, cross-source corroborated, and refreshed automatically. Download CSV, JSON, JSONL, or STIX 2.1."
+      content="Free, open-source threat intelligence feed of malicious IPs, domains, URLs, and file hashes — scored with publisher-aware provenance and refreshed automatically. Download CSV, JSON, JSONL, or STIX 2.1."
     />
     <meta name="keywords" content="threat intelligence feed, malicious IP list, IOC feed, indicators of compromise, C2 IP blocklist, open source threat intel, STIX feed, free IOC download" />
     <meta name="theme-color" content="#191c19" />
@@ -15,7 +15,7 @@
     <meta property="og:title" content="SwiftIOC — Free Live IOC Feed" />
     <meta
       property="og:description"
-      content="The latest malicious IPs, domains, URLs, and hashes — scored, corroborated across sources, and updated automatically. Free CSV / JSON / STIX downloads."
+      content="Malicious IPs, domains, URLs, and hashes — scored with publisher-aware provenance and updated automatically. Free CSV / JSON / STIX downloads."
     />
     <meta property="og:url" content="https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/" />
     <meta name="twitter:card" content="summary" />
@@ -53,7 +53,7 @@
         "@context": "https://schema.org",
         "@type": "Dataset",
         "name": "SwiftIOC Threat Intelligence Feed",
-        "description": "Free, open-source, continuously updated feed of scored, cross-source-corroborated indicators of compromise (malicious IPs, domains, URLs, and file hashes) aggregated from CISA KEV, NVD, abuse.ch, Spamhaus, DShield/SANS ISC, and other public threat intelligence sources.",
+        "description": "Free, open-source feed of scored indicators of compromise with publisher-aware provenance, aggregated from CISA KEV, NVD, abuse.ch, Spamhaus, DShield/SANS ISC, and other public threat intelligence sources.",
         "url": "https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/",
         "license": "https://opensource.org/licenses/MIT",
         "isAccessibleForFree": true,
@@ -338,15 +338,15 @@
           <p class="metric-label">High-confidence</p>
           <p class="metric-value" data-stat="high-confidence">—</p>
           <p class="metric-caption" data-stat="high-confidence-caption">
-            Score ≥80 or 2+ sources
+            Score ≥80 or 2+ reporting groups
           </p>
         </article>
 
         <article class="metric-card">
-          <p class="metric-label">Corroborated</p>
+          <p class="metric-label">Multi-group reporting</p>
           <p class="metric-value" data-stat="corroborated">—</p>
           <p class="metric-caption" data-stat="corroborated-caption">
-            Confirmed by 2+ sources
+            Listed by 2+ reporting groups
           </p>
         </article>
 
@@ -559,13 +559,13 @@
           <div>
             <p class="eyebrow">02 / Discovery</p>
             <h2 id="discovery-heading">Follow the evidence</h2>
-            <p>Follow the evidence behind the score. Explore corroboration, recent sightings, and uncommon tags in the loaded preview.</p>
+            <p>Follow the evidence behind the score. Compare reporting groups, recent sightings, and uncommon tags in the loaded preview.</p>
           </div>
           <a class="button ghost" href="#live-preview">Refine the sample ↓</a>
         </div>
         <div class="discovery-toolbar">
           <div class="discovery-lenses" role="group" aria-label="Discovery lens">
-            <button type="button" data-discovery-mode="corroborated" aria-pressed="true">Cross-source</button>
+            <button type="button" data-discovery-mode="corroborated" aria-pressed="true">Cross-group</button>
             <button type="button" data-discovery-mode="recent" aria-pressed="false">Recent sightings</button>
             <button type="button" data-discovery-mode="uncommon" aria-pressed="false">Uncommon tags</button>
           </div>
@@ -770,7 +770,7 @@
                   >
                     <option value="all">Everything</option>
                     <option value="high">High score (≥80)</option>
-                    <option value="corroborated">Corroborated (2+ sources)</option>
+                    <option value="corroborated">2+ reporting groups</option>
                     <option value="new">New (first seen in 48h)</option>
                   </select>
                 </label>
@@ -906,7 +906,7 @@
                   (<span data-preview-high-percent>0%</span>)
                 </span>
                 <span class="preview-summary-pill">
-                  <span data-preview-corroborated>0</span> corroborated by 2+ sources
+                  <span data-preview-corroborated>0</span> listed by 2+ reporting groups
                 </span>
                 <span class="preview-summary-pill">
                   Top tag:
@@ -1122,7 +1122,7 @@
               data-fallback-label="Complete CSV"
               rel="nofollow"
               download
-              title="Only score ≥80 or indicators confirmed by 2+ sources"
+              title="Review set: score ≥80 or 2+ reporting groups"
               >★ High-confidence CSV</a>
             <a
               class="button-link exports-highlight"
@@ -1131,7 +1131,7 @@
               data-fallback-label="Complete JSONL"
               rel="nofollow"
               download
-              title="Only score ≥80 or indicators confirmed by 2+ sources"
+              title="Review set: score ≥80 or 2+ reporting groups"
               >★ High-confidence JSONL</a>
             <a
               class="button-link"
@@ -1190,7 +1190,7 @@
           </div>
           <p class="panel-footnote">
             The ★ high-confidence feeds contain only indicators scoring ≥80 or
-            confirmed by 2+ independent sources. Review indicators against your
+            reported by 2+ distinct publisher groups. Review indicators against your
             environment before applying blocking rules. All files come from the same SwiftIOC collector run that
             powers the live dashboard above.
           </p>
@@ -1205,7 +1205,7 @@
     </div>
 
     <div class="toast" data-toast role="status" aria-live="polite" aria-atomic="true" hidden></div>
-    <script defer src="assets/dashboard-core.js?v=48"></script>
+    <script defer src="assets/dashboard-core.js?v=50"></script>
     <script defer src="assets/group-intel-core.js?v=50"></script>
     <script defer src="assets/group-intel.js?v=48"></script>
     <script defer src="assets/today-core.js?v=50"></script>
@@ -1214,6 +1214,6 @@
     <script defer src="assets/inventory.js?v=46"></script>
     <script defer src="assets/sbom-core.js?v=1"></script>
     <script defer src="assets/sbom.js?v=1"></script>
-    <script defer src="assets/dashboard.js?v=50"></script>
+    <script defer src="assets/dashboard.js?v=52"></script>
   </body>
 </html>

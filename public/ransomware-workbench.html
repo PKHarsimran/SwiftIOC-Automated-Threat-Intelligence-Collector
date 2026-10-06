@@ -9,7 +9,7 @@
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="assets/styles.css?v=49" />
   <link rel="stylesheet" href="assets/groups.css?v=44" />
-  <link rel="stylesheet" href="assets/ransomware-workbench.css?v=47" />
+  <link rel="stylesheet" href="assets/ransomware-workbench.css?v=48" />
 </head>
 <body data-ioc-root=".">
 <a class="skip-link" href="#workbench">Skip to workbench</a>
@@ -46,9 +46,10 @@
       </section>
 
       <section data-panel="priorities" class="workbench-panel" hidden>
-        <div class="panel-heading"><div><h2>Explainable review queue</h2><p>Group-reported IOCs begin as research candidates, not confirmed detections or a blocklist. Local decisions never change the published feed.</p></div><label>Evidence type<select data-priority-kind><option value="candidates">Unmatched IOC candidates</option><option value="iocs">All IOCs</option><option value="cves">CVEs</option><option value="all">All</option></select></label><label>IOC type<select data-priority-observable><option value="all">All IOC types</option><option value="network">IP, domain or URL</option><option value="hash">File hashes</option></select></label></div>
+        <div class="panel-heading"><div><h2>Explainable review queue</h2><p>Group-reported IOCs begin as research candidates, not confirmed detections or a blocklist. Completed local reviews leave the default queue; they never change the published feed.</p></div><div class="priority-filters"><label>Evidence type<select data-priority-kind><option value="candidates">Unmatched IOC candidates</option><option value="iocs">All IOCs</option><option value="cves">CVEs</option><option value="all">All</option></select></label><label>IOC type<select data-priority-observable><option value="network">IP, domain or URL</option><option value="all">All IOC types</option><option value="hash">File hashes</option></select></label><label>Candidate status<select data-priority-review><option value="pending">Needs review</option><option value="observed">Observed locally</option><option value="dismissed">Dismissed locally</option><option value="all">All statuses</option></select></label></div></div>
         <p data-priority-summary class="group-small"></p><div class="priority-list" data-priorities></div>
         <div class="inline-actions"><button type="button" class="button ghost" data-priority-more hidden>Show more</button><button type="button" class="button ghost" data-candidate-export>Export local decisions</button></div>
+        <details class="case-tools"><summary>Open an exported evidence case</summary><p class="group-small">Case files stay in this browser. Reopening compares the saved provider snapshot with the current one; it does not restore or change local decisions.</p><label>SwiftIOC case JSON<input type="file" accept=".json,application/json" data-case-file /></label><div data-case-preview></div></details>
       </section>
 
       <section data-panel="compare" class="workbench-panel" hidden>
@@ -87,9 +88,9 @@
   </main>
   <footer class="site-footer"><span>SwiftIOC / Open-source threat intelligence</span><a href="groups.html">Explore group evidence</a></footer>
 </div>
-<script defer src="assets/dashboard-core.js?v=42"></script>
+<script defer src="assets/dashboard-core.js?v=49"></script>
 <script defer src="assets/group-intel-core.js?v=50"></script>
-<script defer src="assets/ransomware-workbench-core.js?v=46"></script>
-<script defer src="assets/ransomware-workbench.js?v=47"></script>
+<script defer src="assets/ransomware-workbench-core.js?v=48"></script>
+<script defer src="assets/ransomware-workbench.js?v=49"></script>
 </body>
 </html>

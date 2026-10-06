@@ -44,7 +44,7 @@ flowchart LR
 3. **Write files.** The collector produces separate observable and CVE collections, compatibility feeds, a one-run change feed, detection drafts, and diagnostics. GitHub Actions normally collects every four hours and deploys the resulting `public/` tree. A schedule is not a freshness guarantee; check [run diagnostics](https://harsim.ca/SwiftIOC-Automated-Threat-Intelligence-Collector/diagnostics/summary.html).
 4. **Investigate in the browser.** The site fetches published files. It does not need a Python API server or an account. Lookup, filters, graph pivots, workbench tools, SPL generation, and local inventory comparison do not call upstream providers on each click.
 
-The same CVE may contain separate CISA KEV and NVD reports. Different CVE IDs remain different records even when they name the same product. Source counts and scores help order review; they are **not** proof of independent corroboration, attack attribution, or compromise.
+The same CVE may contain separate CISA KEV and NVD reports. Different CVE IDs remain different records even when they name the same product. Publisher-group counts and scores help order review; they are **not** proof of independent corroboration, attack attribution, or compromise. Shipped aliases from one publisher count once, and aggregate/context lists add no corroboration bonus.
 
 ## What the site helps you do
 
@@ -117,7 +117,7 @@ The core collector and site work without a PRO key. If you have permission to us
 
 Provider associations are research leads. Unmatched provider IOCs are labeled **research candidates**, not silently added to scores or blocklists. See [Ransomware intelligence](https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector/wiki/Ransomware-Intelligence) for data flow, call-budget behavior, UI meanings, and limitations.
 
-The Workbench shows exact feed overlap and explicitly labels groups for which no IOC collection is available. Analysts can record local “observed in my logs” or dismissal decisions and export them; those decisions never change the public feed or prove group attribution. The separate EPSS, CVE, and ATT&CK sidecars use public sources and consume **zero ransomware.live PRO calls**.
+The Workbench shows exact feed overlap and explicitly labels groups for which no IOC collection is available. Analysts can record local “observed in my logs” or dismissal decisions; completed items leave the default queue but remain reviewable. Per-IOC/CVE evidence cases can be exported and reopened against a later snapshot. These local actions never change the public feed or prove group attribution. The separate EPSS, CVE, and ATT&CK sidecars use public sources and consume **zero ransomware.live PRO calls**.
 
 ## Trust and project boundaries
 

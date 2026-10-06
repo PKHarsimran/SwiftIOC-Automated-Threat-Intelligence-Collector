@@ -445,14 +445,22 @@ test('dashboard markup keeps IDs and labelled controls consistent', () => {
   );
 });
 
-test('discovery ranks actual source names, deduplicates IOCs, and explains corroboration', () => {
+test('discovery ranks reporting groups, deduplicates IOCs, and explains feed names', () => {
   const a = { ...row, indicator: 'a.example', sourceList: ['Feed-A', 'feed-a', 'unknown'], sourceCount: 99 };
   const b = { ...row, indicator: 'b.example', sourceList: ['Feed-A', 'Feed-B'] };
   const result = core.buildDiscovery([a, b, b], 'corroborated');
   assert.equal(result.sampleSize, 2);
   assert.equal(result.total, 1);
   assert.equal(result.findings[0].row.indicator, 'b.example');
-  assert.match(result.findings[0].reason, /do not establish source independence/);
+  assert.match(result.findings[0].label, /2 reporting groups · 2 feed names/);
+  assert.match(result.findings[0].reason, /do not prove independent observation/);
+  const aliases = { ...row, indicator: 'alias.example', sourceList: ['threatfox_export_json', 'urlhaus_recent_urls', 'ipsum_level5'] };
+  assert.equal(core.buildDiscovery([aliases], 'corroborated').total, 0);
+  const distinct = { ...aliases, sourceList: [...aliases.sourceList, 'blocklist_de_ssh'] };
+  const grouped = core.buildDiscovery([distinct], 'corroborated');
+  assert.equal(grouped.total, 1);
+  assert.match(grouped.findings[0].label, /2 reporting groups · 4 feed names/);
+  assert.match(grouped.findings[0].reason, /abuse.ch, blocklist.de/);
 });
 
 test('recent discovery excludes future, invalid, and old sightings', () => {
@@ -681,10 +689,17 @@ test('vulnerability aggregation ranks structured vendors and products determinis
 test('page references current asset cache keys', () => {
   const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
   for (const [asset, version] of Object.entries({ 'styles.css': 49, 'today.css': 49, 'today.js': 50,
-    'today-core.js': 50, 'dashboard.js': 50, 'dashboard-core.js': 48, 'group-intel.js': 48,
+    'today-core.js': 50, 'dashboard.js': 52, 'dashboard-core.js': 50, 'group-intel.js': 48,
     'group-intel-core.js': 50, 'sbom-core.js': 1, 'sbom.js': 1 })) {
     assert.ok(html.includes(`assets/${asset}?v=${version}`));
   }
+});
+
+test('diagnostics page inline JavaScript parses', () => {
+  const html = fs.readFileSync(path.join(__dirname, '../diagnostics/summary.html'), 'utf8');
+  const script = html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
+  assert.ok(script);
+  assert.doesNotThrow(() => new Function(script));
 });
 
 test('compact preview honors mobile defaults and explicit shared row counts', () => {
@@ -714,6 +729,12 @@ test('provider graph groups abuse.ch adapters and excludes directory and aggrega
   assert.equal(graph.nodes.filter((node) => node.kind === 'indicator').every((node) => node.sourceCount === 1), true);
   assert.deepEqual(graph.nodes.filter((node) => node.pivotKind === 'tag').map((node) => node.label), ['scanner']);
   assert.equal(providers.find((node) => node.label === 'abuse.ch').feeds.includes('urlhaus_recent_urls'), true);
+});
+
+test('official CVE feeds map to distinct named publishers', () => {
+  const providers = core.sourceProviders({ source: 'cisa_kev,nist_nvd_recent,ipsum_level5' });
+  assert.deepEqual(providers.map((provider) => [provider.id, provider.role]).sort(),
+    [['cisa', 'reporting'], ['ipsum', 'aggregate'], ['nvd', 'reporting']]);
 });
 
 test('provider sampling retains smaller genuine providers without inventing sources', () => {

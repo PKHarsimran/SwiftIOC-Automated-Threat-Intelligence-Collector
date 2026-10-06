@@ -53,11 +53,12 @@
 
       <section class="diag-tables">
         <div class="table-card">
-          <div class="table-card-header"><h3>Per-source counts</h3></div>
+          <div class="table-card-header"><h3>Per-source coverage</h3></div>
           <table>
-            <thead><tr><th>Source</th><th class="numeric">Indicators</th></tr></thead>
+            <thead><tr><th>Source</th><th class="numeric">Indicators</th><th>State</th></tr></thead>
             <tbody data-diag-sources></tbody>
           </table>
+          <p class="diag-status">“Collected” means items were returned within the configured window; it does not certify complete upstream coverage.</p>
         </div>
         <div class="table-card">
           <div class="table-card-header"><h3>Indicator types</h3></div>
@@ -113,6 +114,22 @@
           }
         };
 
+        const fillSources = (counts, coverage) => {
+          const tbody = qs('[data-diag-sources]'); tbody.replaceChildren();
+          const rows = Object.entries(counts || {}).sort((a, b) => b[1] - a[1]);
+          if (!rows.length) {
+            const tr = document.createElement('tr'); const td = document.createElement('td');
+            td.colSpan = 3; td.textContent = 'No source data.'; tr.appendChild(td); tbody.appendChild(tr); return;
+          }
+          for (const [name, count] of rows) {
+            const tr = document.createElement('tr');
+            const source = document.createElement('td'); source.textContent = name;
+            const total = document.createElement('td'); total.className = 'numeric'; total.textContent = num(count);
+            const state = document.createElement('td'); state.textContent = coverage?.[name]?.state || 'not reported';
+            tr.append(source, total, state); tbody.appendChild(tr);
+          }
+        };
+
         const render = (d) => {
           const stored = d.stored != null ? d.stored : d.total;
           const metrics = qs('[data-diag-metrics]');
@@ -123,7 +140,8 @@
             metric(
               'High-confidence',
               num(d.high_confidence_total),
-              'Score ≥ ' + (d.high_confidence_score == null ? 80 : d.high_confidence_score) + ' or 2+ sources'
+              'Score ≥ ' + (d.high_confidence_score == null ? 80 : d.high_confidence_score) +
+                (Number(d.version) >= 4 ? ' or 2+ reporting groups' : ' or 2+ feed names (legacy snapshot)')
             ),
             metric(
               'Score (min/avg/max)',
@@ -139,12 +157,14 @@
           );
           metrics.hidden = false;
 
-          fillTable(qs('[data-diag-sources]'), d.counts);
+          fillSources(d.counts, d.source_coverage);
           fillTable(qs('[data-diag-types]'), d.type_counts);
 
           const failures = Array.isArray(d.failures) ? d.failures : [];
           const empty = Array.isArray(d.empty_sources) ? d.empty_sources : [];
-          if (failures.length || empty.length) {
+          const truncated = Object.entries(d.source_coverage || {}).filter(([, item]) => item?.state === 'truncated');
+          const gracefulFailures = Object.entries(d.source_coverage || {}).filter(([, item]) => item?.state === 'failed' && item.graceful_failure);
+          if (failures.length || empty.length || truncated.length || gracefulFailures.length) {
             const box = qs('[data-diag-issues]');
             box.innerHTML = '';
             failures.forEach((f) => {
@@ -159,8 +179,18 @@
               p.textContent = '⚠️ ' + s + ' returned zero indicators';
               box.appendChild(p);
             });
+            truncated.forEach(([source, item]) => {
+              const p = document.createElement('p'); p.className = 'diag-issue';
+              p.textContent = `⚠️ ${source}: capped at ${num(item.returned)} of ${num(item.eligible_before_cap)} eligible records`;
+              box.appendChild(p);
+            });
+            gracefulFailures.forEach(([source]) => {
+              const p = document.createElement('p'); p.className = 'diag-issue';
+              p.textContent = `⚠️ ${source}: optional source failed; no records returned`;
+              box.appendChild(p);
+            });
             qs('[data-diag-issues-card]').hidden = false;
-          }
+          } else qs('[data-diag-issues-card]').hidden = true;
 
           qs('[data-diag-status]').textContent =
             'Loaded — generated ' + (d.ts || 'unknown') + '.';

@@ -39,13 +39,86 @@
     else reasons.push('Local observation receipt is not available yet (+0)');
     return { score, reasons, meaning: 'Evidence completeness and traceability—not truth, attribution confidence, or compromise probability.' };
   }
-  function coverageSummary(model) {
-    const iocs = model.records.filter((record) => record.kind === 'iocs');
-    const cves = model.records.filter((record) => record.kind === 'cves');
-    return { groups: model.groups.size, reportedIocs: iocs.length, feedIocMatches: iocs.filter((record) => record.matched).length,
+  function coverageSummary(model, group = '') {
+    const scoped = group ? model.byGroup.get(group) || [] : model.records;
+    const iocs = scoped.filter((record) => record.kind === 'iocs');
+    const cves = scoped.filter((record) => record.kind === 'cves');
+    return { groups: group ? Number(model.groups.has(group)) : model.groups.size, reportedIocs: iocs.length, feedIocMatches: iocs.filter((record) => record.matched).length,
       candidates: iocs.filter((record) => !record.matched).length, reportedCves: cves.length,
       feedCveMatches: cves.filter((record) => record.matched).length,
-      groupsWithoutIocCollection: model.groupsWithoutIocCollection };
+      groupsWithoutIocCollection: group ? null : model.groupsWithoutIocCollection };
+  }
+  function normalizeDecisions(input, now = Date.now()) {
+    if (!input || typeof input !== 'object' || Array.isArray(input)) return {};
+    const clean = {};
+    for (const [key, value] of Object.entries(input).slice(0, 10000)) {
+      if (!key.startsWith('iocs:') || key.length > 512 || !value || !['observed', 'dismissed'].includes(value.status)) continue;
+      const at = Date.parse(value.at);
+      if (!Number.isFinite(at) || at < 0 || at > now + 5 * 60000) continue;
+      clean[key] = { status: value.status, at: new Date(at).toISOString() };
+    }
+    return clean;
+  }
+  function priorityQueue(model, { group = '', kind = 'candidates', observable = 'all', review = 'pending', decisions = {} } = {}) {
+    const scoped = group ? model.byGroup.get(group) || [] : model.records;
+    const candidates = scoped.filter((record) => record.kind === 'iocs' && !record.matched);
+    const decisionCounts = { pending: 0, observed: 0, dismissed: 0 };
+    candidates.forEach((record) => {
+      const status = ['observed', 'dismissed'].includes(decisions[record.key]?.status) ? decisions[record.key].status : 'pending';
+      decisionCounts[status]++;
+    });
+    const records = scoped.filter((record) => record.kind !== 'ttps' && (kind === 'all' || record.kind === kind
+      || (kind === 'candidates' && record.kind === 'iocs' && !record.matched))
+      && (record.kind !== 'iocs' || observable === 'all' || (observable === 'network'
+        ? ['ipv4', 'ipv6', 'domain', 'url'].includes(record.type) : ['md5', 'sha1', 'sha256'].includes(record.type)))
+      && (kind !== 'candidates' || review === 'all' || (decisions[record.key]?.status || 'pending') === review));
+    return { records, decisionCounts };
+  }
+  function casePack(model, record, { decision = null, signal = null, signalSnapshotAt = null, buildSpl = null } = {}, now = Date.now()) {
+    if (!model.records.some((item) => item.key === record?.key) || !['iocs', 'cves'].includes(record.kind)) throw new Error('Select a current IOC or CVE.');
+    const receipts = Object.values(model.history?.observations || {}).filter((item) => item.kind === record.kind
+      && item.type === record.type && item.value === record.value && record.groups.includes(item.group)).slice(0, 100)
+      .map((item) => ({ group: item.group, first_observed: item.first_observed || null, last_observed: item.last_observed || null, present: item.present === true }));
+    const ranked = priority(record, model);
+    const local = normalizeDecisions({ [record.key]: decision }, now)[record.key] || null;
+    const spl = record.kind === 'iocs' && typeof buildSpl === 'function'
+      ? buildSpl({ type: record.type, indicator: record.value }, '*', '-7d') : null;
+    return { schema_version: 1, case_kind: 'swiftioc-evidence-review', exported_at: new Date(now).toISOString(),
+      group_snapshot_at: model.generatedAt, signal_snapshot_at: signalSnapshotAt,
+      record: { key: record.key, kind: record.kind, type: record.type, value: record.value,
+        groups: record.groups.slice(0, 100), matched_retained_feed: record.matched },
+      provider: 'ransomware.live', source_links: record.groups.slice(0, 100).map((group) => `https://ransomware.live/group/${encodeURIComponent(group)}`),
+      priority: { score: ranked.score, reasons: ranked.reasons }, receipts, analyst_decision: local,
+      public_cve_signal: record.kind === 'cves' && signal && typeof signal === 'object' ? signal : null,
+      draft_hunt: spl || null, next_steps: record.kind === 'iocs'
+        ? ['Hunt the exact typed value in local telemetry.', 'Review benign context and source provenance before any detection or block.']
+        : ['Verify affected products and versions with authoritative advisories.', 'Check local asset exposure and remediation status.'],
+      limitations: ['Provider association is not proof of current use, attribution, local compromise, or exposure.',
+        'A retained-feed match is not independent corroboration.', 'A local decision is user supplied and does not alter the public feed.',
+        'A query is a draft; review field mappings and search scope before use.'] };
+  }
+  function parseCase(input) {
+    const record = input?.record;
+    if (input?.schema_version !== 1 || input.case_kind !== 'swiftioc-evidence-review' || !record
+      || !['iocs', 'cves'].includes(record.kind) || typeof record.key !== 'string' || record.key.length > 2200
+      || typeof record.value !== 'string' || record.value.length > 2000 || !Array.isArray(record.groups)
+      || record.groups.length > 100 || record.groups.some((group) => typeof group !== 'string' || group.length > 200)
+      || (input.analyst_decision !== null && input.analyst_decision !== undefined
+        && (!['observed', 'dismissed'].includes(input.analyst_decision.status)
+          || !Number.isFinite(Date.parse(input.analyst_decision.at))))
+      || !Number.isFinite(Date.parse(input.group_snapshot_at)) || !Number.isFinite(Date.parse(input.exported_at))) {
+      throw new Error('Not a supported SwiftIOC evidence case.');
+    }
+    return input;
+  }
+  function compareCase(saved, model) {
+    const current = model.records.find((item) => item.key === saved.record.key);
+    if (!current) return { present: false, snapshotSame: saved.group_snapshot_at === model.generatedAt,
+      addedGroups: [], removedGroups: saved.record.groups, feedMatchChanged: false };
+    return { present: true, snapshotSame: saved.group_snapshot_at === model.generatedAt,
+      addedGroups: current.groups.filter((group) => !saved.record.groups.includes(group)),
+      removedGroups: saved.record.groups.filter((group) => !current.groups.includes(group)),
+      feedMatchChanged: current.matched !== saved.record.matched_retained_feed };
   }
   const setFor = (model, group, kind) => new Set((model.byGroup.get(group) || []).filter((r) => r.kind === kind).map((r) => `${r.type}:${r.value}`));
   const intersection = (a, b) => [...a].filter((value) => b.has(value)).length;
@@ -145,5 +218,6 @@
       countries: (context?.activity?.countries || []).filter((r) => countries.has(r.name.toLowerCase())),
       sectors: (context?.activity?.sectors || []).filter((r) => sectors.has(r.name.toLowerCase())) };
   }
-  return { priority, quality, coverageSummary, similarities, coverage, groupSignals, anomalies, triage, exposure, detectionDraft, responsePack, watchMatches, TELEMETRY };
+  return { priority, quality, coverageSummary, normalizeDecisions, priorityQueue, casePack, parseCase, compareCase,
+    similarities, coverage, groupSignals, anomalies, triage, exposure, detectionDraft, responsePack, watchMatches, TELEMETRY };
 });

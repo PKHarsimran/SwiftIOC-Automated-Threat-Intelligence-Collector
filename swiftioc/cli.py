@@ -268,6 +268,7 @@ def main() -> int:
         "ts": iso(now_utc()), "status": "rejected" if failures else "accepted",
         "counts": counts, "source_newest_first_seen": stats.get("source_newest_first_seen", {}),
         "quality_failures": failures, "source_failures": stats.get("failures", []),
+        "source_coverage": stats.get("source_coverage", {}),
         "volume_baseline_missing": [name for name, _ in args.fail_if_volume_drop if previous_counts.get(name, 0) <= 0],
     }
     write_json_document(out_dir / "diagnostics" / "collection-attempt.json", attempt)
@@ -335,7 +336,7 @@ def main() -> int:
     )
     logger.info("Static TAXII 2.1 envelope: %d objects", taxii_objects)
 
-    # Curated "block-ready" feed: only high-score or multi-source-confirmed
+    # Curated review feed: only high-score or multi-reporting-group records.
     # indicators, sorted strongest-first so the top of the file is the most
     # dangerous. Compact, so it is committed to git for direct raw-URL use.
     high_conf = sorted(
@@ -345,7 +346,7 @@ def main() -> int:
     write_csv(out_dir / "iocs" / "high_confidence.csv", high_conf)
     write_jsonl(out_dir / "iocs" / "high_confidence.jsonl", high_conf)
     logger.info(
-        "High-confidence feed: %d of %d indicators (score>=%d or 2+ sources)",
+        "High-confidence review feed: %d of %d indicators (score>=%d or 2+ reporting groups)",
         len(high_conf), len(rows), args.high_confidence_score,
     )
 
@@ -483,7 +484,8 @@ def main() -> int:
         "empty_sources": empty_sources,
         "volume_drops": volume_drops,
         "failures": stats.get("failures", []),
-        "version": 3,
+        "source_coverage": stats.get("source_coverage", {}),
+        "version": 4,
         "ts": run_ts,
     }
     if args.diag_json:
@@ -518,14 +520,15 @@ def main() -> int:
         if latest:
             report_lines.append(f"| Newest first_seen | {latest} |")
         report_lines.append("")
-        report_lines.extend(["## Per-source counts", ""])
-        report_lines.append("| Source | Indicators |")
-        report_lines.append("| --- | ---: |")
+        report_lines.extend(["## Per-source coverage", "", "Collected means records returned in the configured window, not a guarantee of complete upstream coverage.", ""])
+        report_lines.append("| Source | Indicators | State |")
+        report_lines.append("| --- | ---: | --- |")
         if counts:
             for name, count in sorted(counts.items()):
-                report_lines.append(f"| {name} | {count} |")
+                state = stats.get("source_coverage", {}).get(name, {}).get("state", "not reported")
+                report_lines.append(f"| {name} | {count} | {state} |")
         else:
-            report_lines.append("| _None_ | 0 |")
+            report_lines.append("| _None_ | 0 | not reported |")
         report_lines.append("")
         if type_totals:
             report_lines.extend(["## Indicator types", "", "| Type | Indicators |", "| --- | ---: |"])

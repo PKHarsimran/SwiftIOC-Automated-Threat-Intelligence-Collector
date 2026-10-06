@@ -1,17 +1,17 @@
 # Improve the product with measurable outcomes
 
-The following are proposals, not shipped features. Prioritize reliability and analyst trust before expanding the interface. A small product with clear evidence and dependable recovery is more credible than a broad dashboard with unclear claims.
+These are prioritized improvements, including bounded first versions now shipped and larger work still proposed. Prioritize reliability and analyst trust before expanding the interface. A small product with clear evidence and dependable recovery is more credible than a broad dashboard with unclear claims.
 
 ## Recommended order
 
-| Priority | Improvement | Why it matters | Acceptance evidence |
-| --- | --- | --- | --- |
-| 1 | Immutable publication generations and one current-manifest pointer | Avoid mixed-generation files, baselines and signature races. | Interrupt publication at each write; readers keep a coherent prior/current generation. |
-| 2 | Feed contracts and explicit partial-coverage state | Distinguish empty, failed, truncated, stale and partially paginated results. | Fixtures for each state; diagnostics and UI show the same coverage meaning. |
-| 3 | Provider-aware provenance in ranking | Avoid treating aliases/aggregators as independent corroboration. | Auditable provider mapping, score explanations and regression comparisons. |
-| 4 | Measured frontend performance budgets | Keep large retained snapshots and inventory checks responsive. | Published benchmark fixture, hardware/browser context, p50/p95 duration and main-thread blocking time. |
-| 5 | Evidence-linked case export | Package selected IOC/CVE evidence, queries, snapshot identity and analyst reasoning. | Reopen an exported case with provenance intact and explicit missing/stale evidence. |
-| 6 | Optional collaborative backend | Team queues, roles, audit trails and shared case state. | Permission tests, retention policy, migration path and backup/recovery exercise. |
+| Priority | Improvement | Status / remaining acceptance evidence |
+| --- | --- | --- |
+| 1 | Immutable publication generations and one current-manifest pointer | Proposed. Interrupt publication at each write; readers must keep a coherent prior/current generation, including signatures. |
+| 2 | Feed contracts and explicit partial-coverage state | First version distinguishes failed, empty and cap-truncated sources in diagnostics and site health. Upstream pagination completeness and source-specific freshness still need explicit contracts and fixtures. |
+| 3 | Provider-aware provenance in ranking | Bundled adapter aliases now count by publisher; aggregate/context lists add no bonus. Still measure score/rank changes and support explicit mappings for custom feeds. |
+| 4 | Measured frontend performance budgets | Proposed. Publish benchmark fixture, hardware/browser context, p50/p95 duration and main-thread blocking time. |
+| 5 | Evidence-linked case export | First version shipped for IOC/CVE priority cards, with local reopen and current-snapshot comparison. Immutable generation identity and full case-change history remain open. |
+| 6 | Optional collaborative backend | Proposed only. Requires role, retention, privacy, migration and backup/recovery decisions before implementation. |
 
 ## A distinctive product direction
 

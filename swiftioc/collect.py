@@ -101,6 +101,7 @@ def collect_from_yaml(
         got: List[Indicator] = []
         options: Dict[str, Any] = {}
         failure: Optional[Dict[str, str]] = None
+        error: Optional[str] = None
         try:
             t0 = time.perf_counter()
             parser_fn = resolve_parser(parse)
@@ -135,12 +136,13 @@ def collect_from_yaml(
             logger.debug("collect %s %d in %.2fs", name, len(got), dt)
             logger.debug("summary %s types=%s tags_top=%s", name, type_counts(got), top_tags(got))
         except Exception as e:
+            error = str(e)
             graceful_fail = bool(api.get("graceful_fail") or options.get("graceful_fail"))
             logger.warning("%s failed: %s", name, e)
             if not graceful_fail:
                 failure = {"source": name, "error": str(e)}
             got = []
-        return {"name": name, "indicators": got, "failure": failure}
+        return {"name": name, "indicators": got, "failure": failure, "error": error}
 
     def run_rss(rss: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         name = rss.get("name", "rss")
@@ -150,6 +152,7 @@ def collect_from_yaml(
         ref = rss.get("reference", url) or ""
         got: List[Indicator] = []
         failure: Optional[Dict[str, str]] = None
+        error: Optional[str] = None
         try:
             t0 = time.perf_counter()
             got = fetch_rss(url, ref, name, start_for(name), tolerate_missing=ci_safe_rss)
@@ -157,12 +160,13 @@ def collect_from_yaml(
             logger.debug("collect RSS %s %d in %.2fs", name, len(got), dt)
             logger.debug("summary %s types=%s tags_top=%s", name, type_counts(got), top_tags(got))
         except Exception as e:
+            error = str(e)
             graceful_fail = bool(rss.get("graceful_fail"))
             logger.warning("%s failed: %s", name, e)
             if not graceful_fail:
                 failure = {"source": name, "error": str(e)}
             got = []
-        return {"name": name, "indicators": got, "failure": failure}
+        return {"name": name, "indicators": got, "failure": failure, "error": error}
 
     # Build the ordered task list (APIs first, then RSS) so results stay
     # deterministic regardless of which worker finishes first.
@@ -195,6 +199,7 @@ def collect_from_yaml(
     raw_total = 0
     fp_removed = 0
     newest_first_seen: Dict[str, str] = {}
+    source_coverage: Dict[str, Dict[str, Any]] = {}
     collected_at = now_utc()
     for result in results:
         if result is None:
@@ -212,6 +217,13 @@ def collect_from_yaml(
                 continue
             kept.append(ind)
         got = cap(kept)
+        truncated = bool(max_per_source and len(kept) > max_per_source)
+        source_coverage[result["name"]] = {
+            "state": "failed" if result["error"] else "truncated" if truncated else "empty" if not got else "collected",
+            "returned": len(got), "eligible_before_cap": len(kept),
+            "configured_cap": max_per_source if truncated else None,
+            "graceful_failure": bool(result["error"] and not result["failure"]),
+        }
         raw_total += len(got)
         indicators.extend(got)
         counts[result["name"]] = len(got)
@@ -253,6 +265,7 @@ def collect_from_yaml(
         "failures": failures,
         "false_positives_removed": fp_removed,
         "source_newest_first_seen": newest_first_seen,
+        "source_coverage": source_coverage,
     }
     return final, counts, stats
 

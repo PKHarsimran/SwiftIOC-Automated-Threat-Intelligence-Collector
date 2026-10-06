@@ -11,10 +11,15 @@
   const readLocal = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } };
   const writeLocal = (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch { return false; } };
   const decisionKey = 'swiftioc.candidateDecisions.v1';
-  let candidateDecisions = readLocal(decisionKey, {});
-  if (!candidateDecisions || typeof candidateDecisions !== 'object' || Array.isArray(candidateDecisions)) candidateDecisions = {};
+  let candidateDecisions = workbench.normalizeDecisions(readLocal(decisionKey, {}));
+  let cveSignalsPromise = null;
   let priorityLimit = 30;
   const selectedTelemetry = () => [...document.querySelectorAll('[data-telemetry] input:checked')].map((input) => input.value);
+  const cveSignals = () => {
+    if (!cveSignalsPromise) cveSignalsPromise = fetch('cve_signals.json', { cache: 'no-cache' })
+      .then((response) => response.ok ? response.json() : null).catch(() => null);
+    return cveSignalsPromise;
+  };
   function navigate(change, replace = false) {
     state = { ...state, ...change }; render();
     const params = new URLSearchParams(Object.entries(state).filter(([, value]) => value));
@@ -65,28 +70,43 @@
   }
   function renderPriorities() {
     const kind = $('[data-priority-kind]').value, observable = $('[data-priority-observable]').value;
-    const records = state.group ? model.byGroup.get(state.group) : model.records;
-    const ranked = records.filter((r) => r.kind !== 'ttps' && (kind === 'all' || r.kind === kind
-      || (kind === 'candidates' && r.kind === 'iocs' && !r.matched))
-      && (r.kind !== 'iocs' || observable === 'all' || (observable === 'network' ? ['ipv4', 'ipv6', 'domain', 'url'].includes(r.type) : ['md5', 'sha1', 'sha256'].includes(r.type))))
-      .map((record) => ({ record, ...workbench.priority(record, model), quality: workbench.quality(record, model) }))
+    const reviewFilter = $('[data-priority-review]'); reviewFilter.disabled = kind !== 'candidates';
+    const queue = workbench.priorityQueue(model, { group: state.group, kind, observable, review: reviewFilter.value, decisions: candidateDecisions });
+    const ranked = queue.records.map((record) => ({ record, ...workbench.priority(record, model), quality: workbench.quality(record, model) }))
       .sort((a, b) => b.score - a.score || b.record.groups.length - a.record.groups.length || a.record.value.localeCompare(b.record.value));
     const host = $('[data-priorities]'); host.replaceChildren();
-    const coverage = workbench.coverageSummary(model);
-    $('[data-priority-summary]').textContent = `${ranked.length} in this view · ${coverage.candidates} IOC candidates lack an exact retained-feed match · ${coverage.feedIocMatches} exact IOC matches · ${coverage.feedCveMatches}/${coverage.reportedCves} group CVEs retained. ${coverage.groupsWithoutIocCollection === null ? 'Group IOC collection coverage unavailable.' : `${coverage.groupsWithoutIocCollection} groups have no IOC collection available in this snapshot.`} An unmatched value is not a negative finding.`;
+    const coverage = workbench.coverageSummary(model, state.group);
+    const decisions = queue.decisionCounts;
+    $('[data-priority-summary]').textContent = `${ranked.length} in this view · ${coverage.candidates} IOC candidates in ${state.group ? state.group : 'all groups'} (${decisions.pending} awaiting review, ${decisions.observed} locally observed, ${decisions.dismissed} dismissed) · ${coverage.feedIocMatches} exact retained-feed IOC matches · ${coverage.feedCveMatches}/${coverage.reportedCves} reported CVEs retained.${!state.group && coverage.groupsWithoutIocCollection !== null ? ` ${coverage.groupsWithoutIocCollection} groups have no IOC collection available.` : ''} Unmatched does not mean safe or malicious.`;
     $('[data-priority-more]').hidden = ranked.length <= priorityLimit;
     $('[data-priority-more]').textContent = `Show more (${Math.min(30, ranked.length - priorityLimit)} of ${ranked.length - priorityLimit} remaining)`;
+    if (!ranked.length) host.appendChild(el('p', kind === 'candidates' && reviewFilter.value === 'pending'
+      ? 'No candidates await review in this scope. Change the status filter to see local decisions, or choose another group or IOC type.'
+      : 'No evidence matches these filters.', 'group-small'));
     ranked.slice(0, priorityLimit).forEach((item) => {
-      const card = el('article', '', 'priority-card'); const body = el('div'); body.append(el('h3', item.record.value), el('p', `${item.record.type} · ${item.record.groups.slice(0, 3).join(', ')}${item.record.groups.length > 3 ? ` +${item.record.groups.length - 3}` : ''} · ${item.record.matched ? 'in SwiftIOC' : 'research candidate'} · traceability ${item.quality.score}/100`, 'group-small'));
+      const card = el('article', '', 'priority-card'); const body = el('div'); body.append(el('h3', item.record.value), el('p', `${item.record.type} · ${item.record.groups.slice(0, 3).join(', ')}${item.record.groups.length > 3 ? ` +${item.record.groups.length - 3}` : ''} · ${item.record.matched ? 'in SwiftIOC' : 'research candidate'}`, 'group-small'));
+      let receiptText = '';
       if (item.record.kind === 'iocs') {
         const receipt = groupCore.receipt(model, item.record, item.record.groups[0]);
-        body.appendChild(el('p', receipt ? `Locally observed in provider snapshots: ${receipt.first_observed || 'first date unavailable'} to ${receipt.last_observed || 'last date unavailable'}. This is not a dated attack sighting.` : 'No local first/last observation receipt available.', 'group-small'));
+        receiptText = receipt ? `Present in provider snapshots from ${receipt.first_observed || 'an unknown first date'} to ${receipt.last_observed || 'an unknown last date'}. These are collection receipts, not dated attack sightings.` : 'No local first/last collection receipt available.';
       }
       const details = el('details'); details.append(el('summary', 'Why this score'), el('ul'));
       item.reasons.forEach((reason) => details.lastChild.appendChild(el('li', reason))); body.appendChild(details);
       const quality = el('details'); quality.append(el('summary', 'Evidence-quality receipt'), el('p', item.quality.meaning, 'group-small'), el('ul'));
       item.quality.reasons.forEach((reason) => quality.lastChild.appendChild(el('li', reason))); body.appendChild(quality);
+      if (receiptText) quality.appendChild(el('p', receiptText, 'group-small'));
       const actions = el('div'); actions.appendChild(button('Triage evidence', () => { $('[data-triage-input]').value = item.record.value; navigate({ tab: 'triage' }); renderTriage(workbench.triage(model, item.record.value)); }));
+      actions.appendChild(button('Export case', async () => {
+        try {
+          const signals = item.record.kind === 'cves' ? await cveSignals() : null;
+          const pack = workbench.casePack(model, item.record, {
+            decision: candidateDecisions[item.record.key], signal: signals?.items?.[item.record.value],
+            signalSnapshotAt: signals?.generated_at || null, buildSpl: window.SwiftIOCCore?.buildSplQuery,
+          });
+          download(pack, `swiftioc-case-${item.record.value.replace(/[^a-z0-9.-]/gi, '_').slice(0, 80)}.json`);
+          $('[data-status]').textContent = 'Evidence case exported locally. It does not change the public feed or prove attribution.';
+        } catch (error) { $('[data-status]').textContent = `Case export unavailable: ${error.message}`; }
+      }));
       if (item.record.kind === 'iocs' && !item.record.matched) {
         const key = item.record.key;
         const local = candidateDecisions[key];
@@ -96,11 +116,15 @@
         actions.appendChild(button('Observed in my logs', () => {
           candidateDecisions[key] = { status: 'observed', at: new Date().toISOString() };
           if (!writeLocal(decisionKey, candidateDecisions)) $('[data-status]').textContent = 'Browser storage unavailable; local decision lasts only this session.';
+          else $('[data-status]').textContent = 'Local observation recorded. Use Candidate status to review or undo it; this does not verify group attribution.';
+          priorityLimit = 30;
           renderPriorities();
         }));
         actions.appendChild(button('Dismiss locally', () => {
           candidateDecisions[key] = { status: 'dismissed', at: new Date().toISOString() };
           if (!writeLocal(decisionKey, candidateDecisions)) $('[data-status]').textContent = 'Browser storage unavailable; local decision lasts only this session.';
+          else $('[data-status]').textContent = 'Local dismissal recorded. Use Candidate status to review or undo it.';
+          priorityLimit = 30;
           renderPriorities();
         }));
         if (local) actions.appendChild(button('Clear decision', () => { delete candidateDecisions[key]; writeLocal(decisionKey, candidateDecisions); renderPriorities(); }));
@@ -125,6 +149,18 @@
   }
   function download(value, filename) {
     const href = URL.createObjectURL(new Blob([JSON.stringify(value, null, 2)], { type: 'application/json' })); const anchor = link('', href); anchor.download = filename; anchor.click(); setTimeout(() => URL.revokeObjectURL(href), 1000);
+  }
+  function renderCasePreview(saved) {
+    const host = $('[data-case-preview]'); host.replaceChildren();
+    const change = workbench.compareCase(saved, model), record = saved.record;
+    const box = el('div', '', 'result-box'); box.append(el('h3', `${record.value} · ${record.type}`),
+      el('p', `Saved ${new Date(saved.exported_at).toLocaleString()} from provider snapshot ${new Date(saved.group_snapshot_at).toLocaleString()}. ${record.groups.length} reported group association${record.groups.length === 1 ? '' : 's'} and ${saved.receipts?.length || 0} collection receipts in the file.`, 'group-small'),
+      el('p', change.present ? (change.snapshotSame ? 'Same provider snapshot is loaded.' : `Current snapshot differs: ${change.addedGroups.length} group links added, ${change.removedGroups.length} removed${change.feedMatchChanged ? ', and retained-feed match changed' : ''}. Review the evidence before reusing the case.`) : 'This exact evidence record is absent from the current provider snapshot. Absence is not a negative finding.', 'group-small'));
+    if (saved.analyst_decision?.status) box.appendChild(el('p', `Saved local decision: ${saved.analyst_decision.status} at ${saved.analyst_decision.at}. This is user supplied, not group attribution.`, 'group-small'));
+    if (record.kind === 'cves' && /^CVE-\d{4}-\d{4,19}$/.test(record.value)) {
+      const anchor = link('Open official CVE record ↗', `https://www.cve.org/CVERecord?id=${record.value}`); anchor.target = '_blank'; anchor.rel = 'noopener noreferrer'; box.appendChild(anchor);
+    }
+    host.appendChild(box);
   }
   function renderCoverage() {
     const host = $('[data-coverage]'); host.replaceChildren(); const summary = $('[data-coverage-summary]'); summary.replaceChildren();
@@ -203,11 +239,20 @@
     selector.addEventListener('change', (event) => navigate({ group: event.target.value }));
     $('[data-priority-kind]').addEventListener('change', () => { priorityLimit = 30; renderPriorities(); });
     $('[data-priority-observable]').addEventListener('change', () => { priorityLimit = 30; renderPriorities(); });
+    $('[data-priority-review]').addEventListener('change', () => { priorityLimit = 30; renderPriorities(); });
     $('[data-compare]').addEventListener('change', renderCompare);
     $('[data-priority-more]').addEventListener('click', () => { priorityLimit += 30; renderPriorities(); });
     $('[data-candidate-export]').addEventListener('click', () => download({ schema_version: 1, source: 'browser-local analyst decisions',
       group_snapshot_at: model.generatedAt, exported_at: new Date().toISOString(), decisions: candidateDecisions,
       limitation: 'A local observation or dismissal is user supplied, not confirmation of ransomware-group attribution or a published feed update.' }, 'swiftioc-candidate-decisions.json'));
+    $('[data-case-file]').addEventListener('change', async (event) => {
+      const file = event.target.files?.[0]; if (!file) return;
+      try {
+        if (file.size > 500_000) throw new Error('Case file is too large (500 KB limit).');
+        renderCasePreview(workbench.parseCase(JSON.parse(await file.text())));
+      } catch (error) { $('[data-case-preview]').replaceChildren(el('p', `Cannot open case: ${error.message}`, 'group-small')); }
+      finally { event.target.value = ''; }
+    });
     $('[data-quick-plan]').addEventListener('click', () => { const group = state.group || [...model.groups.keys()].sort((a, b) => model.byGroup.get(b).length - model.byGroup.get(a).length)[0]; navigate({ group, tab: 'coverage' }); });
     $('[data-triage-form]').addEventListener('submit', (event) => { event.preventDefault(); renderTriage(workbench.triage(model, $('[data-triage-input]').value)); });
     $('[data-exposure-check]').addEventListener('click', () => renderExposure(workbench.exposure(model, $('[data-exposure-input]').value)));

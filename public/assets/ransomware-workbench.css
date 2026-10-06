@@ -20,6 +20,8 @@
 .workbench-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-bottom: 1rem; }
 .panel-heading { display: flex; justify-content: space-between; gap: 1rem; align-items: end; margin-bottom: 1rem; }
 .panel-heading h2, .workbench-panel > h2 { margin-bottom: .3rem; }
+.priority-filters { display: flex; flex-wrap: wrap; gap: .6rem; align-items: end; }
+.priority-filters label { min-width: 145px; }
 .metric-bars { display: grid; gap: .55rem; }
 .metric-bar { display: grid; grid-template-columns: minmax(85px, 1fr) 3fr auto; align-items: center; gap: .6rem; font-size: .8rem; }
 .metric-bar > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -31,6 +33,10 @@
 .priority-card h3 { margin: .1rem 0 .3rem; font-size: .95rem; overflow-wrap: anywhere; }
 .priority-card details { color: var(--text-muted); font-size: .8rem; }
 .priority-card > :last-child { display: flex; flex-wrap: wrap; gap: .45rem; max-width: 210px; }
+.case-tools { margin-top: 1rem; padding: .9rem 1rem; border: 1px solid var(--border-soft); border-radius: .6rem; }
+.case-tools > summary { cursor: pointer; }
+.case-tools label { display: block; max-width: 440px; margin: .8rem 0; }
+.case-tools input { display: block; width: 100%; margin-top: .4rem; }
 .compare-score { display: grid; grid-template-columns: 150px 1fr; gap: 1rem; align-items: center; margin: 1rem 0; }
 .compare-score strong { font-size: 2rem; color: var(--accent); }
 .dna-grid, .coverage-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; }
@@ -57,4 +63,5 @@
   .priority-card { grid-template-columns: 54px minmax(0, 1fr); }
   .priority-card > :last-child { grid-column: 2; }
   .triage-form, .panel-heading { align-items: stretch; flex-direction: column; }
+  .priority-filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); }
 }

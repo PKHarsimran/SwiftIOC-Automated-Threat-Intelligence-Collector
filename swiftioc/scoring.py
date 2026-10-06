@@ -10,14 +10,14 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from .fp import is_false_positive
 from .models import Indicator, classify, merge_conf, normalize_value, now_utc, parse_dt
+from .provenance import source_provenance
 
 
 # ---------------- scoring: corroboration + age decay ----------------
 # Base score by source-assigned confidence.
 SCORE_BASE = {"low": 40, "medium": 60, "high": 80}
-# Each independent source beyond the first adds a corroboration bonus: an IP
-# reported by Feodo *and* ThreatFox *and* a blog post is qualitatively
-# different from a single scanner hit.
+# Each distinct reporting group beyond the first adds a modest bonus. Feodo
+# and ThreatFox share a publisher; an aggregate list is not another observer.
 CORROBORATION_BONUS = 8
 CORROBORATION_CAP = 16
 # Exponential decay half-life per indicator type, in hours. Network
@@ -48,7 +48,8 @@ def explain_score(indicator: Indicator, now: Optional[datetime] = None) -> Dict[
     """Return the score and the factors used to calculate it."""
     now = now or now_utc()
     base = SCORE_BASE.get(indicator.confidence, 50)
-    n_sources = len([s for s in indicator.source.split(",") if s.strip()])
+    provenance = source_provenance(indicator.source)
+    n_sources = len(provenance["reporting_groups"])
     bonus = min(max(n_sources - 1, 0) * CORROBORATION_BONUS, CORROBORATION_CAP)
     last = parse_dt(indicator.last_seen) or now
     age_hours = max((now - last).total_seconds() / 3600.0, 0.0)
@@ -59,6 +60,7 @@ def explain_score(indicator: Indicator, now: Optional[datetime] = None) -> Dict[
         "score": score,
         "confidence_base": base,
         "source_count": n_sources,
+        **provenance,
         "corroboration_bonus": bonus,
         "age_hours": round(age_hours, 1),
         "half_life_hours": half_life,
@@ -77,18 +79,18 @@ def compute_score(indicator: Indicator, now: Optional[datetime] = None) -> int:
 
 
 def source_count(indicator: Indicator) -> int:
-    """Number of independent feeds reporting this indicator."""
-    return len([s for s in indicator.source.split(",") if s.strip()])
+    """Number of distinct reporting groups; not verified independent observations."""
+    return len(source_provenance(indicator.source)["reporting_groups"])
 
 
 def high_confidence_rows(rows: List[Indicator], *, min_score: int = 80) -> List[Indicator]:
     """Curated subset safe to action directly.
 
-    An indicator qualifies if it scores at or above ``min_score`` (fresh +
-    confident) OR is corroborated by two or more independent sources. This is
-    the "block-ready" feed: high-signal, low-false-positive.
+    An indicator qualifies if it has a reporting source and scores at or above
+    ``min_score``, or has two distinct reporting groups. This is a review set,
+    not an automatic blocklist or proof that publishers observed it separately.
     """
-    return [r for r in rows if r.score >= min_score or source_count(r) >= 2]
+    return [r for r in rows if source_count(r) >= 1 and (r.score >= min_score or source_count(r) >= 2)]
 
 
 def apply_retention(

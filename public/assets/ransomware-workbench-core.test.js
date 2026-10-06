@@ -21,6 +21,43 @@ test('coverage summary separates unmatched IOC candidates from CVE retention', (
   assert.equal(summary.candidates, 1);
   assert.equal(summary.feedIocMatches, 1);
   assert.equal(summary.feedCveMatches, 1);
+  assert.equal(core.coverageSummary(fixture(), 'C').candidates, 0);
+  assert.equal(core.coverageSummary(fixture(), 'C').feedIocMatches, 1);
+});
+
+test('candidate review queue hides completed local decisions by default and can reopen them', () => {
+  const model = fixture(); const candidate = model.records.find((record) => record.kind === 'iocs' && !record.matched);
+  const decisions = { [candidate.key]: { status: 'observed', at: '2026-09-22T00:00:00Z' } };
+  assert.equal(core.priorityQueue(model, { decisions }).records.length, 0);
+  assert.equal(core.priorityQueue(model, { decisions }).decisionCounts.observed, 1);
+  assert.equal(core.priorityQueue(model, { decisions, review: 'observed' }).records[0].key, candidate.key);
+  assert.equal(core.priorityQueue(model, { decisions, review: 'all', observable: 'hash' }).records.length, 0);
+  assert.equal(core.priorityQueue(model, { group: 'C' }).decisionCounts.pending, 0);
+  assert.equal(core.priorityQueue(model, { kind: 'cves', decisions }).records.length, 1);
+});
+
+test('stored candidate decisions must have bounded keys, statuses and dates', () => {
+  const valid = 'iocs:domain:bad.example';
+  assert.deepEqual(core.normalizeDecisions({ [valid]: { status: 'observed', at: '2026-09-22T00:00:00Z' },
+    garbage: { status: 'dismissed', at: '2026-09-22T00:00:00Z' },
+    'iocs:domain:future.example': { status: 'observed', at: '2027-01-01T00:00:00Z' } }, Date.parse('2026-09-23T00:00:00Z')),
+  { [valid]: { status: 'observed', at: '2026-09-22T00:00:00.000Z' } });
+});
+
+test('exported evidence case preserves a reviewable snapshot and compares later changes', () => {
+  const model = fixture(); const record = model.records.find((row) => row.kind === 'iocs' && !row.matched);
+  const saved = core.casePack(model, record, { decision: { status: 'observed', at: '2026-09-22T00:00:00Z' },
+    buildSpl: dashboard.buildSplQuery }, Date.parse('2026-09-23T00:00:00Z'));
+  assert.equal(saved.record.value, 'bad.example');
+  assert.deepEqual(saved.record.groups, ['A', 'B']);
+  assert.equal(saved.analyst_decision.status, 'observed');
+  assert.match(saved.draft_hunt, /bad\.example/);
+  assert.equal(core.compareCase(core.parseCase(saved), model).snapshotSame, true);
+  const later = fixture(); later.generatedAt = '2026-09-24T00:00:00Z';
+  later.records.find((row) => row.key === record.key).groups = ['B', 'C'];
+  assert.deepEqual(core.compareCase(saved, later).addedGroups, ['C']);
+  assert.deepEqual(core.compareCase(saved, later).removedGroups, ['A']);
+  assert.throws(() => core.parseCase({ ...saved, analyst_decision: { status: 'verified actor' } }), /supported/);
 });
 
 test('future provider change cannot boost candidate priority', () => {

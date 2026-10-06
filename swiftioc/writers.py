@@ -543,7 +543,7 @@ def write_rss_feed(path: Path, rows: List[Indicator], *, site_url: str, limit: i
         '<rss version="2.0"><channel>\n'
         "  <title>SwiftIOC — Newest High-Confidence IOCs</title>\n"
         f"  <link>{_xml_escape(site_url)}</link>\n"
-        "  <description>Freshest scored, cross-source-corroborated indicators of compromise.</description>\n"
+        "  <description>Freshest scored indicators of compromise with publisher-aware provenance.</description>\n"
         f"  <lastBuildDate>{now_rfc822}</lastBuildDate>\n"
         + "\n".join(items)
         + "\n</channel></rss>\n"

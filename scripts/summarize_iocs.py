@@ -5,10 +5,15 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import sys
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Sequence, Tuple
+
+# This script is also run directly from scripts/ in the collection workflow.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from swiftioc.provenance import source_provenance  # noqa: E402
 
 ISO_FMT = "%Y-%m-%dT%H:%M:%SZ"
 
@@ -81,8 +86,7 @@ def summarize_scores(rows: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
         value = row.get("score")
         if isinstance(value, (int, float)) and value > 0:
             scores.append(int(value))
-        sources = [s.strip() for s in (row.get("source") or "").split(",") if s.strip()]
-        if len(sources) >= 2:
+        if len(source_provenance(row.get("source") or "")["reporting_groups"]) >= 2:
             corroborated += 1
     if not scores:
         return {"scored": 0, "corroborated": corroborated}
@@ -102,17 +106,17 @@ def top_indicators_by_score(rows: Sequence[Dict[str, Any]], limit: int = 10) -> 
     def sort_key(row: Dict[str, Any]) -> Tuple[int, int, str]:
         score = row.get("score")
         numeric = int(score) if isinstance(score, (int, float)) else 0
-        sources = [s.strip() for s in (row.get("source") or "").split(",") if s.strip()]
-        return (-numeric, -len(sources), str(row.get("indicator") or ""))
+        groups = source_provenance(row.get("source") or "")["reporting_groups"]
+        return (-numeric, -len(groups), str(row.get("indicator") or ""))
 
     ranked = sorted((r for r in rows if r.get("indicator")), key=sort_key)[:limit]
     out: List[Tuple[str, str]] = []
     for row in ranked:
         score = row.get("score")
         numeric = int(score) if isinstance(score, (int, float)) else 0
-        sources = [s.strip() for s in (row.get("source") or "").split(",") if s.strip()]
+        groups = source_provenance(row.get("source") or "")["reporting_groups"]
         label = f"{row.get('type', '?')}: `{row.get('indicator')}`"
-        detail = f"score {numeric}, {len(sources)} source{'s' if len(sources) != 1 else ''}"
+        detail = f"score {numeric}, {len(groups)} reporting group{'s' if len(groups) != 1 else ''}"
         out.append((label, detail))
     return out
 
@@ -121,7 +125,7 @@ def summarize_overlaps(rows: Iterable[Dict[str, Any]], limit: int = 10) -> List[
     overlaps: List[Tuple[str, str]] = []
     for row in rows:
         sources = [s.strip() for s in (row.get("source") or "").split(",") if s.strip()]
-        if len(sources) <= 1:
+        if len(source_provenance(row.get("source") or "")["reporting_groups"]) <= 1:
             continue
         indicator = row.get("indicator") or "(unknown)"
         indicator_type = row.get("type") or "?"
@@ -202,13 +206,13 @@ def build_highlights(diag: Dict[str, Any] | None, rows: List[Dict[str, Any]]) ->
     highlight_rows.append(("Duplicates removed", f"{duplicates}"))
     highlight_rows.append(("Sources reporting", f"{active_sources}"))
     highlight_rows.append(("Indicator types", f"{types_seen}"))
-    highlight_rows.append(("Multi-source overlaps", f"{len(overlaps)}"))
+    highlight_rows.append(("Multi-group overlaps", f"{len(overlaps)}"))
     if score_stats.get("scored"):
         highlight_rows.append(
             ("Score (min / avg / max)", f"{score_stats['min']} / {score_stats['avg']} / {score_stats['max']}")
         )
         highlight_rows.append(("High-score indicators (≥80)", f"{score_stats['high']}"))
-        highlight_rows.append(("Corroborated (2+ sources)", f"{score_stats['corroborated']}"))
+        highlight_rows.append(("2+ reporting groups", f"{score_stats['corroborated']}"))
     if earliest:
         highlight_rows.append(("Earliest first_seen", earliest))
     if newest:
@@ -244,7 +248,7 @@ def render_summary(diag: Dict[str, Any] | None, rows: List[Dict[str, Any]]) -> T
     sections.append("")
     sections.extend(to_table(tag_rows, ("Tag", "Indicators")))
 
-    sections.append("## Multi-source overlaps")
+    sections.append("## Multi-group reporting overlaps")
     sections.append("")
     if overlap_rows:
         sections.append("| Indicator | Sources |")

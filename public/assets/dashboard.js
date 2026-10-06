@@ -915,14 +915,23 @@
       const age = typeof factors.age_hours === 'number'
         ? Math.round(factors.age_hours) + 'h old'
         : 'unknown age';
+      if (!Array.isArray(factors.reporting_groups)) {
+        return 'Published score ' + factors.score + ' = confidence base ' +
+          factors.confidence_base + ' + feed-name bonus ' +
+          factors.corroboration_bonus + ', adjusted for ' + age +
+          ' using a ' + Math.round(factors.half_life_hours / 24) +
+          '-day half-life. This older snapshot counted feed names; the next collection will use reporting groups.';
+      }
+      const groups = factors.reporting_groups.join(', ') || 'none';
       return 'Score ' + factors.score + ' = confidence base ' +
-        factors.confidence_base + ' + corroboration ' +
+        factors.confidence_base + ' + reporting-group bonus ' +
         factors.corroboration_bonus + ', adjusted for ' + age +
-        ' using a ' + Math.round(factors.half_life_hours / 24) + '-day half-life.';
+        ' using a ' + Math.round(factors.half_life_hours / 24) + '-day half-life. Reporting groups: ' +
+        groups + '. Distinct groups do not prove independent observation.';
     }
     const sourceText = (row?.sourceCount || 0) >= 2
-      ? 'confirmed by ' + row.sourceCount + ' independent sources'
-      : 'reported by one source';
+      ? 'listed by ' + row.sourceCount + ' reporting groups (not independent verification)'
+      : (row?.sourceCount || 0) === 1 ? 'listed by one reporting group' : 'listed by aggregate/context feeds only';
     const age = formatRelativeTimeFromNow(row?.bestTimestamp);
     const freshnessText = age ? ' and last seen ' + age : '';
     if (typeof row?.score === 'number') {
@@ -1010,7 +1019,7 @@
         if (key) sources.add(key);
       });
 
-      const multiSource = sourceParts.length >= 2;
+      const multiSource = (row.sourceCount || 0) >= 2;
       if (multiSource) {
         corroborated += 1;
       }
@@ -1034,11 +1043,13 @@
         scoreBands.medium += 1;
       }
 
-      // Block-ready: high score OR confirmed by multiple independent sources.
+      // Review subset: a reporting group plus high score or multi-group reporting.
       if (
-        (typeof row.score === 'number' && row.score >= 80) ||
-        (typeof row.score !== 'number' && legacyConfidenceRank >= 3) ||
-        multiSource
+        (row.sourceCount || 0) >= 1 && (
+          (typeof row.score === 'number' && row.score >= 80) ||
+          (typeof row.score !== 'number' && legacyConfidenceRank >= 3) ||
+          multiSource
+        )
       ) {
         highConfidence += 1;
       }
@@ -1517,10 +1528,12 @@
     };
     const score = parseScore(row.score);
 
-    // The source field accumulates comma-separated feeds as the living feed
-    // merges runs; each independent feed corroborates the indicator.
+    // Keep raw feed names visible, but count known aliases by publisher.
+    // Aggregate/context feeds do not create corroboration.
     const sourceList = uniqueStrings((sourceRaw || '').split(','));
-    const sourceCount = sourceList.length;
+    const sourceCount = dashboardCore?.sourceProviders
+      ? dashboardCore.sourceProviders({ source: sourceRaw }).filter((provider) => provider.role === 'reporting' || provider.role === 'unmapped').length
+      : sourceList.length;
 
     const tagValues = [
       ...extractTags(row.tags),
@@ -2120,7 +2133,7 @@
     setStatText('high-confidence-caption', `${hcPct.toFixed(1)}% of the feed`);
     const corrPct =
       stats.total > 0 ? ((stats.corroborated ?? 0) / stats.total) * 100 : 0;
-    setStatText('corroborated-caption', `${corrPct.toFixed(1)}% multi-source`);
+    setStatText('corroborated-caption', `${corrPct.toFixed(1)}% multi-group reporting`);
 
     renderScoreDistribution(stats);
 
@@ -2216,6 +2229,8 @@
         : stats.activeSources || 0;
       const totalSources = sourceCounts.length || stats.activeSources || 0;
       const failureRows = Array.isArray(diag.failures) ? diag.failures : [];
+      const coverageRows = diag.source_coverage && typeof diag.source_coverage === 'object'
+        ? Object.entries(diag.source_coverage) : [];
       const emptySourceNames = Array.isArray(diag.empty_sources)
         ? diag.empty_sources
         : [];
@@ -2225,6 +2240,9 @@
       failureRows.forEach((failure) => {
         const source = normaliseLower(failure?.source ?? failure?.name);
         if (source) issueSources.add(source);
+      });
+      coverageRows.forEach(([source, coverage]) => {
+        if (['failed', 'truncated', 'empty'].includes(coverage?.state)) issueSources.add(normaliseLower(source));
       });
       const issueCount = issueSources.size || failureRows.length;
       const runTime = parseTimestamp(diag.ts)?.time ?? null;
@@ -4366,6 +4384,12 @@
         const seen = document.createElement('p');
         seen.textContent = `Last seen: ${row.lastSeenDisplay || row.lastSeen || 'Unknown'} · TLP: ${row.tlp || 'Unmarked'}`;
         details.append(summary, seen, context);
+        if (mode === 'corroborated') {
+          const feeds = document.createElement('p');
+          feeds.textContent = `Feed names in this snapshot: ${row.sourceList?.join(', ') || row.source || 'Unknown'}. ` +
+            'Aggregate and context feeds do not add a reporting group.';
+          details.appendChild(feeds);
+        }
         const report = safeHttpUrl(row.reference);
         if (report) {
           const link = document.createElement('a');
@@ -4848,7 +4872,7 @@
     pills.className = 'threat-pills';
     pills.appendChild(makeThreatPill('type', row.type || 'unknown'));
     if ((row.sourceCount || 0) >= 2) {
-      const p = makeThreatPill('confirmed', `${row.sourceCount}× confirmed`);
+      const p = makeThreatPill('confirmed', `${row.sourceCount} reporting groups`);
       if (Array.isArray(row.sourceList)) p.title = row.sourceList.join(', ');
       pills.appendChild(p);
     }

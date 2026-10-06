@@ -543,6 +543,29 @@ def test_domain_case_normalization_dedup(monkeypatch):
     assert si.refang(rows[0].indicator) == "evil[.]com".replace("[.]", ".")
 
 
+def test_source_coverage_distinguishes_truncation_empty_and_graceful_failure(monkeypatch):
+    def payload(url, *args, **kwargs):
+        if url == "http://failed":
+            raise requests.RequestException("temporary failure")
+        return "1.2.3.4\n5.6.7.8\n" if url == "http://full" else ""
+
+    monkeypatch.setattr(si, "http_get", payload)
+    cfg = {"apis": [
+        {"name": "full", "parse": "blocklist_txt", "url": "http://full"},
+        {"name": "empty", "parse": "blocklist_txt", "url": "http://empty"},
+        {"name": "failed", "parse": "blocklist_txt", "url": "http://failed", "graceful_fail": True},
+    ]}
+    _, counts, stats = si.collect_from_yaml(cfg, window_hours=24, skip_rss=True,
+        max_per_source=1, urlhaus_status="any", source_window={}, grace_on_404=set(),
+        ci_safe_rss=False, max_workers=1, fp_filter=False)
+    assert counts == {"full": 1, "empty": 0, "failed": 0}
+    assert stats["source_coverage"]["full"] == {"state": "truncated", "returned": 1,
+        "eligible_before_cap": 2, "configured_cap": 1, "graceful_failure": False}
+    assert stats["source_coverage"]["empty"]["state"] == "empty"
+    assert stats["source_coverage"]["failed"]["state"] == "failed"
+    assert stats["source_coverage"]["failed"]["graceful_failure"] is True
+
+
 def test_stix_covers_all_indicator_types(tmp_path):
     rows = [
         _sample_indicator(indicator="192.0.2.1", type="ipv4"),
@@ -894,6 +917,24 @@ def test_source_count():
     assert si.source_count(_sample_indicator(source="")) == 0
 
 
+def test_reporting_groups_do_not_inflate_score_with_aliases_or_aggregates():
+    now = si.now_utc()
+    same_publisher = _sample_indicator(source="urlhaus_recent_urls,threatfox_export_json")
+    distinct = _sample_indicator(source="urlhaus_recent_urls,binarydefense_banlist")
+    aggregate = _sample_indicator(source="ipsum_level5,binarydefense_banlist")
+    context = _sample_indicator(source="tor_exit_nodes")
+    assert si.source_count(same_publisher) == 1
+    assert si.source_count(distinct) == 2
+    assert si.source_count(aggregate) == 1
+    assert si.source_count(context) == 0
+    assert si.source_count(_sample_indicator(source="unknown,n/a,unspecified")) == 0
+    assert si.explain_score(same_publisher, now)["corroboration_bonus"] == 0
+    assert si.explain_score(distinct, now)["corroboration_bonus"] == 8
+    assert si.explain_score(aggregate, now)["excluded_sources"] == [{"source": "ipsum_level5", "role": "aggregate"}]
+    context.score = 95
+    assert si.high_confidence_rows([context]) == []
+
+
 # ---------------- summarize_iocs helpers ----------------
 def _load_summarizer():
     import importlib.util
@@ -924,7 +965,8 @@ def test_summarizer_score_stats_and_top_table():
     top = mod.top_indicators_by_score(rows, limit=2)
     assert len(top) == 2
     assert "1.2.3.4" in top[0][0]  # highest score first
-    assert "score 96, 3 sources" == top[0][1]
+    assert "score 96, 3 reporting groups" == top[0][1]
+    assert mod.summarize_scores([{"source": "urlhaus_recent_urls,threatfox_export_json", "score": 88}])["corroborated"] == 0
 
 
 def test_summarizer_handles_scoreless_feed():
@@ -950,8 +992,8 @@ def test_compute_score_fresh_multi_source():
         source="feodo,threatfox,blog",
         last_seen=si.iso(si.now_utc()),
     )
-    # base 80 + corroboration capped at +16 = 96, no decay when fresh.
-    assert si.compute_score(ind) == 96
+    # Feodo and ThreatFox share abuse.ch; the unmapped blog is a second group.
+    assert si.compute_score(ind) == 88
 
 
 def test_compute_score_decays_with_age():
@@ -1328,8 +1370,8 @@ def test_overlapping_ip_feeds_corroborate(monkeypatch):
     )
     assert len(rows) == 1
     assert len([s for s in rows[0].source.split(",") if s]) == 3
-    # medium base (60) + 2 extra sources * 8 = 76, fresh (no decay).
-    assert si.compute_score(rows[0]) == 76
+    # IPsum republishes other lists: only ET and Binary Defense add groups.
+    assert si.compute_score(rows[0]) == 68
     tf = json.dumps({"data": [{"ioc": "evil.tld", "ioc_type": "domain", "first_seen": "2025-01-01 00:00:00", "malware": "x"}]})
     monkeypatch.setattr(si, "http_get", lambda *a, **k: tf)
     out = si.fetch_threatfox_export_json("http://x", "ref", "tf", si.now_utc().replace(year=2000))

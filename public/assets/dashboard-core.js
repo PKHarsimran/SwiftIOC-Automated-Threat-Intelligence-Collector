@@ -438,6 +438,8 @@
   // Explicit aliases from the shipped adapters. Unknown/custom feeds keep
   // their identity; similar spelling is not evidence of a common publisher.
   const providerGroups = [
+    ['cisa', 'CISA', ['cisa_kev']],
+    ['nvd', 'NIST NVD', ['nist_nvd_recent']],
     ['abuse.ch', 'abuse.ch', ['threatfox_export_json', 'threatfox_recent', 'threatfox', 'urlhaus_recent_urls', 'urlhaus', 'malwarebazaar_recent', 'malwarebazaar', 'feodo_ipblocklist', 'feodo', 'sslbl_ja3', 'sslbl']],
     ['cins', 'CINS Army', ['ci_army_list', 'cins']],
     ['spamhaus', 'Spamhaus', ['spamhaus_drop', 'spamhaus_drop_v6', 'spamhaus']],
@@ -680,10 +682,13 @@
         label = rare;
         reason = `“${rare}” appears on ${counts.get(rare)} of ${rows.length} indicators in this filtered sample. This is sample rarity, not global rarity.`;
       } else {
-        if (sources.length < 2) continue;
-        rank = sources.length;
-        label = `${sources.length} reporting sources`;
-        reason = `Reported by ${sources.join(', ')}. Multiple reports provide corroboration, but do not establish source independence.`;
+        const groups = sourceProviders(row).filter((provider) =>
+          provider.role === 'reporting' || provider.role === 'unmapped');
+        if (groups.length < 2) continue;
+        rank = groups.length;
+        label = `${groups.length} reporting groups · ${sources.length} feed names`;
+        reason = `Reported by ${groups.map((provider) => provider.label).join(', ')}. ` +
+          'Distinct groups do not prove independent observation.';
       }
       findings.push({ row, label, reason, rank });
     }
