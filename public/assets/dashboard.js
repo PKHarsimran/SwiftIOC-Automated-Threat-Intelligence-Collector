@@ -4443,10 +4443,15 @@
   const initialiseCampaignGraph = () => {
     const root = qs('[data-campaign-root]');
     const svg = qs('[data-campaign-graph]', root);
-    if (!root || !svg || !dashboardCore?.buildCampaignGraph || !dashboardCore?.sourceProviders) return;
+    if (!root || !svg || !dashboardCore?.buildCampaignGraph || !dashboardCore?.layoutCampaignGraph || !dashboardCore?.sourceProviders) return;
     const mode = qs('[data-campaign-mode]', root);
     const density = qs('[data-campaign-density]', root);
+    const style = qs('[data-campaign-style]', root);
     const remix = qs('[data-campaign-layout]', root);
+    const zoomIn = qs('[data-campaign-zoom-in]', root);
+    const zoomOut = qs('[data-campaign-zoom-out]', root);
+    const fit = qs('[data-campaign-fit]', root);
+    const zoomLabel = qs('[data-campaign-zoom-label]', root);
     const search = qs('[data-campaign-search]', root);
     const searchResults = qs('[data-campaign-search-results]', root);
     const searchStatus = qs('[data-campaign-search-status]', root);
@@ -4479,7 +4484,11 @@
     let entries = [];
     let graph = null;
     let selected = null;
+    let hovered = null;
     let rotation = 0;
+    let baseView = { width: 1000, height: 760 };
+    let zoom = 1, viewX = 0, viewY = 0;
+    let drag = null, ignoreNextClick = false;
     if (density && window.matchMedia?.('(max-width: 540px)').matches) {
       density.value = '24';
     }
@@ -4495,33 +4504,48 @@
       return element;
     };
 
-    const positionsFor = (nodes) => {
-      const pivots = nodes.filter((node) => node.kind === 'pivot');
-      const indicators = nodes.filter((node) => node.kind === 'indicator');
-      const positions = new Map();
-      const grouped = new Map(pivots.map((pivot) => [pivot.id, []]));
-      indicators.forEach((node) => {
-        // Balance shared indicators between their actual pivots instead of
-        // assigning every overlap to whichever edge sorts first.
-        const owners = pivots.filter((pivot) => graph.edges.some((edge) => edge.source === pivot.id && edge.target === node.id));
-        owners.sort((a, b) => grouped.get(a.id).length - grouped.get(b.id).length);
-        if (owners.length) grouped.get(owners[0].id).push(node);
+    const applyViewport = () => {
+      const width = baseView.width / zoom, height = baseView.height / zoom;
+      viewX = Math.max(0, Math.min(viewX, baseView.width - width));
+      viewY = Math.max(0, Math.min(viewY, baseView.height - height));
+      svg.setAttribute('viewBox', `${viewX} ${viewY} ${width} ${height}`);
+      svg.classList.toggle('is-zoomed', zoom > 1);
+      if (zoomLabel) zoomLabel.textContent = `${Math.round(zoom * 100)}%`;
+      if (zoomOut) zoomOut.disabled = !graph?.edges.length || zoom <= 1;
+      if (zoomIn) zoomIn.disabled = !graph?.edges.length || zoom >= 3;
+      if (fit) fit.disabled = !graph?.edges.length || zoom === 1;
+    };
+
+    const zoomBy = (factor) => {
+      const centerX = viewX + baseView.width / zoom / 2;
+      const centerY = viewY + baseView.height / zoom / 2;
+      zoom = Math.max(1, Math.min(3, Math.round(zoom * factor * 100) / 100));
+      viewX = centerX - baseView.width / zoom / 2;
+      viewY = centerY - baseView.height / zoom / 2;
+      applyViewport();
+    };
+
+    const paintHighlight = () => {
+      if (!graph) return;
+      const focus = hovered || selected;
+      const connected = new Set();
+      if (focus) graph.edges.forEach((edge) => {
+        if (edge.source === focus.id) connected.add(edge.target);
+        if (edge.target === focus.id) connected.add(edge.source);
       });
-      let top = 25;
-      const reverse = Math.round(rotation / (Math.PI / 7)) % 2 === 1;
-      pivots.forEach((pivot) => {
-        const members = grouped.get(pivot.id);
-        if (reverse) members.reverse();
-        const height = Math.max(95, Math.ceil(members.length / 5) * 75 + 20);
-        positions.set(pivot.id, { x: 145, y: top + height / 2 });
-        members.forEach((node, index) => positions.set(node.id, {
-          x: 350 + (index % 5) * 140,
-          y: top + 30 + Math.floor(index / 5) * 75,
-        }));
-        top += height;
+      qsa('[data-graph-node]', svg).forEach((element) => {
+        const active = element.dataset.graphNode === focus?.id;
+        element.classList.toggle('is-selected', element.dataset.graphNode === selected?.id);
+        element.classList.toggle('is-previewed', active && focus !== selected);
+        element.setAttribute('aria-pressed', String(element.dataset.graphNode === selected?.id));
+        element.classList.toggle('is-connected', connected.has(element.dataset.graphNode));
+        element.classList.toggle('is-dimmed', Boolean(focus) && !active && !connected.has(element.dataset.graphNode));
       });
-      svg.setAttribute('viewBox', `0 0 1000 ${Math.max(260, top + 25)}`);
-      return positions;
+      qsa('[data-graph-edge]', svg).forEach((element) => {
+        const related = element.dataset.source === focus?.id || element.dataset.target === focus?.id;
+        element.classList.toggle('is-connected', Boolean(focus) && related);
+        element.classList.toggle('is-dimmed', Boolean(focus) && !related);
+      });
     };
 
     const selectNode = (node) => {
@@ -4533,19 +4557,8 @@
         if (edge.source === node.id) connected.add(edge.target);
         if (edge.target === node.id) connected.add(edge.source);
       });
-      qsa('[data-graph-node]', svg).forEach((element) => {
-        const active = element.dataset.graphNode === node.id;
-        const related = connected.has(element.dataset.graphNode);
-        element.classList.toggle('is-selected', active);
-        element.setAttribute('aria-pressed', String(active));
-        element.classList.toggle('is-connected', related);
-        element.classList.toggle('is-dimmed', !active && !related);
-      });
-      qsa('[data-graph-edge]', svg).forEach((element) => {
-        const related = element.dataset.source === node.id || element.dataset.target === node.id;
-        element.classList.toggle('is-connected', related);
-        element.classList.toggle('is-dimmed', !related);
-      });
+      hovered = null;
+      paintHighlight();
 
       const degree = graph.edges.filter((edge) => edge.source === node.id || edge.target === node.id).length;
       const relatedNodes = graph.nodes.filter((candidate) => connected.has(candidate.id));
@@ -4643,8 +4656,11 @@
         maxPivots: 8,
         maxIndicators: Number(density?.value) || 36,
       });
-      svg.innerHTML = '';
+      svg.replaceChildren();
       selected = null;
+      hovered = null;
+      root.dataset.campaignView = style?.value === 'lanes' ? 'lanes' : 'orbit';
+      if (remix) remix.textContent = root.dataset.campaignView === 'orbit' ? 'Rotate map' : 'Reverse rows';
       const nextSelected = graph.nodes.find((node) => node.id === selectedId) || null;
       const hasGraph = graph.nodes.length > 0 && graph.edges.length > 0;
       if (empty) empty.hidden = hasGraph;
@@ -4663,7 +4679,7 @@
       setText(visible, formatNumber(graph.stats.indicators));
       if (summary) {
         summary.textContent = hasGraph
-          ? `${formatNumber(graph.stats.relationships)} relationships across ${formatNumber(graph.stats.tagPivots)} tag and ${formatNumber(graph.stats.sourcePivots)} reporting groups (${graph.stats.mappedProviders} mapped providers, ${graph.stats.aggregates} aggregates, ${graph.stats.unmappedFeeds} unmapped feeds; ${graph.stats.availableProviders} eligible groups in the sample). Node size reflects mapped provider coverage; color reflects the collector score. Aggregates and unmapped feeds do not increase provider coverage. Shared reporting does not prove independent verification.`
+          ? `${formatNumber(graph.stats.relationships)} displayed links · ${formatNumber(graph.stats.tagPivots)} tag pivots · ${formatNumber(graph.stats.sourcePivots)} source pivots (${graph.stats.mappedProviders} mapped publishers, ${graph.stats.aggregates} aggregate feeds, ${graph.stats.unmappedFeeds} unmapped feeds). Indicator rings mark 2+ mapped publishers; color reflects the collector score. These links describe shared reporting or tags, not independent verification or campaign attribution.`
           : 'No repeated tags or sources were found in the current preview.';
       }
       const evidenceBlock = qs('[data-campaign-feed-evidence]', root);
@@ -4681,18 +4697,37 @@
         queue.disabled = true;
         queue.textContent = 'Add indicator to queue';
       }
-      if (!hasGraph) return;
+      if (!hasGraph) {
+        zoom = 1; viewX = 0; viewY = 0;
+        applyViewport();
+        return;
+      }
 
-      const positions = positionsFor(graph.nodes);
+      const layout = dashboardCore.layoutCampaignGraph(graph, root.dataset.campaignView, rotation);
+      const positions = layout.positions;
+      baseView = { width: layout.width, height: layout.height };
+      svg.style.aspectRatio = `${layout.width} / ${layout.height}`;
+      applyViewport();
+      if (layout.style === 'orbit') {
+        const guide = createSvg('g', { class: 'campaign-orbit-guide', 'aria-hidden': 'true' });
+        guide.append(
+          createSvg('circle', { cx: 500, cy: 380, r: 198 }),
+          createSvg('circle', { cx: 500, cy: 380, r: 310 }),
+        );
+        svg.appendChild(guide);
+      }
       const edgeLayer = createSvg('g', { class: 'campaign-edges' });
+      const pivotRoles = new Map(graph.nodes.filter((node) => node.kind === 'pivot').map((node) => [node.id, node.role || '']));
       graph.edges.forEach((edge, index) => {
         const start = positions.get(edge.source);
         const end = positions.get(edge.target);
         if (!start || !end) return;
         const line = createSvg('path', {
-          d: `M ${start.x + 120} ${start.y} C ${start.x + 175} ${start.y}, ${end.x - 55} ${end.y}, ${end.x - 17} ${end.y}`,
+          d: layout.style === 'orbit'
+            ? `M ${start.x} ${start.y} L ${end.x} ${end.y}`
+            : `M ${start.x + 120} ${start.y} C ${start.x + 175} ${start.y}, ${end.x - 55} ${end.y}, ${end.x - 17} ${end.y}`,
           fill: 'none',
-          class: `campaign-edge ${edge.kind}`,
+          class: `campaign-edge ${edge.kind} ${pivotRoles.get(edge.source) || ''}`,
           'data-graph-edge': '',
           'data-source': edge.source,
           'data-target': edge.target,
@@ -4709,7 +4744,7 @@
           ? node.score >= 80 ? 'critical' : node.score >= 60 ? 'elevated' : node.score >= 40 ? 'moderate' : 'aging'
           : '';
         const group = createSvg('g', {
-          class: `campaign-node ${node.kind} ${node.pivotKind || ''} ${riskBand}`,
+          class: `campaign-node ${node.kind} ${node.pivotKind || ''} ${node.role || ''} ${riskBand}`,
           transform: `translate(${position.x} ${position.y})`,
           role: 'button',
           tabindex: '0',
@@ -4727,17 +4762,20 @@
           }));
         }
         const circle = node.kind === 'pivot'
-          ? createSvg('rect', { x: -120, y: -27, width: 240, height: 54, rx: 6, class: 'campaign-node-core' })
+          ? createSvg('rect', layout.style === 'orbit'
+            ? { x: -72, y: -22, width: 144, height: 44, rx: 15, class: 'campaign-node-core' }
+            : { x: -120, y: -27, width: 240, height: 54, rx: 6, class: 'campaign-node-core' })
           : createSvg('circle', { r: 14 + Math.min(Math.max(node.sourceCount - 1, 0), 4) * 0.8, class: 'campaign-node-core' });
         const label = createSvg('text', {
-          y: node.kind === 'pivot' ? -3 : 3,
+          y: node.kind === 'pivot' ? (layout.style === 'orbit' ? -2 : -3) : 3,
           'text-anchor': 'middle',
         });
         label.textContent = node.kind === 'pivot'
-          ? (node.label.length > 32 ? node.label.slice(0, 31) + '…' : node.label)
+          ? (node.label.length > (layout.style === 'orbit' ? 17 : 32)
+            ? node.label.slice(0, layout.style === 'orbit' ? 16 : 31) + '…' : node.label)
           : String(node.score);
         const subtitle = createSvg('text', {
-          y: node.kind === 'pivot' ? 17 : 31,
+          y: node.kind === 'pivot' ? (layout.style === 'orbit' ? 13 : 17) : 31,
           'text-anchor': 'middle',
           class: 'campaign-node-subtitle',
         });
@@ -4750,6 +4788,10 @@
           : `${node.label} · ${node.row?.type || 'indicator'} · score ${node.score} · ${node.sourceCount} mapped provider${node.sourceCount === 1 ? '' : 's'}${node.row?.lastSeenDisplay ? ` · last seen ${node.row.lastSeenDisplay}` : ''}`;
         group.append(circle, label, subtitle, tooltip);
         group.addEventListener('click', () => selectNode(node));
+        group.addEventListener('pointerenter', () => { hovered = node; paintHighlight(); });
+        group.addEventListener('pointerleave', () => { if (hovered?.id === node.id) { hovered = null; paintHighlight(); } });
+        group.addEventListener('focus', () => { hovered = node; paintHighlight(); });
+        group.addEventListener('blur', () => { if (hovered?.id === node.id) { hovered = null; paintHighlight(); } });
         group.addEventListener('keydown', (event) => {
           if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
@@ -4781,10 +4823,39 @@
     };
 
     svg.addEventListener('click', (event) => {
+      if (ignoreNextClick) { ignoreNextClick = false; return; }
       if (!selected || event.target.closest('[data-graph-node]')) return;
       selected = null;
       render();
     });
+    svg.addEventListener('pointerdown', (event) => {
+      if (event.pointerType !== 'mouse' || event.button !== 0 || zoom <= 1 || event.target.closest('[data-graph-node]') || !graph?.edges.length) return;
+      drag = { x: event.clientX, y: event.clientY, viewX, viewY, moved: false };
+      svg.setPointerCapture(event.pointerId);
+    });
+    svg.addEventListener('pointermove', (event) => {
+      if (!drag) return;
+      const dx = event.clientX - drag.x, dy = event.clientY - drag.y;
+      if (Math.abs(dx) + Math.abs(dy) > 4) drag.moved = true;
+      if (!drag.moved) return;
+      svg.classList.add('is-panning');
+      const bounds = svg.getBoundingClientRect();
+      viewX = drag.viewX - dx * baseView.width / zoom / bounds.width;
+      viewY = drag.viewY - dy * baseView.height / zoom / bounds.height;
+      applyViewport();
+    });
+    const endDrag = (event) => {
+      if (!drag) return;
+      ignoreNextClick = drag.moved;
+      drag = null;
+      svg.classList.remove('is-panning');
+      if (svg.hasPointerCapture(event.pointerId)) svg.releasePointerCapture(event.pointerId);
+    };
+    svg.addEventListener('pointerup', endDrag);
+    svg.addEventListener('pointercancel', endDrag);
+    zoomIn?.addEventListener('click', () => zoomBy(1.3));
+    zoomOut?.addEventListener('click', () => zoomBy(1 / 1.3));
+    fit?.addEventListener('click', () => { zoom = 1; viewX = 0; viewY = 0; applyViewport(); });
     search?.addEventListener('input', updateSearch);
     reset?.addEventListener('click', () => {
       selected = null;
@@ -4816,10 +4887,11 @@
         nodes, edges,
       }, null, 2) + '\n', 'swiftioc-graph-evidence.json', 'application/json');
     });
-    mode?.addEventListener('change', render);
-    density?.addEventListener('change', render);
+    mode?.addEventListener('change', () => { zoom = 1; viewX = 0; viewY = 0; render(); });
+    density?.addEventListener('change', () => { zoom = 1; viewX = 0; viewY = 0; render(); });
+    style?.addEventListener('change', () => { zoom = 1; viewX = 0; viewY = 0; rotation = 0; render(); });
     remix?.addEventListener('click', () => {
-      rotation = (rotation + Math.PI / 7) % (Math.PI * 2);
+      rotation += 1;
       render();
     });
     queue?.addEventListener('click', () => {
@@ -4837,6 +4909,7 @@
     window.addEventListener('swiftioc:preview-filtered', (event) => {
       if (!Array.isArray(event.detail?.rows)) return;
       entries = event.detail.rows;
+      zoom = 1; viewX = 0; viewY = 0;
       render();
     });
 

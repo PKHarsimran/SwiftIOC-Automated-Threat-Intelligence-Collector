@@ -46,7 +46,7 @@
       });
     </script>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/styles.css?v=49" />
+    <link rel="stylesheet" href="assets/styles.css?v=50" />
     <link rel="stylesheet" href="assets/today.css?v=49" />
     <script type="application/ld+json">
       {
@@ -591,7 +591,7 @@
             <p class="eyebrow">Reporting map · provider coverage</p>
             <h2 id="campaign-graph-heading" class="panel-title">Reporting &amp; relationship graph</h2>
             <p class="panel-subtitle">
-              Compare reporting providers and shared behavior tags in the filtered sample. Known adapter aliases are grouped; raw feed names remain in the evidence panel. Shared reporting does not establish a campaign or independent verification. On small screens, scroll the diagram sideways to inspect each indicator.
+              Compare reporting providers and shared behavior tags in the filtered sample. Switch between a compact constellation and evidence lanes; hover or focus a node to trace its links. Known adapter aliases are grouped, and raw feed names remain in the evidence panel. Shared reporting does not establish a campaign or independent verification.
             </p>
             <p class="discovery-scope"><a href="groups.html#view=graph">Explore group-linked IOCs, CVEs and techniques in the evidence map →</a></p>
           </div>
@@ -612,13 +612,20 @@
                 <option value="48">Maximum · 48 IOCs</option>
               </select>
             </div>
+            <div class="campaign-control-field">
+              <label for="campaign-style">Layout</label>
+              <select id="campaign-style" data-campaign-style>
+                <option value="orbit" selected>Constellation</option>
+                <option value="lanes">Evidence lanes</option>
+              </select>
+            </div>
             <button type="button" class="button ghost" data-campaign-layout>
-              Reverse indicator order
+              Rotate map
             </button>
           </div>
         </div>
         <div class="panel-body campaign-graph-body">
-          <p class="campaign-interaction-hint">Select a node to trace its relationships. Click empty graph space or press Escape to clear the selection.</p>
+          <p class="campaign-interaction-hint">Hover or focus a node to preview links; select it for details. Zoom in, then drag empty space to pan; Fit resets the view. Press Escape to clear a selection. On small screens, swipe sideways.</p>
           <div class="campaign-stage" data-campaign-stage>
             <div class="campaign-search-tools">
               <label for="campaign-search">Find in this graph</label>
@@ -628,11 +635,17 @@
               <div class="campaign-search-actions">
                 <button type="button" class="button ghost" data-campaign-reset disabled>Clear selection</button>
                 <button type="button" class="button ghost" data-campaign-export disabled>Export graph JSON</button>
+                <div class="campaign-zoom-controls" role="group" aria-label="Graph zoom">
+                  <button type="button" class="button ghost" data-campaign-zoom-out aria-label="Zoom out" disabled>−</button>
+                  <button type="button" class="button ghost" data-campaign-fit disabled>Fit</button>
+                  <button type="button" class="button ghost" data-campaign-zoom-in aria-label="Zoom in" disabled>+</button>
+                  <span data-campaign-zoom-label aria-live="polite">100%</span>
+                </div>
               </div>
             </div>
             <dl class="campaign-stage-stats" data-campaign-stats hidden>
               <div><dt>High risk</dt><dd data-campaign-high>0</dd></div>
-              <div><dt>2+ providers</dt><dd data-campaign-corroborated>0</dd></div>
+              <div><dt>2+ mapped publishers</dt><dd data-campaign-corroborated>0</dd></div>
               <div><dt>Avg score</dt><dd data-campaign-average>0</dd></div>
               <div><dt>Visible IOCs</dt><dd data-campaign-visible>0</dd></div>
             </dl>
@@ -649,6 +662,7 @@
             <div class="campaign-legend" aria-label="Graph legend">
               <span><i class="legend-node tag"></i>Behavior tag</span>
               <span><i class="legend-node source"></i>Reporting provider</span>
+              <span><i class="legend-node aggregate"></i>Aggregate feed</span>
               <span><i class="legend-node indicator"></i>Indicator</span>
             </div>
           </div>
@@ -1205,7 +1219,7 @@
     </div>
 
     <div class="toast" data-toast role="status" aria-live="polite" aria-atomic="true" hidden></div>
-    <script defer src="assets/dashboard-core.js?v=50"></script>
+    <script defer src="assets/dashboard-core.js?v=51"></script>
     <script defer src="assets/group-intel-core.js?v=50"></script>
     <script defer src="assets/group-intel.js?v=48"></script>
     <script defer src="assets/today-core.js?v=50"></script>
@@ -1214,6 +1228,6 @@
     <script defer src="assets/inventory.js?v=46"></script>
     <script defer src="assets/sbom-core.js?v=1"></script>
     <script defer src="assets/sbom.js?v=1"></script>
-    <script defer src="assets/dashboard.js?v=52"></script>
+    <script defer src="assets/dashboard.js?v=53"></script>
   </body>
 </html>

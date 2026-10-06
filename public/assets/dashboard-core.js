@@ -632,6 +632,55 @@
     };
   };
 
+  // Layout is presentation only: it never adds or removes evidence edges.
+  // The orbit groups IOCs by their first displayed pivot, then spaces them
+  // evenly so the bounded graph remains readable without a force simulation.
+  const layoutCampaignGraph = (graph, style = 'orbit', rotation = 0) => {
+    const pivots = (graph?.nodes || []).filter((node) => node.kind === 'pivot');
+    const indicators = (graph?.nodes || []).filter((node) => node.kind === 'indicator');
+    const positions = new Map();
+    const turn = Number.isFinite(rotation) ? Math.trunc(rotation) : 0;
+    if (style === 'lanes') {
+      const grouped = new Map(pivots.map((pivot) => [pivot.id, []]));
+      indicators.forEach((node) => {
+        const owners = pivots.filter((pivot) => graph.edges.some((edge) => edge.source === pivot.id && edge.target === node.id));
+        owners.sort((a, b) => grouped.get(a.id).length - grouped.get(b.id).length);
+        if (owners.length) grouped.get(owners[0].id).push(node);
+      });
+      let top = 28;
+      pivots.forEach((pivot) => {
+        const members = grouped.get(pivot.id);
+        if (turn % 2) members.reverse();
+        const height = Math.max(96, Math.ceil(members.length / 5) * 76 + 22);
+        positions.set(pivot.id, { x: 125, y: top + height / 2 });
+        members.forEach((node, index) => positions.set(node.id, {
+          x: 348 + (index % 5) * 142,
+          y: top + 34 + Math.floor(index / 5) * 76,
+        }));
+        top += height;
+      });
+      return { positions, width: 1000, height: Math.max(300, top + 28), style: 'lanes' };
+    }
+    const width = 1000, height = 760, cx = width / 2, cy = height / 2;
+    const pivotIndex = new Map(pivots.map((pivot, index) => [pivot.id, index]));
+    const ownerIndex = (node) => {
+      const linked = graph.edges.filter((edge) => edge.target === node.id).map((edge) => pivotIndex.get(edge.source));
+      return linked.length ? Math.min(...linked) : pivots.length;
+    };
+    const ordered = indicators.slice().sort((a, b) => ownerIndex(a) - ownerIndex(b)
+      || b.score - a.score || a.label.localeCompare(b.label));
+    const offset = pivots.length ? turn * 2 * Math.PI / pivots.length : 0;
+    pivots.forEach((pivot, index) => {
+      const angle = -Math.PI / 2 + offset + index * 2 * Math.PI / pivots.length;
+      positions.set(pivot.id, { x: cx + Math.cos(angle) * 198, y: cy + Math.sin(angle) * 198 });
+    });
+    ordered.forEach((node, index) => {
+      const angle = -Math.PI / 2 + offset + (index + 0.5) * 2 * Math.PI / ordered.length;
+      positions.set(node.id, { x: cx + Math.cos(angle) * 310, y: cy + Math.sin(angle) * 310 });
+    });
+    return { positions, width, height, style: 'orbit' };
+  };
+
   // Rank evidence already present in the loaded sample; never infer global
   // rarity, attribution, or new activity from absence in a compact feed.
   const buildDiscovery = (value, mode = 'corroborated', now = Date.now() / 1000) => {
@@ -1116,6 +1165,7 @@
     vulnerabilityEvidence, vulnerabilityChanges, normaliseVulnerabilityView,
     compareRows,
     buildCampaignGraph,
+    layoutCampaignGraph,
     graphNodeMatches,
     sourceProviders,
     buildDiscovery,

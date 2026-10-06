@@ -23,8 +23,8 @@ The graph and Python scorer use the same shipped publisher families, but raw sou
 
 1. Start with the preview's filters so the graph answers a focused question.
 2. Switch between provider/source, tag or combined relationships.
-3. Choose 24, 36 or 48 indicators; phones begin with the smaller view.
-4. Select a node to highlight its direct neighbors and inspect evidence.
+3. Choose 24, 36 or 48 indicators; phones begin with the smaller view. Switch between the compact constellation and evidence lanes without changing the underlying links.
+4. Hover or focus a node to preview its direct links, then select it to pin the neighborhood and inspect evidence. Zoom in, drag empty map space to pan, or use Fit to reset the view.
 5. Add a useful IOC to Workspace or export the displayed evidence/neighborhood.
 6. Click empty graph space or press Escape to reset selection.
 
@@ -34,7 +34,7 @@ Arrow keys move between nodes; Home/End jump; Enter/Space select. Search refangs
 
 Rendering is bounded to at most **48 indicators and eight pivots**. Singleton pivots are excluded, and counters should include only pivots represented by selected edges. The displayed sample can omit real relationships. Graph size is not the full feed size, and visible high-risk counts describe the sample.
 
-Layout remixing changes presentation, not evidence. Node selection, highlighting and the inspector should remain consistent through filter, density and refresh changes. Motion respects reduced-motion preferences in the dashboard.
+Layout changes, rotation and zoom change presentation, not evidence. The constellation spaces bounded nodes deterministically rather than using a free-running physics animation. Node selection, highlighting and the inspector should remain consistent through filter, density and refresh changes. Motion respects reduced-motion preferences in the dashboard.
 
 ## Discovery lenses
 

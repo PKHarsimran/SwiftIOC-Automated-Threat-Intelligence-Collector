@@ -688,8 +688,8 @@ test('vulnerability aggregation ranks structured vendors and products determinis
 
 test('page references current asset cache keys', () => {
   const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
-  for (const [asset, version] of Object.entries({ 'styles.css': 49, 'today.css': 49, 'today.js': 50,
-    'today-core.js': 50, 'dashboard.js': 52, 'dashboard-core.js': 50, 'group-intel.js': 48,
+  for (const [asset, version] of Object.entries({ 'styles.css': 50, 'today.css': 49, 'today.js': 50,
+    'today-core.js': 50, 'dashboard.js': 53, 'dashboard-core.js': 51, 'group-intel.js': 48,
     'group-intel-core.js': 50, 'sbom-core.js': 1, 'sbom.js': 1 })) {
     assert.ok(html.includes(`assets/${asset}?v=${version}`));
   }
@@ -749,6 +749,31 @@ test('provider sampling retains smaller genuine providers without inventing sour
   const one = core.buildCampaignGraph(rows.slice(0, 28), { mode: 'sources', maxIndicators: 24 });
   assert.equal(one.stats.sourcePivots, 1);
   assert.equal(one.stats.indicators, 24);
+});
+
+test('constellation and lanes layout preserve bounded graph evidence without node collisions', () => {
+  const rows = Array.from({ length: 48 }, (_, index) => ({ ...row,
+    indicator: `ioc-${index}.example`, sourceList: [`custom-feed-${Math.floor(index / 6)}`], score: 80 - index % 6,
+  }));
+  const graph = core.buildCampaignGraph(rows, { mode: 'sources', maxPivots: 8, maxIndicators: 48 });
+  const before = JSON.stringify(graph.edges);
+  const orbit = core.layoutCampaignGraph(graph, 'orbit');
+  const rotated = core.layoutCampaignGraph(graph, 'orbit', 1);
+  const lanes = core.layoutCampaignGraph(graph, 'lanes');
+  assert.equal(orbit.positions.size, graph.nodes.length);
+  assert.equal(lanes.positions.size, graph.nodes.length);
+  assert.deepEqual([orbit.width, orbit.height], [1000, 760]);
+  assert.notDeepEqual([...orbit.positions], [...rotated.positions]);
+  const indicators = graph.nodes.filter((node) => node.kind === 'indicator').map((node) => orbit.positions.get(node.id));
+  for (const point of orbit.positions.values()) {
+    assert.ok(Number.isFinite(point.x) && Number.isFinite(point.y));
+    assert.ok(point.x >= 0 && point.x <= orbit.width && point.y >= 0 && point.y <= orbit.height);
+  }
+  for (let i = 0; i < indicators.length; i++) for (let j = i + 1; j < indicators.length; j++) {
+    assert.ok(Math.hypot(indicators[i].x - indicators[j].x, indicators[i].y - indicators[j].y) >= 39);
+  }
+  assert.equal(JSON.stringify(graph.edges), before);
+  assert.deepEqual([...core.layoutCampaignGraph(graph, 'orbit').positions], [...orbit.positions]);
 });
 
 const briefingItem = (id = 'CVE-2026-1234') => ({
