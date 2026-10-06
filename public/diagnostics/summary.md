@@ -1,15 +1,15 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-10-06T22:34:13Z_
+_Generated 2026-10-06T22:56:17Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-06T22:34:13Z |
+| Generated | 2026-10-06T22:56:17Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6293 |
+| Duplicates removed | 6301 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-group overlaps | 335 |
@@ -17,7 +17,7 @@ _Generated 2026-10-06T22:34:13Z_
 | High-score indicators (≥80) | 10000 |
 | 2+ reporting groups | 335 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-06T22:17:37Z |
+| Newest first_seen | 2026-10-06T22:47:27Z |
 
 ## Top indicators by score
 
@@ -39,12 +39,12 @@ _Generated 2026-10-06T22:34:13Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| urlhaus_recent_urls | 14617 |
-| greensnow_blocklist | 4860 |
-| blocklist_de_ssh | 4406 |
-| threatfox_export_json | 4255 |
+| urlhaus_recent_urls | 14616 |
+| greensnow_blocklist | 4847 |
+| blocklist_de_ssh | 4420 |
+| threatfox_export_json | 4215 |
 | ipsum_level5 | 4122 |
-| nist_nvd_recent | 3161 |
+| nist_nvd_recent | 2800 |
 | binarydefense_banlist | 1976 |
 | cisa_kev | 1734 |
 | spamhaus_drop | 1641 |
@@ -53,11 +53,11 @@ _Generated 2026-10-06T22:34:13Z_
 
 | Type | Indicators |
 | --- | ---: |
-| url | 3963 |
+| url | 3956 |
 | cve | 2667 |
 | ipv4_cidr | 1640 |
-| domain | 1107 |
-| sha256 | 386 |
+| domain | 1112 |
+| sha256 | 388 |
 | md5 | 87 |
 | sha1 | 87 |
 | ipv4 | 63 |
@@ -66,12 +66,12 @@ _Generated 2026-10-06T22:34:13Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 4253 |
-| malware_download | 3931 |
-| zip | 3678 |
-| github | 3671 |
-| LuaJIT-loader | 3656 |
-| SmartLoader | 3656 |
+| malware | 4248 |
+| malware_download | 3924 |
+| zip | 3668 |
+| github | 3661 |
+| LuaJIT-loader | 3646 |
+| SmartLoader | 3646 |
 | cve | 2667 |
 | exploited-in-the-wild | 1734 |
 | drop | 1640 |
