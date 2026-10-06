@@ -1,15 +1,15 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-10-06T12:27:24Z_
+_Generated 2026-10-06T12:45:36Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-06T12:27:24Z |
+| Generated | 2026-10-06T12:45:36Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6101 |
+| Duplicates removed | 6103 |
 | Sources reporting | 17 |
 | Indicator types | 6 |
 | Multi-group overlaps | 334 |
@@ -17,7 +17,7 @@ _Generated 2026-10-06T12:27:24Z_
 | High-score indicators (≥80) | 10000 |
 | 2+ reporting groups | 334 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-06T12:26:55Z |
+| Newest first_seen | 2026-10-06T12:38:44Z |
 
 ## Top indicators by score
 
@@ -39,11 +39,11 @@ _Generated 2026-10-06T12:27:24Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| urlhaus_recent_urls | 14570 |
-| greensnow_blocklist | 4895 |
-| threatfox_export_json | 4443 |
+| urlhaus_recent_urls | 14562 |
+| greensnow_blocklist | 4885 |
+| threatfox_export_json | 4475 |
 | ipsum_level5 | 4122 |
-| blocklist_de_ssh | 3959 |
+| blocklist_de_ssh | 3972 |
 | nist_nvd_recent | 2040 |
 | binarydefense_banlist | 1976 |
 | cisa_kev | 1734 |
@@ -53,23 +53,23 @@ _Generated 2026-10-06T12:27:24Z_
 
 | Type | Indicators |
 | --- | ---: |
-| url | 5606 |
+| url | 5570 |
 | cve | 2108 |
 | ipv4_cidr | 1640 |
-| sha256 | 538 |
-| domain | 67 |
-| ipv4 | 41 |
+| sha256 | 539 |
+| domain | 99 |
+| ipv4 | 44 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 6029 |
-| malware_download | 5592 |
-| zip | 5498 |
-| github | 5490 |
-| SmartLoader | 5481 |
-| LuaJIT-loader | 5477 |
+| malware | 5991 |
+| malware_download | 5555 |
+| zip | 5452 |
+| github | 5444 |
+| SmartLoader | 5435 |
+| LuaJIT-loader | 5431 |
 | cve | 2108 |
 | exploited-in-the-wild | 1734 |
 | drop | 1640 |
