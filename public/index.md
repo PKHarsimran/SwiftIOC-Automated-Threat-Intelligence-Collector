@@ -2,16 +2,16 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-10-06T12:03:58Z_
+_Generated 2026-10-06T12:27:24Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-06T12:03:58Z |
+| Generated | 2026-10-06T12:27:24Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6154 |
+| Duplicates removed | 6101 |
 | Sources reporting | 17 |
 | Indicator types | 6 |
 | Multi-group overlaps | 334 |
@@ -19,7 +19,7 @@ _Generated 2026-10-06T12:03:58Z_
 | High-score indicators (≥80) | 10000 |
 | 2+ reporting groups | 334 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-06T12:03:10Z |
+| Newest first_seen | 2026-10-06T12:26:55Z |
 
 ## Top indicators by score
 
@@ -41,12 +41,12 @@ _Generated 2026-10-06T12:03:58Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| urlhaus_recent_urls | 14585 |
-| greensnow_blocklist | 4899 |
-| threatfox_export_json | 4444 |
+| urlhaus_recent_urls | 14570 |
+| greensnow_blocklist | 4895 |
+| threatfox_export_json | 4443 |
 | ipsum_level5 | 4122 |
-| blocklist_de_ssh | 3926 |
-| nist_nvd_recent | 2037 |
+| blocklist_de_ssh | 3959 |
+| nist_nvd_recent | 2040 |
 | binarydefense_banlist | 1976 |
 | cisa_kev | 1734 |
 | spamhaus_drop | 1641 |
@@ -55,27 +55,27 @@ _Generated 2026-10-06T12:03:58Z_
 
 | Type | Indicators |
 | --- | ---: |
-| url | 6923 |
-| cve | 2106 |
-| sha256 | 544 |
-| ipv4_cidr | 327 |
-| domain | 58 |
-| ipv4 | 42 |
+| url | 5606 |
+| cve | 2108 |
+| ipv4_cidr | 1640 |
+| sha256 | 538 |
+| domain | 67 |
+| ipv4 | 41 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 7367 |
-| malware_download | 6910 |
-| zip | 6803 |
-| github | 6794 |
-| SmartLoader | 6785 |
-| LuaJIT-loader | 6781 |
-| cve | 2106 |
+| malware | 6029 |
+| malware_download | 5592 |
+| zip | 5498 |
+| github | 5490 |
+| SmartLoader | 5481 |
+| LuaJIT-loader | 5477 |
+| cve | 2108 |
 | exploited-in-the-wild | 1734 |
-| nvd | 681 |
-| drop | 327 |
+| drop | 1640 |
+| spamhaus | 1640 |
 
 ## Multi-group reporting overlaps
 
