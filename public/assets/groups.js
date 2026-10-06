@@ -26,6 +26,7 @@
   let mapHover = '';
   let mapAllLinks = false;
   let renderedMapLayout = '';
+  let cveSignalsPromise;
   let changeLimit = 30;
   const labels = { iocs: 'IOCs', cves: 'CVEs', ttps: 'ATT&CK techniques' };
   function readLocation() {
@@ -52,10 +53,11 @@
   function groupLinks(names) {
     const wrap = el('div', '', 'group-inline-links');
     const add = (host, name) => host.appendChild(button(name, () => selectGroup(name)));
-    names.slice(0, 2).forEach((name) => add(wrap, name));
-    if (names.length > 2) {
-      const details = el('details'); details.appendChild(el('summary', `+${names.length - 2} groups`));
-      const rest = el('div', '', 'group-inline-links'); names.slice(2).forEach((name) => add(rest, name)); details.appendChild(rest); wrap.appendChild(details);
+    const ordered = state.group && names.includes(state.group) ? [state.group, ...names.filter((name) => name !== state.group)] : names;
+    ordered.slice(0, 2).forEach((name) => add(wrap, name));
+    if (ordered.length > 2) {
+      const details = el('details'); details.appendChild(el('summary', `+${ordered.length - 2} groups`));
+      const rest = el('div', '', 'group-inline-links'); ordered.slice(2).forEach((name) => add(rest, name)); details.appendChild(rest); wrap.appendChild(details);
     }
     return wrap;
   }
@@ -230,7 +232,7 @@
     const positions = mapPositions(graph, state.layout);
     const groupNode = (name, focus) => ({ data: { id: `group:${name}`, kind: 'group', name, label: name, focus: focus ? 1 : 0 }, position: positions.get(`group:${name}`) });
     const elements = [groupNode(graph.group, true), ...graph.visibleGroups.map((name) => groupNode(name, false)),
-      ...graph.evidence.map((record) => ({ data: { id: record.key, kind: 'evidence', key: record.key, label: record.value,
+      ...graph.evidence.map((record) => ({ data: { id: record.key, kind: 'evidence', evidenceKind: record.kind, key: record.key, label: record.value,
         shortLabel: record.value.length > 27 ? `${record.value.slice(0, 24)}…` : record.value,
         matched: record.matched ? 1 : 0 }, position: positions.get(record.key) })),
       ...graph.links.map((edge, index) => ({ data: { id: `link:${index}`, source: `group:${edge.group}`, target: edge.evidence } }))];
@@ -247,6 +249,7 @@
           { selector: 'node[focus = 1]', style: { 'background-color': '#75513b', 'border-color': '#ffce9c', 'border-width': 3 } },
           { selector: 'node[kind = "evidence"]', style: { 'label': 'data(shortLabel)', 'background-color': '#27362f', 'border-color': '#a9b6a3' } },
           { selector: 'node[matched = 1]', style: { 'background-color': '#134c4a', 'border-color': '#5ce1cd' } },
+          { selector: 'node[evidenceKind = "ttps"]', style: { 'background-color': '#3a3046', 'border-color': '#c1a4da' } },
           { selector: 'edge', style: { 'curve-style': 'bezier', 'line-color': '#8ca59a', 'width': 1.8, 'opacity': .32 } },
           { selector: 'edge.is-concealed', style: { 'opacity': 0 } },
           { selector: 'edge.is-linked', style: { 'line-color': '#91ecdb', 'width': 3, 'opacity': .88 } },
@@ -301,9 +304,88 @@
       const row = el('div', '', 'group-map-relationship-row');
       row.appendChild(button(record.value, () => selectEvidence(record.key), 'group-link-button'));
       const shown = record.groups.filter((name) => name === graph.group || graph.visibleGroups.includes(name));
-      row.appendChild(el('span', `${record.matched ? 'In SwiftIOC' : 'Research candidate'} · Reported for ${shown.join(', ')}${record.groups.length > shown.length ? ` · +${record.groups.length - shown.length} outside this map` : ''}`, 'group-small'));
+      row.appendChild(el('span', `${record.kind === 'ttps' ? 'Group-level technique' : record.matched ? 'In SwiftIOC' : 'Research candidate'} · Reported for ${shown.join(', ')}${record.groups.length > shown.length ? ` · +${record.groups.length - shown.length} outside this map` : ''}`, 'group-small'));
       host.appendChild(row);
     });
+  }
+  function renderMapSummary(graph) {
+    const host = $('[data-map-summary]'); host.replaceChildren();
+    if (!graph.total) {
+      const empty = el('div', '', 'group-map-empty');
+      empty.append(el('strong', `No ${labels[state.mapKind]} reported for ${graph.group}`),
+        el('span', 'This is an empty published snapshot for this evidence type, not proof that the group has no activity. Try another evidence type or group.'));
+      host.appendChild(empty); return;
+    }
+    const scopeNote = graph.total > graph.evidence.length ? 'Search can bring any other record into view.' : 'All records of this type are shown.';
+    const stats = [
+      [`${graph.evidence.length} / ${graph.total}`, `${labels[state.mapKind]} mapped`, scopeNote],
+      state.mapKind === 'ttps'
+        ? [`${graph.visibleGroups.length} / ${graph.visibleGroupsTotal}`, 'Other groups in this sample', 'Linked to the shown techniques; capped for readability.']
+        : [String(graph.summary.exactFeedMatches), 'Exact feed matches', `Of ${graph.evidence.length} shown; not independent confirmation.`],
+      state.mapKind === 'ttps'
+        ? [String(graph.links.length), 'Direct map links', 'Reported group-to-technique associations.']
+        : [String(graph.summary.sharedRecords), 'Records reported for 2+ groups', 'Shared reporting does not imply collaboration.'],
+    ];
+    stats.forEach(([value, label, note]) => {
+      const card = el('div', '', 'group-map-stat');
+      card.append(el('strong', value), el('span', label), el('small', note)); host.appendChild(card);
+    });
+  }
+  function renderMapInspector(graph) {
+    const host = $('[data-map-inspector]'); host.replaceChildren();
+    const record = graph.selected;
+    if (!record) { host.appendChild(el('p', 'No evidence of this type in this snapshot. Choose another evidence type or group.')); return; }
+    const iocLabels = { ipv4: 'IPv4 IOC', ipv6: 'IPv6 IOC', domain: 'Domain IOC', url: 'URL IOC', sha256: 'SHA-256 IOC', sha1: 'SHA-1 IOC', md5: 'MD5 IOC' };
+    const kindLabel = record.kind === 'cves' ? 'CVE' : record.kind === 'ttps' ? 'ATT&CK technique'
+      : Object.hasOwn(iocLabels, record.type) ? iocLabels[record.type] : 'IOC';
+    const coverage = record.kind === 'ttps' ? 'Group-level behavior' : record.matched ? 'Exact SwiftIOC match' : 'No exact SwiftIOC match';
+    const receipt = core.receipt(model, record, graph.group);
+    const shortDate = (value) => {
+      const date = new Date(value || '');
+      return Number.isFinite(date.getTime()) ? date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Not available';
+    };
+    host.append(el('span', `SELECTED ${kindLabel}`, 'group-map-inspector-kicker'), el('strong', record.value));
+    host.appendChild(el('p', record.kind === 'ttps'
+      ? 'Reported for the group as a whole; it is not automatically attached to each IOC.'
+      : 'A reported group association; it does not establish current use or local compromise.', 'group-map-inspector-note'));
+    const facts = el('dl', '', 'group-map-facts');
+    for (const [label, value] of [
+      [record.kind === 'ttps' ? 'Evidence type' : 'Feed status', coverage], ['Reported groups', String(record.groups.length)],
+      ['First tracked locally', shortDate(receipt?.first_observed)],
+      ['Last local check', shortDate(receipt?.last_observed)],
+    ]) {
+      const pair = el('div'); pair.append(el('dt', label), el('dd', value)); facts.appendChild(pair);
+    }
+    host.appendChild(facts);
+    if (record.kind === 'cves') {
+      const context = el('section', '', 'group-map-cve-context'); host.appendChild(context);
+      cveSignalsPromise ||= fetch('cve_signals.json', { cache: 'no-cache' })
+        .then((response) => { if (!response.ok) throw new Error('CVE context unavailable'); return response.json(); })
+        .catch((error) => { cveSignalsPromise = undefined; throw error; });
+      cveSignalsPromise.then((signals) => {
+        if (!context.isConnected) return;
+        const info = core.officialCveContext(signals, record.value);
+        if (!info) return;
+        context.append(el('span', 'OFFICIAL CVE CONTEXT', 'group-map-inspector-kicker'), el('strong', info.product),
+          el('p', info.description), el('small', 'Product context from the published CVE record; confirm affected versions before acting. This does not confirm named-group use.'));
+      }).catch(() => { context.remove(); });
+    }
+    host.appendChild(el('h3', 'Where it is reported on this map', 'group-map-inspector-heading'));
+    const mapped = [graph.group, ...graph.visibleGroups].filter((name) => record.groups.includes(name));
+    const list = el('ul', '', 'group-map-group-list');
+    mapped.slice(0, 6).forEach((name) => {
+      const row = el('li');
+      const action = button(name, () => selectGroup(name), 'group-map-group-button');
+      const count = graph.evidence.filter((item) => item.groups.includes(name)).length;
+      row.append(action, el('span', `${count} mapped record${count === 1 ? '' : 's'}`, 'group-small'));
+      list.appendChild(row);
+    });
+    host.appendChild(list);
+    if (record.groups.length > Math.min(mapped.length, 6)) host.appendChild(el('p',
+      `+${record.groups.length - Math.min(mapped.length, 6)} more reported groups in the snapshot.`, 'group-small'));
+    host.appendChild(button('See full record in evidence table →', () => navigate({ view: record.kind, q: record.value, coverage: 'all', type: '' }), 'group-link-button'));
+    host.appendChild(investigate(record));
+    host.appendChild(evidenceReceipt(record));
   }
   function updateMapSearch() {
     const input = $('[data-map-search]'), host = $('[data-map-results]');
@@ -312,7 +394,7 @@
     if (!term || !model || state.view !== 'graph') return;
     const matches = core.filter(model, { group: state.group, kind: state.mapKind })
       .filter((record) => record.value.toLowerCase().replaceAll('[.]', '.').includes(term)).slice(0, 8);
-    matches.forEach((record) => host.appendChild(button(`${record.value} · ${record.matched ? 'In SwiftIOC' : 'Research candidate'}`,
+    matches.forEach((record) => host.appendChild(button(`${record.value} · ${record.kind === 'ttps' ? 'Group-level technique' : record.matched ? 'In SwiftIOC' : 'Research candidate'}`,
       () => { input.value = ''; host.hidden = true; selectEvidence(record.key); }, 'group-map-result')));
     if (!matches.length) host.appendChild(el('p', 'No matching record for this group and evidence type.', 'group-small'));
   }
@@ -326,17 +408,20 @@
     const denseMap = graph.links.length > 40;
     $('[data-map-all-links-wrap]').hidden = !denseMap;
     $('[data-map-all-links]').checked = mapAllLinks;
-    $('[data-map-status]').textContent = `Showing ${graph.evidence.length} of ${graph.total} ${labels[state.mapKind]}, ${graph.visibleGroups.length} of ${graph.visibleGroupsTotal} other groups, and ${graph.links.length} direct reported links for ${state.group}. ${graph.total > 12 ? 'Find a specific record above or use the evidence table for all records. ' : ''}${denseMap && !mapAllLinks ? 'To reduce clutter, only the focus-group and selected-record lines are shown; hover a node or choose All links to reveal more. ' : ''}Layout and proximity do not imply collaboration.`;
-    if (!renderCanvasMap(graph)) renderFallbackMap(graph);
+    renderMapSummary(graph);
+    $('[data-map-legend]').classList.toggle('is-technique', state.mapKind === 'ttps');
+    $('[data-map-legend-matched]').hidden = state.mapKind === 'ttps';
+    $('[data-map-legend-candidate]').textContent = state.mapKind === 'ttps' ? 'Group-level technique' : 'Research candidate';
+    $('[data-map-status]').hidden = graph.total === 0;
+    $('[data-map-status]').textContent = `${state.mapKind === 'ttps' ? '' : `${graph.links.length} direct reported links in this map. `}${graph.total > 12 ? 'Search above to bring other records into view. ' : ''}${denseMap && !mapAllLinks ? 'Dense map: focus and selected links are shown; hover a node or turn on All links to reveal the rest. ' : ''}Proximity does not imply collaboration.`;
+    $('[data-map-toolbar]').hidden = !graph.total;
+    $('[data-map-workspace]').hidden = !graph.total;
+    $('[data-map-relationships-wrap]').hidden = !graph.total;
+    if (graph.total) { if (!renderCanvasMap(graph)) renderFallbackMap(graph); }
+    else if (mapCy) { mapCy.destroy(); mapCy = null; mapSceneKey = ''; }
     renderMapRelationships(graph);
     updateMapSearch();
-    const inspector = $('[data-map-inspector]'); inspector.replaceChildren();
-    if (graph.selected) {
-      inspector.append(el('span', 'Selected evidence', 'group-map-inspector-kicker'), el('strong', graph.selected.value),
-        el('p', `${graph.selected.matched ? 'Exact match in the retained SwiftIOC feed' : 'Research candidate'} · ${graph.selected.groups.length} reported group${graph.selected.groups.length === 1 ? '' : 's'}. A shared record is not proof of collaboration or current use.`, 'group-small'),
-        groupLinks(graph.selected.groups), investigate(graph.selected));
-      inspector.appendChild(evidenceReceipt(graph.selected));
-    } else inspector.appendChild(el('p', 'No evidence of this type in the snapshot. Choose another evidence type or group.'));
+    renderMapInspector(graph);
     $('[data-map-export]').disabled = !graph.selected;
   }
   function render() {

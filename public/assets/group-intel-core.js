@@ -59,10 +59,23 @@
     const links = evidence.flatMap((record) => [group, ...record.groups.filter((name) => name !== group && visibleSet.has(name))]
       .map((name) => ({ group: name, evidence: record.key, relationship: 'reported_association' })));
     return { group, evidence, total: all.length, selected, related: related.slice(0, 8), relatedTotal: related.length,
-      visibleGroups, visibleGroupsTotal: counts.size, links };
+      visibleGroups, visibleGroupsTotal: counts.size, links,
+      summary: { exactFeedMatches: evidence.filter((record) => record.matched).length,
+        sharedRecords: evidence.filter((record) => record.groups.length > 1).length } };
   }
   function receipt(model, record, group) {
     return Object.values(model.history?.observations || {}).find((item) => item.group === group && item.kind === record.kind && item.type === record.type && item.value === record.value) || null;
+  }
+  function officialCveContext(signals, cveId) {
+    const official = signals?.items?.[cveId]?.official_cve;
+    if (!official || typeof official.description !== 'string') return null;
+    const description = official.description.replace(/\s+/g, ' ').trim();
+    if (!description) return null;
+    const affected = Array.isArray(official.affected) ? official.affected.find((item) => typeof item?.product === 'string') : null;
+    const product = [affected?.vendor, affected?.product].filter((part) => typeof part === 'string' && part.trim()).join(' · ');
+    const excerpt = description.length > 245
+      ? `${description.slice(0, 242).replace(/\s+\S*$/, '') || description.slice(0, 242)}…` : description;
+    return { product: product || 'Official CVE record', description: excerpt };
   }
   function huntPack(model, group, index, earliest, buildSpl) {
     if (!model.groups.has(group)) throw new Error('Select a group first.');
@@ -78,5 +91,5 @@
         steps: ['Confirm affected products and versions using authoritative advisories.', 'Check your asset inventory and exposure.', 'Verify remediation and investigate relevant logs.'], evidence: receipt(model, r, group) })),
       techniques: records.filter((r) => r.kind === 'ttps').map((r) => ({ id: r.value, reference: `https://attack.mitre.org/techniques/${r.value.replace('.', '/')}/`, evidence: receipt(model, r, group) })) };
   }
-  return { build, filter, graph, identity, receipt, huntPack };
+  return { build, filter, graph, identity, receipt, officialCveContext, huntPack };
 });

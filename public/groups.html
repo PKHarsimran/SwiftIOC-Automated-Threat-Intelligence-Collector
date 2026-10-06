@@ -8,7 +8,7 @@
     <meta name="description" content="Explore ransomware group associations with IOCs, CVEs and ATT&CK techniques. Trace shared reporting with the SwiftIOC evidence map." />
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="assets/styles.css?v=49" />
-    <link rel="stylesheet" href="assets/groups.css?v=46" />
+    <link rel="stylesheet" href="assets/groups.css?v=49" />
   </head>
   <body data-ioc-root=".">
     <a class="skip-link" href="#group-content">Skip to group evidence</a>
@@ -74,17 +74,18 @@
             <div class="group-map-heading"><div><p class="eyebrow">Bounded evidence network</p><h2 id="evidence-map-title">Trace a reported connection</h2><p class="group-small">Explore direct group-to-record links. Select an evidence node to inspect its source, or a group to pivot. Proximity and layout do not imply attribution or collaboration.</p></div><button type="button" class="button ghost" data-map-export>Export map data</button></div>
             <div class="group-map-controls"><label>Map evidence<select data-map-kind><option value="cves">CVEs</option><option value="iocs">IOCs</option><option value="ttps">ATT&amp;CK techniques</option></select></label><label>Find evidence in this group<input type="search" data-map-search placeholder="CVE, IOC or technique…" autocomplete="off" /></label><label>Selected evidence<select data-map-evidence></select></label></div>
             <div class="group-map-results" data-map-results hidden></div>
+            <div class="group-map-summary" data-map-summary aria-label="Map snapshot summary"></div>
             <p class="group-small" data-map-status role="status"></p>
-            <div class="group-map-toolbar"><span>Drag to pan · scroll or use buttons to zoom · drag nodes to untangle</span><div role="group" aria-label="Map controls"><label class="group-map-toggle" data-map-all-links-wrap hidden><input type="checkbox" data-map-all-links /> All links</label><label>Layout<select data-map-layout><option value="lanes">Evidence lanes</option><option value="orbit">Constellation</option></select></label><button type="button" class="button ghost" data-map-zoom-out aria-label="Zoom out">−</button><button type="button" class="button ghost" data-map-fit>Fit</button><button type="button" class="button ghost" data-map-zoom-in aria-label="Zoom in">+</button></div></div>
-            <div class="group-map-workspace">
+            <div class="group-map-toolbar" data-map-toolbar><span>Drag to pan · scroll or use buttons to zoom · drag nodes to untangle</span><div role="group" aria-label="Map controls"><label class="group-map-toggle" data-map-all-links-wrap hidden><input type="checkbox" data-map-all-links /> All links</label><label>Layout<select data-map-layout><option value="lanes">Evidence lanes</option><option value="orbit">Constellation</option></select></label><button type="button" class="button ghost" data-map-zoom-out aria-label="Zoom out">−</button><button type="button" class="button ghost" data-map-fit>Fit</button><button type="button" class="button ghost" data-map-zoom-in aria-label="Zoom in">+</button></div></div>
+            <div class="group-map-workspace" data-map-workspace>
               <div class="group-map-visual">
                 <div class="group-map-canvas" data-map-canvas role="group" aria-label="Interactive reported group and evidence network" hidden></div>
                 <div class="group-map-scroll"><svg data-map viewBox="0 0 1000 600" role="group" aria-label="Reported group and evidence relationships"></svg></div>
-                <div class="group-map-legend" aria-label="Map legend"><span><i class="group-legend-group"></i>Group</span><span><i class="group-legend-matched"></i>Exact SwiftIOC match</span><span><i class="group-legend-candidate"></i>Research candidate</span></div>
+                <div class="group-map-legend" data-map-legend aria-label="Map legend"><span><i class="group-legend-group"></i>Group</span><span data-map-legend-matched><i class="group-legend-matched"></i>Exact SwiftIOC match</span><span><i class="group-legend-candidate"></i><span data-map-legend-candidate>Research candidate</span></span></div>
               </div>
               <aside class="group-map-inspector" data-map-inspector aria-label="Selected evidence details"></aside>
             </div>
-            <details class="group-map-relationships"><summary>Read the displayed connections as a list</summary><div data-map-relationships></div></details>
+            <details class="group-map-relationships" data-map-relationships-wrap><summary>Read the displayed connections as a list</summary><div data-map-relationships></div></details>
           </section>
           <details class="group-evidence-notes"><summary>How to read this evidence</summary><p>These are associations reported by ransomware.live. They do not establish current use, local exposure, a shared campaign, or collaboration between groups. Group techniques describe the group’s reported behavior; they are not automatically attributed to each IOC.</p><p>“In SwiftIOC” means an exact record match in the retained feed. Research candidates do not automatically enter scores or blocklists. An empty result does not prove a group has no such activity.</p><p>Source data refreshes daily; SwiftIOC matches are checked each collection. Source: <a href="https://ransomware.live/" target="_blank" rel="noopener noreferrer">ransomware.live</a>. <a href="group_evidence.json">Download derived evidence JSON</a>.</p></details>
         </div>
@@ -92,9 +93,9 @@
       <footer class="site-footer"><span>SwiftIOC / Open-source threat intelligence</span><a href="index.html">Back to the intelligence desk</a></footer>
     </div>
     <script defer src="assets/dashboard-core.js?v=49"></script>
-    <script defer src="assets/group-intel-core.js?v=51"></script>
+    <script defer src="assets/group-intel-core.js?v=53"></script>
     <script defer src="assets/group-intel.js?v=42"></script>
     <script defer src="assets/vendor/cytoscape-3.34.3/cytoscape.min.js"></script>
-    <script defer src="assets/groups.js?v=51"></script>
+    <script defer src="assets/groups.js?v=56"></script>
   </body>
 </html>

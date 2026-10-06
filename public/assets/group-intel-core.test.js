@@ -23,6 +23,16 @@ test('receipts are specific to the group and evidence type', () => {
   assert.equal(core.receipt(model, cve, 'A').first_observed, '2026-09-22');
   assert.equal(core.receipt(model, cve, 'B'), null);
 });
+test('official CVE context is concise and stays separate from group associations', () => {
+  const signals = { items: { 'CVE-2025-1234': { official_cve: {
+    description: 'A vulnerable product.\nAffected versions require review.', affected: [{ vendor: 'Example', product: 'Gateway' }],
+  } } } };
+  assert.deepEqual(core.officialCveContext(signals, 'CVE-2025-1234'),
+    { product: 'Example · Gateway', description: 'A vulnerable product. Affected versions require review.' });
+  assert.equal(core.officialCveContext(signals, 'CVE-2025-5678'), null);
+  signals.items['CVE-2025-1234'].official_cve.description = 'x'.repeat(300);
+  assert.match(core.officialCveContext(signals, 'CVE-2025-1234').description, /^x+…$/);
+});
 
 const fixture = () => ({ schema_version: 1, generated_at: '2026-09-22T00:00:00Z',
   groups: [{ name: 'A', ttps: ['T1486'] }, { name: 'B', ttps: ['T1486', 'T1059.001'] }, { name: 'C', ttps: [] }],
@@ -32,7 +42,9 @@ const fixture = () => ({ schema_version: 1, generated_at: '2026-09-22T00:00:00Z'
 test('group graph uses direct reported links and keeps IOC, CVE and technique evidence distinct', () => {
   const model = core.build(fixture());
   assert.deepEqual(core.graph(model, 'A', 'cves').related, ['B']);
+  assert.deepEqual(core.graph(model, 'A', 'cves').summary, { exactFeedMatches: 1, sharedRecords: 1 });
   assert.deepEqual(core.graph(model, 'A', 'iocs').related, ['C']);
+  assert.deepEqual(core.graph(model, 'A', 'iocs').summary, { exactFeedMatches: 0, sharedRecords: 1 });
   assert.deepEqual(core.graph(model, 'A', 'ttps').related, ['B']);
   assert.equal(core.filter(model, { group: 'C', kind: 'ttps' }).length, 0);
   assert.equal(core.filter(model, { kind: 'iocs', coverage: 'matched' }).length, 0);
