@@ -688,8 +688,8 @@ test('vulnerability aggregation ranks structured vendors and products determinis
 
 test('page references current asset cache keys', () => {
   const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
-  for (const [asset, version] of Object.entries({ 'styles.css': 50, 'today.css': 49, 'today.js': 50,
-    'today-core.js': 50, 'dashboard.js': 53, 'dashboard-core.js': 51, 'group-intel.js': 48,
+  for (const [asset, version] of Object.entries({ 'styles.css': 51, 'today.css': 49, 'today.js': 50,
+    'today-core.js': 50, 'dashboard.js': 54, 'dashboard-core.js': 52, 'group-intel.js': 48,
     'group-intel-core.js': 50, 'sbom-core.js': 1, 'sbom.js': 1 })) {
     assert.ok(html.includes(`assets/${asset}?v=${version}`));
   }
@@ -774,6 +774,25 @@ test('constellation and lanes layout preserve bounded graph evidence without nod
   }
   assert.equal(JSON.stringify(graph.edges), before);
   assert.deepEqual([...core.layoutCampaignGraph(graph, 'orbit').positions], [...orbit.positions]);
+});
+
+test('graph focus contains only direct observed links and never mutates the full graph', () => {
+  const rows = [
+    { ...row, indicator: 'a.example', sourceList: ['threatfox_export_json', 'ci_army_list'] },
+    { ...row, indicator: 'b.example', sourceList: ['threatfox_export_json'] },
+    { ...row, indicator: 'c.example', sourceList: ['ci_army_list'] },
+  ];
+  const graph = core.buildCampaignGraph(rows, { mode: 'sources' });
+  const before = JSON.stringify(graph);
+  const indicator = graph.nodes.find((node) => node.label === 'a.example');
+  const focused = core.campaignGraphNeighborhood(graph, indicator.id);
+  assert.deepEqual([...focused.nodes].sort(), [indicator.id, ...graph.nodes.filter((node) => node.kind === 'pivot').map((node) => node.id)].sort());
+  assert.equal(focused.edges.size, 2);
+  assert.ok([...focused.edges].every((edge) => edge.target === indicator.id));
+  const pivot = graph.nodes.find((node) => node.label === 'abuse.ch');
+  assert.equal(core.campaignGraphNeighborhood(graph, pivot.id).edges.size, 2);
+  assert.equal(core.campaignGraphNeighborhood(graph, 'missing').nodes.size, 0);
+  assert.equal(JSON.stringify(graph), before);
 });
 
 const briefingItem = (id = 'CVE-2026-1234') => ({

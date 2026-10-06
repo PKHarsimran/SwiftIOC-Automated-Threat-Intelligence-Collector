@@ -4443,7 +4443,7 @@
   const initialiseCampaignGraph = () => {
     const root = qs('[data-campaign-root]');
     const svg = qs('[data-campaign-graph]', root);
-    if (!root || !svg || !dashboardCore?.buildCampaignGraph || !dashboardCore?.layoutCampaignGraph || !dashboardCore?.sourceProviders) return;
+    if (!root || !svg || !dashboardCore?.buildCampaignGraph || !dashboardCore?.layoutCampaignGraph || !dashboardCore?.campaignGraphNeighborhood || !dashboardCore?.sourceProviders) return;
     const mode = qs('[data-campaign-mode]', root);
     const density = qs('[data-campaign-density]', root);
     const style = qs('[data-campaign-style]', root);
@@ -4456,7 +4456,11 @@
     const searchResults = qs('[data-campaign-search-results]', root);
     const searchStatus = qs('[data-campaign-search-status]', root);
     const reset = qs('[data-campaign-reset]', root);
+    const focusButton = qs('[data-campaign-focus]', root);
     const exportGraph = qs('[data-campaign-export]', root);
+    const shortcuts = qs('[data-campaign-shortcuts]', root);
+    const shortcutList = qs('[data-campaign-shortcut-list]', root);
+    const viewStatus = qs('[data-campaign-view-status]', root);
     const empty = qs('[data-campaign-empty]', root);
     const title = qs('[data-campaign-title]', root);
     const description = qs('[data-campaign-description]', root);
@@ -4485,8 +4489,10 @@
     let graph = null;
     let selected = null;
     let hovered = null;
+    let focusMode = false;
     let rotation = 0;
     let baseView = { width: 1000, height: 760 };
+    let layoutPositions = new Map();
     let zoom = 1, viewX = 0, viewY = 0;
     let drag = null, ignoreNextClick = false;
     if (density && window.matchMedia?.('(max-width: 540px)').matches) {
@@ -4529,12 +4535,20 @@
       if (!graph) return;
       const focus = hovered || selected;
       const connected = new Set();
+      const neighborhood = focusMode && selected
+        ? dashboardCore.campaignGraphNeighborhood(graph, selected.id)
+        : null;
+      root.dataset.campaignLens = neighborhood ? 'focused' : 'all';
       if (focus) graph.edges.forEach((edge) => {
         if (edge.source === focus.id) connected.add(edge.target);
         if (edge.target === focus.id) connected.add(edge.source);
       });
       qsa('[data-graph-node]', svg).forEach((element) => {
         const active = element.dataset.graphNode === focus?.id;
+        const outside = Boolean(neighborhood) && !neighborhood.nodes.has(element.dataset.graphNode);
+        element.classList.toggle('is-outside-focus', outside);
+        element.setAttribute('tabindex', outside ? '-1' : '0');
+        element.setAttribute('aria-hidden', String(outside));
         element.classList.toggle('is-selected', element.dataset.graphNode === selected?.id);
         element.classList.toggle('is-previewed', active && focus !== selected);
         element.setAttribute('aria-pressed', String(element.dataset.graphNode === selected?.id));
@@ -4542,10 +4556,40 @@
         element.classList.toggle('is-dimmed', Boolean(focus) && !active && !connected.has(element.dataset.graphNode));
       });
       qsa('[data-graph-edge]', svg).forEach((element) => {
+        const outside = Boolean(neighborhood) && element.dataset.source !== selected.id && element.dataset.target !== selected.id;
+        element.classList.toggle('is-outside-focus', outside);
         const related = element.dataset.source === focus?.id || element.dataset.target === focus?.id;
         element.classList.toggle('is-connected', Boolean(focus) && related);
         element.classList.toggle('is-dimmed', Boolean(focus) && !related);
       });
+      if (focusButton) {
+        focusButton.disabled = !selected;
+        focusButton.setAttribute('aria-pressed', String(Boolean(neighborhood)));
+        focusButton.textContent = neighborhood ? 'Show all links' : 'Focus links';
+      }
+      const shown = graph.nodes.filter((node) => node.kind === 'indicator' && (!neighborhood || neighborhood.nodes.has(node.id)));
+      setText(high, formatNumber(shown.filter((node) => node.score >= 80).length));
+      setText(corroborated, formatNumber(shown.filter((node) => node.sourceCount >= 2).length));
+      setText(average, formatNumber(shown.length ? Math.round(shown.reduce((total, node) => total + node.score, 0) / shown.length) : 0));
+      setText(visible, formatNumber(shown.length));
+      const status = neighborhood
+        ? `Focused on ${selected.label}: ${shown.length} of ${graph.stats.indicators} indicators and ${neighborhood.edges.size} of ${graph.edges.length} links shown. Other links are hidden, not removed from the data.`
+        : `${graph.stats.indicators} indicators and ${graph.edges.length} links shown. ${selected ? `Use Focus links to isolate ${selected.label}'s direct connections.` : 'Select a node to focus its direct connections.'}`;
+      if (viewStatus?.textContent !== status) setText(viewStatus, status);
+    };
+
+    const centerNeighborhood = () => {
+      if (!selected || !focusMode) return;
+      const neighborhood = dashboardCore.campaignGraphNeighborhood(graph, selected.id);
+      const points = [...neighborhood.nodes].map((id) => layoutPositions.get(id)).filter(Boolean);
+      if (!points.length) return;
+      const xs = points.map((point) => point.x), ys = points.map((point) => point.y);
+      const left = Math.min(...xs), right = Math.max(...xs);
+      const top = Math.min(...ys), bottom = Math.max(...ys);
+      zoom = Math.max(1, Math.min(2.2, baseView.width / (right - left + 230), baseView.height / (bottom - top + 190)));
+      viewX = (left + right) / 2 - baseView.width / zoom / 2;
+      viewY = (top + bottom) / 2 - baseView.height / zoom / 2;
+      applyViewport();
     };
 
     const selectNode = (node) => {
@@ -4559,6 +4603,7 @@
       });
       hovered = null;
       paintHighlight();
+      centerNeighborhood();
 
       const degree = graph.edges.filter((edge) => edge.source === node.id || edge.target === node.id).length;
       const relatedNodes = graph.nodes.filter((candidate) => connected.has(candidate.id));
@@ -4640,7 +4685,7 @@
           selectNode(node);
           const element = qsa('[data-graph-node]', svg).find((item) => item.dataset.graphNode === node.id);
           element?.focus({ preventScroll: true });
-          element?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'instant' });
+          element?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'instant' });
         });
         return button;
       }));
@@ -4662,6 +4707,7 @@
       root.dataset.campaignView = style?.value === 'lanes' ? 'lanes' : 'orbit';
       if (remix) remix.textContent = root.dataset.campaignView === 'orbit' ? 'Rotate map' : 'Reverse rows';
       const nextSelected = graph.nodes.find((node) => node.id === selectedId) || null;
+      if (!nextSelected) focusMode = false;
       const hasGraph = graph.nodes.length > 0 && graph.edges.length > 0;
       if (empty) empty.hidden = hasGraph;
       svg.hidden = !hasGraph;
@@ -4672,6 +4718,22 @@
         exportGraph.disabled = !hasGraph;
         exportGraph.textContent = 'Export graph JSON';
       }
+      if (shortcuts && shortcutList) {
+        const leading = graph.nodes.filter((node) => node.kind === 'pivot')
+          .sort((a, b) => Number(b.role === 'reporting') - Number(a.role === 'reporting')
+            || Number(b.pivotKind === 'tag') - Number(a.pivotKind === 'tag')
+            || b.count - a.count || a.label.localeCompare(b.label)).slice(0, 3);
+        shortcutList.replaceChildren(...leading.map((node) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'campaign-shortcut';
+          button.textContent = `${node.label} · ${node.count} IOCs`;
+          button.title = `Explore ${node.label}: ${node.count} indicators in this displayed graph`;
+          button.addEventListener('click', () => selectNode(node));
+          return button;
+        }));
+        shortcuts.hidden = !leading.length;
+      }
       updateSearch();
       setText(high, formatNumber(graph.stats.highScore));
       setText(corroborated, formatNumber(graph.stats.corroborated));
@@ -4679,7 +4741,7 @@
       setText(visible, formatNumber(graph.stats.indicators));
       if (summary) {
         summary.textContent = hasGraph
-          ? `${formatNumber(graph.stats.relationships)} displayed links · ${formatNumber(graph.stats.tagPivots)} tag pivots · ${formatNumber(graph.stats.sourcePivots)} source pivots (${graph.stats.mappedProviders} mapped publishers, ${graph.stats.aggregates} aggregate feeds, ${graph.stats.unmappedFeeds} unmapped feeds). Indicator rings mark 2+ mapped publishers; color reflects the collector score. These links describe shared reporting or tags, not independent verification or campaign attribution.`
+          ? `${formatNumber(graph.stats.relationships)} displayed links · ${formatNumber(graph.stats.tagPivots)} tag pivots · ${formatNumber(graph.stats.sourcePivots)} source pivots (${graph.stats.mappedProviders} mapped publisher${graph.stats.mappedProviders === 1 ? '' : 's'}, ${graph.stats.aggregates} aggregate feed${graph.stats.aggregates === 1 ? '' : 's'}, ${graph.stats.unmappedFeeds} unmapped feed${graph.stats.unmappedFeeds === 1 ? '' : 's'}). Indicator rings mark 2+ mapped publishers; color reflects the collector score. These links describe shared reporting or tags, not independent verification or campaign attribution.`
           : 'No repeated tags or sources were found in the current preview.';
       }
       const evidenceBlock = qs('[data-campaign-feed-evidence]', root);
@@ -4700,11 +4762,14 @@
       if (!hasGraph) {
         zoom = 1; viewX = 0; viewY = 0;
         applyViewport();
+        if (focusButton) { focusButton.disabled = true; focusButton.setAttribute('aria-pressed', 'false'); focusButton.textContent = 'Focus links'; }
+        setText(viewStatus, 'No connections in the displayed sample.');
         return;
       }
 
       const layout = dashboardCore.layoutCampaignGraph(graph, root.dataset.campaignView, rotation);
       const positions = layout.positions;
+      layoutPositions = positions;
       baseView = { width: layout.width, height: layout.height };
       svg.style.aspectRatio = `${layout.width} / ${layout.height}`;
       applyViewport();
@@ -4718,13 +4783,20 @@
       }
       const edgeLayer = createSvg('g', { class: 'campaign-edges' });
       const pivotRoles = new Map(graph.nodes.filter((node) => node.kind === 'pivot').map((node) => [node.id, node.role || '']));
+      const orbitControl = (point, radius) => {
+        const dx = point.x - 500, dy = point.y - 380;
+        const distance = Math.hypot(dx, dy) || 1;
+        return { x: 500 + dx * radius / distance, y: 380 + dy * radius / distance };
+      };
       graph.edges.forEach((edge, index) => {
         const start = positions.get(edge.source);
         const end = positions.get(edge.target);
         if (!start || !end) return;
+        const first = layout.style === 'orbit' ? orbitControl(start, 237) : null;
+        const last = layout.style === 'orbit' ? orbitControl(end, 256) : null;
         const line = createSvg('path', {
           d: layout.style === 'orbit'
-            ? `M ${start.x} ${start.y} L ${end.x} ${end.y}`
+            ? `M ${start.x} ${start.y} C ${first.x} ${first.y}, ${last.x} ${last.y}, ${end.x} ${end.y}`
             : `M ${start.x + 120} ${start.y} C ${start.x + 175} ${start.y}, ${end.x - 55} ${end.y}, ${end.x - 17} ${end.y}`,
           fill: 'none',
           class: `campaign-edge ${edge.kind} ${pivotRoles.get(edge.source) || ''}`,
@@ -4820,6 +4892,7 @@
       });
       svg.appendChild(nodeLayer);
       if (nextSelected) selectNode(nextSelected);
+      else paintHighlight();
     };
 
     svg.addEventListener('click', (event) => {
@@ -4859,15 +4932,25 @@
     search?.addEventListener('input', updateSearch);
     reset?.addEventListener('click', () => {
       selected = null;
+      focusMode = false;
       if (search) search.value = '';
       render();
     });
     root.addEventListener('keydown', (event) => {
       if (event.key === 'Escape' && selected) {
         selected = null;
+        focusMode = false;
         render();
         search?.focus();
       }
+    });
+    focusButton?.addEventListener('click', () => {
+      if (!selected) return;
+      focusMode = !focusMode;
+      hovered = null;
+      paintHighlight();
+      if (focusMode) centerNeighborhood();
+      else { zoom = 1; viewX = 0; viewY = 0; applyViewport(); }
     });
     exportGraph?.addEventListener('click', () => {
       if (!graph?.edges.length) return;

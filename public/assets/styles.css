@@ -4209,3 +4209,15 @@ body:has(.workspace-dock:not([hidden])) .toast { bottom: 6rem; }
   .campaign-node, .campaign-edge, .campaign-node .campaign-node-core,
   .campaign-graph-section[data-campaign-view="orbit"] .campaign-node.indicator .campaign-node-subtitle { animation: none; transition: none; }
 }
+
+/* Progressive graph exploration: keep evidence intact, reveal one neighborhood. */
+.campaign-pivot-shortcuts { display: flex; align-items: center; gap: .65rem; flex-wrap: wrap; padding: .6rem 1rem; border-bottom: 1px solid var(--border-soft); }
+.campaign-pivot-shortcuts > span { color: var(--text-muted); font-size: .72rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.campaign-pivot-shortcuts > div { display: flex; gap: .4rem; flex-wrap: wrap; }
+.campaign-shortcut { border: 1px solid var(--border-control); border-radius: 999px; padding: .35rem .65rem; background: var(--card-bg-soft); color: var(--text-primary); font-size: .75rem; cursor: pointer; }
+.campaign-shortcut:is(:hover, :focus-visible) { border-color: var(--accent); color: var(--accent); }
+.campaign-view-status { margin: .2rem 1rem .8rem; color: var(--text-muted); font-size: .75rem; line-height: 1.4; }
+.campaign-graph-section [data-campaign-focus][aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+.campaign-node.is-outside-focus, .campaign-edge.is-outside-focus { display: none; }
+.campaign-graph-section[data-campaign-lens="focused"] .campaign-edge.is-connected { stroke-width: 2.6; opacity: 1; }
+.campaign-edge { stroke-linecap: round; }

@@ -24,9 +24,10 @@ The graph and Python scorer use the same shipped publisher families, but raw sou
 1. Start with the preview's filters so the graph answers a focused question.
 2. Switch between provider/source, tag or combined relationships.
 3. Choose 24, 36 or 48 indicators; phones begin with the smaller view. Switch between the compact constellation and evidence lanes without changing the underlying links.
-4. Hover or focus a node to preview its direct links, then select it to pin the neighborhood and inspect evidence. Zoom in, drag empty map space to pan, or use Fit to reset the view.
-5. Add a useful IOC to Workspace or export the displayed evidence/neighborhood.
-6. Click empty graph space or press Escape to reset selection.
+4. Use a suggested connection or search, then hover or focus a node to preview its direct links. Select it to pin the neighborhood and inspect evidence. **Focus links** temporarily hides unrelated nodes and edges, updates the visible-sample counters, and centers that neighborhood; **Show all links** restores the full display. Hidden links are not removed from the data.
+5. Zoom in, drag empty map space to pan, or use Fit to reset the view. Curved links in the constellation make routes easier to follow; curvature does not imply relationship strength.
+6. Add a useful IOC to Workspace or export the displayed evidence/neighborhood.
+7. Click empty graph space or press Escape to reset selection.
 
 Arrow keys move between nodes; Home/End jump; Enter/Space select. Search refangs IOC labels and queries, so an ordinary IP can match `[.]` display spelling and an HTTP URL can match `hxxp`. Provider/tag matching retains its literal meaning.
 

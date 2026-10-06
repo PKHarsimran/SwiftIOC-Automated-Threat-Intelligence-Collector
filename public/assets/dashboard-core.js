@@ -681,6 +681,21 @@
     return { positions, width, height, style: 'orbit' };
   };
 
+  // A focus view is strictly a presentation subset of observed links. Keep
+  // edge objects intact so exports and the inspector use the same evidence.
+  const campaignGraphNeighborhood = (graph, nodeId) => {
+    const nodes = new Set(nodeId ? [nodeId] : []);
+    const edges = new Set();
+    if (!(graph?.nodes || []).some((node) => node.id === nodeId)) return { nodes: new Set(), edges };
+    for (const edge of graph.edges || []) {
+      if (edge.source !== nodeId && edge.target !== nodeId) continue;
+      nodes.add(edge.source);
+      nodes.add(edge.target);
+      edges.add(edge);
+    }
+    return { nodes, edges };
+  };
+
   // Rank evidence already present in the loaded sample; never infer global
   // rarity, attribution, or new activity from absence in a compact feed.
   const buildDiscovery = (value, mode = 'corroborated', now = Date.now() / 1000) => {
@@ -1166,6 +1181,7 @@
     compareRows,
     buildCampaignGraph,
     layoutCampaignGraph,
+    campaignGraphNeighborhood,
     graphNodeMatches,
     sourceProviders,
     buildDiscovery,
