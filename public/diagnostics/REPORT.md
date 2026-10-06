@@ -4,51 +4,51 @@
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-06T04:31:40Z |
+| Generated | 2026-10-06T12:03:58Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6405 |
-| Carried forward | 2147 |
+| Duplicates removed | 6154 |
+| Carried forward | 2287 |
 | Expired (score < 20) | 0 |
 | Aged out (> 30d) | 0 |
-| Pruned over cap (10000) | 29586 |
+| Pruned over cap (10000) | 44323 |
 | Stored | 10000 |
-| Score (min / avg / max) | 80 / 81.0 / 96 |
+| Score (min / avg / max) | 80 / 80.3 / 96 |
 | High-confidence indicators | 10000 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-06T04:30:28Z |
+| Newest first_seen | 2026-10-06T12:03:10Z |
 
-## Per-source counts
+## Per-source coverage
 
-| Source | Indicators |
-| --- | ---: |
-| binarydefense_banlist | 1976 |
-| blocklist_de_ssh | 3408 |
-| ci_army_list | 15000 |
-| cisa_kev | 1734 |
-| dshield_block | 20 |
-| et_compromised | 599 |
-| feodo_ipblocklist | 5 |
-| greensnow_blocklist | 5556 |
-| ipsum_level5 | 4122 |
-| malwarebazaar_recent | 1043 |
-| nist_nvd_recent | 1622 |
-| openphish_feed | 300 |
-| spamhaus_drop | 1641 |
-| sslbl_ja3 | 97 |
-| threatfox_export_json | 4547 |
-| tor_exit_nodes | 1363 |
-| urlhaus_recent_urls | 811 |
+Collected means records returned in the configured window, not a guarantee of complete upstream coverage.
+
+| Source | Indicators | State |
+| --- | ---: | --- |
+| binarydefense_banlist | 1976 | collected |
+| blocklist_de_ssh | 3926 | collected |
+| ci_army_list | 15000 | collected |
+| cisa_kev | 1734 | collected |
+| dshield_block | 20 | collected |
+| et_compromised | 599 | collected |
+| feodo_ipblocklist | 5 | collected |
+| greensnow_blocklist | 4899 | collected |
+| ipsum_level5 | 4122 | collected |
+| malwarebazaar_recent | 1439 | collected |
+| nist_nvd_recent | 2037 | collected |
+| openphish_feed | 300 | collected |
+| spamhaus_drop | 1641 | collected |
+| sslbl_ja3 | 97 | collected |
+| threatfox_export_json | 4444 | collected |
+| tor_exit_nodes | 1366 | collected |
+| urlhaus_recent_urls | 14585 | collected |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 4308 |
-| cve | 2245 |
-| ipv4_cidr | 1326 |
-| url | 990 |
-| domain | 763 |
-| ipv4 | 176 |
-| md5 | 108 |
-| sha1 | 84 |
+| url | 6923 |
+| cve | 2106 |
+| sha256 | 544 |
+| ipv4_cidr | 327 |
+| domain | 58 |
+| ipv4 | 42 |
