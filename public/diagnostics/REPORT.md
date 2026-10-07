@@ -4,19 +4,19 @@
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-07T10:51:38Z |
+| Generated | 2026-10-07T18:20:25Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6321 |
-| Carried forward | 1030 |
+| Duplicates removed | 6581 |
+| Carried forward | 116 |
 | Expired (score < 20) | 0 |
 | Aged out (> 30d) | 0 |
-| Pruned over cap (10000) | 43008 |
+| Pruned over cap (10000) | 43737 |
 | Stored | 10000 |
 | Score (min / avg / max) | 80 / 80.3 / 96 |
 | High-confidence indicators | 10000 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-07T10:50:57Z |
+| Newest first_seen | 2026-10-07T18:19:45Z |
 
 ## Per-source coverage
 
@@ -25,32 +25,32 @@ Collected means records returned in the configured window, not a guarantee of co
 | Source | Indicators | State |
 | --- | ---: | --- |
 | binarydefense_banlist | 2241 | collected |
-| blocklist_de_ssh | 4935 | collected |
+| blocklist_de_ssh | 4904 | collected |
 | ci_army_list | 15000 | collected |
 | cisa_kev | 1734 | collected |
 | dshield_block | 20 | collected |
 | et_compromised | 599 | collected |
 | feodo_ipblocklist | 5 | collected |
-| greensnow_blocklist | 3544 | collected |
+| greensnow_blocklist | 4784 | collected |
 | ipsum_level5 | 4864 | collected |
-| malwarebazaar_recent | 1369 | collected |
-| nist_nvd_recent | 2600 | collected |
+| malwarebazaar_recent | 1235 | collected |
+| nist_nvd_recent | 3800 | collected |
 | openphish_feed | 300 | collected |
-| spamhaus_drop | 1660 | collected |
+| spamhaus_drop | 1671 | collected |
 | sslbl_ja3 | 97 | collected |
-| threatfox_export_json | 3584 | collected |
-| tor_exit_nodes | 1275 | collected |
-| urlhaus_recent_urls | 14472 | collected |
+| threatfox_export_json | 3392 | collected |
+| tor_exit_nodes | 1237 | collected |
+| urlhaus_recent_urls | 14319 | collected |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| url | 3647 |
-| cve | 2667 |
-| ipv4_cidr | 1659 |
-| domain | 1169 |
-| sha256 | 554 |
-| ipv4 | 130 |
-| md5 | 87 |
-| sha1 | 87 |
+| url | 3127 |
+| cve | 2914 |
+| ipv4_cidr | 1670 |
+| domain | 1226 |
+| sha256 | 602 |
+| ipv4 | 157 |
+| md5 | 152 |
+| sha1 | 152 |

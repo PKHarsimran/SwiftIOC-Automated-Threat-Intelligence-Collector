@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-10-07T10:51:38Z_
+_Generated 2026-10-07T18:20:25Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-07T10:51:38Z |
+| Generated | 2026-10-07T18:20:25Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6321 |
+| Duplicates removed | 6581 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-group overlaps | 333 |
+| Multi-group overlaps | 341 |
 | Score (min / avg / max) | 80 / 80.3 / 96 |
 | High-score indicators (≥80) | 10000 |
-| 2+ reporting groups | 333 |
+| 2+ reporting groups | 341 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-07T10:50:57Z |
+| Newest first_seen | 2026-10-07T18:19:45Z |
 
 ## Top indicators by score
 
@@ -41,43 +41,43 @@ _Generated 2026-10-07T10:51:38Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| urlhaus_recent_urls | 14472 |
-| blocklist_de_ssh | 4935 |
+| urlhaus_recent_urls | 14319 |
+| blocklist_de_ssh | 4904 |
 | ipsum_level5 | 4864 |
-| threatfox_export_json | 3584 |
-| greensnow_blocklist | 3544 |
-| nist_nvd_recent | 2600 |
+| greensnow_blocklist | 4784 |
+| nist_nvd_recent | 3800 |
+| threatfox_export_json | 3392 |
 | binarydefense_banlist | 2241 |
 | cisa_kev | 1734 |
-| spamhaus_drop | 1660 |
+| spamhaus_drop | 1671 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| url | 3647 |
-| cve | 2667 |
-| ipv4_cidr | 1659 |
-| domain | 1169 |
-| sha256 | 554 |
-| ipv4 | 130 |
-| md5 | 87 |
-| sha1 | 87 |
+| url | 3127 |
+| cve | 2914 |
+| ipv4_cidr | 1670 |
+| domain | 1226 |
+| sha256 | 602 |
+| ipv4 | 157 |
+| md5 | 152 |
+| sha1 | 152 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 4063 |
-| malware_download | 3587 |
-| zip | 3181 |
-| github | 3174 |
-| LuaJIT-loader | 3159 |
-| SmartLoader | 3159 |
-| cve | 2667 |
+| malware | 3546 |
+| malware_download | 3013 |
+| cve | 2914 |
+| github | 2564 |
+| zip | 2564 |
+| LuaJIT-loader | 2552 |
+| SmartLoader | 2552 |
+| threatfox | 1957 |
 | exploited-in-the-wild | 1734 |
-| drop | 1659 |
-| spamhaus | 1659 |
+| drop | 1670 |
 
 ## Multi-group reporting overlaps
 
