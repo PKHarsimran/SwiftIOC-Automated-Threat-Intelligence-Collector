@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-10-08T15:10:41Z_
+_Generated 2026-10-08T20:59:16Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-08T15:10:41Z |
+| Generated | 2026-10-08T20:59:16Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 5504 |
+| Duplicates removed | 5490 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-group overlaps | 354 |
+| Multi-group overlaps | 363 |
 | Score (min / avg / max) | 80 / 80.3 / 96 |
 | High-score indicators (≥80) | 10000 |
-| 2+ reporting groups | 354 |
+| 2+ reporting groups | 363 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-08T15:08:39Z |
+| Newest first_seen | 2026-10-08T20:51:26Z |
 
 ## Top indicators by score
 
@@ -39,26 +39,26 @@ _Generated 2026-10-08T15:10:41Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| greensnow_blocklist | 4801 |
-| blocklist_de_ssh | 4746 |
-| nist_nvd_recent | 3400 |
+| blocklist_de_ssh | 4710 |
+| greensnow_blocklist | 4641 |
 | ipsum_level5 | 3385 |
+| nist_nvd_recent | 2800 |
 | binarydefense_banlist | 2520 |
-| urlhaus_recent_urls | 2000 |
-| threatfox_export_json | 1832 |
-| cisa_kev | 1734 |
+| urlhaus_recent_urls | 2066 |
+| threatfox_export_json | 1940 |
+| cisa_kev | 1739 |
 | spamhaus_drop | 1672 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3777 |
-| url | 2172 |
+| cve | 3281 |
+| url | 2246 |
 | ipv4_cidr | 1671 |
-| sha256 | 1132 |
-| domain | 625 |
-| ipv4 | 243 |
+| sha256 | 1372 |
+| domain | 785 |
+| ipv4 | 265 |
 | md5 | 190 |
 | sha1 | 190 |
 
@@ -66,16 +66,16 @@ _Generated 2026-10-08T15:10:41Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| cve | 3777 |
-| malware | 2972 |
-| nvd | 2374 |
-| malware_download | 2000 |
-| threatfox | 1754 |
-| exploited-in-the-wild | 1734 |
+| cve | 3281 |
+| malware | 3229 |
+| malware_download | 2067 |
+| threatfox | 2064 |
+| nvd | 1881 |
+| exploited-in-the-wild | 1739 |
 | drop | 1671 |
 | spamhaus | 1671 |
-| CheatSheet | 1331 |
-| exe | 913 |
+| CheatSheet | 1330 |
+| exe | 936 |
 
 ## Multi-group reporting overlaps
 
