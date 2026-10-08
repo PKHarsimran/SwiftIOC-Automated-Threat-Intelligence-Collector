@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-10-07T23:58:56Z_
+_Generated 2026-10-08T05:28:45Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-07T23:58:56Z |
+| Generated | 2026-10-08T05:28:45Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6837 |
+| Duplicates removed | 6131 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-group overlaps | 343 |
+| Multi-group overlaps | 351 |
 | Score (min / avg / max) | 80 / 80.3 / 96 |
 | High-score indicators (≥80) | 10000 |
-| 2+ reporting groups | 343 |
+| 2+ reporting groups | 351 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-07T23:47:09Z |
+| Newest first_seen | 2026-10-08T05:17:06Z |
 
 ## Top indicators by score
 
@@ -32,20 +32,20 @@ _Generated 2026-10-07T23:58:56Z_
 | ipv4: `45[.]198[.]224[.]184` | score 96, 3 reporting groups |
 | ipv4: `45[.]78[.]201[.]248` | score 96, 3 reporting groups |
 | ipv4: `139[.]162[.]5[.]254` | score 88, 2 reporting groups |
-| ipv4_cidr: `178.20.210.0/24` | score 88, 2 reporting groups |
+| ipv4: `156[.]225[.]17[.]60` | score 88, 2 reporting groups |
 
 ## Per-source totals
 
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| urlhaus_recent_urls | 14365 |
-| greensnow_blocklist | 5488 |
-| ipsum_level5 | 4864 |
-| blocklist_de_ssh | 4846 |
-| threatfox_export_json | 3050 |
-| nist_nvd_recent | 2400 |
-| binarydefense_banlist | 2241 |
+| urlhaus_recent_urls | 14380 |
+| greensnow_blocklist | 5508 |
+| nist_nvd_recent | 5462 |
+| blocklist_de_ssh | 4830 |
+| ipsum_level5 | 3385 |
+| threatfox_export_json | 2685 |
+| binarydefense_banlist | 2520 |
 | cisa_kev | 1734 |
 | spamhaus_drop | 1671 |
 
@@ -53,12 +53,12 @@ _Generated 2026-10-07T23:58:56Z_
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 2914 |
-| url | 2801 |
+| cve | 3073 |
+| url | 2549 |
 | ipv4_cidr | 1670 |
-| domain | 1349 |
-| sha256 | 772 |
-| ipv4 | 190 |
+| domain | 1366 |
+| sha256 | 845 |
+| ipv4 | 193 |
 | md5 | 152 |
 | sha1 | 152 |
 
@@ -66,14 +66,14 @@ _Generated 2026-10-07T23:58:56Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 3371 |
-| cve | 2914 |
-| malware_download | 2677 |
-| github | 2141 |
-| zip | 2141 |
-| LuaJIT-loader | 2133 |
-| SmartLoader | 2133 |
-| threatfox | 2132 |
+| malware | 3161 |
+| cve | 3073 |
+| malware_download | 2414 |
+| threatfox | 2183 |
+| github | 1822 |
+| zip | 1822 |
+| LuaJIT-loader | 1816 |
+| SmartLoader | 1816 |
 | exploited-in-the-wild | 1734 |
 | drop | 1670 |
 
