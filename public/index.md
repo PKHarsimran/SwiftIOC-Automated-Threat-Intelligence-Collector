@@ -2,16 +2,16 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-10-09T14:56:56Z_
+_Generated 2026-10-09T20:30:17Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-09T14:56:56Z |
+| Generated | 2026-10-09T20:30:17Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6646 |
+| Duplicates removed | 6705 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-group overlaps | 363 |
@@ -19,7 +19,7 @@ _Generated 2026-10-09T14:56:56Z_
 | High-score indicators (≥80) | 10000 |
 | 2+ reporting groups | 363 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-09T14:54:08Z |
+| Newest first_seen | 2026-10-09T20:29:46Z |
 
 ## Top indicators by score
 
@@ -42,42 +42,42 @@ _Generated 2026-10-09T14:56:56Z_
 | --- | ---: |
 | ci_army_list | 15000 |
 | ipsum_level5 | 4686 |
-| nist_nvd_recent | 4600 |
-| greensnow_blocklist | 4537 |
-| blocklist_de_ssh | 4487 |
+| greensnow_blocklist | 4452 |
+| blocklist_de_ssh | 4272 |
 | binarydefense_banlist | 2809 |
-| threatfox_export_json | 2012 |
+| nist_nvd_recent | 2600 |
+| threatfox_export_json | 2352 |
 | cisa_kev | 1739 |
-| spamhaus_drop | 1682 |
-| urlhaus_recent_urls | 1665 |
+| spamhaus_drop | 1684 |
+| urlhaus_recent_urls | 1629 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3408 |
-| url | 1931 |
-| ipv4_cidr | 1681 |
-| sha256 | 1602 |
-| domain | 764 |
-| ipv4 | 234 |
-| md5 | 190 |
-| sha1 | 190 |
+| cve | 3036 |
+| url | 1897 |
+| ipv4_cidr | 1683 |
+| sha256 | 1597 |
+| domain | 1031 |
+| md5 | 256 |
+| sha1 | 255 |
+| ipv4 | 245 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| cve | 3408 |
-| malware | 3044 |
-| threatfox | 2148 |
-| nvd | 2009 |
+| cve | 3036 |
+| malware | 3013 |
+| threatfox | 2648 |
 | exploited-in-the-wild | 1739 |
-| drop | 1681 |
-| spamhaus | 1681 |
-| malware_download | 1668 |
-| CheatSheet | 1061 |
-| exe | 834 |
+| drop | 1683 |
+| spamhaus | 1683 |
+| nvd | 1637 |
+| malware_download | 1632 |
+| CheatSheet | 1102 |
+| exe | 882 |
 
 ## Multi-group reporting overlaps
 
