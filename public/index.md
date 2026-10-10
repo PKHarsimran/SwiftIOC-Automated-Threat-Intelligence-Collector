@@ -2,16 +2,16 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-10-10T04:01:54Z_
+_Generated 2026-10-10T10:32:19Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-10T04:01:54Z |
+| Generated | 2026-10-10T10:32:19Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 7643 |
+| Duplicates removed | 6559 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-group overlaps | 363 |
@@ -19,7 +19,7 @@ _Generated 2026-10-10T04:01:54Z_
 | High-score indicators (≥80) | 10000 |
 | 2+ reporting groups | 363 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-10T03:54:11Z |
+| Newest first_seen | 2026-10-10T10:31:57Z |
 
 ## Top indicators by score
 
@@ -41,43 +41,43 @@ _Generated 2026-10-10T04:01:54Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| greensnow_blocklist | 5272 |
 | ipsum_level5 | 4798 |
-| blocklist_de_ssh | 4304 |
+| blocklist_de_ssh | 4306 |
+| greensnow_blocklist | 3153 |
 | binarydefense_banlist | 3095 |
-| threatfox_export_json | 2831 |
+| nist_nvd_recent | 3000 |
+| threatfox_export_json | 2853 |
 | cisa_kev | 1739 |
 | spamhaus_drop | 1684 |
-| urlhaus_recent_urls | 1670 |
-| tor_exit_nodes | 1207 |
+| tor_exit_nodes | 1205 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 2557 |
-| url | 2022 |
-| sha256 | 1837 |
-| ipv4_cidr | 1561 |
-| domain | 1273 |
-| md5 | 256 |
-| sha1 | 255 |
-| ipv4 | 239 |
+| cve | 3749 |
+| sha256 | 1763 |
+| ipv4_cidr | 1683 |
+| domain | 1235 |
+| url | 974 |
+| ipv4 | 259 |
+| md5 | 169 |
+| sha1 | 168 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 3264 |
-| threatfox | 3113 |
-| cve | 2557 |
+| cve | 3749 |
+| threatfox | 2871 |
+| nvd | 2350 |
+| malware | 2211 |
 | exploited-in-the-wild | 1739 |
-| malware_download | 1673 |
-| drop | 1561 |
-| spamhaus | 1561 |
-| nvd | 1158 |
-| CheatSheet | 1102 |
-| exe | 919 |
+| drop | 1683 |
+| spamhaus | 1683 |
+| medium | 968 |
+| high | 796 |
+| Mirai | 707 |
 
 ## Multi-group reporting overlaps
 
