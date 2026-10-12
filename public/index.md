@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-10-11T23:24:29Z_
+_Generated 2026-10-12T03:59:22Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-11T23:24:29Z |
+| Generated | 2026-10-12T03:59:22Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 7121 |
+| Duplicates removed | 7757 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
 | Multi-group overlaps | 366 |
-| Score (min / avg / max) | 79 / 80.3 / 96 |
-| High-score indicators (≥80) | 9943 |
+| Score (min / avg / max) | 79 / 80.2 / 96 |
+| High-score indicators (≥80) | 9176 |
 | 2+ reporting groups | 366 |
 | Earliest first_seen | 2002-10-04T04:00:00Z |
-| Newest first_seen | 2026-10-11T23:18:18Z |
+| Newest first_seen | 2026-10-12T03:51:15Z |
 
 ## Top indicators by score
 
@@ -41,26 +41,26 @@ _Generated 2026-10-11T23:24:29Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4789 |
-| greensnow_blocklist | 4714 |
-| ipsum_level5 | 4518 |
-| binarydefense_banlist | 3489 |
+| greensnow_blocklist | 4803 |
+| blocklist_de_ssh | 4743 |
+| ipsum_level5 | 4723 |
+| binarydefense_banlist | 3698 |
 | cisa_kev | 1739 |
 | spamhaus_drop | 1684 |
-| threatfox_export_json | 1548 |
-| nist_nvd_recent | 1255 |
-| tor_exit_nodes | 1198 |
+| threatfox_export_json | 1512 |
+| nist_nvd_recent | 1241 |
+| tor_exit_nodes | 1197 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 4551 |
-| sha256 | 1866 |
+| cve | 4398 |
+| sha256 | 1942 |
 | ipv4_cidr | 1683 |
-| url | 959 |
-| domain | 275 |
-| ipv4 | 204 |
+| url | 1057 |
+| domain | 248 |
+| ipv4 | 210 |
 | md5 | 183 |
 | sha1 | 182 |
 | ja3 | 97 |
@@ -69,16 +69,16 @@ _Generated 2026-10-11T23:24:29Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| cve | 4551 |
-| nvd | 3153 |
-| malware | 2251 |
-| threatfox | 2028 |
+| cve | 4398 |
+| nvd | 3000 |
+| malware | 2370 |
+| threatfox | 2090 |
 | exploited-in-the-wild | 1739 |
 | drop | 1683 |
 | spamhaus | 1683 |
-| medium | 1312 |
-| high | 1051 |
-| Mirai | 893 |
+| medium | 1258 |
+| high | 973 |
+| Mirai | 935 |
 
 ## Multi-group reporting overlaps
 
