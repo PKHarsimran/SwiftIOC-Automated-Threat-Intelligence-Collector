@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-10-14T16:24:08Z_
+_Generated 2026-10-14T22:57:15Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-14T16:24:08Z |
+| Generated | 2026-10-14T22:57:15Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 7228 |
+| Duplicates removed | 7235 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-group overlaps | 374 |
+| Multi-group overlaps | 378 |
 | Score (min / avg / max) | 80 / 80.3 / 96 |
 | High-score indicators (≥80) | 10000 |
-| 2+ reporting groups | 374 |
+| 2+ reporting groups | 378 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-14T16:22:25Z |
+| Newest first_seen | 2026-10-14T22:56:20Z |
 
 ## Top indicators by score
 
@@ -39,26 +39,26 @@ _Generated 2026-10-14T16:24:08Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| greensnow_blocklist | 4904 |
+| greensnow_blocklist | 4844 |
 | ipsum_level5 | 4558 |
 | binarydefense_banlist | 4182 |
-| blocklist_de_ssh | 4156 |
-| threatfox_export_json | 3766 |
-| nist_nvd_recent | 2600 |
-| cisa_kev | 1741 |
+| blocklist_de_ssh | 4179 |
+| threatfox_export_json | 3670 |
+| nist_nvd_recent | 2800 |
+| cisa_kev | 1745 |
 | spamhaus_drop | 1682 |
-| tor_exit_nodes | 1212 |
+| malwarebazaar_recent | 1218 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3101 |
-| url | 2480 |
-| ipv4_cidr | 1680 |
-| sha256 | 1581 |
-| domain | 653 |
-| ipv4 | 237 |
+| cve | 2998 |
+| url | 2604 |
+| ipv4_cidr | 1681 |
+| sha256 | 1568 |
+| domain | 639 |
+| ipv4 | 242 |
 | md5 | 134 |
 | sha1 | 134 |
 
@@ -66,16 +66,16 @@ _Generated 2026-10-14T16:24:08Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3668 |
-| cve | 3101 |
-| malware | 1997 |
-| exploited-in-the-wild | 1741 |
-| nvd | 1704 |
-| drop | 1680 |
-| spamhaus | 1680 |
-| c2 | 1361 |
-| stealer | 1331 |
-| Vidar | 1324 |
+| threatfox | 3690 |
+| cve | 2998 |
+| malware | 1988 |
+| exploited-in-the-wild | 1745 |
+| drop | 1681 |
+| spamhaus | 1681 |
+| nvd | 1602 |
+| c2 | 1474 |
+| Vidar | 1430 |
+| stealer | 1426 |
 
 ## Multi-group reporting overlaps
 
