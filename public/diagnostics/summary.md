@@ -1,15 +1,15 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-10-14T09:16:17Z_
+_Generated 2026-10-14T16:24:08Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-14T09:16:17Z |
+| Generated | 2026-10-14T16:24:08Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 7644 |
+| Duplicates removed | 7228 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-group overlaps | 374 |
@@ -17,7 +17,7 @@ _Generated 2026-10-14T09:16:17Z_
 | High-score indicators (≥80) | 10000 |
 | 2+ reporting groups | 374 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-14T09:13:44Z |
+| Newest first_seen | 2026-10-14T16:22:25Z |
 
 ## Top indicators by score
 
@@ -39,43 +39,43 @@ _Generated 2026-10-14T09:16:17Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| greensnow_blocklist | 5724 |
+| greensnow_blocklist | 4904 |
 | ipsum_level5 | 4558 |
 | binarydefense_banlist | 4182 |
-| blocklist_de_ssh | 4149 |
-| threatfox_export_json | 3669 |
-| nist_nvd_recent | 3600 |
+| blocklist_de_ssh | 4156 |
+| threatfox_export_json | 3766 |
+| nist_nvd_recent | 2600 |
 | cisa_kev | 1741 |
 | spamhaus_drop | 1682 |
-| tor_exit_nodes | 1213 |
+| tor_exit_nodes | 1212 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3334 |
-| url | 2213 |
-| sha256 | 1652 |
-| ipv4_cidr | 1541 |
-| domain | 641 |
-| ipv4 | 309 |
-| md5 | 155 |
-| sha1 | 155 |
+| cve | 3101 |
+| url | 2480 |
+| ipv4_cidr | 1680 |
+| sha256 | 1581 |
+| domain | 653 |
+| ipv4 | 237 |
+| md5 | 134 |
+| sha1 | 134 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3638 |
-| cve | 3334 |
-| malware | 2026 |
-| nvd | 1937 |
+| threatfox | 3668 |
+| cve | 3101 |
+| malware | 1997 |
 | exploited-in-the-wild | 1741 |
-| drop | 1541 |
-| spamhaus | 1541 |
-| c2 | 1149 |
-| stealer | 1128 |
-| Vidar | 1126 |
+| nvd | 1704 |
+| drop | 1680 |
+| spamhaus | 1680 |
+| c2 | 1361 |
+| stealer | 1331 |
+| Vidar | 1324 |
 
 ## Multi-group reporting overlaps
 
