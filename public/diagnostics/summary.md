@@ -1,15 +1,15 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-10-14T03:15:47Z_
+_Generated 2026-10-14T09:16:17Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-14T03:15:47Z |
+| Generated | 2026-10-14T09:16:17Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 7948 |
+| Duplicates removed | 7644 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-group overlaps | 374 |
@@ -17,7 +17,7 @@ _Generated 2026-10-14T03:15:47Z_
 | High-score indicators (≥80) | 10000 |
 | 2+ reporting groups | 374 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-14T03:14:57Z |
+| Newest first_seen | 2026-10-14T09:13:44Z |
 
 ## Top indicators by score
 
@@ -39,43 +39,43 @@ _Generated 2026-10-14T03:15:47Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| greensnow_blocklist | 5680 |
+| greensnow_blocklist | 5724 |
 | ipsum_level5 | 4558 |
-| blocklist_de_ssh | 4185 |
 | binarydefense_banlist | 4182 |
-| threatfox_export_json | 3349 |
-| nist_nvd_recent | 2800 |
+| blocklist_de_ssh | 4149 |
+| threatfox_export_json | 3669 |
+| nist_nvd_recent | 3600 |
 | cisa_kev | 1741 |
 | spamhaus_drop | 1682 |
-| tor_exit_nodes | 1214 |
+| tor_exit_nodes | 1213 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3457 |
-| url | 2637 |
-| sha256 | 1752 |
-| ipv4_cidr | 866 |
-| domain | 555 |
-| ipv4 | 307 |
-| md5 | 213 |
-| sha1 | 213 |
+| cve | 3334 |
+| url | 2213 |
+| sha256 | 1652 |
+| ipv4_cidr | 1541 |
+| domain | 641 |
+| ipv4 | 309 |
+| md5 | 155 |
+| sha1 | 155 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3509 |
-| cve | 3457 |
-| malware | 2787 |
-| nvd | 2059 |
+| threatfox | 3638 |
+| cve | 3334 |
+| malware | 2026 |
+| nvd | 1937 |
 | exploited-in-the-wild | 1741 |
-| malware_download | 1120 |
-| c2 | 974 |
-| Vidar | 965 |
-| stealer | 941 |
-| loader | 938 |
+| drop | 1541 |
+| spamhaus | 1541 |
+| c2 | 1149 |
+| stealer | 1128 |
+| Vidar | 1126 |
 
 ## Multi-group reporting overlaps
 
