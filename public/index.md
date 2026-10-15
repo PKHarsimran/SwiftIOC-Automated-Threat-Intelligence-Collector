@@ -2,16 +2,16 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-10-15T16:11:23Z_
+_Generated 2026-10-15T22:51:30Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-15T16:11:23Z |
+| Generated | 2026-10-15T22:51:30Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 4983 |
+| Duplicates removed | 5104 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-group overlaps | 381 |
@@ -19,7 +19,7 @@ _Generated 2026-10-15T16:11:23Z_
 | High-score indicators (≥80) | 10000 |
 | 2+ reporting groups | 381 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-15T16:02:51Z |
+| Newest first_seen | 2026-10-15T22:44:25Z |
 
 ## Top indicators by score
 
@@ -42,42 +42,42 @@ _Generated 2026-10-15T16:11:23Z_
 | --- | ---: |
 | ci_army_list | 15000 |
 | ipsum_level5 | 4416 |
-| greensnow_blocklist | 4415 |
-| threatfox_export_json | 4290 |
-| blocklist_de_ssh | 4075 |
-| cisa_kev | 1745 |
+| greensnow_blocklist | 4344 |
+| blocklist_de_ssh | 4161 |
+| threatfox_export_json | 4070 |
+| nist_nvd_recent | 2600 |
+| cisa_kev | 1746 |
 | spamhaus_drop | 1680 |
 | tor_exit_nodes | 1212 |
-| malwarebazaar_recent | 1057 |
-| et_compromised | 540 |
+| malwarebazaar_recent | 1015 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3678 |
-| url | 2316 |
+| cve | 3155 |
+| url | 2456 |
 | ipv4_cidr | 1679 |
-| sha256 | 1365 |
-| domain | 444 |
-| ipv4 | 268 |
-| md5 | 125 |
-| sha1 | 125 |
+| sha256 | 1491 |
+| domain | 553 |
+| ipv4 | 298 |
+| md5 | 184 |
+| sha1 | 184 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| cve | 3678 |
-| threatfox | 3460 |
-| nvd | 2286 |
-| exploited-in-the-wild | 1745 |
+| threatfox | 3943 |
+| cve | 3155 |
+| nvd | 1762 |
+| exploited-in-the-wild | 1746 |
 | drop | 1679 |
 | spamhaus | 1679 |
-| c2 | 1412 |
-| malware | 1348 |
-| stealer | 1339 |
-| Vidar | 1319 |
+| c2 | 1536 |
+| malware | 1467 |
+| stealer | 1442 |
+| Vidar | 1421 |
 
 ## Multi-group reporting overlaps
 
