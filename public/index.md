@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-10-14T22:57:15Z_
+_Generated 2026-10-15T02:59:35Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-14T22:57:15Z |
+| Generated | 2026-10-15T02:59:35Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 7235 |
+| Duplicates removed | 6068 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-group overlaps | 378 |
+| Multi-group overlaps | 382 |
 | Score (min / avg / max) | 80 / 80.3 / 96 |
 | High-score indicators (≥80) | 10000 |
-| 2+ reporting groups | 378 |
+| 2+ reporting groups | 382 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-14T22:56:20Z |
+| Newest first_seen | 2026-10-15T02:44:34Z |
 
 ## Top indicators by score
 
@@ -41,43 +41,43 @@ _Generated 2026-10-14T22:57:15Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| greensnow_blocklist | 4844 |
-| ipsum_level5 | 4558 |
-| binarydefense_banlist | 4182 |
-| blocklist_de_ssh | 4179 |
-| threatfox_export_json | 3670 |
-| nist_nvd_recent | 2800 |
+| nist_nvd_recent | 8522 |
+| greensnow_blocklist | 5577 |
+| ipsum_level5 | 4416 |
+| blocklist_de_ssh | 4124 |
+| threatfox_export_json | 3926 |
 | cisa_kev | 1745 |
 | spamhaus_drop | 1682 |
-| malwarebazaar_recent | 1218 |
+| malwarebazaar_recent | 1254 |
+| tor_exit_nodes | 1210 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 2998 |
-| url | 2604 |
-| ipv4_cidr | 1681 |
-| sha256 | 1568 |
-| domain | 639 |
-| ipv4 | 242 |
-| md5 | 134 |
-| sha1 | 134 |
+| cve | 4443 |
+| url | 1871 |
+| ipv4_cidr | 1677 |
+| sha256 | 974 |
+| domain | 606 |
+| ipv4 | 179 |
+| md5 | 125 |
+| sha1 | 125 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3690 |
-| cve | 2998 |
-| malware | 1988 |
+| cve | 4443 |
+| nvd | 3051 |
+| threatfox | 2811 |
 | exploited-in-the-wild | 1745 |
-| drop | 1681 |
-| spamhaus | 1681 |
-| nvd | 1602 |
-| c2 | 1474 |
-| Vidar | 1430 |
-| stealer | 1426 |
+| drop | 1677 |
+| spamhaus | 1677 |
+| high | 1640 |
+| malware | 1248 |
+| c2 | 1077 |
+| stealer | 1051 |
 
 ## Multi-group reporting overlaps
 
