@@ -3,305 +3,305 @@
   <title>SwiftIOC — Newest High-Confidence IOCs</title>
   <link>https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector</link>
   <description>Freshest scored indicators of compromise with publisher-aware provenance.</description>
-  <lastBuildDate>Thu, 15 Oct 2026 02:59:36 +0000</lastBuildDate>
+  <lastBuildDate>Thu, 15 Oct 2026 08:47:08 +0000</lastBuildDate>
     <item>
-      <title>[80] url: hxxps://wy[.]78royal[.]org/lc</title>
+      <title>[80] ipv4_cidr: 173.239.214.0/24</title>
+      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
+      <guid isPermaLink="false">be49be89-588d-5f41-bc25-c7e8206b4c8c</guid>
+      <pubDate>Thu, 15 Oct 2026 08:46:10 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] ipv4_cidr: 202.170.75.0/24</title>
+      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
+      <guid isPermaLink="false">9e9170f5-376e-554d-b1a6-885e82dba073</guid>
+      <pubDate>Thu, 15 Oct 2026 08:46:10 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] ipv4_cidr: 45.138.12.0/24</title>
+      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
+      <guid isPermaLink="false">b59e4405-9e55-579a-9342-07e46853ad93</guid>
+      <pubDate>Thu, 15 Oct 2026 08:46:10 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] ipv4_cidr: 89.32.41.0/24</title>
+      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
+      <guid isPermaLink="false">8ab12fa8-86bb-5ed4-bbb1-acd90c00722f</guid>
+      <pubDate>Thu, 15 Oct 2026 08:46:10 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxps://r[.]78royal[.]org/xvi</title>
       <description>Score 80, confidence high, sources: threatfox_export_json, tags: Vidar,b89d843f29af2eed09805e9767a1165f,c2,loader,stealer,threatfox</description>
-      <guid isPermaLink="false">7bc10ce4-f59a-5cca-842a-c25161e10f6c</guid>
-      <pubDate>Thu, 15 Oct 2026 02:44:34 +0000</pubDate>
+      <guid isPermaLink="false">9da6d97e-810e-5c2a-a1bd-232d2dfacb2f</guid>
+      <pubDate>Thu, 15 Oct 2026 08:44:47 +0000</pubDate>
     </item>
     <item>
-      <title>[80] url: hxxps://wy[.]78royal[.]org/u</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Vidar,c2,c7a50169dbc6d842a7e7d349513f88f1,loader,stealer,threatfox</description>
-      <guid isPermaLink="false">b7e634d0-53f0-5f04-a713-c05b546aaabe</guid>
-      <pubDate>Thu, 15 Oct 2026 02:42:27 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxps://wy[.]78royal[.]org/a</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Vidar,c2,c7a50169dbc6d842a7e7d349513f88f1,loader,stealer,threatfox</description>
-      <guid isPermaLink="false">707e3c8a-3591-5e39-a21f-5d4a9cbccf5b</guid>
-      <pubDate>Thu, 15 Oct 2026 02:41:05 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxps://wy[.]78royal[.]org/a/</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: threatfox,vidar</description>
-      <guid isPermaLink="false">01ee4afe-8b65-5e6c-aa17-f251720c5e5d</guid>
-      <pubDate>Thu, 15 Oct 2026 02:40:48 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxps://wy[.]78royal[.]org/prc</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: 1718e0679220166cf123fbe6e40c635c,Vidar,c2,loader,stealer,threatfox</description>
-      <guid isPermaLink="false">92b5aa78-dd88-5fca-bf10-47e69dedda10</guid>
-      <pubDate>Thu, 15 Oct 2026 02:38:16 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxps://wy[.]78royal[.]org/oa</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Vidar,c2,c7a50169dbc6d842a7e7d349513f88f1,loader,stealer,threatfox</description>
-      <guid isPermaLink="false">3e2efcd6-1064-5295-b8bb-39a19cf5143e</guid>
-      <pubDate>Thu, 15 Oct 2026 02:37:06 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxp://115[.]50[.]104[.]42:48635/i</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,cowrie,elf,honeypot,mips,Mozi</description>
-      <guid isPermaLink="false">c4439958-5d1f-5ea7-90b3-8008df5b548c</guid>
-      <pubDate>Thu, 15 Oct 2026 02:36:15 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxps://wy[.]78royal[.]org/j6/</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: threatfox,vidar</description>
-      <guid isPermaLink="false">ebb25cb7-f04c-5cd2-a142-67ffdbef0f20</guid>
-      <pubDate>Thu, 15 Oct 2026 02:35:48 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxps://wy[.]78royal[.]org/j6</title>
+      <title>[80] url: hxxps://r[.]78royal[.]org/qw</title>
       <description>Score 80, confidence high, sources: threatfox_export_json, tags: Vidar,c2,d852ede598d72f2b3a4050576466ec62,loader,stealer,threatfox</description>
-      <guid isPermaLink="false">60800d2c-7c62-5838-b677-30d67f251a7b</guid>
-      <pubDate>Thu, 15 Oct 2026 02:34:45 +0000</pubDate>
+      <guid isPermaLink="false">506becef-2d89-5367-b5ea-4f7d22e52977</guid>
+      <pubDate>Thu, 15 Oct 2026 08:42:30 +0000</pubDate>
     </item>
     <item>
-      <title>[80] url: hxxp://219[.]157[.]61[.]33:46146/bin[.]sh</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,elf,mips,Mozi</description>
-      <guid isPermaLink="false">3f1be625-41d2-5014-b35c-2b33202ba48f</guid>
-      <pubDate>Thu, 15 Oct 2026 02:34:17 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxps://wy[.]78royal[.]org/d</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: 6713982832fdd0efe07912b12c5c5b2b,Vidar,c2,loader,stealer,threatfox</description>
-      <guid isPermaLink="false">555403f9-0e9f-5203-93dd-0cf3f67d8aef</guid>
-      <pubDate>Thu, 15 Oct 2026 02:32:51 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxp://123[.]12[.]226[.]4:57201/i</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
-      <guid isPermaLink="false">8c0fe53c-43f0-5341-b183-c75d279fd7ef</guid>
-      <pubDate>Thu, 15 Oct 2026 02:32:07 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxp://123[.]14[.]176[.]37:37998/bin[.]sh</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
-      <guid isPermaLink="false">6e24b8ed-445f-509f-9fd3-e0efc20f19e3</guid>
-      <pubDate>Thu, 15 Oct 2026 02:32:07 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxps://wy[.]78royal[.]org/mw/</title>
+      <title>[80] url: hxxps://r[.]78royal[.]org/nh/</title>
       <description>Score 80, confidence high, sources: threatfox_export_json, tags: threatfox,vidar</description>
-      <guid isPermaLink="false">ab32b33e-9039-5507-bdfa-35e885f2fc44</guid>
-      <pubDate>Thu, 15 Oct 2026 02:30:48 +0000</pubDate>
+      <guid isPermaLink="false">2fe14609-981c-5170-9f9c-fd3924b840bd</guid>
+      <pubDate>Thu, 15 Oct 2026 08:40:48 +0000</pubDate>
     </item>
     <item>
-      <title>[80] url: hxxps://wy[.]78royal[.]org/mw</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Vidar,c2,c7a50169dbc6d842a7e7d349513f88f1,loader,stealer,threatfox</description>
-      <guid isPermaLink="false">70e2805b-f0fa-5910-b728-1d50c8c2d34e</guid>
-      <pubDate>Thu, 15 Oct 2026 02:30:21 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxps://wy[.]78royal[.]org/uj</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Vidar,b89d843f29af2eed09805e9767a1165f,c2,loader,stealer,threatfox</description>
-      <guid isPermaLink="false">5d906334-6c26-5d9b-b8ac-f4699dc0855a</guid>
-      <pubDate>Thu, 15 Oct 2026 02:28:39 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxp://116[.]138[.]107[.]83:57675/i</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,cowrie,elf,honeypot,mipsel,Mozi</description>
-      <guid isPermaLink="false">5ddc9016-1641-5d71-97dd-d00cbcf6bfe4</guid>
-      <pubDate>Thu, 15 Oct 2026 02:28:14 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxps://wy[.]78royal[.]org/jx</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Vidar,c2,c7a50169dbc6d842a7e7d349513f88f1,loader,stealer,threatfox</description>
-      <guid isPermaLink="false">9a90fca8-0faa-5743-a3a6-010c9c5dd026</guid>
-      <pubDate>Thu, 15 Oct 2026 02:26:17 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxps://wy[.]78royal[.]org/n1/</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: threatfox,vidar</description>
-      <guid isPermaLink="false">533250c8-875a-5281-8144-6a1e2fa1805f</guid>
-      <pubDate>Thu, 15 Oct 2026 02:25:48 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxps://wy[.]78royal[.]org/n1</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Vidar,c2,d852ede598d72f2b3a4050576466ec62,loader,stealer,threatfox</description>
-      <guid isPermaLink="false">2c3df15d-dbcd-5b56-968d-972fed4b0dde</guid>
-      <pubDate>Thu, 15 Oct 2026 02:24:24 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxps://wy[.]78royal[.]org/st</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Vidar,ab0a59f4970a96fd6e8daa4f6f8e22cd,c2,loader,stealer,threatfox</description>
-      <guid isPermaLink="false">174c4643-d47d-524a-952d-b9db894d6534</guid>
-      <pubDate>Thu, 15 Oct 2026 02:22:26 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxps://wy[.]78royal[.]org/d4</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: 6713982832fdd0efe07912b12c5c5b2b,Vidar,c2,loader,stealer,threatfox</description>
-      <guid isPermaLink="false">792466ff-668e-5e2b-85d0-4e656f4e9391</guid>
-      <pubDate>Thu, 15 Oct 2026 02:21:27 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxps://wy[.]78royal[.]org/d4/</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: threatfox,vidar</description>
-      <guid isPermaLink="false">fe380c97-3779-5b54-95d9-90e38b661e2c</guid>
-      <pubDate>Thu, 15 Oct 2026 02:20:48 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] cve: CVE-2026-76660</title>
-      <description>Score 80, confidence high, sources: nist_nvd_recent, tags: cve,high,nvd</description>
-      <guid isPermaLink="false">c783f582-d16c-5422-bd7f-4741a8ff7d5b</guid>
-      <pubDate>Thu, 15 Oct 2026 02:20:16 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] cve: CVE-2026-76661</title>
-      <description>Score 80, confidence high, sources: nist_nvd_recent, tags: cve,high,nvd</description>
-      <guid isPermaLink="false">dedf7564-70bc-591e-9bb1-5fa608834fb3</guid>
-      <pubDate>Thu, 15 Oct 2026 02:20:16 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] cve: CVE-2026-77931</title>
-      <description>Score 80, confidence high, sources: nist_nvd_recent, tags: cve,high,nvd</description>
-      <guid isPermaLink="false">c5f5ead9-e1db-518e-acd9-6bb0e62c0fdc</guid>
-      <pubDate>Thu, 15 Oct 2026 02:20:16 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] cve: CVE-2026-73799</title>
-      <description>Score 80, confidence high, sources: nist_nvd_recent, tags: cve,high,nvd</description>
-      <guid isPermaLink="false">6f55b603-9802-53b6-b7d1-fbb4514fffe7</guid>
-      <pubDate>Thu, 15 Oct 2026 02:20:15 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] cve: CVE-2026-76066</title>
-      <description>Score 80, confidence high, sources: nist_nvd_recent, tags: cve,high,nvd</description>
-      <guid isPermaLink="false">ed5a9cc1-aa53-55eb-a33d-abeb9ac4a5b6</guid>
-      <pubDate>Thu, 15 Oct 2026 02:20:15 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] cve: CVE-2026-76656</title>
-      <description>Score 80, confidence high, sources: nist_nvd_recent, tags: cve,medium,nvd</description>
-      <guid isPermaLink="false">235a2db3-e3ec-5182-b749-df80cc876a8a</guid>
-      <pubDate>Thu, 15 Oct 2026 02:20:15 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] cve: CVE-2026-76659</title>
-      <description>Score 80, confidence high, sources: nist_nvd_recent, tags: cve,high,nvd</description>
-      <guid isPermaLink="false">48e49884-4741-5bd3-8bc9-7e436a389a92</guid>
-      <pubDate>Thu, 15 Oct 2026 02:20:15 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxps://wy[.]78royal[.]org/pw</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: 6713982832fdd0efe07912b12c5c5b2b,Vidar,c2,loader,stealer,threatfox</description>
-      <guid isPermaLink="false">7765ab08-2c44-55cc-8c10-eb93b3e8eadb</guid>
-      <pubDate>Thu, 15 Oct 2026 02:18:59 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] cve: CVE-2026-109430</title>
-      <description>Score 80, confidence high, sources: nist_nvd_recent, tags: cve,high,nvd</description>
-      <guid isPermaLink="false">45e3153e-cf89-599d-85f9-7c66b98629f5</guid>
-      <pubDate>Thu, 15 Oct 2026 02:18:37 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] cve: CVE-2026-110904</title>
-      <description>Score 80, confidence high, sources: nist_nvd_recent, tags: cve,medium,nvd</description>
-      <guid isPermaLink="false">c3ab68df-1a22-55d4-aa9d-1224bdea5bae</guid>
-      <pubDate>Thu, 15 Oct 2026 02:18:37 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxp://188[.]225[.]2[.]32:46748/i</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,elf,mips,Mozi</description>
-      <guid isPermaLink="false">c48aa2d3-6ada-555a-94c7-2bb294f4787d</guid>
-      <pubDate>Thu, 15 Oct 2026 02:18:22 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxp://46[.]236[.]65[.]9:41630/bin[.]sh</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
-      <guid isPermaLink="false">15d65d79-0a88-59fa-bbe8-dc033f226a89</guid>
-      <pubDate>Thu, 15 Oct 2026 02:17:06 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxps://wy[.]78royal[.]org/nd</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Vidar,c2,d852ede598d72f2b3a4050576466ec62,loader,stealer,threatfox</description>
-      <guid isPermaLink="false">fbaa3976-e542-596b-bde1-b1a131d1e8ff</guid>
-      <pubDate>Thu, 15 Oct 2026 02:16:41 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxps://wy[.]78royal[.]org/xm2/</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: threatfox,vidar</description>
-      <guid isPermaLink="false">02be19f5-2446-5978-acf5-68642285054b</guid>
-      <pubDate>Thu, 15 Oct 2026 02:15:48 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxps://wy[.]78royal[.]org/xm2</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Vidar,c2,c7a50169dbc6d842a7e7d349513f88f1,loader,stealer,threatfox</description>
-      <guid isPermaLink="false">f07c8f5d-f14f-5f96-b2b6-f02396df9072</guid>
-      <pubDate>Thu, 15 Oct 2026 02:14:33 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxps://wy[.]78royal[.]org/a0</title>
+      <title>[80] url: hxxps://r[.]78royal[.]org/nh</title>
       <description>Score 80, confidence high, sources: threatfox_export_json, tags: 5ecaf10790d5f89db8606b207b2143e4,Vidar,c2,loader,stealer,threatfox</description>
-      <guid isPermaLink="false">8cf45847-554b-5ab0-b266-ddd2b108bef4</guid>
-      <pubDate>Thu, 15 Oct 2026 02:12:18 +0000</pubDate>
+      <guid isPermaLink="false">9638fa6e-46fc-5199-9a01-d4297a678a6e</guid>
+      <pubDate>Thu, 15 Oct 2026 08:40:26 +0000</pubDate>
     </item>
     <item>
-      <title>[80] url: hxxps://wy[.]78royal[.]org/sj1</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Vidar,ab0a59f4970a96fd6e8daa4f6f8e22cd,c2,loader,stealer,threatfox</description>
-      <guid isPermaLink="false">030f48f5-4f2d-5ef4-a568-2ac8cd9aae4a</guid>
-      <pubDate>Thu, 15 Oct 2026 02:10:50 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxps://wy[.]78royal[.]org/sj1/</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: threatfox,vidar</description>
-      <guid isPermaLink="false">5727fa01-26a4-571c-891f-8b498c6f95d7</guid>
-      <pubDate>Thu, 15 Oct 2026 02:10:48 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxps://wy[.]78royal[.]org/k3</title>
+      <title>[80] url: hxxps://r[.]78royal[.]org/wn</title>
       <description>Score 80, confidence high, sources: threatfox_export_json, tags: 6713982832fdd0efe07912b12c5c5b2b,Vidar,c2,loader,stealer,threatfox</description>
-      <guid isPermaLink="false">42cb4731-79ab-5f86-9ac3-2a3d50f81a16</guid>
-      <pubDate>Thu, 15 Oct 2026 02:08:43 +0000</pubDate>
+      <guid isPermaLink="false">10f80cd3-946f-5dca-a540-9750bdc06c60</guid>
+      <pubDate>Thu, 15 Oct 2026 08:39:15 +0000</pubDate>
     </item>
     <item>
-      <title>[80] url: hxxps://wy[.]78royal[.]org/ct</title>
+      <title>[80] url: hxxps://r[.]78royal[.]org/zuv</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Vidar,c2,d852ede598d72f2b3a4050576466ec62,loader,stealer,threatfox</description>
+      <guid isPermaLink="false">0cd7f457-fdcc-55d8-bd30-cc58e566411c</guid>
+      <pubDate>Thu, 15 Oct 2026 08:37:19 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] ipv4: 147[.]90[.]182[.]38</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: XWorm,threatfox</description>
+      <guid isPermaLink="false">8194a316-446e-5fde-9c86-63e5dc15ea36</guid>
+      <pubDate>Thu, 15 Oct 2026 08:36:27 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxps://r[.]78royal[.]org/co/</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: threatfox,vidar</description>
+      <guid isPermaLink="false">b9dafae3-dc44-5213-acb9-31a6800dccdc</guid>
+      <pubDate>Thu, 15 Oct 2026 08:35:48 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxps://cdn[.]discordapp[.]com/attachments/1557740644179517531/1560206841797939210/bundle_3[.]zip?ex=6ad1df5a&amp;is=6ad08dda&amp;hm=94d7059bfa407e04fa9e30edd05d792a68272c07e2bd3ab74e919b8647f857ae&amp;</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,IRAHook</description>
+      <guid isPermaLink="false">f4ab4681-af50-562f-a977-d00e28cba032</guid>
+      <pubDate>Thu, 15 Oct 2026 08:35:40 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxps://r[.]78royal[.]org/co</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: 5ecaf10790d5f89db8606b207b2143e4,Vidar,c2,loader,stealer,threatfox</description>
+      <guid isPermaLink="false">48ed6a39-faec-5671-82f7-8adc66ca4dda</guid>
+      <pubDate>Thu, 15 Oct 2026 08:34:36 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] domain: jb6p5nn8[.]rtplive-miliarbet[.]online</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClearFake,mac-0x0f14,macos,threatfox</description>
+      <guid isPermaLink="false">947b58b0-405e-5b4a-b1ba-a22cd733d088</guid>
+      <pubDate>Thu, 15 Oct 2026 08:34:28 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxps://r[.]78royal[.]org/v0</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Vidar,c2,d852ede598d72f2b3a4050576466ec62,loader,stealer,threatfox</description>
+      <guid isPermaLink="false">6da4b488-6090-52dd-b488-007c1becbf90</guid>
+      <pubDate>Thu, 15 Oct 2026 08:32:14 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxp://202[.]83[.]167[.]117:47317/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
+      <guid isPermaLink="false">73e78ac4-0e28-5a60-91be-ed59083b0486</guid>
+      <pubDate>Thu, 15 Oct 2026 08:32:10 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxp://115[.]55[.]203[.]30:32869/bin[.]sh</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
+      <guid isPermaLink="false">e8c32189-ad15-56e9-966f-8713d5fdd1e4</guid>
+      <pubDate>Thu, 15 Oct 2026 08:32:07 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxps://r[.]78royal[.]org/q1</title>
       <description>Score 80, confidence high, sources: threatfox_export_json, tags: Vidar,c2,c7a50169dbc6d842a7e7d349513f88f1,loader,stealer,threatfox</description>
-      <guid isPermaLink="false">0e951bfa-5679-5caa-8837-4d62512dc87b</guid>
-      <pubDate>Thu, 15 Oct 2026 02:06:17 +0000</pubDate>
+      <guid isPermaLink="false">ada8b90f-c151-5210-9a9b-db91724b6bd3</guid>
+      <pubDate>Thu, 15 Oct 2026 08:32:05 +0000</pubDate>
     </item>
     <item>
-      <title>[80] url: hxxps://wy[.]78royal[.]org/kf/</title>
+      <title>[80] domain: basickantoor1[.]nl</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClearFake,threatfox</description>
+      <guid isPermaLink="false">0ffd613f-a309-5f3a-a131-8c49136b4345</guid>
+      <pubDate>Thu, 15 Oct 2026 08:31:09 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxps://r[.]78royal[.]org/q1/</title>
       <description>Score 80, confidence high, sources: threatfox_export_json, tags: threatfox,vidar</description>
-      <guid isPermaLink="false">85579b22-3765-59d5-80a4-0d12ad53be90</guid>
-      <pubDate>Thu, 15 Oct 2026 02:05:48 +0000</pubDate>
+      <guid isPermaLink="false">d2438a0c-e4bf-5610-a738-d9bbc478a3b7</guid>
+      <pubDate>Thu, 15 Oct 2026 08:30:48 +0000</pubDate>
     </item>
     <item>
-      <title>[80] url: hxxps://wy[.]78royal[.]org/kf</title>
+      <title>[80] url: hxxps://r[.]78royal[.]org/m7</title>
       <description>Score 80, confidence high, sources: threatfox_export_json, tags: Vidar,ab0a59f4970a96fd6e8daa4f6f8e22cd,c2,loader,stealer,threatfox</description>
-      <guid isPermaLink="false">285ecf9d-413d-53f6-97d3-c70dd501913a</guid>
-      <pubDate>Thu, 15 Oct 2026 02:05:12 +0000</pubDate>
+      <guid isPermaLink="false">eb2aa9b4-6069-5cb6-8754-75e191194d9d</guid>
+      <pubDate>Thu, 15 Oct 2026 08:26:46 +0000</pubDate>
     </item>
     <item>
-      <title>[80] url: hxxps://wy[.]78royal[.]org/rn</title>
+      <title>[80] url: hxxps://r[.]78royal[.]org/u5/</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: threatfox,vidar</description>
+      <guid isPermaLink="false">7b37a46a-d047-58ab-b189-c8c25c1ce816</guid>
+      <pubDate>Thu, 15 Oct 2026 08:25:48 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxps://r[.]78royal[.]org/u5</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Vidar,b89d843f29af2eed09805e9767a1165f,c2,loader,stealer,threatfox</description>
+      <guid isPermaLink="false">98901790-a623-55e4-8f36-c654b96f8ab0</guid>
+      <pubDate>Thu, 15 Oct 2026 08:25:16 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxps://r[.]78royal[.]org/u</title>
       <description>Score 80, confidence high, sources: threatfox_export_json, tags: 6713982832fdd0efe07912b12c5c5b2b,Vidar,c2,loader,stealer,threatfox</description>
-      <guid isPermaLink="false">2f3edbc7-7517-57f4-a0de-190dfdd7f2a4</guid>
-      <pubDate>Thu, 15 Oct 2026 02:03:30 +0000</pubDate>
+      <guid isPermaLink="false">c7b01c2c-d465-586d-b304-2124e6992531</guid>
+      <pubDate>Thu, 15 Oct 2026 08:22:30 +0000</pubDate>
     </item>
     <item>
-      <title>[80] sha256: 4ea545bd4a77d715f0d67c223165b8558c413215300dd3c7704aa0b5d99e0cae</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
-      <guid isPermaLink="false">a8404480-b23f-5227-8a3a-97a9a5095fec</guid>
-      <pubDate>Thu, 15 Oct 2026 02:02:53 +0000</pubDate>
+      <title>[80] url: hxxps://r[.]78royal[.]org/wa</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Vidar,c2,d852ede598d72f2b3a4050576466ec62,loader,stealer,threatfox</description>
+      <guid isPermaLink="false">b457204a-8174-52d4-96cd-b0792aecfece</guid>
+      <pubDate>Thu, 15 Oct 2026 08:21:37 +0000</pubDate>
     </item>
     <item>
-      <title>[80] sha256: e631961754aecfab4c11d53b72cf6782d140ac342a229dbbe697b18139693550</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
-      <guid isPermaLink="false">35accdc6-8426-54a7-b92b-89721c3afd42</guid>
-      <pubDate>Thu, 15 Oct 2026 02:02:50 +0000</pubDate>
+      <title>[80] ipv4: 85[.]137[.]54[.]178</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: tag,threatfox</description>
+      <guid isPermaLink="false">024ad910-52f7-5919-ab1e-caf8dc64b0a6</guid>
+      <pubDate>Thu, 15 Oct 2026 08:21:17 +0000</pubDate>
     </item>
     <item>
-      <title>[80] url: hxxp://125[.]41[.]4[.]218:38474/i</title>
+      <title>[80] url: hxxps://r[.]78royal[.]org/wa/</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: threatfox,vidar</description>
+      <guid isPermaLink="false">e739cae8-1101-515f-b9fc-7ea5a9a24acb</guid>
+      <pubDate>Thu, 15 Oct 2026 08:20:48 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxps://r[.]78royal[.]org/uo</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Vidar,c2,d852ede598d72f2b3a4050576466ec62,loader,stealer,threatfox</description>
+      <guid isPermaLink="false">565d3bcd-0516-57ab-b9b4-975a037ac80c</guid>
+      <pubDate>Thu, 15 Oct 2026 08:18:31 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxp://115[.]55[.]206[.]233:48121/bin[.]sh</title>
       <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
-      <guid isPermaLink="false">cb615ce5-684f-58a4-ab8d-1f0da4224f26</guid>
-      <pubDate>Thu, 15 Oct 2026 02:02:07 +0000</pubDate>
+      <guid isPermaLink="false">12530839-4a55-5abf-bd09-a9c31ef363f2</guid>
+      <pubDate>Thu, 15 Oct 2026 08:17:07 +0000</pubDate>
     </item>
     <item>
-      <title>[80] url: hxxp://14[.]177[.]78[.]121:62685/i</title>
+      <title>[80] url: hxxp://115[.]55[.]238[.]219:32771/i</title>
       <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
-      <guid isPermaLink="false">81746858-62e0-5179-bf3d-0a1feb1b8c11</guid>
-      <pubDate>Thu, 15 Oct 2026 02:02:07 +0000</pubDate>
+      <guid isPermaLink="false">cb48d717-3383-5859-9786-780d9635837e</guid>
+      <pubDate>Thu, 15 Oct 2026 08:17:07 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxps://r[.]78royal[.]org/oo</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Vidar,c2,d852ede598d72f2b3a4050576466ec62,loader,stealer,threatfox</description>
+      <guid isPermaLink="false">e792f4f6-efbe-52d5-a449-452d4c864219</guid>
+      <pubDate>Thu, 15 Oct 2026 08:16:19 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxps://r[.]78royal[.]org/ta/</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: threatfox,vidar</description>
+      <guid isPermaLink="false">d7c3a1cc-71ae-57fe-8271-645dd9e0ae60</guid>
+      <pubDate>Thu, 15 Oct 2026 08:15:48 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxps://r[.]78royal[.]org/ta</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Vidar,c2,c7a50169dbc6d842a7e7d349513f88f1,loader,stealer,threatfox</description>
+      <guid isPermaLink="false">cd3e71d4-9b99-5bcc-b8c8-2814f8190da4</guid>
+      <pubDate>Thu, 15 Oct 2026 08:14:40 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxps://r[.]78royal[.]org/fw</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Vidar,c2,d852ede598d72f2b3a4050576466ec62,loader,stealer,threatfox</description>
+      <guid isPermaLink="false">9b2d3982-8693-5dd8-8c81-bda2b886d9e1</guid>
+      <pubDate>Thu, 15 Oct 2026 08:12:33 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxps://r[.]78royal[.]org/vn</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Vidar,c2,d852ede598d72f2b3a4050576466ec62,loader,stealer,threatfox</description>
+      <guid isPermaLink="false">dc6364c1-cf6f-5512-a448-c15faeec113d</guid>
+      <pubDate>Thu, 15 Oct 2026 08:11:12 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxps://r[.]78royal[.]org/vn/</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: threatfox,vidar</description>
+      <guid isPermaLink="false">d096fbf0-5524-50e5-8ee0-b66967bef7e0</guid>
+      <pubDate>Thu, 15 Oct 2026 08:10:48 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxps://r[.]78royal[.]org/br</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Vidar,c2,c7a50169dbc6d842a7e7d349513f88f1,loader,stealer,threatfox</description>
+      <guid isPermaLink="false">e046386b-f047-57ee-9882-c9024046e1dc</guid>
+      <pubDate>Thu, 15 Oct 2026 08:09:02 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: b6c49943afd87215dbd560583fc0c464f3dcf819278557953a33a811b4880f36</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
+      <guid isPermaLink="false">56ec4fb8-4651-5352-a720-97e4d84c0549</guid>
+      <pubDate>Thu, 15 Oct 2026 08:08:43 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxps://r[.]78royal[.]org/w9</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: 6713982832fdd0efe07912b12c5c5b2b,Vidar,c2,loader,stealer,threatfox</description>
+      <guid isPermaLink="false">c14e1c0c-f656-5e0f-bc76-ce3cb8536318</guid>
+      <pubDate>Thu, 15 Oct 2026 08:06:49 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxps://r[.]78royal[.]org/jrs/</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: threatfox,vidar</description>
+      <guid isPermaLink="false">5ee094c9-2b97-53f2-8d16-19b9cd6334b1</guid>
+      <pubDate>Thu, 15 Oct 2026 08:05:48 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] ipv4: 49[.]235[.]52[.]47</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: cobaltstrike,threatfox</description>
+      <guid isPermaLink="false">186ec767-4a18-566b-9896-dde3dce570de</guid>
+      <pubDate>Thu, 15 Oct 2026 08:05:05 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] ipv4: 89[.]40[.]105[.]179</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: cobaltstrike,threatfox</description>
+      <guid isPermaLink="false">4fd69220-fc17-53f7-833f-a65debf6ac97</guid>
+      <pubDate>Thu, 15 Oct 2026 08:05:05 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] ipv4: 217[.]182[.]168[.]142</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: mythic,threatfox</description>
+      <guid isPermaLink="false">33a7e582-8f5b-5d25-94d4-620d0b691256</guid>
+      <pubDate>Thu, 15 Oct 2026 08:05:04 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxps://r[.]78royal[.]org/jrs</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Vidar,c2,d852ede598d72f2b3a4050576466ec62,loader,stealer,threatfox</description>
+      <guid isPermaLink="false">308ea682-62cf-5b0e-82c1-c9498d463c27</guid>
+      <pubDate>Thu, 15 Oct 2026 08:04:23 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxps://eq[.]78royal[.]org/se</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Vidar,c2,c7a50169dbc6d842a7e7d349513f88f1,loader,stealer,threatfox</description>
+      <guid isPermaLink="false">af025403-a806-5bf1-a91b-70abd274c6cd</guid>
+      <pubDate>Thu, 15 Oct 2026 08:02:16 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxp://103[.]66[.]176[.]192:33647/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
+      <guid isPermaLink="false">15f1e222-2615-5265-bf22-196f949ebc79</guid>
+      <pubDate>Thu, 15 Oct 2026 08:02:07 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxps://r[.]78royal[.]org</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: 6713982832fdd0efe07912b12c5c5b2b,Vidar,c2,loader,stealer,threatfox</description>
+      <guid isPermaLink="false">1dc7dd4e-62f7-5536-bf58-3f6628c3b100</guid>
+      <pubDate>Thu, 15 Oct 2026 08:01:18 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxps://eq[.]78royal[.]org/m/</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: threatfox,vidar</description>
+      <guid isPermaLink="false">2ade3aef-573f-5384-bf97-5f0e82138143</guid>
+      <pubDate>Thu, 15 Oct 2026 08:00:48 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxps://eq[.]78royal[.]org/m</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: 6713982832fdd0efe07912b12c5c5b2b,Vidar,c2,loader,stealer,threatfox</description>
+      <guid isPermaLink="false">b13246c8-3222-5eb6-b550-1fcf33edc4d9</guid>
+      <pubDate>Thu, 15 Oct 2026 08:00:20 +0000</pubDate>
     </item>
 </channel></rss>

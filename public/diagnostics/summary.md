@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-10-15T02:59:35Z_
+_Generated 2026-10-15T08:47:07Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-15T02:59:35Z |
+| Generated | 2026-10-15T08:47:07Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6068 |
+| Duplicates removed | 5840 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-group overlaps | 382 |
+| Multi-group overlaps | 381 |
 | Score (min / avg / max) | 80 / 80.3 / 96 |
 | High-score indicators (≥80) | 10000 |
-| 2+ reporting groups | 382 |
+| 2+ reporting groups | 381 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-15T02:44:34Z |
+| Newest first_seen | 2026-10-15T08:46:10Z |
 
 ## Top indicators by score
 
@@ -39,26 +39,26 @@ _Generated 2026-10-15T02:59:35Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| nist_nvd_recent | 8522 |
-| greensnow_blocklist | 5577 |
+| greensnow_blocklist | 5530 |
 | ipsum_level5 | 4416 |
-| blocklist_de_ssh | 4124 |
-| threatfox_export_json | 3926 |
+| threatfox_export_json | 4079 |
+| blocklist_de_ssh | 4052 |
+| nist_nvd_recent | 2000 |
 | cisa_kev | 1745 |
 | spamhaus_drop | 1682 |
-| malwarebazaar_recent | 1254 |
 | tor_exit_nodes | 1210 |
+| malwarebazaar_recent | 1197 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 4443 |
-| url | 1871 |
-| ipv4_cidr | 1677 |
-| sha256 | 974 |
-| domain | 606 |
-| ipv4 | 179 |
+| cve | 4338 |
+| url | 1980 |
+| ipv4_cidr | 1681 |
+| sha256 | 1015 |
+| domain | 542 |
+| ipv4 | 194 |
 | md5 | 125 |
 | sha1 | 125 |
 
@@ -66,16 +66,16 @@ _Generated 2026-10-15T02:59:35Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| cve | 4443 |
-| nvd | 3051 |
-| threatfox | 2811 |
+| cve | 4338 |
+| nvd | 2946 |
+| threatfox | 2914 |
 | exploited-in-the-wild | 1745 |
-| drop | 1677 |
-| spamhaus | 1677 |
-| high | 1640 |
-| malware | 1248 |
-| c2 | 1077 |
-| stealer | 1051 |
+| drop | 1681 |
+| spamhaus | 1681 |
+| high | 1605 |
+| malware | 1227 |
+| c2 | 1174 |
+| stealer | 1149 |
 
 ## Multi-group reporting overlaps
 
