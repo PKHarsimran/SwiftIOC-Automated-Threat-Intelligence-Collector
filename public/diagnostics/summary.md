@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-10-16T19:24:44Z_
+_Generated 2026-10-16T22:25:52Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-16T19:24:44Z |
+| Generated | 2026-10-16T22:25:52Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 5559 |
+| Duplicates removed | 5562 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-group overlaps | 385 |
+| Multi-group overlaps | 386 |
 | Score (min / avg / max) | 80 / 80.3 / 96 |
 | High-score indicators (≥80) | 10000 |
-| 2+ reporting groups | 385 |
+| 2+ reporting groups | 386 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-16T19:23:56Z |
+| Newest first_seen | 2026-10-16T22:25:37Z |
 
 ## Top indicators by score
 
@@ -39,11 +39,11 @@ _Generated 2026-10-16T19:24:44Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| nist_nvd_recent | 12709 |
 | ipsum_level5 | 4457 |
-| threatfox_export_json | 4359 |
-| greensnow_blocklist | 4304 |
-| blocklist_de_ssh | 4270 |
+| threatfox_export_json | 4377 |
+| blocklist_de_ssh | 4358 |
+| greensnow_blocklist | 4277 |
+| nist_nvd_recent | 2200 |
 | cisa_kev | 1748 |
 | spamhaus_drop | 1691 |
 | tor_exit_nodes | 1207 |
@@ -53,12 +53,12 @@ _Generated 2026-10-16T19:24:44Z_
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3538 |
-| url | 2337 |
-| sha256 | 2004 |
-| ipv4_cidr | 1047 |
-| domain | 425 |
-| ipv4 | 323 |
+| cve | 3419 |
+| url | 2213 |
+| sha256 | 2127 |
+| ipv4_cidr | 1169 |
+| domain | 431 |
+| ipv4 | 315 |
 | md5 | 163 |
 | sha1 | 163 |
 
@@ -66,16 +66,16 @@ _Generated 2026-10-16T19:24:44Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 4107 |
-| cve | 3538 |
-| nvd | 2146 |
+| threatfox | 4119 |
+| cve | 3419 |
+| nvd | 2027 |
 | exploited-in-the-wild | 1748 |
-| malware | 1602 |
-| c2 | 1387 |
-| Vidar | 1305 |
-| stealer | 1301 |
-| loader | 1289 |
-| drop | 1047 |
+| malware | 1587 |
+| c2 | 1303 |
+| Vidar | 1225 |
+| stealer | 1221 |
+| loader | 1209 |
+| drop | 1169 |
 
 ## Multi-group reporting overlaps
 
