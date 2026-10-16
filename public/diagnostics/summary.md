@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-10-16T08:42:44Z_
+_Generated 2026-10-16T15:57:55Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-16T08:42:44Z |
+| Generated | 2026-10-16T15:57:55Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6119 |
+| Duplicates removed | 5552 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-group overlaps | 381 |
+| Multi-group overlaps | 382 |
 | Score (min / avg / max) | 80 / 80.3 / 96 |
 | High-score indicators (≥80) | 10000 |
-| 2+ reporting groups | 381 |
+| 2+ reporting groups | 382 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-16T08:41:37Z |
+| Newest first_seen | 2026-10-16T15:57:34Z |
 
 ## Top indicators by score
 
@@ -29,36 +29,36 @@ _Generated 2026-10-16T08:42:44Z_
 | ipv4: `165[.]154[.]162[.]74` | score 96, 3 reporting groups |
 | ipv4: `165[.]154[.]227[.]8` | score 96, 3 reporting groups |
 | ipv4: `165[.]245[.]160[.]178` | score 96, 3 reporting groups |
-| ipv4: `165[.]245[.]171[.]220` | score 96, 3 reporting groups |
 | ipv4: `31[.]59[.]220[.]26` | score 96, 3 reporting groups |
 | ipv4: `45[.]198[.]224[.]184` | score 96, 3 reporting groups |
 | ipv4: `45[.]78[.]201[.]248` | score 96, 3 reporting groups |
+| ipv4: `91[.]92[.]43[.]221` | score 96, 3 reporting groups |
 
 ## Per-source totals
 
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| greensnow_blocklist | 5028 |
 | ipsum_level5 | 4457 |
-| blocklist_de_ssh | 4274 |
-| threatfox_export_json | 4033 |
-| nist_nvd_recent | 3200 |
+| threatfox_export_json | 4410 |
+| greensnow_blocklist | 4285 |
+| blocklist_de_ssh | 4268 |
+| nist_nvd_recent | 2200 |
 | cisa_kev | 1746 |
-| spamhaus_drop | 1690 |
-| tor_exit_nodes | 1214 |
-| malwarebazaar_recent | 1038 |
+| spamhaus_drop | 1691 |
+| tor_exit_nodes | 1207 |
+| malwarebazaar_recent | 796 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3021 |
-| url | 2462 |
-| ipv4_cidr | 1689 |
-| sha256 | 1654 |
-| domain | 416 |
-| ipv4 | 308 |
+| cve | 2624 |
+| url | 2520 |
+| sha256 | 1966 |
+| ipv4_cidr | 1667 |
+| domain | 437 |
+| ipv4 | 336 |
 | md5 | 225 |
 | sha1 | 225 |
 
@@ -66,16 +66,16 @@ _Generated 2026-10-16T08:42:44Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3970 |
-| cve | 3021 |
+| threatfox | 4338 |
+| cve | 2624 |
 | exploited-in-the-wild | 1746 |
-| drop | 1689 |
-| spamhaus | 1689 |
-| malware | 1632 |
-| nvd | 1628 |
-| c2 | 1529 |
-| Vidar | 1425 |
-| stealer | 1417 |
+| malware | 1684 |
+| drop | 1667 |
+| spamhaus | 1667 |
+| c2 | 1495 |
+| stealer | 1407 |
+| Vidar | 1405 |
+| loader | 1390 |
 
 ## Multi-group reporting overlaps
 
