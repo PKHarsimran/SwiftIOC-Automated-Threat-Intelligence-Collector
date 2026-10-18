@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-10-18T02:43:59Z_
+_Generated 2026-10-18T08:29:55Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-18T02:43:59Z |
+| Generated | 2026-10-18T08:29:55Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6683 |
+| Duplicates removed | 6446 |
 | Sources reporting | 17 |
-| Indicator types | 9 |
-| Multi-group overlaps | 385 |
+| Indicator types | 8 |
+| Multi-group overlaps | 386 |
 | Score (min / avg / max) | 80 / 80.3 / 96 |
 | High-score indicators (≥80) | 10000 |
-| 2+ reporting groups | 385 |
+| 2+ reporting groups | 386 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-18T02:35:48Z |
+| Newest first_seen | 2026-10-18T08:24:41Z |
 
 ## Top indicators by score
 
@@ -40,43 +40,42 @@ _Generated 2026-10-18T02:43:59Z_
 | --- | ---: |
 | ci_army_list | 15000 |
 | ipsum_level5 | 4946 |
-| greensnow_blocklist | 4872 |
-| blocklist_de_ssh | 4485 |
-| threatfox_export_json | 3365 |
-| nist_nvd_recent | 2400 |
+| greensnow_blocklist | 4842 |
+| blocklist_de_ssh | 4427 |
+| threatfox_export_json | 3155 |
+| nist_nvd_recent | 2800 |
 | cisa_kev | 1748 |
 | spamhaus_drop | 1692 |
-| tor_exit_nodes | 1209 |
-| malwarebazaar_recent | 797 |
+| tor_exit_nodes | 1211 |
+| malwarebazaar_recent | 901 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3174 |
-| sha256 | 2567 |
-| ipv4_cidr | 1691 |
-| url | 1395 |
-| domain | 483 |
-| ipv4 | 257 |
-| md5 | 216 |
-| sha1 | 216 |
-| ja3 | 1 |
+| cve | 3087 |
+| sha256 | 2715 |
+| ipv4_cidr | 1645 |
+| url | 1362 |
+| domain | 501 |
+| md5 | 234 |
+| sha1 | 234 |
+| ipv4 | 222 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3910 |
-| cve | 3174 |
-| nvd | 1782 |
+| threatfox | 3870 |
+| cve | 3087 |
+| malware | 1881 |
 | exploited-in-the-wild | 1748 |
-| drop | 1691 |
-| spamhaus | 1691 |
-| malware | 1642 |
-| elf | 1213 |
-| Mirai | 989 |
-| ClickFix | 768 |
+| nvd | 1695 |
+| drop | 1645 |
+| spamhaus | 1645 |
+| elf | 1228 |
+| Mirai | 1060 |
+| ClickFix | 792 |
 
 ## Multi-group reporting overlaps
 
