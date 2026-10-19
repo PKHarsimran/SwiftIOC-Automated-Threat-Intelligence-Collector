@@ -1,15 +1,15 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-10-19T18:14:31Z_
+_Generated 2026-10-19T23:16:07Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-19T18:14:31Z |
+| Generated | 2026-10-19T23:16:07Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6418 |
+| Duplicates removed | 6901 |
 | Sources reporting | 17 |
 | Indicator types | 9 |
 | Multi-group overlaps | 383 |
@@ -17,7 +17,7 @@ _Generated 2026-10-19T18:14:31Z_
 | High-score indicators (≥80) | 10000 |
 | 2+ reporting groups | 383 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-19T18:14:12Z |
+| Newest first_seen | 2026-10-19T23:05:48Z |
 
 ## Top indicators by score
 
@@ -40,43 +40,43 @@ _Generated 2026-10-19T18:14:31Z_
 | --- | ---: |
 | ci_army_list | 15000 |
 | ipsum_level5 | 5306 |
-| blocklist_de_ssh | 5085 |
-| greensnow_blocklist | 4305 |
-| nist_nvd_recent | 2800 |
-| threatfox_export_json | 2691 |
+| blocklist_de_ssh | 5267 |
+| greensnow_blocklist | 5127 |
+| threatfox_export_json | 2577 |
+| nist_nvd_recent | 2200 |
 | cisa_kev | 1748 |
 | spamhaus_drop | 1693 |
-| tor_exit_nodes | 1201 |
-| malwarebazaar_recent | 1130 |
+| tor_exit_nodes | 1208 |
+| malwarebazaar_recent | 1174 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 2972 |
-| sha256 | 2899 |
+| sha256 | 3045 |
+| cve | 2942 |
 | ipv4_cidr | 1692 |
-| url | 1292 |
-| domain | 669 |
-| ipv4 | 224 |
-| md5 | 126 |
+| url | 1244 |
+| domain | 555 |
+| ipv4 | 231 |
+| md5 | 127 |
 | sha1 | 125 |
-| ja3 | 1 |
+| ja3 | 39 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3540 |
-| cve | 2972 |
-| malware | 2268 |
+| threatfox | 3445 |
+| cve | 2942 |
+| malware | 2364 |
 | exploited-in-the-wild | 1748 |
 | drop | 1692 |
 | spamhaus | 1692 |
-| nvd | 1580 |
-| Mirai | 1131 |
-| elf | 1037 |
-| ClickFix | 778 |
+| nvd | 1550 |
+| Mirai | 1159 |
+| elf | 1047 |
+| ClickFix | 656 |
 
 ## Multi-group reporting overlaps
 
