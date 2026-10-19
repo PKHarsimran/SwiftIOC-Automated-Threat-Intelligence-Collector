@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-10-19T09:31:42Z_
+_Generated 2026-10-19T18:14:31Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-19T09:31:42Z |
+| Generated | 2026-10-19T18:14:31Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6619 |
+| Duplicates removed | 6418 |
 | Sources reporting | 17 |
-| Indicator types | 8 |
-| Multi-group overlaps | 382 |
+| Indicator types | 9 |
+| Multi-group overlaps | 383 |
 | Score (min / avg / max) | 80 / 80.3 / 96 |
 | High-score indicators (≥80) | 10000 |
-| 2+ reporting groups | 382 |
+| 2+ reporting groups | 383 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-19T09:24:31Z |
+| Newest first_seen | 2026-10-19T18:14:12Z |
 
 ## Top indicators by score
 
@@ -40,42 +40,43 @@ _Generated 2026-10-19T09:31:42Z_
 | --- | ---: |
 | ci_army_list | 15000 |
 | ipsum_level5 | 5306 |
-| greensnow_blocklist | 4462 |
-| blocklist_de_ssh | 4185 |
-| nist_nvd_recent | 3600 |
-| threatfox_export_json | 3021 |
+| blocklist_de_ssh | 5085 |
+| greensnow_blocklist | 4305 |
+| nist_nvd_recent | 2800 |
+| threatfox_export_json | 2691 |
 | cisa_kev | 1748 |
-| spamhaus_drop | 1692 |
-| tor_exit_nodes | 1203 |
+| spamhaus_drop | 1693 |
+| tor_exit_nodes | 1201 |
 | malwarebazaar_recent | 1130 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 2813 |
-| cve | 2684 |
-| ipv4_cidr | 1691 |
-| url | 1465 |
-| domain | 798 |
-| ipv4 | 217 |
-| md5 | 166 |
-| sha1 | 166 |
+| cve | 2972 |
+| sha256 | 2899 |
+| ipv4_cidr | 1692 |
+| url | 1292 |
+| domain | 669 |
+| ipv4 | 224 |
+| md5 | 126 |
+| sha1 | 125 |
+| ja3 | 1 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3809 |
-| cve | 2684 |
-| malware | 2330 |
+| threatfox | 3540 |
+| cve | 2972 |
+| malware | 2268 |
 | exploited-in-the-wild | 1748 |
-| drop | 1691 |
-| spamhaus | 1691 |
-| nvd | 1292 |
-| Mirai | 1106 |
-| elf | 1097 |
-| ClickFix | 973 |
+| drop | 1692 |
+| spamhaus | 1692 |
+| nvd | 1580 |
+| Mirai | 1131 |
+| elf | 1037 |
+| ClickFix | 778 |
 
 ## Multi-group reporting overlaps
 
