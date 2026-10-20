@@ -1,15 +1,15 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-10-20T16:19:59Z_
+_Generated 2026-10-20T22:53:40Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-20T16:19:59Z |
+| Generated | 2026-10-20T22:53:40Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 7387 |
+| Duplicates removed | 7357 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-group overlaps | 393 |
@@ -17,7 +17,7 @@ _Generated 2026-10-20T16:19:59Z_
 | High-score indicators (≥80) | 10000 |
 | 2+ reporting groups | 393 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-20T16:14:11Z |
+| Newest first_seen | 2026-10-20T22:53:22Z |
 
 ## Top indicators by score
 
@@ -39,26 +39,26 @@ _Generated 2026-10-20T16:19:59Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| nist_nvd_recent | 9926 |
 | ipsum_level5 | 5407 |
-| blocklist_de_ssh | 5201 |
-| greensnow_blocklist | 4814 |
-| threatfox_export_json | 2717 |
-| cisa_kev | 1748 |
+| blocklist_de_ssh | 5350 |
+| greensnow_blocklist | 4729 |
+| threatfox_export_json | 2867 |
+| nist_nvd_recent | 2000 |
+| cisa_kev | 1754 |
 | spamhaus_drop | 1687 |
 | binarydefense_banlist | 1465 |
-| malwarebazaar_recent | 1380 |
+| malwarebazaar_recent | 1435 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3138 |
-| sha256 | 2806 |
-| url | 1668 |
-| ipv4_cidr | 1576 |
-| domain | 224 |
-| ipv4 | 224 |
+| cve | 3144 |
+| sha256 | 2789 |
+| url | 1648 |
+| ipv4_cidr | 1588 |
+| ipv4 | 235 |
+| domain | 232 |
 | md5 | 183 |
 | sha1 | 181 |
 
@@ -66,16 +66,16 @@ _Generated 2026-10-20T16:19:59Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3164 |
-| cve | 3138 |
-| malware | 2947 |
+| threatfox | 3224 |
+| cve | 3144 |
+| malware | 2875 |
 | nvd | 1756 |
-| exploited-in-the-wild | 1748 |
-| drop | 1576 |
-| spamhaus | 1576 |
-| Mirai | 827 |
-| malware_download | 762 |
-| elf | 647 |
+| exploited-in-the-wild | 1754 |
+| drop | 1588 |
+| spamhaus | 1588 |
+| Mirai | 815 |
+| malware_download | 706 |
+| vidar | 634 |
 
 ## Multi-group reporting overlaps
 
