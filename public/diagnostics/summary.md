@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-10-21T03:01:47Z_
+_Generated 2026-10-21T09:04:31Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-21T03:01:47Z |
+| Generated | 2026-10-21T09:04:31Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 7509 |
-| Sources reporting | 16 |
+| Duplicates removed | 7355 |
+| Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-group overlaps | 393 |
+| Multi-group overlaps | 395 |
 | Score (min / avg / max) | 80 / 80.3 / 96 |
 | High-score indicators (≥80) | 10000 |
-| 2+ reporting groups | 393 |
+| 2+ reporting groups | 395 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-21T03:01:07Z |
+| Newest first_seen | 2026-10-21T09:03:40Z |
 
 ## Top indicators by score
 
@@ -39,26 +39,26 @@ _Generated 2026-10-21T03:01:47Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| greensnow_blocklist | 5506 |
-| blocklist_de_ssh | 5376 |
+| greensnow_blocklist | 5531 |
+| blocklist_de_ssh | 5420 |
 | ipsum_level5 | 5316 |
-| threatfox_export_json | 3025 |
+| threatfox_export_json | 3713 |
 | cisa_kev | 1754 |
 | spamhaus_drop | 1687 |
-| malwarebazaar_recent | 1542 |
-| tor_exit_nodes | 1208 |
-| urlhaus_recent_urls | 678 |
+| malwarebazaar_recent | 1441 |
+| tor_exit_nodes | 1223 |
+| urlhaus_recent_urls | 741 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3144 |
-| sha256 | 2728 |
-| ipv4_cidr | 1661 |
-| url | 1641 |
-| domain | 321 |
-| ipv4 | 247 |
+| cve | 3090 |
+| sha256 | 3071 |
+| url | 1769 |
+| domain | 1037 |
+| ipv4_cidr | 511 |
+| ipv4 | 264 |
 | md5 | 130 |
 | sha1 | 128 |
 
@@ -66,16 +66,16 @@ _Generated 2026-10-21T03:01:47Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3222 |
-| cve | 3144 |
-| malware | 2802 |
-| nvd | 1756 |
+| threatfox | 4137 |
+| malware | 3139 |
+| cve | 3090 |
 | exploited-in-the-wild | 1754 |
-| drop | 1661 |
-| spamhaus | 1661 |
-| Mirai | 763 |
-| malware_download | 685 |
-| vidar | 635 |
+| nvd | 1702 |
+| ClickFix | 1169 |
+| Mirai | 800 |
+| etherhiding | 794 |
+| malware_download | 744 |
+| vidar | 667 |
 
 ## Multi-group reporting overlaps
 
