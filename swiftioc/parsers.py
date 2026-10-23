@@ -296,7 +296,7 @@ def fetch_urlhaus_csv(
 ) -> List[Indicator]:
     if auth_key_env:
         url = _abusech_export_url(url, auth_key_env, source)
-    text = ensure_text(_pkg.http_get(url, name=source, **({"redact_url": True} if auth_key_env else {})))
+    text = ensure_text(_pkg.http_get(url, name=source, redact_url=bool(auth_key_env)))
     out: List[Indicator] = []
     now = now_utc()
     for row in csv.reader(io.StringIO(text)):
@@ -345,7 +345,7 @@ def fetch_malwarebazaar_csv(
     if auth_key_env:
         url = _abusech_export_url(url, auth_key_env, source)
     try:
-        text = ensure_text(_pkg.http_get(url, name=source, **({"redact_url": True} if auth_key_env else {})))
+        text = ensure_text(_pkg.http_get(url, name=source, redact_url=bool(auth_key_env)))
     except Exception as e:
         if not isinstance(e, requests.exceptions.HTTPError):
             raise
