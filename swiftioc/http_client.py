@@ -180,8 +180,9 @@ def _read_capped(r: requests.Response, max_bytes: int) -> bytes:
     return b"".join(chunks)
 
 
-def http_get(
+def _http_get_impl(
     url: str, *, name: str, kind: str = "text", timeout: int = 20, headers: Optional[Dict[str, str]] = None,
+    redact_url: bool = False,
 ) -> str | bytes:
     s = ensure_session()
     request_headers = choose_ua()
@@ -198,12 +199,14 @@ def http_get(
         if not location or hops > MAX_REDIRECTS:
             raise requests.exceptions.TooManyRedirects(f"Exceeded {MAX_REDIRECTS} redirects fetching {url!r}")
         next_url = urljoin(current_url, location)
+        if redact_url and _origin(next_url) != _origin(current_url):
+            raise requests.exceptions.RequestException("Authenticated export redirected to another origin")
         if _origin(next_url) != _origin(current_url):
             # A redirect is untrusted until its target is validated. Never
             # forward credentials (for example an NVD API key) to another
             # origin, even when that host resolves to a public address.
             for key in list(request_headers):
-                if key.lower() in {"apikey", "authorization", "cookie", "proxy-authorization"}:
+                if key.lower() in {"apikey", "auth-key", "x-api-key", "authorization", "cookie", "proxy-authorization"}:
                     del request_headers[key]
         current_url = next_url
         _validate_redirect_target(current_url)
@@ -223,10 +226,58 @@ def http_get(
         "requests": previous.get("requests", 0) + 1,
     }
     if HTTP_DEBUG:
-        logger.debug("HTTP %s %.2fs %s [%s]", r.status_code, dt, current_url, name)
+        logger.debug("HTTP %s %.2fs %s [%s]", r.status_code, dt,
+                     "[authenticated export]" if redact_url else current_url, name)
     r.raise_for_status()
     body: str | bytes = raw.decode(r.encoding or "utf-8", errors="replace") if kind == "text" else raw
     save_raw(name, body, kind)
+    return body
+
+
+def http_get(
+    url: str, *, name: str, kind: str = "text", timeout: int = 20, headers: Optional[Dict[str, str]] = None,
+    redact_url: bool = False,
+) -> str | bytes:
+    """Fetch a feed; redact credential-bearing export URLs from failures and logs."""
+    try:
+        return _http_get_impl(url, name=name, kind=kind, timeout=timeout,
+                              headers=headers, redact_url=redact_url)
+    except requests.exceptions.RequestException as exc:
+        if not redact_url:
+            raise
+        response = getattr(exc, "response", None)
+        status = getattr(response, "status_code", None)
+        detail = f"HTTP {status}" if status is not None else type(exc).__name__
+        raise requests.exceptions.RequestException(f"{name} authenticated export failed ({detail})") from None
+
+
+def http_post_json(
+    url: str, *, name: str, payload: Dict[str, Any], headers: Optional[Dict[str, str]] = None,
+    timeout: int = 20,
+) -> str:
+    """POST a JSON API query with capped response and feed-health telemetry."""
+    request_headers = choose_ua()
+    request_headers.update(headers or {})
+    t0 = time.perf_counter()
+    r = ensure_session().post(url, json=payload, headers=request_headers, timeout=timeout,
+                              stream=True, allow_redirects=False)
+    if r.is_redirect or r.is_permanent_redirect:
+        r.close()
+        raise requests.exceptions.RequestException(f"{name} API redirected unexpectedly")
+    raw = _read_capped(r, MAX_RESPONSE_BYTES)
+    dt = time.perf_counter() - t0
+    previous = _FETCH_METRICS.get(name, {})
+    _FETCH_METRICS[name] = {
+        "ms": previous.get("ms", 0) + round(dt * 1000),
+        "bytes": previous.get("bytes", 0) + len(raw),
+        "status": r.status_code,
+        "requests": previous.get("requests", 0) + 1,
+    }
+    if HTTP_DEBUG:
+        logger.debug("HTTP %s %.2fs %s [%s]", r.status_code, dt, url, name)
+    r.raise_for_status()
+    body = raw.decode(r.encoding or "utf-8", errors="replace")
+    save_raw(name, body, "text")
     return body
 
 

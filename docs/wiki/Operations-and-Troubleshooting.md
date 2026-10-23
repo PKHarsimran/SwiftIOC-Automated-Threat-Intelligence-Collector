@@ -49,6 +49,7 @@ On quality rejection, the command exits with code 1 without replacing feed expor
 | Dashboard unavailable locally | HTTP server URL and directory; browser errors. | Serve `public/` over HTTP and generate data. |
 | CVEs missing after clone | Generated collections may be ignored by Git. | Run collector; inspect source failures. |
 | Source returns zero | HTTP status, authentication, parser format, time window. | Fix cause; rerun with an appropriate window. |
+| abuse.ch exports fail or the collector reports `ABUSECH_AUTH_KEY` missing | Check that a free abuse.ch Auth-Key is stored under that exact repository-secret name; `RANSOMWARE_LIVE_API_KEY` is unrelated. | Add the secret, then rerun Collect. Keep the non-empty publication gates enabled so a missing feed cannot replace the last good snapshot. |
 | Lower retained count | Filter omissions, score expiry, age and storage caps. | Separate ingestion count from retained count before adjusting limits. |
 | Quality check rejects | Attempt report and previous published counts. | Investigate source/config change; preserve baseline. |
 | Delta empty on first run | `baseline_available`. | Expected: establish a baseline without an alert flood. |

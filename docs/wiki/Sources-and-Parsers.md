@@ -21,6 +21,8 @@ apis:
 
 `name` is the stable source identifier used in provenance and source-specific CLI rules. `parse` selects an adapter. `reference` points analysts back to supporting evidence. `options` passes adapter-specific settings. The optional NVD setting reads an environment variable; do not commit the actual key.
 
+URLhaus and MalwareBazaar use abuse.ch authenticated `recent.csv` exports; ThreatFox uses its `get_iocs` API. Set `ABUSECH_AUTH_KEY` in the environment (a GitHub Actions repository secret for scheduled runs). The CSV URLs contain a literal `{auth_key}` placeholder that the adapter fills at request time; never replace it with the actual key in YAML. The collector redacts authenticated export URLs in HTTP diagnostics and errors. The ThreatFox query asks for enough days to cover the configured lookback, up to its seven-day API limit, then applies the exact local window.
+
 ## Sources have different meanings
 
 | Family | Typical evidence | Interpretation |

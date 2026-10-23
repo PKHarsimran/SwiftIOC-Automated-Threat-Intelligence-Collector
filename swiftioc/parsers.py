@@ -18,11 +18,13 @@ from __future__ import annotations
 import csv
 import io
 import json
+import math
 import os
 import re
 from datetime import datetime, timedelta
 from importlib import import_module
 from typing import Any, Callable, Dict, Iterable, List, Optional, Set, Tuple
+from urllib.parse import quote
 
 import requests
 
@@ -46,6 +48,19 @@ from .models import (
 
 
 # ---------------- parser registry ----------------
+def _abusech_auth_key(env_name: str, source: str) -> str:
+    key = os.environ.get(env_name, "").strip()
+    if not key:
+        raise ValueError(f"{source} requires the {env_name} environment variable")
+    return key
+
+
+def _abusech_export_url(url: str, env_name: str, source: str) -> str:
+    if "{auth_key}" not in url:
+        raise ValueError(f"{source} authenticated export URL lacks {{auth_key}} placeholder")
+    return url.replace("{auth_key}", quote(_abusech_auth_key(env_name, source), safe=""))
+
+
 ParserFunc = Callable[..., List["Indicator"]]
 
 
@@ -275,8 +290,13 @@ def fetch_nvd_recent(url: str, ref_url: str, source: str, ws: datetime, *, api_k
 
 
 @register_parser("urlhaus")
-def fetch_urlhaus_csv(url: str, ref_url: str, source: str, ws: datetime, *, status_filter: str = "any") -> List[Indicator]:
-    text = ensure_text(_pkg.http_get(url, name=source))
+def fetch_urlhaus_csv(
+    url: str, ref_url: str, source: str, ws: datetime, *, status_filter: str = "any",
+    auth_key_env: Optional[str] = None,
+) -> List[Indicator]:
+    if auth_key_env:
+        url = _abusech_export_url(url, auth_key_env, source)
+    text = ensure_text(_pkg.http_get(url, name=source, **({"redact_url": True} if auth_key_env else {})))
     out: List[Indicator] = []
     now = now_utc()
     for row in csv.reader(io.StringIO(text)):
@@ -320,19 +340,24 @@ def fetch_malwarebazaar_csv(
     *,
     fallback_url: Optional[str] = None,
     graceful_404: bool = False,
+    auth_key_env: Optional[str] = None,
 ) -> List[Indicator]:
+    if auth_key_env:
+        url = _abusech_export_url(url, auth_key_env, source)
     try:
-        text = ensure_text(_pkg.http_get(url, name=source))
+        text = ensure_text(_pkg.http_get(url, name=source, **({"redact_url": True} if auth_key_env else {})))
     except Exception as e:
         if not isinstance(e, requests.exceptions.HTTPError):
             raise
         resp = getattr(e, "response", None)
         status = getattr(resp, "status_code", None)
         if resp is not None and status == 404 and fallback_url:
-            logger.warning("%s 404, falling back to %s", url, fallback_url)
+            logger.warning("%s 404, falling back to %s",
+                           "[authenticated export]" if auth_key_env else url, fallback_url)
             text = ensure_text(_pkg.http_get(fallback_url, name=f"{source}_fallback"))
         elif resp is not None and status == 404 and graceful_404:
-            logger.warning("%s 404, treating as empty due to --grace-on-404", url)
+            logger.warning("%s 404, treating as empty due to --grace-on-404",
+                           "[authenticated export]" if auth_key_env else url)
             return []
         else:
             raise
@@ -372,9 +397,24 @@ def fetch_malwarebazaar_csv(
 
 
 @register_parser("threatfox_recent", "threatfox_export_json")
-def fetch_threatfox_export_json(url: str, ref_url: str, source: str, ws: datetime) -> List[Indicator]:
-    text = ensure_text(_pkg.http_get(url, name=source))
+def fetch_threatfox_export_json(
+    url: str, ref_url: str, source: str, ws: datetime, *, auth_key_env: Optional[str] = None,
+) -> List[Indicator]:
+    if auth_key_env:
+        key = _abusech_auth_key(auth_key_env, source)
+        lookback_days = max(0, (now_utc() - ws).total_seconds() / 86400)
+        if lookback_days > 7:
+            raise ValueError(f"{source} API supports a maximum seven-day lookback")
+        days = max(1, min(7, math.ceil(lookback_days) + 1))
+        text = ensure_text(_pkg.http_post_json(
+            url, name=source, payload={"query": "get_iocs", "days": days},
+            headers={"Auth-Key": key},
+        ))
+    else:
+        text = ensure_text(_pkg.http_get(url, name=source))
     raw = json.loads(text)
+    if auth_key_env and isinstance(raw, dict) and raw.get("query_status") not in {"ok", "no_result", "no_results"}:
+        raise ValueError(f"{source} API returned {raw.get('query_status', 'no status')!r}")
     data: List[Dict[str, Any]]
     if isinstance(raw, dict):
         if isinstance(raw.get("data"), list):

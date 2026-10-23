@@ -129,8 +129,14 @@ jobs:
         env:
           WINDOW_HOURS: ${{ github.event.inputs.window_hours || '48' }}
           URLHAUS_STATUS: ${{ github.event.inputs.urlhaus_status || 'online' }}
+          ABUSECH_AUTH_KEY: ${{ secrets.ABUSECH_AUTH_KEY }}
         run: |
           set -Eeuo pipefail
+
+          if [[ -z "$ABUSECH_AUTH_KEY" ]]; then
+            echo "::error::Missing ABUSECH_AUTH_KEY repository secret; authenticated abuse.ch exports cannot run."
+            exit 1
+          fi
 
           # --persist-feed makes this a living feed: the latest.jsonl committed
           # by the previous run (checked out above) is merged in, re-observed

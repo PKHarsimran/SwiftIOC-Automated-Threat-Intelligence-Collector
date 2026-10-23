@@ -19,20 +19,26 @@ apis:
   - name: urlhaus_recent_urls
     kind: csv
     parse: urlhaus
-    url: https://urlhaus.abuse.ch/downloads/csv_recent/
+    url: https://urlhaus-api.abuse.ch/v2/files/exports/{auth_key}/recent.csv
     reference: https://urlhaus.abuse.ch/
+    options:
+      auth_key_env: ABUSECH_AUTH_KEY
 
   - name: malwarebazaar_recent
     kind: csv
     parse: malwarebazaar
-    url: https://bazaar.abuse.ch/export/csv/recent/
+    url: https://mb-api.abuse.ch/v2/files/exports/{auth_key}/recent.csv
     reference: https://bazaar.abuse.ch/
+    options:
+      auth_key_env: ABUSECH_AUTH_KEY
 
   - name: threatfox_export_json
     kind: json
     parse: threatfox_export_json
-    url: https://threatfox.abuse.ch/export/json/recent/
+    url: https://threatfox-api.abuse.ch/api/v1/
     reference: https://threatfox.abuse.ch/browse/
+    options:
+      auth_key_env: ABUSECH_AUTH_KEY
 
   - name: feodo_ipblocklist
     kind: csv

@@ -59,6 +59,7 @@ from .http_client import (
     ensure_text,
     get_fetch_metrics,
     http_get,
+    http_post_json,
     load_feedparser,
     reset_fetch_metrics,
     save_raw,
@@ -154,7 +155,7 @@ __all__ = [
     # extraction
     "extract_indicators_from_text",
     # http
-    "http_get", "ensure_text", "ensure_session", "build_session",
+    "http_get", "http_post_json", "ensure_text", "ensure_session", "build_session",
     "choose_ua", "save_raw", "load_feedparser", "UA_POOL", "DEFAULT_UAS",
     "reset_fetch_metrics", "get_fetch_metrics",
     # scoring

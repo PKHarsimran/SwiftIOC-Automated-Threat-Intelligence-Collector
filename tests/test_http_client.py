@@ -41,7 +41,7 @@ class FakeSession:
         self.calls = []
 
     def get(self, url, headers=None, timeout=None, stream=None, allow_redirects=None):
-        self.calls.append((url, headers))
+        self.calls.append((url, dict(headers or {})))
         return self._responses.pop(0)
 
 
@@ -69,6 +69,26 @@ def test_http_get_returns_body_on_success(monkeypatch):
     assert hc.http_get("http://feed.example/x", name="src") == "hello world"
 
 
+def test_authenticated_export_redacts_url_from_logs_and_errors(monkeypatch, caplog):
+    secret = "very-private-key"
+    url = f"https://urlhaus-api.abuse.ch/v2/files/exports/{secret}/recent.csv"
+
+    class LeakyResponse(FakeResponse):
+        def raise_for_status(self):
+            raise requests.exceptions.HTTPError(f"410 Gone for {url}", response=self)
+
+    _use_fake_session(monkeypatch, [LeakyResponse(status_code=410)])
+    monkeypatch.setattr(hc, "HTTP_DEBUG", True)
+    with caplog.at_level("DEBUG", logger="swiftioc"):
+        try:
+            hc.http_get(url, name="urlhaus", redact_url=True)
+            assert False, "expected failure"
+        except requests.exceptions.RequestException as exc:
+            assert "HTTP 410" in str(exc)
+            assert secret not in str(exc)
+    assert secret not in caplog.text
+
+
 def test_http_get_latency_includes_streamed_body(monkeypatch):
     clock = [10.0]
 
@@ -94,6 +114,35 @@ def test_http_get_allows_parser_specific_headers(monkeypatch):
     fake = _use_fake_session(monkeypatch, [FakeResponse(body=b"ok")])
     hc.http_get("http://feed.example/x", name="src", headers={"apiKey": "test-key"})
     assert fake.calls[0][1]["apiKey"] == "test-key"
+
+
+def test_http_get_drops_abusech_key_on_cross_origin_redirect(monkeypatch):
+    fake = _use_fake_session(monkeypatch, [
+        FakeResponse(status_code=302, headers={"Location": "https://93.184.216.34/next"}, is_redirect=True),
+        FakeResponse(body=b"ok"),
+    ])
+    hc.http_get("https://feed.example/x", name="src", headers={"Auth-Key": "private-key"})
+    assert fake.calls[0][1]["Auth-Key"] == "private-key"
+    assert "Auth-Key" not in fake.calls[1][1]
+
+
+def test_http_post_json_records_metrics_without_logging_auth_header(monkeypatch, caplog):
+    class PostSession:
+        def post(self, url, **kwargs):
+            assert kwargs["headers"]["Auth-Key"] == "private-key"
+            assert kwargs["json"] == {"query": "get_iocs", "days": 2}
+            assert kwargs["allow_redirects"] is False
+            return FakeResponse(body=b'{"query_status":"ok","data":[]}')
+
+    monkeypatch.setattr(hc, "ensure_session", lambda: PostSession())
+    monkeypatch.setattr(hc, "HTTP_DEBUG", True)
+    hc.reset_fetch_metrics()
+    with caplog.at_level("DEBUG", logger="swiftioc"):
+        body = hc.http_post_json("https://threatfox-api.abuse.ch/api/v1/", name="tf",
+                                 payload={"query": "get_iocs", "days": 2}, headers={"Auth-Key": "private-key"})
+    assert '"query_status":"ok"' in body
+    assert hc.get_fetch_metrics()["tf"]["status"] == 200
+    assert "private-key" not in caplog.text
 
 
 def test_http_get_rejects_oversized_content_length(monkeypatch):
