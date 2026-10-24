@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-10-23T22:52:00Z_
+_Generated 2026-10-24T03:02:59Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-23T22:52:00Z |
+| Generated | 2026-10-24T03:02:59Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6675 |
+| Duplicates removed | 5139 |
 | Sources reporting | 16 |
 | Indicator types | 8 |
-| Multi-group overlaps | 399 |
+| Multi-group overlaps | 400 |
 | Score (min / avg / max) | 80 / 80.3 / 96 |
 | High-score indicators (≥80) | 10000 |
-| 2+ reporting groups | 399 |
+| 2+ reporting groups | 400 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-23T22:41:21Z |
+| Newest first_seen | 2026-10-24T02:55:02Z |
 
 ## Top indicators by score
 
@@ -41,26 +41,26 @@ _Generated 2026-10-23T22:52:00Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| urlhaus_recent_urls | 13781 |
-| ipsum_level5 | 5475 |
-| blocklist_de_ssh | 4896 |
-| greensnow_blocklist | 4558 |
-| nist_nvd_recent | 4200 |
-| threatfox_export_json | 3287 |
+| urlhaus_recent_urls | 13736 |
+| nist_nvd_recent | 6600 |
+| ipsum_level5 | 5289 |
+| blocklist_de_ssh | 4922 |
+| threatfox_export_json | 3156 |
 | cisa_kev | 1756 |
 | spamhaus_drop | 1688 |
 | tor_exit_nodes | 1218 |
+| binarydefense_banlist | 1145 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| url | 5670 |
+| url | 5577 |
 | cve | 1756 |
 | ipv4_cidr | 1687 |
-| sha256 | 490 |
-| domain | 161 |
-| ipv4 | 131 |
+| sha256 | 566 |
+| domain | 170 |
+| ipv4 | 139 |
 | md5 | 53 |
 | sha1 | 52 |
 
@@ -68,16 +68,16 @@ _Generated 2026-10-23T22:52:00Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 5798 |
-| malware_download | 5525 |
-| zip | 5344 |
-| github | 5336 |
-| SmartLoader | 5215 |
+| malware | 5736 |
+| malware_download | 5424 |
+| zip | 5224 |
+| github | 5214 |
+| SmartLoader | 5108 |
 | cve | 1756 |
 | exploited-in-the-wild | 1756 |
 | drop | 1687 |
 | spamhaus | 1687 |
-| threatfox | 817 |
+| threatfox | 916 |
 
 ## Multi-group reporting overlaps
 
