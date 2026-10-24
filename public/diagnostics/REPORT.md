@@ -4,19 +4,19 @@
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-24T03:02:59Z |
+| Generated | 2026-10-24T08:35:17Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 5139 |
-| Carried forward | 39 |
+| Duplicates removed | 7260 |
+| Carried forward | 42 |
 | Expired (score < 20) | 0 |
 | Aged out (> 30d) | 0 |
-| Pruned over cap (10000) | 41318 |
+| Pruned over cap (10000) | 53258 |
 | Stored | 10000 |
 | Score (min / avg / max) | 80 / 80.3 / 96 |
 | High-confidence indicators | 10000 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-24T02:55:02Z |
+| Newest first_seen | 2026-10-24T08:33:19Z |
 
 ## Per-source coverage
 
@@ -25,37 +25,30 @@ Collected means records returned in the configured window, not a guarantee of co
 | Source | Indicators | State |
 | --- | ---: | --- |
 | binarydefense_banlist | 1145 | collected |
-| blocklist_de_ssh | 4922 | collected |
+| blocklist_de_ssh | 4794 | collected |
 | ci_army_list | 15000 | collected |
 | cisa_kev | 1756 | collected |
 | dshield_block | 20 | collected |
 | et_compromised | 482 | collected |
 | feodo_ipblocklist | 5 | collected |
-| greensnow_blocklist | 0 | failed |
+| greensnow_blocklist | 5301 | collected |
 | ipsum_level5 | 5289 | collected |
-| malwarebazaar_recent | 1004 | collected |
-| nist_nvd_recent | 6600 | collected |
+| malwarebazaar_recent | 844 | collected |
+| nist_nvd_recent | 2800 | collected |
 | openphish_feed | 300 | collected |
 | spamhaus_drop | 1688 | collected |
 | sslbl_ja3 | 97 | collected |
-| threatfox_export_json | 3156 | collected |
-| tor_exit_nodes | 1218 | collected |
-| urlhaus_recent_urls | 13736 | collected |
+| threatfox_export_json | 2985 | collected |
+| tor_exit_nodes | 1217 | collected |
+| urlhaus_recent_urls | 26753 | collected |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| url | 5577 |
+| url | 8126 |
 | cve | 1756 |
-| ipv4_cidr | 1687 |
-| sha256 | 566 |
-| domain | 170 |
-| ipv4 | 139 |
-| md5 | 53 |
-| sha1 | 52 |
-
-## Issues
-
-- ⚠️ **greensnow_blocklist**: 503 Server Error: Service Unavailable for url: https://blocklist.greensnow.co/greensnow.txt
-- ⚠️ **greensnow_blocklist** returned zero indicators
+| sha256 | 45 |
+| ipv4 | 41 |
+| domain | 19 |
+| ipv4_cidr | 13 |

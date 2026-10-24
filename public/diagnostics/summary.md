@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-10-24T03:02:59Z_
+_Generated 2026-10-24T08:35:17Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-24T03:02:59Z |
+| Generated | 2026-10-24T08:35:17Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 5139 |
-| Sources reporting | 16 |
-| Indicator types | 8 |
+| Duplicates removed | 7260 |
+| Sources reporting | 17 |
+| Indicator types | 6 |
 | Multi-group overlaps | 400 |
 | Score (min / avg / max) | 80 / 80.3 / 96 |
 | High-score indicators (≥80) | 10000 |
 | 2+ reporting groups | 400 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-24T02:55:02Z |
+| Newest first_seen | 2026-10-24T08:33:19Z |
 
 ## Top indicators by score
 
@@ -38,44 +38,42 @@ _Generated 2026-10-24T03:02:59Z_
 
 | Source | Indicators |
 | --- | ---: |
+| urlhaus_recent_urls | 26753 |
 | ci_army_list | 15000 |
-| urlhaus_recent_urls | 13736 |
-| nist_nvd_recent | 6600 |
+| greensnow_blocklist | 5301 |
 | ipsum_level5 | 5289 |
-| blocklist_de_ssh | 4922 |
-| threatfox_export_json | 3156 |
+| blocklist_de_ssh | 4794 |
+| threatfox_export_json | 2985 |
+| nist_nvd_recent | 2800 |
 | cisa_kev | 1756 |
 | spamhaus_drop | 1688 |
-| tor_exit_nodes | 1218 |
-| binarydefense_banlist | 1145 |
+| tor_exit_nodes | 1217 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| url | 5577 |
+| url | 8126 |
 | cve | 1756 |
-| ipv4_cidr | 1687 |
-| sha256 | 566 |
-| domain | 170 |
-| ipv4 | 139 |
-| md5 | 53 |
-| sha1 | 52 |
+| sha256 | 45 |
+| ipv4 | 41 |
+| domain | 19 |
+| ipv4_cidr | 13 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 5736 |
-| malware_download | 5424 |
-| zip | 5224 |
-| github | 5214 |
-| SmartLoader | 5108 |
+| malware | 8133 |
+| malware_download | 8114 |
+| zip | 8042 |
+| github | 8036 |
+| SmartLoader | 4071 |
+| zapret | 3966 |
+| SalatStealer | 3965 |
 | cve | 1756 |
 | exploited-in-the-wild | 1756 |
-| drop | 1687 |
-| spamhaus | 1687 |
-| threatfox | 916 |
+| nvd | 370 |
 
 ## Multi-group reporting overlaps
 
