@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-10-24T15:16:40Z_
+_Generated 2026-10-24T18:33:07Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-24T15:16:40Z |
+| Generated | 2026-10-24T18:33:07Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6790 |
-| Sources reporting | 17 |
-| Indicator types | 7 |
+| Duplicates removed | 6734 |
+| Sources reporting | 16 |
+| Indicator types | 8 |
 | Multi-group overlaps | 402 |
 | Score (min / avg / max) | 80 / 80.3 / 96 |
 | High-score indicators (≥80) | 10000 |
 | 2+ reporting groups | 402 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-24T15:16:22Z |
+| Newest first_seen | 2026-10-24T18:31:51Z |
 
 ## Top indicators by score
 
@@ -40,43 +40,44 @@ _Generated 2026-10-24T15:16:40Z_
 
 | Source | Indicators |
 | --- | ---: |
-| urlhaus_recent_urls | 31225 |
+| urlhaus_recent_urls | 33935 |
 | ci_army_list | 15000 |
 | ipsum_level5 | 5289 |
-| blocklist_de_ssh | 4715 |
-| greensnow_blocklist | 4530 |
-| threatfox_export_json | 2848 |
-| nist_nvd_recent | 2800 |
+| blocklist_de_ssh | 4672 |
+| greensnow_blocklist | 4533 |
+| threatfox_export_json | 2859 |
+| nist_nvd_recent | 2400 |
 | cisa_kev | 1756 |
 | spamhaus_drop | 1688 |
-| tor_exit_nodes | 1216 |
+| tor_exit_nodes | 1210 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| url | 6175 |
+| url | 5961 |
 | cve | 1756 |
 | ipv4_cidr | 1687 |
-| sha256 | 225 |
-| ipv4 | 86 |
-| domain | 70 |
-| md5 | 1 |
+| sha256 | 237 |
+| domain | 130 |
+| md5 | 77 |
+| ipv4 | 76 |
+| sha1 | 76 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 6253 |
-| malware_download | 6117 |
-| github | 5973 |
-| zip | 5973 |
-| SalatStealer | 4519 |
-| zapret | 4509 |
+| malware | 6017 |
+| malware_download | 5891 |
+| zip | 5754 |
+| github | 5753 |
+| SmartLoader | 4289 |
 | cve | 1756 |
 | exploited-in-the-wild | 1756 |
 | drop | 1687 |
 | spamhaus | 1687 |
+| SalatStealer | 1477 |
 
 ## Multi-group reporting overlaps
 
