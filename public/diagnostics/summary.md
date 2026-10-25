@@ -1,15 +1,15 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-10-24T22:12:47Z_
+_Generated 2026-10-25T02:55:38Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-24T22:12:47Z |
+| Generated | 2026-10-25T02:55:38Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6822 |
+| Duplicates removed | 7923 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-group overlaps | 405 |
@@ -17,7 +17,7 @@ _Generated 2026-10-24T22:12:47Z_
 | High-score indicators (≥80) | 10000 |
 | 2+ reporting groups | 405 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-24T22:07:42Z |
+| Newest first_seen | 2026-10-25T02:50:40Z |
 
 ## Top indicators by score
 
@@ -38,27 +38,27 @@ _Generated 2026-10-24T22:12:47Z_
 
 | Source | Indicators |
 | --- | ---: |
-| urlhaus_recent_urls | 33922 |
+| urlhaus_recent_urls | 33920 |
 | ci_army_list | 15000 |
-| ipsum_level5 | 5289 |
-| blocklist_de_ssh | 4630 |
-| greensnow_blocklist | 4533 |
-| threatfox_export_json | 2873 |
-| nist_nvd_recent | 2400 |
+| ipsum_level5 | 5986 |
+| greensnow_blocklist | 5256 |
+| blocklist_de_ssh | 4661 |
+| threatfox_export_json | 3021 |
+| nist_nvd_recent | 3000 |
 | cisa_kev | 1756 |
 | spamhaus_drop | 1688 |
-| tor_exit_nodes | 1212 |
+| tor_exit_nodes | 1214 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| url | 5684 |
+| url | 5375 |
 | cve | 1756 |
 | ipv4_cidr | 1687 |
-| domain | 325 |
-| sha256 | 302 |
-| ipv4 | 93 |
+| domain | 543 |
+| sha256 | 384 |
+| ipv4 | 102 |
 | md5 | 77 |
 | sha1 | 76 |
 
@@ -66,16 +66,16 @@ _Generated 2026-10-24T22:12:47Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 5753 |
-| malware_download | 5605 |
-| zip | 5431 |
-| github | 5429 |
-| SmartLoader | 4280 |
+| malware | 5465 |
+| malware_download | 5269 |
+| zip | 5054 |
+| github | 5052 |
+| SmartLoader | 4269 |
 | cve | 1756 |
 | exploited-in-the-wild | 1756 |
 | drop | 1687 |
 | spamhaus | 1687 |
-| SalatStealer | 1163 |
+| threatfox | 1156 |
 
 ## Multi-group reporting overlaps
 
