@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-10-25T18:41:43Z_
+_Generated 2026-10-25T22:15:06Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-25T18:41:43Z |
+| Generated | 2026-10-25T22:15:06Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 7030 |
+| Duplicates removed | 7169 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-group overlaps | 407 |
+| Multi-group overlaps | 408 |
 | Score (min / avg / max) | 80 / 80.3 / 96 |
 | High-score indicators (≥80) | 10000 |
-| 2+ reporting groups | 407 |
+| 2+ reporting groups | 408 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-25T18:39:50Z |
+| Newest first_seen | 2026-10-25T22:11:30Z |
 
 ## Top indicators by score
 
@@ -40,40 +40,40 @@ _Generated 2026-10-25T18:41:43Z_
 
 | Source | Indicators |
 | --- | ---: |
-| urlhaus_recent_urls | 43851 |
+| urlhaus_recent_urls | 43847 |
 | ci_army_list | 15000 |
-| threatfox_export_json | 6677 |
+| threatfox_export_json | 7354 |
 | ipsum_level5 | 5986 |
-| blocklist_de_ssh | 4602 |
-| greensnow_blocklist | 4475 |
-| nist_nvd_recent | 3600 |
+| blocklist_de_ssh | 5223 |
+| greensnow_blocklist | 4457 |
+| nist_nvd_recent | 2800 |
 | cisa_kev | 1756 |
 | spamhaus_drop | 1688 |
-| tor_exit_nodes | 1214 |
+| tor_exit_nodes | 1212 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| url | 4334 |
-| sha256 | 1959 |
+| url | 3680 |
+| sha256 | 2056 |
 | cve | 1756 |
 | ipv4_cidr | 1687 |
-| domain | 103 |
+| domain | 606 |
+| ipv4 | 81 |
 | md5 | 67 |
 | sha1 | 67 |
-| ipv4 | 27 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 4411 |
-| malware_download | 4299 |
-| github | 4098 |
-| zapret | 2823 |
-| threatfox | 2179 |
-| exe | 2058 |
+| malware | 3686 |
+| malware_download | 3514 |
+| github | 3293 |
+| threatfox | 2913 |
+| exe | 2059 |
+| zapret | 2018 |
 | Vshell | 1774 |
 | x86-64 | 1771 |
 | cve | 1756 |
