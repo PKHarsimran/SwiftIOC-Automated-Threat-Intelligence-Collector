@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-10-25T15:27:09Z_
+_Generated 2026-10-25T18:41:43Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-25T15:27:09Z |
+| Generated | 2026-10-25T18:41:43Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 7007 |
+| Duplicates removed | 7030 |
 | Sources reporting | 17 |
-| Indicator types | 6 |
-| Multi-group overlaps | 406 |
+| Indicator types | 8 |
+| Multi-group overlaps | 407 |
 | Score (min / avg / max) | 80 / 80.3 / 96 |
 | High-score indicators (≥80) | 10000 |
-| 2+ reporting groups | 406 |
+| 2+ reporting groups | 407 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-25T15:26:42Z |
+| Newest first_seen | 2026-10-25T18:39:50Z |
 
 ## Top indicators by score
 
@@ -38,42 +38,44 @@ _Generated 2026-10-25T15:27:09Z_
 
 | Source | Indicators |
 | --- | ---: |
-| urlhaus_recent_urls | 44377 |
+| urlhaus_recent_urls | 43851 |
 | ci_army_list | 15000 |
+| threatfox_export_json | 6677 |
 | ipsum_level5 | 5986 |
-| threatfox_export_json | 4711 |
-| blocklist_de_ssh | 4614 |
-| greensnow_blocklist | 4489 |
-| nist_nvd_recent | 3000 |
+| blocklist_de_ssh | 4602 |
+| greensnow_blocklist | 4475 |
+| nist_nvd_recent | 3600 |
 | cisa_kev | 1756 |
 | spamhaus_drop | 1688 |
-| tor_exit_nodes | 1213 |
+| tor_exit_nodes | 1214 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| url | 6223 |
+| url | 4334 |
+| sha256 | 1959 |
 | cve | 1756 |
 | ipv4_cidr | 1687 |
-| sha256 | 154 |
-| domain | 128 |
-| ipv4 | 52 |
+| domain | 103 |
+| md5 | 67 |
+| sha1 | 67 |
+| ipv4 | 27 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 6272 |
-| malware_download | 6189 |
-| github | 6040 |
-| zapret | 6040 |
+| malware | 4411 |
+| malware_download | 4299 |
+| github | 4098 |
+| zapret | 2823 |
+| threatfox | 2179 |
+| exe | 2058 |
+| Vshell | 1774 |
+| x86-64 | 1771 |
 | cve | 1756 |
 | exploited-in-the-wild | 1756 |
-| drop | 1687 |
-| spamhaus | 1687 |
-| nvd | 375 |
-| threatfox | 288 |
 
 ## Multi-group reporting overlaps
 
