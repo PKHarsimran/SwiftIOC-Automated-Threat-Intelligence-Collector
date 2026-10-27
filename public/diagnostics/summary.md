@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-10-27T09:32:41Z_
+_Generated 2026-10-27T17:19:37Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-27T09:32:41Z |
+| Generated | 2026-10-27T17:19:37Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6400 |
-| Sources reporting | 16 |
+| Duplicates removed | 6021 |
+| Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-group overlaps | 421 |
 | Score (min / avg / max) | 80 / 80.3 / 96 |
 | High-score indicators (≥80) | 10000 |
 | 2+ reporting groups | 421 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-27T09:30:48Z |
+| Newest first_seen | 2026-10-27T17:18:40Z |
 
 ## Top indicators by score
 
@@ -38,44 +38,44 @@ _Generated 2026-10-27T09:32:41Z_
 
 | Source | Indicators |
 | --- | ---: |
-| urlhaus_recent_urls | 29269 |
+| urlhaus_recent_urls | 22533 |
 | ci_army_list | 15000 |
-| threatfox_export_json | 7224 |
-| greensnow_blocklist | 5565 |
-| blocklist_de_ssh | 5222 |
+| blocklist_de_ssh | 5655 |
+| greensnow_blocklist | 4890 |
 | ipsum_level5 | 4197 |
-| malwarebazaar_recent | 1776 |
+| threatfox_export_json | 3976 |
+| nist_nvd_recent | 3200 |
+| malwarebazaar_recent | 2119 |
 | cisa_kev | 1758 |
-| spamhaus_drop | 1688 |
-| tor_exit_nodes | 1225 |
+| spamhaus_drop | 1726 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| url | 5662 |
+| url | 6070 |
 | cve | 1758 |
-| ipv4_cidr | 1383 |
-| sha256 | 843 |
-| domain | 121 |
+| sha256 | 1399 |
+| ipv4_cidr | 355 |
+| domain | 145 |
+| ipv4 | 114 |
 | md5 | 80 |
 | sha1 | 79 |
-| ipv4 | 74 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 6087 |
-| malware_download | 5430 |
-| github | 4923 |
-| zapret | 4265 |
-| SalatStealer | 2657 |
+| malware | 6819 |
+| malware_download | 5729 |
+| github | 4960 |
+| zapret | 4156 |
+| SalatStealer | 2619 |
 | cve | 1758 |
 | exploited-in-the-wild | 1758 |
-| drop | 1383 |
-| spamhaus | 1383 |
-| threatfox | 993 |
+| threatfox | 1423 |
+| elf | 581 |
+| Mirai | 464 |
 
 ## Multi-group reporting overlaps
 
