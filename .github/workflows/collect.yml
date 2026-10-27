@@ -248,7 +248,7 @@ jobs:
 
       - name: Auto-commit updated outputs
         if: success() && github.ref == 'refs/heads/main'
-        uses: stefanzweifel/git-auto-commit-action@4a55954c782fc1ea30b9056cd3e7a2b40ca8887d # v7
+        uses: stefanzweifel/git-auto-commit-action@d0b01107b5db882071f96de5dd4b54961ea93f4c # v7
         with:
           commit_message: "chore(ioc): update feeds [skip ci]"
           # Single `public` add — NOT a multi-line file_pattern. The previous
