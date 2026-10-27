@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-10-27T17:19:37Z_
+_Generated 2026-10-27T23:26:13Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-27T17:19:37Z |
+| Generated | 2026-10-27T23:26:13Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6021 |
+| Duplicates removed | 6041 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-group overlaps | 421 |
+| Multi-group overlaps | 420 |
 | Score (min / avg / max) | 80 / 80.3 / 96 |
 | High-score indicators (≥80) | 10000 |
-| 2+ reporting groups | 421 |
+| 2+ reporting groups | 420 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-27T17:18:40Z |
+| Newest first_seen | 2026-10-27T23:25:41Z |
 
 ## Top indicators by score
 
@@ -40,44 +40,44 @@ _Generated 2026-10-27T17:19:37Z_
 
 | Source | Indicators |
 | --- | ---: |
-| urlhaus_recent_urls | 22533 |
+| urlhaus_recent_urls | 21933 |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5655 |
-| greensnow_blocklist | 4890 |
+| blocklist_de_ssh | 5297 |
+| greensnow_blocklist | 4846 |
 | ipsum_level5 | 4197 |
-| threatfox_export_json | 3976 |
-| nist_nvd_recent | 3200 |
-| malwarebazaar_recent | 2119 |
-| cisa_kev | 1758 |
-| spamhaus_drop | 1726 |
+| threatfox_export_json | 3242 |
+| nist_nvd_recent | 3000 |
+| malwarebazaar_recent | 2039 |
+| cisa_kev | 1760 |
+| spamhaus_drop | 1760 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| url | 6070 |
-| cve | 1758 |
-| sha256 | 1399 |
-| ipv4_cidr | 355 |
-| domain | 145 |
-| ipv4 | 114 |
-| md5 | 80 |
-| sha1 | 79 |
+| url | 4322 |
+| cve | 1760 |
+| ipv4_cidr | 1759 |
+| sha256 | 1521 |
+| domain | 181 |
+| md5 | 169 |
+| sha1 | 168 |
+| ipv4 | 120 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 6819 |
-| malware_download | 5729 |
-| github | 4960 |
-| zapret | 4156 |
-| SalatStealer | 2619 |
-| cve | 1758 |
-| exploited-in-the-wild | 1758 |
-| threatfox | 1423 |
-| elf | 581 |
-| Mirai | 464 |
+| malware | 5031 |
+| malware_download | 3891 |
+| github | 3153 |
+| zapret | 2240 |
+| threatfox | 1888 |
+| cve | 1760 |
+| exploited-in-the-wild | 1760 |
+| drop | 1759 |
+| spamhaus | 1759 |
+| SalatStealer | 1338 |
 
 ## Multi-group reporting overlaps
 
