@@ -2,16 +2,16 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-10-28T23:50:03Z_
+_Generated 2026-10-29T04:06:32Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-28T23:50:03Z |
+| Generated | 2026-10-29T04:06:32Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 7724 |
+| Duplicates removed | 8709 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-group overlaps | 423 |
@@ -19,7 +19,7 @@ _Generated 2026-10-28T23:50:03Z_
 | High-score indicators (≥80) | 10000 |
 | 2+ reporting groups | 423 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-28T23:49:46Z |
+| Newest first_seen | 2026-10-29T04:01:44Z |
 
 ## Top indicators by score
 
@@ -29,38 +29,38 @@ _Generated 2026-10-28T23:50:03Z_
 | ipv4: `94[.]154[.]43[.]69` | score 96, 5 reporting groups |
 | ipv4: `91[.]92[.]43[.]221` | score 96, 4 reporting groups |
 | ipv4: `114[.]111[.]53[.]214` | score 96, 3 reporting groups |
+| ipv4: `156[.]225[.]17[.]60` | score 96, 3 reporting groups |
 | ipv4: `165[.]154[.]162[.]74` | score 96, 3 reporting groups |
 | ipv4: `165[.]154[.]227[.]8` | score 96, 3 reporting groups |
 | ipv4: `176[.]65[.]139[.]131` | score 96, 3 reporting groups |
 | ipv4: `45[.]78[.]201[.]248` | score 96, 3 reporting groups |
 | ipv4: `77[.]239[.]124[.]135` | score 96, 3 reporting groups |
-| ipv4: `92[.]249[.]61[.]190` | score 96, 3 reporting groups |
 
 ## Per-source totals
 
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| ipsum_level5 | 6086 |
-| urlhaus_recent_urls | 5278 |
-| blocklist_de_ssh | 4996 |
-| greensnow_blocklist | 4065 |
-| threatfox_export_json | 3949 |
-| nist_nvd_recent | 2800 |
+| ipsum_level5 | 5728 |
+| urlhaus_recent_urls | 5307 |
+| blocklist_de_ssh | 5047 |
+| greensnow_blocklist | 4945 |
+| threatfox_export_json | 3883 |
+| nist_nvd_recent | 2400 |
 | cisa_kev | 1762 |
 | spamhaus_drop | 1760 |
-| malwarebazaar_recent | 1664 |
+| malwarebazaar_recent | 1660 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| url | 4858 |
-| cve | 1895 |
-| ipv4_cidr | 1509 |
-| sha256 | 1084 |
-| domain | 377 |
-| ipv4 | 118 |
+| url | 4937 |
+| cve | 1806 |
+| ipv4_cidr | 1243 |
+| sha256 | 1232 |
+| domain | 501 |
+| ipv4 | 122 |
 | sha1 | 80 |
 | md5 | 79 |
 
@@ -68,16 +68,16 @@ _Generated 2026-10-28T23:50:03Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 4905 |
-| malware_download | 4282 |
-| github | 3835 |
-| zapret | 3041 |
-| SalatStealer | 1992 |
-| threatfox | 1956 |
-| cve | 1895 |
+| malware | 5086 |
+| malware_download | 4323 |
+| github | 3875 |
+| zapret | 3081 |
+| threatfox | 2213 |
+| SalatStealer | 2137 |
+| cve | 1806 |
 | exploited-in-the-wild | 1762 |
-| drop | 1509 |
-| spamhaus | 1509 |
+| drop | 1243 |
+| spamhaus | 1243 |
 
 ## Multi-group reporting overlaps
 
