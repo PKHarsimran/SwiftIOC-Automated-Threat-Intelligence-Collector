@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-10-31T16:42:55Z_
+_Generated 2026-10-31T22:59:13Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-31T16:42:55Z |
+| Generated | 2026-10-31T22:59:13Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 4090 |
-| Sources reporting | 16 |
-| Indicator types | 6 |
+| Duplicates removed | 6123 |
+| Sources reporting | 17 |
+| Indicator types | 8 |
 | Multi-group overlaps | 425 |
 | Score (min / avg / max) | 80 / 80.3 / 96 |
 | High-score indicators (≥80) | 10000 |
 | 2+ reporting groups | 425 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-31T16:42:32Z |
+| Newest first_seen | 2026-10-31T22:58:59Z |
 
 ## Top indicators by score
 
@@ -32,48 +32,50 @@ _Generated 2026-10-31T16:42:55Z_
 | ipv4: `176[.]65[.]139[.]131` | score 96, 3 reporting groups |
 | ipv4: `45[.]78[.]201[.]248` | score 96, 3 reporting groups |
 | ipv4: `77[.]239[.]124[.]135` | score 96, 3 reporting groups |
-| ipv4: `156[.]225[.]17[.]60` | score 91, 3 reporting groups |
+| ipv4: `156[.]225[.]17[.]60` | score 89, 3 reporting groups |
 
 ## Per-source totals
 
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4934 |
+| blocklist_de_ssh | 4902 |
 | ipsum_level5 | 4867 |
-| threatfox_export_json | 4713 |
-| urlhaus_recent_urls | 3476 |
+| threatfox_export_json | 4496 |
+| urlhaus_recent_urls | 3445 |
+| greensnow_blocklist | 3187 |
 | nist_nvd_recent | 2600 |
 | cisa_kev | 1766 |
 | spamhaus_drop | 1756 |
-| tor_exit_nodes | 1221 |
-| malwarebazaar_recent | 960 |
+| tor_exit_nodes | 1222 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| url | 3587 |
-| cve | 1898 |
-| ipv4_cidr | 1580 |
-| sha256 | 1344 |
-| domain | 1299 |
-| ipv4 | 292 |
+| url | 3644 |
+| cve | 1959 |
+| ipv4_cidr | 1755 |
+| sha256 | 1332 |
+| domain | 832 |
+| ipv4 | 324 |
+| md5 | 77 |
+| sha1 | 77 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 4023 |
-| malware_download | 3119 |
-| threatfox | 2798 |
-| github | 2506 |
-| cve | 1898 |
-| SalatStealer | 1881 |
+| malware | 4045 |
+| malware_download | 3133 |
+| threatfox | 2599 |
+| github | 2497 |
+| cve | 1959 |
+| SalatStealer | 1823 |
 | exploited-in-the-wild | 1766 |
-| drop | 1580 |
-| spamhaus | 1580 |
-| ClickFix | 1468 |
+| drop | 1755 |
+| spamhaus | 1755 |
+| zapret | 1009 |
 
 ## Multi-group reporting overlaps
 
