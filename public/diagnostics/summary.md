@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-10-30T20:19:40Z_
+_Generated 2026-10-31T03:49:04Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-30T20:19:40Z |
+| Generated | 2026-10-31T03:49:04Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6699 |
-| Sources reporting | 17 |
-| Indicator types | 8 |
-| Multi-group overlaps | 426 |
+| Duplicates removed | 7009 |
+| Sources reporting | 16 |
+| Indicator types | 6 |
+| Multi-group overlaps | 425 |
 | Score (min / avg / max) | 80 / 80.3 / 96 |
 | High-score indicators (≥80) | 10000 |
-| 2+ reporting groups | 426 |
+| 2+ reporting groups | 425 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-30T20:17:11Z |
+| Newest first_seen | 2026-10-31T03:47:51Z |
 
 ## Top indicators by score
 
@@ -39,12 +39,12 @@ _Generated 2026-10-30T20:19:40Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| urlhaus_recent_urls | 5268 |
-| threatfox_export_json | 5184 |
-| ipsum_level5 | 5012 |
-| blocklist_de_ssh | 4893 |
-| greensnow_blocklist | 3432 |
-| nist_nvd_recent | 2200 |
+| urlhaus_recent_urls | 5180 |
+| threatfox_export_json | 5054 |
+| blocklist_de_ssh | 4897 |
+| ipsum_level5 | 4867 |
+| nist_nvd_recent | 4000 |
+| greensnow_blocklist | 3967 |
 | cisa_kev | 1766 |
 | spamhaus_drop | 1757 |
 | tor_exit_nodes | 1224 |
@@ -53,29 +53,27 @@ _Generated 2026-10-30T20:19:40Z_
 
 | Type | Indicators |
 | --- | ---: |
-| url | 3366 |
-| domain | 1962 |
-| cve | 1766 |
-| ipv4_cidr | 1617 |
-| sha256 | 887 |
-| ipv4 | 226 |
-| md5 | 88 |
-| sha1 | 88 |
+| url | 3102 |
+| domain | 2282 |
+| cve | 1955 |
+| ipv4_cidr | 1377 |
+| sha256 | 1057 |
+| ipv4 | 227 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 3413 |
-| threatfox | 3301 |
-| malware_download | 2887 |
-| github | 2489 |
-| SalatStealer | 2133 |
-| ClickFix | 1917 |
-| cve | 1766 |
+| threatfox | 3528 |
+| malware | 3260 |
+| malware_download | 2649 |
+| ClickFix | 2321 |
+| github | 2269 |
+| SalatStealer | 1977 |
+| cve | 1955 |
 | exploited-in-the-wild | 1766 |
-| drop | 1617 |
-| spamhaus | 1617 |
+| drop | 1377 |
+| spamhaus | 1377 |
 
 ## Multi-group reporting overlaps
 
@@ -90,6 +88,6 @@ _Generated 2026-10-30T20:19:40Z_
 | ipv4: 176[.]65[.]139[.]131 | blocklist_de_ssh, et_compromised, ipsum_level5, threatfox_export_json |
 | ipv4: 45[.]78[.]201[.]248 | blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
 | ipv4: 77[.]239[.]124[.]135 | binarydefense_banlist, ci_army_list, ipsum_level5, threatfox_export_json |
-| ipv4: 92[.]249[.]61[.]190 | blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
+| ipv4: 156[.]225[.]17[.]60 | binarydefense_banlist, ci_army_list, threatfox_export_json |
 
 For more detail see [diagnostics/REPORT.md](diagnostics/REPORT.md) and the machine-readable feeds in [iocs/](iocs/).
