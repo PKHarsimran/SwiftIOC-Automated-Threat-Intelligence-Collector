@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-11-01T17:31:59Z_
+_Generated 2026-11-01T23:18:33Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-11-01T17:31:59Z |
+| Generated | 2026-11-01T23:18:33Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6582 |
+| Duplicates removed | 6589 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-group overlaps | 425 |
+| Multi-group overlaps | 426 |
 | Score (min / avg / max) | 80 / 80.3 / 96 |
 | High-score indicators (≥80) | 10000 |
-| 2+ reporting groups | 425 |
+| 2+ reporting groups | 426 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-11-01T17:24:43Z |
+| Newest first_seen | 2026-11-01T23:17:30Z |
 
 ## Top indicators by score
 
@@ -39,26 +39,26 @@ _Generated 2026-11-01T17:31:59Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5066 |
+| blocklist_de_ssh | 5114 |
 | ipsum_level5 | 4662 |
-| threatfox_export_json | 3751 |
-| greensnow_blocklist | 3306 |
+| threatfox_export_json | 3856 |
+| greensnow_blocklist | 3421 |
 | cisa_kev | 1766 |
 | spamhaus_drop | 1754 |
-| urlhaus_recent_urls | 1732 |
-| nist_nvd_recent | 1356 |
-| tor_exit_nodes | 1234 |
+| urlhaus_recent_urls | 1668 |
+| tor_exit_nodes | 1235 |
+| malwarebazaar_recent | 979 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 2403 |
-| url | 2142 |
-| ipv4_cidr | 1755 |
-| sha256 | 1569 |
-| domain | 1489 |
-| ipv4 | 322 |
+| cve | 2327 |
+| url | 2077 |
+| sha256 | 1753 |
+| ipv4_cidr | 1719 |
+| domain | 1504 |
+| ipv4 | 300 |
 | md5 | 160 |
 | sha1 | 160 |
 
@@ -66,16 +66,16 @@ _Generated 2026-11-01T17:31:59Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3468 |
-| malware | 2795 |
-| cve | 2403 |
+| threatfox | 3630 |
+| malware | 2767 |
+| cve | 2327 |
 | exploited-in-the-wild | 1766 |
-| drop | 1755 |
-| spamhaus | 1755 |
-| malware_download | 1734 |
-| ClickFix | 1518 |
-| nvd | 1036 |
-| github | 924 |
+| drop | 1719 |
+| spamhaus | 1719 |
+| malware_download | 1671 |
+| ClickFix | 1540 |
+| nvd | 960 |
+| github | 908 |
 
 ## Multi-group reporting overlaps
 
