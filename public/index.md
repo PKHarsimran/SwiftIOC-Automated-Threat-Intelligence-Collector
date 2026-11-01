@@ -2,16 +2,16 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-10-31T22:59:13Z_
+_Generated 2026-11-01T03:57:16Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-10-31T22:59:13Z |
+| Generated | 2026-11-01T03:57:16Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6123 |
+| Duplicates removed | 7182 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-group overlaps | 425 |
@@ -19,7 +19,7 @@ _Generated 2026-10-31T22:59:13Z_
 | High-score indicators (≥80) | 10000 |
 | 2+ reporting groups | 425 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-10-31T22:58:59Z |
+| Newest first_seen | 2026-11-01T03:50:23Z |
 
 ## Top indicators by score
 
@@ -34,33 +34,33 @@ _Generated 2026-10-31T22:59:13Z_
 | ipv4: `176[.]65[.]139[.]131` | score 96, 3 reporting groups |
 | ipv4: `45[.]78[.]201[.]248` | score 96, 3 reporting groups |
 | ipv4: `77[.]239[.]124[.]135` | score 96, 3 reporting groups |
-| ipv4: `156[.]225[.]17[.]60` | score 89, 3 reporting groups |
+| ipv4: `176[.]123[.]7[.]7` | score 88, 2 reporting groups |
 
 ## Per-source totals
 
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4902 |
-| ipsum_level5 | 4867 |
-| threatfox_export_json | 4496 |
-| urlhaus_recent_urls | 3445 |
-| greensnow_blocklist | 3187 |
-| nist_nvd_recent | 2600 |
+| blocklist_de_ssh | 4896 |
+| ipsum_level5 | 4662 |
+| greensnow_blocklist | 3727 |
+| threatfox_export_json | 3007 |
+| nist_nvd_recent | 3000 |
+| urlhaus_recent_urls | 2635 |
 | cisa_kev | 1766 |
 | spamhaus_drop | 1756 |
-| tor_exit_nodes | 1222 |
+| tor_exit_nodes | 1228 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| url | 3644 |
-| cve | 1959 |
+| url | 3044 |
+| cve | 2334 |
 | ipv4_cidr | 1755 |
-| sha256 | 1332 |
-| domain | 832 |
-| ipv4 | 324 |
+| sha256 | 1283 |
+| domain | 1100 |
+| ipv4 | 330 |
 | md5 | 77 |
 | sha1 | 77 |
 
@@ -68,16 +68,16 @@ _Generated 2026-10-31T22:59:13Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 4045 |
-| malware_download | 3133 |
-| threatfox | 2599 |
-| github | 2497 |
-| cve | 1959 |
-| SalatStealer | 1823 |
+| malware | 3514 |
+| threatfox | 2736 |
+| malware_download | 2620 |
+| cve | 2334 |
+| github | 1980 |
 | exploited-in-the-wild | 1766 |
 | drop | 1755 |
 | spamhaus | 1755 |
-| zapret | 1009 |
+| SalatStealer | 1326 |
+| ClickFix | 972 |
 
 ## Multi-group reporting overlaps
 
