@@ -1,15 +1,15 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-11-01T03:57:16Z_
+_Generated 2026-11-01T11:03:13Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-11-01T03:57:16Z |
+| Generated | 2026-11-01T11:03:13Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 7182 |
+| Duplicates removed | 5896 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-group overlaps | 425 |
@@ -17,7 +17,7 @@ _Generated 2026-11-01T03:57:16Z_
 | High-score indicators (≥80) | 10000 |
 | 2+ reporting groups | 425 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-11-01T03:50:23Z |
+| Newest first_seen | 2026-11-01T11:01:14Z |
 
 ## Top indicators by score
 
@@ -39,26 +39,26 @@ _Generated 2026-11-01T03:57:16Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4896 |
+| blocklist_de_ssh | 4809 |
 | ipsum_level5 | 4662 |
-| greensnow_blocklist | 3727 |
-| threatfox_export_json | 3007 |
+| threatfox_export_json | 3258 |
 | nist_nvd_recent | 3000 |
-| urlhaus_recent_urls | 2635 |
+| greensnow_blocklist | 2341 |
+| urlhaus_recent_urls | 1869 |
 | cisa_kev | 1766 |
 | spamhaus_drop | 1756 |
-| tor_exit_nodes | 1228 |
+| tor_exit_nodes | 1234 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| url | 3044 |
-| cve | 2334 |
+| cve | 2719 |
+| url | 2250 |
 | ipv4_cidr | 1755 |
-| sha256 | 1283 |
-| domain | 1100 |
-| ipv4 | 330 |
+| sha256 | 1514 |
+| domain | 1301 |
+| ipv4 | 307 |
 | md5 | 77 |
 | sha1 | 77 |
 
@@ -66,16 +66,16 @@ _Generated 2026-11-01T03:57:16Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 3514 |
-| threatfox | 2736 |
-| malware_download | 2620 |
-| cve | 2334 |
-| github | 1980 |
+| threatfox | 3086 |
+| malware | 2861 |
+| cve | 2719 |
+| malware_download | 1872 |
 | exploited-in-the-wild | 1766 |
 | drop | 1755 |
 | spamhaus | 1755 |
-| SalatStealer | 1326 |
-| ClickFix | 972 |
+| ClickFix | 1370 |
+| nvd | 1352 |
+| github | 1085 |
 
 ## Multi-group reporting overlaps
 
