@@ -2,16 +2,16 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-11-02T04:01:14Z_
+_Generated 2026-11-02T12:13:37Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-11-02T04:01:14Z |
+| Generated | 2026-11-02T12:13:37Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 7228 |
+| Duplicates removed | 6648 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-group overlaps | 426 |
@@ -19,7 +19,7 @@ _Generated 2026-11-02T04:01:14Z_
 | High-score indicators (≥80) | 10000 |
 | 2+ reporting groups | 426 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-11-02T03:59:59Z |
+| Newest first_seen | 2026-11-02T12:11:17Z |
 
 ## Top indicators by score
 
@@ -41,26 +41,26 @@ _Generated 2026-11-02T04:01:14Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5128 |
+| blocklist_de_ssh | 5060 |
 | ipsum_level5 | 4418 |
-| greensnow_blocklist | 3912 |
-| threatfox_export_json | 3668 |
+| threatfox_export_json | 3675 |
+| greensnow_blocklist | 3342 |
 | cisa_kev | 1766 |
 | spamhaus_drop | 1754 |
-| urlhaus_recent_urls | 1556 |
-| tor_exit_nodes | 1237 |
+| urlhaus_recent_urls | 1278 |
+| tor_exit_nodes | 1238 |
 | binarydefense_banlist | 1052 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 2515 |
-| url | 1925 |
-| sha256 | 1848 |
-| ipv4_cidr | 1753 |
-| domain | 1352 |
-| ipv4 | 287 |
+| cve | 2457 |
+| sha256 | 2115 |
+| ipv4_cidr | 1734 |
+| url | 1614 |
+| domain | 1507 |
+| ipv4 | 253 |
 | md5 | 160 |
 | sha1 | 160 |
 
@@ -68,16 +68,16 @@ _Generated 2026-11-02T04:01:14Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3507 |
-| malware | 2712 |
-| cve | 2515 |
+| threatfox | 3741 |
+| malware | 2618 |
+| cve | 2457 |
 | exploited-in-the-wild | 1766 |
-| drop | 1753 |
-| spamhaus | 1753 |
-| malware_download | 1560 |
-| ClickFix | 1262 |
-| nvd | 1148 |
-| github | 933 |
+| drop | 1734 |
+| spamhaus | 1734 |
+| ClickFix | 1313 |
+| malware_download | 1281 |
+| nvd | 1090 |
+| github | 813 |
 
 ## Multi-group reporting overlaps
 
