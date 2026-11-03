@@ -2,16 +2,16 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-11-02T23:17:17Z_
+_Generated 2026-11-03T05:02:17Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-11-02T23:17:17Z |
+| Generated | 2026-11-03T05:02:17Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6916 |
+| Duplicates removed | 7180 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-group overlaps | 427 |
@@ -19,7 +19,7 @@ _Generated 2026-11-02T23:17:17Z_
 | High-score indicators (≥80) | 10000 |
 | 2+ reporting groups | 427 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-11-02T23:16:50Z |
+| Newest first_seen | 2026-11-03T05:01:10Z |
 
 ## Top indicators by score
 
@@ -41,43 +41,43 @@ _Generated 2026-11-02T23:17:17Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| threatfox_export_json | 5022 |
-| blocklist_de_ssh | 4909 |
-| ipsum_level5 | 4418 |
-| greensnow_blocklist | 3354 |
+| threatfox_export_json | 4907 |
+| blocklist_de_ssh | 4850 |
+| ipsum_level5 | 4456 |
+| urlhaus_recent_urls | 3860 |
+| greensnow_blocklist | 3783 |
 | cisa_kev | 1766 |
 | spamhaus_drop | 1757 |
-| nist_nvd_recent | 1645 |
-| urlhaus_recent_urls | 1535 |
-| tor_exit_nodes | 1239 |
+| nist_nvd_recent | 1697 |
+| tor_exit_nodes | 1240 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 2361 |
-| url | 1833 |
-| domain | 1751 |
-| sha256 | 1677 |
-| ipv4 | 973 |
-| ipv4_cidr | 951 |
-| md5 | 227 |
-| sha1 | 227 |
+| url | 3812 |
+| cve | 2276 |
+| domain | 1064 |
+| sha256 | 963 |
+| ipv4 | 876 |
+| ipv4_cidr | 875 |
+| md5 | 67 |
+| sha1 | 67 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 4481 |
-| malware | 2556 |
-| cve | 2361 |
+| malware | 4156 |
+| malware_download | 3649 |
+| github | 3562 |
+| SalatStealer | 3427 |
+| zapret | 3150 |
+| threatfox | 2881 |
+| cve | 2276 |
 | exploited-in-the-wild | 1766 |
-| malware_download | 1539 |
-| github | 1342 |
-| ClickFix | 1219 |
-| SalatStealer | 1155 |
-| nvd | 994 |
-| drop | 951 |
+| nvd | 909 |
+| drop | 875 |
 
 ## Multi-group reporting overlaps
 
