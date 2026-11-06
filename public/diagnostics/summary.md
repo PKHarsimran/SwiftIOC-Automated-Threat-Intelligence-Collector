@@ -1,15 +1,15 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-11-06T18:47:58Z_
+_Generated 2026-11-06T23:56:02Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-11-06T18:47:58Z |
+| Generated | 2026-11-06T23:56:02Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 5945 |
+| Duplicates removed | 5759 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-group overlaps | 425 |
@@ -17,7 +17,7 @@ _Generated 2026-11-06T18:47:58Z_
 | High-score indicators (≥80) | 10000 |
 | 2+ reporting groups | 425 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-11-06T18:47:23Z |
+| Newest first_seen | 2026-11-06T23:55:03Z |
 
 ## Top indicators by score
 
@@ -39,43 +39,43 @@ _Generated 2026-11-06T18:47:58Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4789 |
 | ipsum_level5 | 4654 |
-| threatfox_export_json | 3285 |
-| nist_nvd_recent | 3000 |
-| greensnow_blocklist | 2973 |
-| cisa_kev | 1768 |
+| blocklist_de_ssh | 4639 |
+| threatfox_export_json | 3267 |
+| greensnow_blocklist | 3045 |
+| nist_nvd_recent | 2200 |
+| cisa_kev | 1769 |
 | spamhaus_drop | 1764 |
-| tor_exit_nodes | 1244 |
-| malwarebazaar_recent | 1133 |
+| tor_exit_nodes | 1246 |
+| malwarebazaar_recent | 1109 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3814 |
-| cve | 2565 |
-| ipv4_cidr | 1331 |
-| url | 977 |
-| domain | 396 |
-| md5 | 322 |
-| sha1 | 322 |
-| ipv4 | 273 |
+| sha256 | 3416 |
+| cve | 2716 |
+| ipv4_cidr | 1763 |
+| url | 963 |
+| domain | 377 |
+| ipv4 | 279 |
+| md5 | 243 |
+| sha1 | 243 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 4031 |
-| malware | 2704 |
-| cve | 2565 |
-| exploited-in-the-wild | 1768 |
-| drop | 1331 |
-| spamhaus | 1331 |
-| nvd | 1201 |
-| ClickFix | 1169 |
-| macOS | 1146 |
-| Amos | 1110 |
+| threatfox | 3574 |
+| cve | 2716 |
+| malware | 2507 |
+| exploited-in-the-wild | 1769 |
+| drop | 1763 |
+| spamhaus | 1763 |
+| nvd | 1351 |
+| ClickFix | 995 |
+| macOS | 982 |
+| Amos | 944 |
 
 ## Multi-group reporting overlaps
 
