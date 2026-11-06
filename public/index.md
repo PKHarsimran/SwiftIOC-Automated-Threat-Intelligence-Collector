@@ -2,16 +2,16 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-11-06T11:44:16Z_
+_Generated 2026-11-06T18:47:58Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-11-06T11:44:16Z |
+| Generated | 2026-11-06T18:47:58Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 5370 |
+| Duplicates removed | 5945 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-group overlaps | 425 |
@@ -19,7 +19,7 @@ _Generated 2026-11-06T11:44:16Z_
 | High-score indicators (≥80) | 10000 |
 | 2+ reporting groups | 425 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-11-06T11:43:59Z |
+| Newest first_seen | 2026-11-06T18:47:23Z |
 
 ## Top indicators by score
 
@@ -41,43 +41,43 @@ _Generated 2026-11-06T11:44:16Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4765 |
+| blocklist_de_ssh | 4789 |
 | ipsum_level5 | 4654 |
-| threatfox_export_json | 3065 |
-| nist_nvd_recent | 2600 |
-| greensnow_blocklist | 2186 |
+| threatfox_export_json | 3285 |
+| nist_nvd_recent | 3000 |
+| greensnow_blocklist | 2973 |
 | cisa_kev | 1768 |
 | spamhaus_drop | 1764 |
-| tor_exit_nodes | 1241 |
-| binarydefense_banlist | 993 |
+| tor_exit_nodes | 1244 |
+| malwarebazaar_recent | 1133 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3322 |
-| cve | 2834 |
-| ipv4_cidr | 1763 |
-| url | 887 |
-| domain | 472 |
-| ipv4 | 266 |
-| md5 | 228 |
-| sha1 | 228 |
+| sha256 | 3814 |
+| cve | 2565 |
+| ipv4_cidr | 1331 |
+| url | 977 |
+| domain | 396 |
+| md5 | 322 |
+| sha1 | 322 |
+| ipv4 | 273 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3565 |
-| cve | 2834 |
-| malware | 2331 |
+| threatfox | 4031 |
+| malware | 2704 |
+| cve | 2565 |
 | exploited-in-the-wild | 1768 |
-| drop | 1763 |
-| spamhaus | 1763 |
-| nvd | 1470 |
-| ClickFix | 1118 |
-| macOS | 1076 |
-| Amos | 1049 |
+| drop | 1331 |
+| spamhaus | 1331 |
+| nvd | 1201 |
+| ClickFix | 1169 |
+| macOS | 1146 |
+| Amos | 1110 |
 
 ## Multi-group reporting overlaps
 
