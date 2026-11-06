@@ -3,305 +3,305 @@
   <title>SwiftIOC — Newest High-Confidence IOCs</title>
   <link>https://github.com/PKHarsimran/SwiftIOC-Automated-Threat-Intelligence-Collector</link>
   <description>Freshest scored indicators of compromise with publisher-aware provenance.</description>
-  <lastBuildDate>Fri, 06 Nov 2026 00:41:25 +0000</lastBuildDate>
+  <lastBuildDate>Fri, 06 Nov 2026 11:44:17 +0000</lastBuildDate>
     <item>
-      <title>[80] sha256: 3f6ffd3d1c16396acbf5a78519366537f2597a7aaae9c2fbe5a9873be6976041</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Amos,ClickFix,Foxveil,grove,macOS,threatfox</description>
-      <guid isPermaLink="false">c8c8f6fb-e201-500f-982b-9cd1e4fc088a</guid>
-      <pubDate>Fri, 06 Nov 2026 00:35:29 +0000</pubDate>
+      <title>[80] ipv4_cidr: 209.126.88.0/22</title>
+      <description>Score 80, confidence high, sources: spamhaus_drop, tags: spamhaus,drop</description>
+      <guid isPermaLink="false">13fdda9e-9f97-5ff5-af76-253cc44e3b98</guid>
+      <pubDate>Fri, 06 Nov 2026 11:43:59 +0000</pubDate>
     </item>
     <item>
-      <title>[80] sha256: bed81a5ad907946434a04b6eb2dec4ce54eee2d8c63e4ee59a2b172442f72605</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Amos,ClickFix,Foxveil,frame97,macOS,threatfox</description>
-      <guid isPermaLink="false">0d625c5f-d709-5b4f-9b69-7acb8a4c3f4a</guid>
-      <pubDate>Fri, 06 Nov 2026 00:33:01 +0000</pubDate>
+      <title>[80] sha256: 677238ebdd600b90fe44fd15210838415bc59532a51111ab941f92b2b1aa35fd</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Amos,ClickFix,Foxveil,haven,macOS,threatfox</description>
+      <guid isPermaLink="false">5097fe42-8caa-55bc-a24c-16d1e3abf25b</guid>
+      <pubDate>Fri, 06 Nov 2026 11:39:16 +0000</pubDate>
     </item>
     <item>
-      <title>[80] sha256: 7e6622f2dbbf3126720558eb408b59a63ffa8792f00363adbe0fceb68c6aed38</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Amos,ClickFix,Foxveil,frame,macOS,threatfox</description>
-      <guid isPermaLink="false">213e638c-2540-59e9-a807-afa6696b07bd</guid>
-      <pubDate>Fri, 06 Nov 2026 00:30:41 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: d7502bafa4dfd5fea3211d8268ee5a7174299b4e14fe2c7a5c06774d5c188de7</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
-      <guid isPermaLink="false">695e6d9a-0fce-5862-a293-687bfb967b86</guid>
-      <pubDate>Fri, 06 Nov 2026 00:29:49 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: 28fd9d4ef7c380cff388359af8778b9de7e4e2aa2e329feea21a30d0c951229b</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, threatfox_export_json, tags: Amos,ClickFix,Foxveil,macOS,malware,nova,threatfox</description>
-      <guid isPermaLink="false">14422398-0d1b-5212-a5ea-95885a488bc4</guid>
-      <pubDate>Fri, 06 Nov 2026 00:28:08 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: 886914a0ecb32e47f4aaa97c28a83d8e1bde8a59dcca1791417bf95498d2a6e1</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
-      <guid isPermaLink="false">515ebb4f-60fd-5023-972c-9cb045bb1795</guid>
-      <pubDate>Fri, 06 Nov 2026 00:25:56 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: e312a8df7df6374bdad8037ab2d4d2ba60a9269b16ddce114ca03fbb84e029d0</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, threatfox_export_json, tags: Amos,ClickFix,Foxveil,macOS,malware,nuyar,threatfox</description>
-      <guid isPermaLink="false">4d0d76db-5994-58a8-825a-b2fdb292a7b3</guid>
-      <pubDate>Fri, 06 Nov 2026 00:25:40 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: 30f650edd736f2385078f329697985f5c6cff7b28df930a1506148b110f70d22</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
-      <guid isPermaLink="false">3b98c074-578d-5ffe-a0e9-05636f1e259f</guid>
-      <pubDate>Fri, 06 Nov 2026 00:24:45 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: 0ecda82e3f350e0aac183c0f2c9dd40ca4be46e12c8747899213e92d29fd6a7b</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, threatfox_export_json, tags: Amos,ClickFix,Foxveil,haven,macOS,malware,threatfox</description>
-      <guid isPermaLink="false">b8826adb-2844-539a-bd88-c7f4eeb75f38</guid>
-      <pubDate>Fri, 06 Nov 2026 00:23:18 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: 3dce59dd51b3b3a10577a9259d870f79a0dd50ac0cb4022fbc992e27f69dac6f</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
-      <guid isPermaLink="false">e3200ac1-a545-505e-88eb-261913bf95df</guid>
-      <pubDate>Fri, 06 Nov 2026 00:21:52 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: 6f84b938bcc3b894fbb87299f2f653ea6b1ea93346f75b3bf117a4a0a4f9bcb9</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, threatfox_export_json, tags: Amos,ClickFix,Foxveil,chant,macOS,malware,threatfox</description>
-      <guid isPermaLink="false">f4de36a3-3bdc-5b92-9830-f9e920b1db1b</guid>
-      <pubDate>Fri, 06 Nov 2026 00:20:53 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: ce3f5a68ce36d86d97b0633e3624b75f61bdcc75b685a27f01782db6c33fedf9</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,VShell</description>
-      <guid isPermaLink="false">42193bd4-088a-507e-9aca-3ecfd6ad9858</guid>
-      <pubDate>Fri, 06 Nov 2026 00:19:50 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: 160b08c6c6905d5cfa18d05d9440de2e81a51fa3ec0ef845c3aa6c1922563908</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, threatfox_export_json, tags: Amos,ClickFix,Foxveil,macOS,malware,threatfox,willow</description>
-      <guid isPermaLink="false">b9e3b48b-baf4-55b7-a52f-25e6ceb89cbc</guid>
-      <pubDate>Fri, 06 Nov 2026 00:18:20 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxp://115[.]171[.]55[.]112:59716/i</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
-      <guid isPermaLink="false">40b35df2-b07c-548f-9475-1b8d542037e7</guid>
-      <pubDate>Fri, 06 Nov 2026 00:17:05 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: 96556b8939e1de45a08cf3b97877b27c1c8b6e553ec5968bfb7dff519a93ac0a</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,Mirai</description>
-      <guid isPermaLink="false">179ed5c0-5061-59f3-97ec-ace8aaf98302</guid>
-      <pubDate>Fri, 06 Nov 2026 00:16:58 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: 31810889506dd999d37d1622c135ffed2e6f60933e6a29ac1c00e86ed7abe460</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,WARDENStealer</description>
-      <guid isPermaLink="false">8ef1e883-895e-5392-9966-340bfe548ec2</guid>
-      <pubDate>Fri, 06 Nov 2026 00:16:53 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: 8f607e195cfbf1b7b55737f13caec71b1bc961cffab6c2ca4b44d0437f85f9bb</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Amos,ClickFix,Foxveil,macOS,quill,threatfox</description>
-      <guid isPermaLink="false">c01a3a56-8b5d-50d6-a92a-fe60a3795b8c</guid>
-      <pubDate>Fri, 06 Nov 2026 00:16:02 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] domain: k81f5l4o[.]kunci[.]store</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClearFake,mac-0xa07e,macOS,threatfox</description>
-      <guid isPermaLink="false">cf3d6214-e441-5747-b50b-d56d80684e88</guid>
-      <pubDate>Fri, 06 Nov 2026 00:15:26 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: 2b9e8c59c1160334a1b854ceda0efd9629fb9c2fd8edf278c5904e8a64828a23</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
-      <guid isPermaLink="false">8a73b075-733d-5a61-8bc2-c288f1005446</guid>
-      <pubDate>Fri, 06 Nov 2026 00:11:50 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: d7d69ec7d701c7a007b4cc34bb935f89f9a15793d272e1fa7cc0150f53b2adc5</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,VShell</description>
-      <guid isPermaLink="false">0525a3eb-c92a-5cc5-962e-593cadb0b65e</guid>
-      <pubDate>Fri, 06 Nov 2026 00:11:45 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: 496620850f85ce131e19937e7222185d74e4739b47cb1bb7bce4520b39b923b4</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
-      <guid isPermaLink="false">e9974858-6879-5382-80ea-e93f09d6d9f7</guid>
-      <pubDate>Fri, 06 Nov 2026 00:10:45 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] domain: uzpzgday[.]bossbeyprimecenter[.]click</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClearFake,mac-0x0f14,macOS,threatfox</description>
-      <guid isPermaLink="false">a77a7ae2-8b97-53ed-a3d3-fadb01f26d8b</guid>
-      <pubDate>Fri, 06 Nov 2026 00:09:08 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] domain: bossbeyprimecenter[.]click</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: 6November2026,ClearFake,Commandline,macOS,threatfox</description>
-      <guid isPermaLink="false">d0cdeb23-0c48-52e8-89d7-3becf8698c6d</guid>
-      <pubDate>Fri, 06 Nov 2026 00:07:05 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxps://github[.]com/middlebladesmanstore/VpnbOT/releases/download/v1[.]0[.]20/vpnbot[.]zip</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,github,SalatStealer,zapret</description>
-      <guid isPermaLink="false">23bf1ad0-441e-5a74-941e-92684b080086</guid>
-      <pubDate>Fri, 06 Nov 2026 00:06:11 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxps://github[.]com/middlebladesmanstore/MY-rEmNAWAVE/releases/download/v1[.]5/my-remnawave[.]zip</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,github,SalatStealer,zapret</description>
-      <guid isPermaLink="false">cd6d400d-f6ca-591a-8026-7ad11064419c</guid>
-      <pubDate>Fri, 06 Nov 2026 00:06:07 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] domain: k4[.]altertogel[.]net</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Vidar,threatfox</description>
-      <guid isPermaLink="false">459f22bb-c5a3-5335-b5a5-f9393fdfda17</guid>
-      <pubDate>Fri, 06 Nov 2026 00:05:37 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] domain: 6b86s0yu[.]bittu[.]store</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClearFake,mac-0x68dc,macOS,threatfox</description>
-      <guid isPermaLink="false">f24f8c8f-600a-51bc-8105-e30be0f6a90d</guid>
-      <pubDate>Fri, 06 Nov 2026 00:04:57 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: e9cb61e9651a22037783e7d4f3e44b0e122d918730c2cb685e949c8a32e9a593</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, threatfox_export_json, tags: Amos,ClickFix,Foxveil,macOS,malware,quill,threatfox</description>
-      <guid isPermaLink="false">2b20a069-fecc-5734-b0b2-0c58e85bc2c2</guid>
-      <pubDate>Fri, 06 Nov 2026 00:03:22 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxp://171[.]213[.]226[.]160:43111/i</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
-      <guid isPermaLink="false">ca6c6edb-7cb1-56ec-8d49-e321a97c8d28</guid>
-      <pubDate>Fri, 06 Nov 2026 00:02:27 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxp://84[.]214[.]80[.]208:41585/i</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
-      <guid isPermaLink="false">858fc315-65c7-5749-9395-b490ce9d83fb</guid>
-      <pubDate>Fri, 06 Nov 2026 00:02:05 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: fc12c72075d780370618fd14e9633683620176bb61f7f4588a5abc3e80fedfeb</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, threatfox_export_json, tags: Amos,ClickFix,Foxveil,cube,macOS,malware,threatfox</description>
-      <guid isPermaLink="false">e5144aca-88bf-5ded-b8fc-816e4d3cef52</guid>
-      <pubDate>Fri, 06 Nov 2026 00:00:53 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: b642b90a8fb96a8a3346529183a6d43eb9e0db02cd7e83e49a76725d757b2fa0</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,VShell</description>
-      <guid isPermaLink="false">6d231f7e-1c0f-51e2-b294-11b81e57e001</guid>
-      <pubDate>Fri, 06 Nov 2026 00:00:35 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] domain: growmoreaccounting[.]co[.]nz</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: compromised,etherhide,threatfox</description>
-      <guid isPermaLink="false">43152f45-4686-5303-b161-ca4751170c78</guid>
-      <pubDate>Thu, 05 Nov 2026 23:59:36 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: b41286360f43585c2c7e783d0dfcbe4965e8485221035d7f3e6a20fd20c3acd8</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,Gafgyt</description>
-      <guid isPermaLink="false">6f1884af-fb1b-5da5-95a8-c1cdf2cdd13b</guid>
-      <pubDate>Thu, 05 Nov 2026 23:58:46 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: 954c3785a9d9e6dd611e05f1dcb18814e4bb7fa9c07da926b5c5be0d6fd4956f</title>
-      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,Mirai</description>
-      <guid isPermaLink="false">45e41a49-1c1f-5e2a-ab04-dc50f73d21d7</guid>
-      <pubDate>Thu, 05 Nov 2026 23:58:40 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: f086c723c4040ce8a264e79fda41d6ad0edf4f2eb7dd6a1c91fb14a627190257</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Amos,ClickFix,Foxveil,macOS,schema,threatfox</description>
-      <guid isPermaLink="false">c9098f04-d038-5d69-8e16-f2f3e57ed2d1</guid>
-      <pubDate>Thu, 05 Nov 2026 23:58:22 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: c82129ae65efd5c429ff230ed8e44fb7dfd37fda59dbfe42ec0112bc5aba6aa4</title>
+      <title>[80] sha256: 4b2dcae293486158fd65202b4e591bd744d68d7be8d403bf97ee37f472ea0587</title>
       <description>Score 80, confidence high, sources: threatfox_export_json, tags: Amos,ClickFix,Foxveil,forge,macOS,threatfox</description>
-      <guid isPermaLink="false">94e0d5ea-f2b9-5c65-b5aa-e8c53ee5f501</guid>
-      <pubDate>Thu, 05 Nov 2026 23:56:10 +0000</pubDate>
+      <guid isPermaLink="false">95f9db28-bd58-593d-911a-716a63e38185</guid>
+      <pubDate>Fri, 06 Nov 2026 11:35:41 +0000</pubDate>
     </item>
     <item>
-      <title>[80] domain: bittu[.]store</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClearFake,threatfox</description>
-      <guid isPermaLink="false">b6b7bc37-74f7-5ecf-9df4-499aad8c2f82</guid>
-      <pubDate>Thu, 05 Nov 2026 23:54:50 +0000</pubDate>
+      <title>[80] sha256: 190d1e67c0f193b13ee7b42a0a88716787a15d0826b057bcf246cb23f37b51ac</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Amos,ClickFix,Foxveil,macOS,schema,threatfox</description>
+      <guid isPermaLink="false">b3848abc-b8b0-5b55-b133-a7e46b86da76</guid>
+      <pubDate>Fri, 06 Nov 2026 11:30:09 +0000</pubDate>
     </item>
     <item>
-      <title>[80] url: hxxps://raw[.]githubusercontent[.]com/micka2311/flatline/refs/heads/main/Oryzorictes/flatline-3[.]5-alpha[.]3[.]zip</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,github,SmartLoader,zip</description>
-      <guid isPermaLink="false">39d105dd-a67a-5a01-97fa-3fdda8d0bd02</guid>
-      <pubDate>Thu, 05 Nov 2026 23:54:06 +0000</pubDate>
+      <title>[80] domain: xzx1[.]com</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: ClickFix,threatfox</description>
+      <guid isPermaLink="false">df7db85d-d1c6-5184-a5bd-4b9e573a8d62</guid>
+      <pubDate>Fri, 06 Nov 2026 11:27:00 +0000</pubDate>
     </item>
     <item>
-      <title>[80] sha256: cb20cbf426f78a7d73be735181ab511fa8698d49530c364cdd7a0304bf346529</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Amos,ClickFix,Foxveil,boost,macOS,threatfox</description>
-      <guid isPermaLink="false">c9c0cd16-9a97-55ea-80ae-b7961860506b</guid>
-      <pubDate>Thu, 05 Nov 2026 23:53:34 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxp://115[.]49[.]93[.]49:54411/i</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,elf,mips,Mozi</description>
-      <guid isPermaLink="false">f1e1e861-1d18-5e3b-8ff9-9070c9828b73</guid>
-      <pubDate>Thu, 05 Nov 2026 23:52:12 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: 735a659520942c7559acdd520f3203b470c4af0b33c50e0282d1fadeecc74406</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Amos,ClickFix,Foxveil,macOS,stratos,threatfox</description>
-      <guid isPermaLink="false">a4309a08-6f33-5e5e-8290-1a20d70dc1c4</guid>
-      <pubDate>Thu, 05 Nov 2026 23:51:24 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: fcb5648901d317018d3d8941ef8ef648ab6587af2ce17fc1699be0ed8875cac5</title>
+      <title>[80] sha256: 30d02fe870f4ce3952e028bb20483074c91ca5e4e3068145a2cf1389e6c63f17</title>
       <description>Score 80, confidence high, sources: threatfox_export_json, tags: Amos,ClickFix,Foxveil,grove,macOS,threatfox</description>
-      <guid isPermaLink="false">c4849445-9098-50c6-b032-47bc6cea8490</guid>
-      <pubDate>Thu, 05 Nov 2026 23:49:18 +0000</pubDate>
+      <guid isPermaLink="false">bde41fe8-51b1-5cac-baeb-f0a43c5c2d6b</guid>
+      <pubDate>Fri, 06 Nov 2026 11:25:49 +0000</pubDate>
     </item>
     <item>
-      <title>[80] url: hxxp://125[.]45[.]57[.]250:45165/i</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
-      <guid isPermaLink="false">15a30d35-5344-503c-a648-9224d8d15d63</guid>
-      <pubDate>Thu, 05 Nov 2026 23:47:25 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxp://115[.]171[.]55[.]112:59716/bin[.]sh</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
-      <guid isPermaLink="false">a1f818c8-bb4e-5cb1-aa44-191d3186970e</guid>
-      <pubDate>Thu, 05 Nov 2026 23:47:07 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxp://105[.]186[.]158[.]12:41465/i</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
-      <guid isPermaLink="false">f1cd7b18-b003-5db9-bced-e43b097a989e</guid>
-      <pubDate>Thu, 05 Nov 2026 23:47:06 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] url: hxxp://84[.]214[.]80[.]208:41585/bin[.]sh</title>
-      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
-      <guid isPermaLink="false">bb7d4ea9-2ba6-5975-86bf-f2dae3b6648f</guid>
-      <pubDate>Thu, 05 Nov 2026 23:47:05 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: 98cda1eb875e07aa8357572adf687cd9d5379935b543a963e72c9dbab3528ec1</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Amos,ClickFix,Foxveil,frame97,macOS,threatfox</description>
-      <guid isPermaLink="false">7501b800-f836-5aa4-b314-6910f1014ffb</guid>
-      <pubDate>Thu, 05 Nov 2026 23:46:55 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: 9955aa20ca7e29bf00a61e358f18140599d6c9b4b49535930f364c52ed1ab3dd</title>
-      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Amos,ClickFix,Foxveil,frame,macOS,threatfox</description>
-      <guid isPermaLink="false">b83d276f-bdf0-579f-a9e8-bc5d7e2eac8c</guid>
-      <pubDate>Thu, 05 Nov 2026 23:44:40 +0000</pubDate>
-    </item>
-    <item>
-      <title>[80] sha256: c56d72d4868aa9bb3e56ac5eeb65e54670e90ab86dd2a5c2d79cf3b2b8825cd5</title>
+      <title>[80] sha256: 7da1664c3755857f1a2931fe66948e591ec228a5aa2f659f37d6cb04dab9a818</title>
       <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
-      <guid isPermaLink="false">f146cae3-1833-581a-a6ee-167da6531162</guid>
-      <pubDate>Thu, 05 Nov 2026 23:43:45 +0000</pubDate>
+      <guid isPermaLink="false">0e9bce2a-3571-592b-ab32-dfb89a473006</guid>
+      <pubDate>Fri, 06 Nov 2026 11:25:43 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: 56bc2101ba986ea84a5204da5f31fa2cf5354b9eff4fccdb79ce48c950561106</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Amos,ClickFix,Foxveil,macOS,nuyar,threatfox</description>
+      <guid isPermaLink="false">fba7209a-ee71-51da-9162-46687c3dc37f</guid>
+      <pubDate>Fri, 06 Nov 2026 11:23:42 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: 647b20e376b82699afb8ab5f9f1dccd906e5591168ea0a599c5b4357d17b6360</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
+      <guid isPermaLink="false">f25c06cd-4d72-5b8a-bf72-a966a57bdad2</guid>
+      <pubDate>Fri, 06 Nov 2026 11:20:51 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: a8e0cb7fb52d2449fcd58326a9176e97c1d9f36e212bb00e73ec6c9a79322573</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
+      <guid isPermaLink="false">82c7bb24-d84a-5332-8e94-ac1786ff34f4</guid>
+      <pubDate>Fri, 06 Nov 2026 11:20:32 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: d513ea26f521b4fc8db05f6d3b90b9a29aa8402c17660fc5291022c966df8444</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,njrat</description>
+      <guid isPermaLink="false">26dc714e-5131-5b9a-9884-3d29c861fdf7</guid>
+      <pubDate>Fri, 06 Nov 2026 11:20:22 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: 994a17dc0b958eefc39d35ad757432ee9f9576e3f6639c4f004edacd9c59c13b</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
+      <guid isPermaLink="false">53d510b9-8161-58eb-9cdb-d18d77cf8264</guid>
+      <pubDate>Fri, 06 Nov 2026 11:20:21 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: ec74a28aed5bf5b0b5447df5879cc3bacd67ff700bef5368c4f200adebacb259</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
+      <guid isPermaLink="false">dd3960d6-9386-5937-9947-4648a9448ce4</guid>
+      <pubDate>Fri, 06 Nov 2026 11:20:05 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxp://36[.]69[.]80[.]48:42508/bin[.]sh</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,32-bit,arm,elf,Mozi</description>
+      <guid isPermaLink="false">0bd7c816-75aa-5a17-a6ab-a2656e9f5e8a</guid>
+      <pubDate>Fri, 06 Nov 2026 11:19:12 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: 910fb7f5c6e02368c534ab15aca2272f1b0f245fc139e7c9ea830cfdfaf76d3d</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Amos,ClickFix,Foxveil,frame97,macOS,threatfox</description>
+      <guid isPermaLink="false">32104343-f9ab-5d3f-b235-1c15400b040b</guid>
+      <pubDate>Fri, 06 Nov 2026 11:18:55 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxp://138[.]204[.]196[.]254:53068/i</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
+      <guid isPermaLink="false">a840e509-255a-5fce-a898-fde4d27bd2ed</guid>
+      <pubDate>Fri, 06 Nov 2026 11:17:06 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: 3fa744af1112c498121991251c011f264c8ee22ed0f40cb7cf9086e48e06a33f</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Amos,ClickFix,Foxveil,macOS,nova,threatfox</description>
+      <guid isPermaLink="false">f62813a4-c42b-5492-9bc0-d119a34eeece</guid>
+      <pubDate>Fri, 06 Nov 2026 11:15:47 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] domain: h[.]cou4d[.]org</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Vidar,threatfox</description>
+      <guid isPermaLink="false">93a782cd-205c-5477-bace-8647a93bd559</guid>
+      <pubDate>Fri, 06 Nov 2026 11:15:37 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: 52cd3a921f7ffc39a78eb2b32e5181f3a132ee7be360740dd49e395ed4080587</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,Formbook</description>
+      <guid isPermaLink="false">f81297b3-a654-58ac-89bf-3462d4063505</guid>
+      <pubDate>Fri, 06 Nov 2026 11:14:41 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] ipv4: 31[.]56[.]19[.]164</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: XWorm,threatfox</description>
+      <guid isPermaLink="false">1451ee73-133a-5db7-b87c-00366bfaaa16</guid>
+      <pubDate>Fri, 06 Nov 2026 11:12:30 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxp://94[.]156[.]152[.]4/yuxwoctober[.]png</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,xworm</description>
+      <guid isPermaLink="false">9dfb2885-d0cd-5c86-8517-5c8feef02eb1</guid>
+      <pubDate>Fri, 06 Nov 2026 11:12:08 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxp://94[.]156[.]152[.]4/rumpnovember[.]png</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,xworm</description>
+      <guid isPermaLink="false">89e57113-ae97-5cb3-b928-5d220e7ce234</guid>
+      <pubDate>Fri, 06 Nov 2026 11:12:07 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: 1707a71219800ac9c5682b9f42ad831028b4e145160f818f1ce12638733107ed</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Amos,ClickFix,Foxveil,macOS,quill,threatfox</description>
+      <guid isPermaLink="false">508cfb05-465b-5a96-8094-d17b1a59b6ab</guid>
+      <pubDate>Fri, 06 Nov 2026 11:10:56 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] ipv4: 155[.]103[.]70[.]232</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: remcos,threatfox</description>
+      <guid isPermaLink="false">f200b89b-98b4-5e24-bcf6-980bbcb44f2b</guid>
+      <pubDate>Fri, 06 Nov 2026 11:10:20 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] ipv4: 155[.]103[.]71[.]245</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: remcos,threatfox</description>
+      <guid isPermaLink="false">8314f1c5-9d94-5e0c-b093-5234390cfb1a</guid>
+      <pubDate>Fri, 06 Nov 2026 11:10:20 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] ipv4: 152[.]232[.]62[.]135</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: RAT,STRRAT,threatfox</description>
+      <guid isPermaLink="false">ae973b85-2fef-5a13-9678-1e426eb64658</guid>
+      <pubDate>Fri, 06 Nov 2026 11:07:01 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: 74d372c95c86e0b5dad61597b931e2cf8017b28fefa0f9ed962305d96f2a4a51</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Amos,ClickFix,Foxveil,frame,macOS,threatfox</description>
+      <guid isPermaLink="false">8a777bc0-a91e-5229-b30c-d7c16bdcd579</guid>
+      <pubDate>Fri, 06 Nov 2026 11:06:40 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] domain: gf[.]akuntoti[.]net</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: Vidar,threatfox</description>
+      <guid isPermaLink="false">1cc0398e-16f3-5bfd-bd8d-b1495a8b697d</guid>
+      <pubDate>Fri, 06 Nov 2026 11:05:36 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] ipv4: 196[.]251[.]102[.]107</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: XWorm,threatfox</description>
+      <guid isPermaLink="false">54b283dd-638d-5204-a12a-b057df795e25</guid>
+      <pubDate>Fri, 06 Nov 2026 11:05:18 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] ipv4: 217[.]60[.]76[.]14</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: remcos,threatfox</description>
+      <guid isPermaLink="false">146bae58-14e7-5ca5-aa6e-0a354ca9be44</guid>
+      <pubDate>Fri, 06 Nov 2026 11:05:18 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] ipv4: 1[.]117[.]76[.]217</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: CobaltStrike,threatfox</description>
+      <guid isPermaLink="false">7fd15d64-b905-5f81-a3f4-97afd870d8f0</guid>
+      <pubDate>Fri, 06 Nov 2026 11:05:05 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] domain: ramus[.]com[.]br</title>
+      <description>Score 80, confidence high, sources: threatfox_export_json, tags: StrelaStealer,threatfox</description>
+      <guid isPermaLink="false">98be8bda-16eb-5bd0-ac74-da61e4ac351f</guid>
+      <pubDate>Fri, 06 Nov 2026 11:02:21 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxp://123[.]185[.]64[.]59:55925/bin[.]sh</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
+      <guid isPermaLink="false">1d26084e-0fb8-549b-bba3-6e8891c08989</guid>
+      <pubDate>Fri, 06 Nov 2026 11:02:07 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxp://125[.]45[.]56[.]225:45429/bin[.]sh</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
+      <guid isPermaLink="false">012a7a15-16df-529b-bd8c-6e0437b266b8</guid>
+      <pubDate>Fri, 06 Nov 2026 11:02:07 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: f82d6c9ccc0c3537f8d38238e06329b8b6f04e73dc88e42f9d734529a6503a13</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
+      <guid isPermaLink="false">5110bebb-35d7-571e-9215-1be647434bd6</guid>
+      <pubDate>Fri, 06 Nov 2026 11:01:16 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxps://github[.]com/3proxy/3proxy/releases/download/0[.]9[.]4/3proxy-0[.]9[.]4[.]x86_64[.]deb</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
+      <guid isPermaLink="false">a7a83960-f207-5ca6-bc25-d94d97d37c3d</guid>
+      <pubDate>Fri, 06 Nov 2026 11:01:07 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] url: hxxp://103[.]191[.]243[.]96/ezo</title>
+      <description>Score 80, confidence high, sources: urlhaus_recent_urls, tags: malware,malware_download,None</description>
+      <guid isPermaLink="false">debb1a2d-9f11-52d4-ba66-b32a024acd6f</guid>
+      <pubDate>Fri, 06 Nov 2026 11:01:05 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: 43de6af8cdd13f4e8106f4b21c8b9d8a3a84092b93b1b47faa031db86e2dac2b</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,XWorm</description>
+      <guid isPermaLink="false">c27b9c12-236c-5eda-abe9-cb39339778b5</guid>
+      <pubDate>Fri, 06 Nov 2026 11:01:02 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: 5e0181dc8356c0e529dfec12d2a3645728811d606f240b238804200f0c4ef6dc</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,XWorm</description>
+      <guid isPermaLink="false">c495d83f-c36e-560d-b44f-5e863fee2906</guid>
+      <pubDate>Fri, 06 Nov 2026 11:00:59 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: d460dc01fdbe4b72019623cbe1e85577f6d37edcd13e8d8cf94c266b9e4a325c</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,RemcosRAT</description>
+      <guid isPermaLink="false">dbabd2d4-164e-50f4-a150-0d09af777b0a</guid>
+      <pubDate>Fri, 06 Nov 2026 11:00:54 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: 8937526abcff7279161d5f42f0071bc7af87b463b28874bfc147f563ee2df9b9</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,AgentTesla</description>
+      <guid isPermaLink="false">99d69d9e-2fd0-5c00-8256-482abe2a92b3</guid>
+      <pubDate>Fri, 06 Nov 2026 11:00:50 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: f271f6a93cffcce36b67a4c0027e249e4c0b70300f9ac7992f7e6594c8c9362d</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,RemcosRAT</description>
+      <guid isPermaLink="false">86f2c3cd-af0b-5d03-a2c2-1fdeafff7e2c</guid>
+      <pubDate>Fri, 06 Nov 2026 11:00:36 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: e9b2ecd6bdc0d9648c8dacab13bd852872f969e251c7ec8eb9be8ab0256388a3</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,RemcosRAT</description>
+      <guid isPermaLink="false">08310bb0-064b-5705-a947-77185dcf97c6</guid>
+      <pubDate>Fri, 06 Nov 2026 11:00:32 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: bce2a4a686cdf29abc08ffe30bb84c3270ce4a73338ff0a704d009d94ecaf1c3</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,MassLogger</description>
+      <guid isPermaLink="false">613ff23f-6452-5149-a2e0-5cbe70161f91</guid>
+      <pubDate>Fri, 06 Nov 2026 11:00:27 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: 54e4e8c5dfb51a7dd161bbc07760938359b2e438b99e3f133dfc311eef6bac88</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware</description>
+      <guid isPermaLink="false">248777b8-4807-58a8-adc7-99d77e5e8c7a</guid>
+      <pubDate>Fri, 06 Nov 2026 11:00:20 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: e2b6f4e4bb873c18e7676c039e8895e8a28753267cfd85b834340e3a928d4f47</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,AsyncRAT</description>
+      <guid isPermaLink="false">1234e860-c0b4-5249-bf44-37980ca16523</guid>
+      <pubDate>Fri, 06 Nov 2026 11:00:18 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: 0f7fec44d2837a6835890c89cb3d192b8608e3004c6eacf9342ad881ce4c1b67</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,AsyncRAT</description>
+      <guid isPermaLink="false">4f843d0f-31a6-5d4c-b069-88d9c389bfc3</guid>
+      <pubDate>Fri, 06 Nov 2026 11:00:14 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: 37615f5a3c9c90a9002296b925bd562d5eb37891d98f3e70f4bf3c69dc8a077f</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,RemcosRAT</description>
+      <guid isPermaLink="false">94fce911-d749-55b5-935d-cc4e3e118464</guid>
+      <pubDate>Fri, 06 Nov 2026 10:59:59 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: 2014586b5f8e9f2757d9b2a2ffc4480a5f9bf9ad9e08075acf13a61a3a56258d</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,AgentTesla</description>
+      <guid isPermaLink="false">299bd5a6-fc20-565d-8003-801d18eb1198</guid>
+      <pubDate>Fri, 06 Nov 2026 10:59:55 +0000</pubDate>
+    </item>
+    <item>
+      <title>[80] sha256: 83f3e8935433a788feabfdc239349ef49842114a2059ade91051dac4b621b35a</title>
+      <description>Score 80, confidence high, sources: malwarebazaar_recent, tags: malware,XWorm</description>
+      <guid isPermaLink="false">17e3aa3a-22d4-5f8a-819b-ba4b6b4d1ab5</guid>
+      <pubDate>Fri, 06 Nov 2026 10:59:51 +0000</pubDate>
     </item>
 </channel></rss>

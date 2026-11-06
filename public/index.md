@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-11-06T00:41:23Z_
+_Generated 2026-11-06T11:44:16Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-11-06T00:41:23Z |
+| Generated | 2026-11-06T11:44:16Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 5679 |
+| Duplicates removed | 5370 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-group overlaps | 427 |
+| Multi-group overlaps | 425 |
 | Score (min / avg / max) | 80 / 80.3 / 96 |
 | High-score indicators (≥80) | 10000 |
-| 2+ reporting groups | 427 |
+| 2+ reporting groups | 425 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-11-06T00:35:29Z |
+| Newest first_seen | 2026-11-06T11:43:59Z |
 
 ## Top indicators by score
 
@@ -41,26 +41,26 @@ _Generated 2026-11-06T00:41:23Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4798 |
-| ipsum_level5 | 4268 |
-| greensnow_blocklist | 3653 |
-| threatfox_export_json | 2738 |
-| nist_nvd_recent | 2000 |
+| blocklist_de_ssh | 4765 |
+| ipsum_level5 | 4654 |
+| threatfox_export_json | 3065 |
+| nist_nvd_recent | 2600 |
+| greensnow_blocklist | 2186 |
 | cisa_kev | 1768 |
-| spamhaus_drop | 1763 |
-| tor_exit_nodes | 1240 |
-| malwarebazaar_recent | 1083 |
+| spamhaus_drop | 1764 |
+| tor_exit_nodes | 1241 |
+| binarydefense_banlist | 993 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3337 |
-| sha256 | 2566 |
-| ipv4_cidr | 1762 |
-| url | 1154 |
-| domain | 490 |
-| ipv4 | 235 |
+| sha256 | 3322 |
+| cve | 2834 |
+| ipv4_cidr | 1763 |
+| url | 887 |
+| domain | 472 |
+| ipv4 | 266 |
 | md5 | 228 |
 | sha1 | 228 |
 
@@ -68,16 +68,16 @@ _Generated 2026-11-06T00:41:23Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| cve | 3337 |
-| threatfox | 3119 |
-| malware | 2227 |
-| nvd | 1973 |
+| threatfox | 3565 |
+| cve | 2834 |
+| malware | 2331 |
 | exploited-in-the-wild | 1768 |
-| drop | 1762 |
-| spamhaus | 1762 |
-| ClickFix | 996 |
-| macOS | 936 |
-| Amos | 909 |
+| drop | 1763 |
+| spamhaus | 1763 |
+| nvd | 1470 |
+| ClickFix | 1118 |
+| macOS | 1076 |
+| Amos | 1049 |
 
 ## Multi-group reporting overlaps
 
@@ -91,7 +91,7 @@ _Generated 2026-11-06T00:41:23Z_
 | ipv4: 176[.]65[.]139[.]131 | blocklist_de_ssh, et_compromised, ipsum_level5, threatfox_export_json |
 | ipv4: 45[.]78[.]201[.]248 | blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
 | ipv4: 77[.]239[.]124[.]135 | binarydefense_banlist, ci_army_list, ipsum_level5, threatfox_export_json |
-| ipv4: 45[.]90[.]163[.]37 | binarydefense_banlist, ci_army_list, threatfox_export_json |
 | cve: CVE-2008-4128 | cisa_kev, nist_nvd_recent |
+| cve: CVE-2009-3960 | cisa_kev, nist_nvd_recent |
 
 For more detail see [diagnostics/REPORT.md](diagnostics/REPORT.md) and the machine-readable feeds in [iocs/](iocs/).
