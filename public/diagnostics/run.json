@@ -1,23 +1,23 @@
 {
   "window_hours": 48,
   "total": 10000,
-  "total_before_dedup": 41295,
+  "total_before_dedup": 41170,
   "collections": {
-    "observables": 7658,
-    "vulnerabilities": 2342,
+    "observables": 7643,
+    "vulnerabilities": 2357,
     "known_exploited": 1769,
     "reported_exploitation": 0,
-    "not_established": 573
+    "not_established": 588
   },
-  "duplicates_removed": 5879,
-  "false_positives_removed": 1,
+  "duplicates_removed": 5827,
+  "false_positives_removed": 0,
   "sensitive_rows_omitted": 0,
   "sensitive_previous_rows_omitted": 0,
   "persist_feed": true,
-  "carried_forward": 2851,
+  "carried_forward": 2863,
   "expired_low_score": 0,
   "aged_out": 0,
-  "pruned_over_cap": 28267,
+  "pruned_over_cap": 28206,
   "stored": 10000,
   "max_age_days": 30,
   "max_store": 10000,
@@ -35,28 +35,28 @@
   "high_confidence_score": 80,
   "detection_pack": {
     "sigma_rules": 2,
-    "suricata_rules": 4301,
-    "rpz_domains": 259
+    "suricata_rules": 4314,
+    "rpz_domains": 258
   },
   "delta_counts": {
-    "added": 1048,
-    "updated": 207,
-    "removed": 1048
+    "added": 702,
+    "updated": 323,
+    "removed": 702
   },
   "delta_baseline_available": true,
   "counts": {
     "cisa_kev": 1769,
-    "nist_nvd_recent": 2800,
-    "urlhaus_recent_urls": 892,
-    "malwarebazaar_recent": 1043,
-    "threatfox_export_json": 2702,
+    "nist_nvd_recent": 2400,
+    "urlhaus_recent_urls": 1032,
+    "malwarebazaar_recent": 1014,
+    "threatfox_export_json": 2888,
     "feodo_ipblocklist": 5,
     "sslbl_ja3": 97,
     "openphish_feed": 300,
     "spamhaus_drop": 1764,
     "dshield_block": 20,
-    "blocklist_de_ssh": 4554,
-    "greensnow_blocklist": 2790,
+    "blocklist_de_ssh": 4510,
+    "greensnow_blocklist": 2812,
     "ci_army_list": 15000,
     "tor_exit_nodes": 1245,
     "et_compromised": 511,
@@ -65,30 +65,30 @@
   },
   "source_newest_first_seen": {
     "cisa_kev": "2026-11-06T00:00:00Z",
-    "nist_nvd_recent": "2026-08-10T10:17:32Z",
-    "urlhaus_recent_urls": "2026-11-07T10:56:06Z",
-    "malwarebazaar_recent": "2026-11-07T14:04:31Z",
-    "threatfox_export_json": "2026-11-07T14:34:27Z",
+    "nist_nvd_recent": "2026-06-24T17:17:14Z",
+    "urlhaus_recent_urls": "2026-11-07T19:24:51Z",
+    "malwarebazaar_recent": "2026-11-07T19:40:05Z",
+    "threatfox_export_json": "2026-11-07T19:46:18Z",
     "feodo_ipblocklist": "2026-03-04T14:28:39Z",
     "sslbl_ja3": "2020-12-27T16:53:04Z",
-    "openphish_feed": "2026-11-07T14:37:07Z",
-    "spamhaus_drop": "2026-11-07T14:37:06Z",
-    "dshield_block": "2026-11-07T14:37:07Z",
-    "blocklist_de_ssh": "2026-11-07T14:37:06Z",
-    "greensnow_blocklist": "2026-11-07T14:37:07Z",
-    "ci_army_list": "2026-11-07T14:37:07Z",
-    "tor_exit_nodes": "2026-11-07T14:37:07Z",
-    "et_compromised": "2026-11-07T14:37:07Z",
-    "binarydefense_banlist": "2026-11-07T14:37:07Z",
-    "ipsum_level5": "2026-11-07T14:37:07Z"
+    "openphish_feed": "2026-11-07T19:49:12Z",
+    "spamhaus_drop": "2026-11-07T19:49:12Z",
+    "dshield_block": "2026-11-07T19:49:12Z",
+    "blocklist_de_ssh": "2026-11-07T19:49:12Z",
+    "greensnow_blocklist": "2026-11-07T19:49:12Z",
+    "ci_army_list": "2026-11-07T19:49:12Z",
+    "tor_exit_nodes": "2026-11-07T19:49:13Z",
+    "et_compromised": "2026-11-07T19:49:12Z",
+    "binarydefense_banlist": "2026-11-07T19:49:13Z",
+    "ipsum_level5": "2026-11-07T19:49:12Z"
   },
   "stored_counts": {
-    "threatfox_export_json": 3753,
-    "malwarebazaar_recent": 2014,
+    "threatfox_export_json": 3837,
+    "malwarebazaar_recent": 1773,
     "cisa_kev": 1769,
     "spamhaus_drop": 1763,
-    "nist_nvd_recent": 978,
-    "urlhaus_recent_urls": 892,
+    "urlhaus_recent_urls": 1033,
+    "nist_nvd_recent": 993,
     "dshield_block": 13,
     "ipsum_level5": 8,
     "blocklist_de_ssh": 7,
@@ -98,148 +98,148 @@
     "ci_army_list": 3
   },
   "type_counts": {
-    "sha256": 3893,
-    "cve": 2342,
+    "sha256": 3578,
+    "cve": 2357,
     "ipv4_cidr": 1763,
-    "url": 999,
-    "domain": 259,
-    "ipv4": 258,
-    "md5": 243,
-    "sha1": 243
+    "url": 1119,
+    "md5": 330,
+    "sha1": 330,
+    "ipv4": 265,
+    "domain": 258
   },
   "tag_counts": {
-    "threatfox": 3753,
-    "malware": 2906,
-    "cve": 2342,
+    "threatfox": 3837,
+    "malware": 2806,
+    "cve": 2357,
     "exploited-in-the-wild": 1769,
     "drop": 1763,
     "spamhaus": 1763,
-    "ClickFix": 1168,
-    "macOS": 1163,
-    "Amos": 1121,
-    "Foxveil": 1104,
-    "nvd": 978,
-    "malware_download": 892,
-    "ps1": 790,
-    "Dropper": 781,
-    "elf": 408,
-    "medium": 395,
-    "Mirai": 374,
-    "None": 368,
-    "high": 334,
-    "github": 251,
-    "zapret": 219,
-    "zip": 218,
+    "macOS": 1096,
+    "ClickFix": 1068,
+    "Amos": 1035,
+    "Foxveil": 1034,
+    "malware_download": 1033,
+    "nvd": 993,
+    "ps1": 788,
+    "Dropper": 779,
+    "github": 419,
+    "medium": 404,
+    "None": 373,
+    "elf": 372,
+    "high": 340,
+    "Mirai": 332,
+    "zip": 260,
+    "SalatStealer": 216,
+    "zapret": 187,
     "critical": 186,
-    "Loader": 184,
-    "macho": 153
+    "Loader": 181
   },
   "fetch_metrics": {
-    "sslbl_ja3": {
-      "ms": 67,
-      "bytes": 8496,
-      "status": 200,
-      "requests": 1
-    },
     "feodo_ipblocklist": {
-      "ms": 127,
+      "ms": 37,
       "bytes": 940,
       "status": 200,
       "requests": 1
     },
-    "spamhaus_drop": {
-      "ms": 99,
-      "bytes": 49044,
-      "status": 200,
-      "requests": 1
-    },
     "cisa_kev": {
-      "ms": 218,
+      "ms": 85,
       "bytes": 1832349,
       "status": 200,
       "requests": 1
     },
-    "blocklist_de_ssh": {
-      "ms": 96,
-      "bytes": 65687,
+    "spamhaus_drop": {
+      "ms": 54,
+      "bytes": 49044,
       "status": 200,
       "requests": 1
     },
-    "nist_nvd_recent": {
-      "ms": 7259,
-      "bytes": 20208335,
-      "status": 429,
-      "requests": 15
+    "blocklist_de_ssh": {
+      "ms": 36,
+      "bytes": 65057,
+      "status": 200,
+      "requests": 1
     },
     "dshield_block": {
-      "ms": 268,
+      "ms": 163,
       "bytes": 2050,
       "status": 200,
       "requests": 1
     },
     "openphish_feed": {
-      "ms": 503,
+      "ms": 419,
       "bytes": 15753,
       "status": 200,
       "requests": 1
     },
-    "et_compromised": {
-      "ms": 71,
-      "bytes": 7200,
-      "status": 200,
-      "requests": 1
-    },
     "ci_army_list": {
-      "ms": 298,
-      "bytes": 212533,
+      "ms": 304,
+      "bytes": 212532,
       "status": 200,
       "requests": 1
     },
     "greensnow_blocklist": {
-      "ms": 535,
-      "bytes": 40081,
+      "ms": 525,
+      "bytes": 40389,
+      "status": 200,
+      "requests": 1
+    },
+    "et_compromised": {
+      "ms": 47,
+      "bytes": 7200,
       "status": 200,
       "requests": 1
     },
     "ipsum_level5": {
-      "ms": 28,
+      "ms": 9,
       "bytes": 64208,
       "status": 200,
       "requests": 1
     },
     "binarydefense_banlist": {
-      "ms": 482,
+      "ms": 164,
       "bytes": 19005,
       "status": 200,
       "requests": 1
     },
     "threatfox_export_json": {
-      "ms": 1073,
-      "bytes": 5389532,
+      "ms": 1026,
+      "bytes": 5359570,
       "status": 200,
       "requests": 1
     },
     "tor_exit_nodes": {
-      "ms": 755,
-      "bytes": 436882,
+      "ms": 656,
+      "bytes": 436884,
       "status": 200,
       "requests": 1
     },
     "malwarebazaar_recent": {
-      "ms": 1454,
-      "bytes": 495039,
+      "ms": 1917,
+      "bytes": 479999,
+      "status": 200,
+      "requests": 1
+    },
+    "nist_nvd_recent": {
+      "ms": 24882,
+      "bytes": 15834910,
+      "status": 429,
+      "requests": 13
+    },
+    "sslbl_ja3": {
+      "ms": 19710,
+      "bytes": 8496,
       "status": 200,
       "requests": 1
     },
     "urlhaus_recent_urls": {
-      "ms": 27905,
-      "bytes": 29650410,
+      "ms": 26649,
+      "bytes": 29727254,
       "status": 200,
       "requests": 1
     }
   },
   "earliest_first_seen": "2008-09-18T20:00:00Z",
-  "newest_first_seen": "2026-11-07T14:34:27Z",
+  "newest_first_seen": "2026-11-07T19:46:18Z",
   "empty_sources": [],
   "volume_drops": [],
   "failures": [],
@@ -253,29 +253,29 @@
     },
     "nist_nvd_recent": {
       "state": "collected",
-      "returned": 2800,
-      "eligible_before_cap": 2800,
+      "returned": 2400,
+      "eligible_before_cap": 2400,
       "configured_cap": null,
       "graceful_failure": false
     },
     "urlhaus_recent_urls": {
       "state": "collected",
-      "returned": 892,
-      "eligible_before_cap": 892,
+      "returned": 1032,
+      "eligible_before_cap": 1032,
       "configured_cap": null,
       "graceful_failure": false
     },
     "malwarebazaar_recent": {
       "state": "collected",
-      "returned": 1043,
-      "eligible_before_cap": 1043,
+      "returned": 1014,
+      "eligible_before_cap": 1014,
       "configured_cap": null,
       "graceful_failure": false
     },
     "threatfox_export_json": {
       "state": "collected",
-      "returned": 2702,
-      "eligible_before_cap": 2702,
+      "returned": 2888,
+      "eligible_before_cap": 2888,
       "configured_cap": null,
       "graceful_failure": false
     },
@@ -316,15 +316,15 @@
     },
     "blocklist_de_ssh": {
       "state": "collected",
-      "returned": 4554,
-      "eligible_before_cap": 4554,
+      "returned": 4510,
+      "eligible_before_cap": 4510,
       "configured_cap": null,
       "graceful_failure": false
     },
     "greensnow_blocklist": {
       "state": "collected",
-      "returned": 2790,
-      "eligible_before_cap": 2790,
+      "returned": 2812,
+      "eligible_before_cap": 2812,
       "configured_cap": null,
       "graceful_failure": false
     },
@@ -365,5 +365,5 @@
     }
   },
   "version": 4,
-  "ts": "2026-11-07T14:37:45Z"
+  "ts": "2026-11-07T19:49:49Z"
 }
