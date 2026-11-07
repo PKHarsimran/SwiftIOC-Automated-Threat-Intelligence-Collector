@@ -2,16 +2,16 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-11-06T23:56:02Z_
+_Generated 2026-11-07T04:19:05Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-11-06T23:56:02Z |
+| Generated | 2026-11-07T04:19:05Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 5759 |
+| Duplicates removed | 6438 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-group overlaps | 425 |
@@ -19,7 +19,7 @@ _Generated 2026-11-06T23:56:02Z_
 | High-score indicators (≥80) | 10000 |
 | 2+ reporting groups | 425 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-11-06T23:55:03Z |
+| Newest first_seen | 2026-11-07T04:16:44Z |
 
 ## Top indicators by score
 
@@ -41,26 +41,26 @@ _Generated 2026-11-06T23:56:02Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| ipsum_level5 | 4654 |
-| blocklist_de_ssh | 4639 |
-| threatfox_export_json | 3267 |
-| greensnow_blocklist | 3045 |
-| nist_nvd_recent | 2200 |
+| blocklist_de_ssh | 4598 |
+| ipsum_level5 | 4471 |
+| greensnow_blocklist | 3598 |
+| threatfox_export_json | 3241 |
+| nist_nvd_recent | 2600 |
 | cisa_kev | 1769 |
 | spamhaus_drop | 1764 |
-| tor_exit_nodes | 1246 |
-| malwarebazaar_recent | 1109 |
+| binarydefense_banlist | 1332 |
+| tor_exit_nodes | 1247 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3416 |
-| cve | 2716 |
+| sha256 | 3648 |
+| cve | 2455 |
 | ipv4_cidr | 1763 |
-| url | 963 |
-| domain | 377 |
-| ipv4 | 279 |
+| url | 988 |
+| domain | 382 |
+| ipv4 | 278 |
 | md5 | 243 |
 | sha1 | 243 |
 
@@ -68,16 +68,16 @@ _Generated 2026-11-06T23:56:02Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3574 |
-| cve | 2716 |
-| malware | 2507 |
+| threatfox | 3747 |
+| malware | 2704 |
+| cve | 2455 |
 | exploited-in-the-wild | 1769 |
 | drop | 1763 |
 | spamhaus | 1763 |
-| nvd | 1351 |
-| ClickFix | 995 |
-| macOS | 982 |
-| Amos | 944 |
+| nvd | 1090 |
+| ClickFix | 1048 |
+| macOS | 1035 |
+| Amos | 997 |
 
 ## Multi-group reporting overlaps
 
