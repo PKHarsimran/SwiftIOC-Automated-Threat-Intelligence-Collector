@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-11-07T04:19:05Z_
+_Generated 2026-11-07T14:37:45Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-11-07T04:19:05Z |
+| Generated | 2026-11-07T14:37:45Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 6438 |
+| Duplicates removed | 5879 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-group overlaps | 425 |
+| Multi-group overlaps | 428 |
 | Score (min / avg / max) | 80 / 80.3 / 96 |
 | High-score indicators (≥80) | 10000 |
-| 2+ reporting groups | 425 |
+| 2+ reporting groups | 428 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-11-07T04:16:44Z |
+| Newest first_seen | 2026-11-07T14:34:27Z |
 
 ## Top indicators by score
 
@@ -33,34 +33,34 @@ _Generated 2026-11-07T04:19:05Z_
 | ipv4: `176[.]65[.]139[.]131` | score 96, 3 reporting groups |
 | ipv4: `45[.]78[.]201[.]248` | score 96, 3 reporting groups |
 | ipv4: `77[.]239[.]124[.]135` | score 96, 3 reporting groups |
+| ipv4: `158[.]220[.]81[.]103` | score 88, 2 reporting groups |
 | ipv4_cidr: `178.20.210.0/24` | score 88, 2 reporting groups |
-| ipv4_cidr: `195.178.110.0/24` | score 88, 2 reporting groups |
 
 ## Per-source totals
 
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4598 |
+| blocklist_de_ssh | 4554 |
 | ipsum_level5 | 4471 |
-| greensnow_blocklist | 3598 |
-| threatfox_export_json | 3241 |
-| nist_nvd_recent | 2600 |
+| nist_nvd_recent | 2800 |
+| greensnow_blocklist | 2790 |
+| threatfox_export_json | 2702 |
 | cisa_kev | 1769 |
 | spamhaus_drop | 1764 |
 | binarydefense_banlist | 1332 |
-| tor_exit_nodes | 1247 |
+| tor_exit_nodes | 1245 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3648 |
-| cve | 2455 |
+| sha256 | 3893 |
+| cve | 2342 |
 | ipv4_cidr | 1763 |
-| url | 988 |
-| domain | 382 |
-| ipv4 | 278 |
+| url | 999 |
+| domain | 259 |
+| ipv4 | 258 |
 | md5 | 243 |
 | sha1 | 243 |
 
@@ -68,16 +68,16 @@ _Generated 2026-11-07T04:19:05Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3747 |
-| malware | 2704 |
-| cve | 2455 |
+| threatfox | 3753 |
+| malware | 2906 |
+| cve | 2342 |
 | exploited-in-the-wild | 1769 |
 | drop | 1763 |
 | spamhaus | 1763 |
-| nvd | 1090 |
-| ClickFix | 1048 |
-| macOS | 1035 |
-| Amos | 997 |
+| ClickFix | 1168 |
+| macOS | 1163 |
+| Amos | 1121 |
+| Foxveil | 1104 |
 
 ## Multi-group reporting overlaps
 
