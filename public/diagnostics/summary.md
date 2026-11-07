@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-11-07T19:49:49Z_
+_Generated 2026-11-07T23:21:45Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-11-07T19:49:49Z |
+| Generated | 2026-11-07T23:21:45Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 5827 |
+| Duplicates removed | 5756 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-group overlaps | 428 |
+| Multi-group overlaps | 429 |
 | Score (min / avg / max) | 80 / 80.3 / 96 |
 | High-score indicators (≥80) | 10000 |
-| 2+ reporting groups | 428 |
+| 2+ reporting groups | 429 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-11-07T19:46:18Z |
+| Newest first_seen | 2026-11-07T23:17:41Z |
 
 ## Top indicators by score
 
@@ -39,43 +39,43 @@ _Generated 2026-11-07T19:49:49Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4510 |
+| blocklist_de_ssh | 4494 |
 | ipsum_level5 | 4471 |
-| threatfox_export_json | 2888 |
-| greensnow_blocklist | 2812 |
-| nist_nvd_recent | 2400 |
+| nist_nvd_recent | 3400 |
+| threatfox_export_json | 3169 |
+| greensnow_blocklist | 2867 |
 | cisa_kev | 1769 |
 | spamhaus_drop | 1764 |
 | binarydefense_banlist | 1332 |
-| tor_exit_nodes | 1245 |
+| tor_exit_nodes | 1240 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3578 |
-| cve | 2357 |
-| ipv4_cidr | 1763 |
-| url | 1119 |
+| sha256 | 3649 |
+| cve | 2927 |
+| url | 1400 |
+| ipv4_cidr | 700 |
+| domain | 400 |
 | md5 | 330 |
 | sha1 | 330 |
-| ipv4 | 265 |
-| domain | 258 |
+| ipv4 | 264 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3837 |
-| malware | 2806 |
-| cve | 2357 |
+| threatfox | 4162 |
+| malware | 2976 |
+| cve | 2927 |
 | exploited-in-the-wild | 1769 |
-| drop | 1763 |
-| spamhaus | 1763 |
-| macOS | 1096 |
-| ClickFix | 1068 |
-| Amos | 1035 |
-| Foxveil | 1034 |
+| nvd | 1564 |
+| malware_download | 1177 |
+| ClickFix | 1148 |
+| macOS | 1137 |
+| Amos | 1075 |
+| Foxveil | 1074 |
 
 ## Multi-group reporting overlaps
 
