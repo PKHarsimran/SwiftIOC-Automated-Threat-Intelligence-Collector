@@ -2,16 +2,16 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-11-08T20:06:38Z_
+_Generated 2026-11-09T04:18:25Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-11-08T20:06:38Z |
+| Generated | 2026-11-09T04:18:25Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 5437 |
+| Duplicates removed | 6175 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-group overlaps | 429 |
@@ -19,7 +19,7 @@ _Generated 2026-11-08T20:06:38Z_
 | High-score indicators (≥80) | 10000 |
 | 2+ reporting groups | 429 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-11-08T20:05:46Z |
+| Newest first_seen | 2026-11-09T04:17:07Z |
 
 ## Top indicators by score
 
@@ -41,43 +41,43 @@ _Generated 2026-11-08T20:06:38Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4486 |
-| ipsum_level5 | 3847 |
-| greensnow_blocklist | 2612 |
-| threatfox_export_json | 2588 |
-| nist_nvd_recent | 2000 |
-| urlhaus_recent_urls | 1792 |
+| blocklist_de_ssh | 4571 |
+| ipsum_level5 | 3884 |
+| greensnow_blocklist | 3240 |
+| threatfox_export_json | 3032 |
+| binarydefense_banlist | 1920 |
+| urlhaus_recent_urls | 1888 |
 | cisa_kev | 1769 |
 | spamhaus_drop | 1762 |
-| binarydefense_banlist | 1629 |
+| nist_nvd_recent | 1527 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 2869 |
-| sha256 | 2081 |
-| url | 2031 |
-| ipv4_cidr | 1761 |
-| domain | 568 |
-| md5 | 266 |
-| sha1 | 266 |
-| ipv4 | 158 |
+| cve | 2680 |
+| url | 2186 |
+| sha256 | 1891 |
+| ipv4_cidr | 1759 |
+| domain | 984 |
+| md5 | 172 |
+| sha1 | 172 |
+| ipv4 | 156 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 3125 |
-| threatfox | 2901 |
-| cve | 2869 |
-| malware_download | 1792 |
+| malware | 3317 |
+| threatfox | 2994 |
+| cve | 2680 |
+| malware_download | 1888 |
 | exploited-in-the-wild | 1769 |
-| drop | 1761 |
-| spamhaus | 1761 |
-| nvd | 1506 |
-| None | 962 |
-| elf | 674 |
+| drop | 1759 |
+| spamhaus | 1759 |
+| nvd | 1317 |
+| None | 949 |
+| ClickFix | 901 |
 
 ## Multi-group reporting overlaps
 
