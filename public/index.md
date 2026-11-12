@@ -2,16 +2,16 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-11-11T22:26:16Z_
+_Generated 2026-11-12T05:29:34Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-11-11T22:26:16Z |
+| Generated | 2026-11-12T05:29:34Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 4680 |
+| Duplicates removed | 5240 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-group overlaps | 437 |
@@ -19,7 +19,7 @@ _Generated 2026-11-11T22:26:16Z_
 | High-score indicators (≥80) | 10000 |
 | 2+ reporting groups | 437 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-11-11T22:25:55Z |
+| Newest first_seen | 2026-11-12T05:29:09Z |
 
 ## Top indicators by score
 
@@ -41,43 +41,43 @@ _Generated 2026-11-11T22:26:16Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4462 |
-| ipsum_level5 | 3423 |
-| nist_nvd_recent | 3200 |
-| greensnow_blocklist | 2798 |
-| threatfox_export_json | 2717 |
+| blocklist_de_ssh | 4465 |
+| ipsum_level5 | 3708 |
+| greensnow_blocklist | 3377 |
+| nist_nvd_recent | 3000 |
+| threatfox_export_json | 2805 |
 | cisa_kev | 1779 |
 | spamhaus_drop | 1756 |
-| malwarebazaar_recent | 1386 |
-| urlhaus_recent_urls | 1313 |
+| urlhaus_recent_urls | 1307 |
+| tor_exit_nodes | 1258 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3371 |
-| cve | 2473 |
-| url | 1446 |
-| ipv4_cidr | 1124 |
-| domain | 869 |
-| md5 | 272 |
-| sha1 | 272 |
-| ipv4 | 173 |
+| sha256 | 3398 |
+| cve | 2383 |
+| url | 1459 |
+| ipv4_cidr | 1275 |
+| domain | 930 |
+| md5 | 187 |
+| sha1 | 187 |
+| ipv4 | 181 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 4326 |
-| threatfox | 3158 |
-| cve | 2473 |
+| malware | 4303 |
+| threatfox | 3143 |
+| cve | 2383 |
 | exploited-in-the-wild | 1779 |
-| malware_download | 1332 |
-| drop | 1124 |
-| spamhaus | 1124 |
-| nvd | 1109 |
-| elf | 961 |
-| None | 750 |
+| malware_download | 1331 |
+| drop | 1275 |
+| spamhaus | 1275 |
+| nvd | 1019 |
+| elf | 970 |
+| None | 789 |
 
 ## Multi-group reporting overlaps
 
