@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-11-13T11:49:33Z_
+_Generated 2026-11-13T19:06:14Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-11-13T11:49:33Z |
+| Generated | 2026-11-13T19:06:14Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3979 |
+| Duplicates removed | 4315 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-group overlaps | 439 |
+| Multi-group overlaps | 440 |
 | Score (min / avg / max) | 80 / 80.4 / 96 |
 | High-score indicators (≥80) | 10000 |
-| 2+ reporting groups | 439 |
+| 2+ reporting groups | 440 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-11-13T11:42:58Z |
+| Newest first_seen | 2026-11-13T19:05:51Z |
 
 ## Top indicators by score
 
@@ -39,43 +39,43 @@ _Generated 2026-11-13T11:49:33Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4717 |
+| blocklist_de_ssh | 4805 |
 | ipsum_level5 | 3855 |
-| threatfox_export_json | 2929 |
-| nist_nvd_recent | 2800 |
-| cisa_kev | 1779 |
-| greensnow_blocklist | 1762 |
-| spamhaus_drop | 1758 |
+| threatfox_export_json | 3123 |
+| greensnow_blocklist | 2564 |
+| cisa_kev | 1781 |
+| spamhaus_drop | 1759 |
 | tor_exit_nodes | 1254 |
-| malwarebazaar_recent | 1089 |
+| malwarebazaar_recent | 1042 |
+| urlhaus_recent_urls | 628 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| sha256 | 3118 |
-| cve | 2412 |
-| ipv4_cidr | 1757 |
-| domain | 1318 |
-| url | 810 |
-| md5 | 219 |
-| sha1 | 212 |
-| ipv4 | 154 |
+| sha256 | 2933 |
+| cve | 2455 |
+| ipv4_cidr | 1758 |
+| domain | 1390 |
+| url | 771 |
+| md5 | 282 |
+| sha1 | 275 |
+| ipv4 | 136 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3734 |
-| malware | 2971 |
-| cve | 2412 |
-| exploited-in-the-wild | 1779 |
-| drop | 1757 |
-| spamhaus | 1757 |
-| nvd | 1048 |
-| etherhiding | 795 |
-| Mirai | 681 |
-| malware_download | 677 |
+| threatfox | 3801 |
+| malware | 2743 |
+| cve | 2455 |
+| exploited-in-the-wild | 1781 |
+| drop | 1758 |
+| spamhaus | 1758 |
+| nvd | 1090 |
+| etherhiding | 886 |
+| malware_download | 631 |
+| Mirai | 588 |
 
 ## Multi-group reporting overlaps
 
