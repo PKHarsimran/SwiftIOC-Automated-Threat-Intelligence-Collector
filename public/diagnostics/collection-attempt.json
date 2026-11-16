@@ -1,46 +1,52 @@
 {
   "phase": "quality_checks",
-  "ts": "2026-11-15T20:45:06Z",
+  "ts": "2026-11-16T04:28:08Z",
   "status": "accepted",
   "counts": {
     "cisa_kev": 1781,
-    "nist_nvd_recent": 635,
-    "urlhaus_recent_urls": 1175,
-    "malwarebazaar_recent": 1192,
-    "threatfox_export_json": 2345,
+    "nist_nvd_recent": 0,
+    "urlhaus_recent_urls": 1178,
+    "malwarebazaar_recent": 1138,
+    "threatfox_export_json": 2665,
     "feodo_ipblocklist": 5,
-    "sslbl_ja3": 97,
+    "sslbl_ja3": 0,
     "openphish_feed": 300,
     "spamhaus_drop": 1759,
     "dshield_block": 20,
-    "blocklist_de_ssh": 4642,
+    "blocklist_de_ssh": 4658,
     "greensnow_blocklist": 0,
     "ci_army_list": 15000,
-    "tor_exit_nodes": 1256,
+    "tor_exit_nodes": 1260,
     "et_compromised": 584,
-    "binarydefense_banlist": 751,
-    "ipsum_level5": 3613
+    "binarydefense_banlist": 1099,
+    "ipsum_level5": 2773
   },
   "source_newest_first_seen": {
     "cisa_kev": "2026-11-13T00:00:00Z",
-    "nist_nvd_recent": "2026-11-15T19:17:16Z",
-    "urlhaus_recent_urls": "2026-11-15T20:18:15Z",
-    "malwarebazaar_recent": "2026-11-15T20:26:20Z",
-    "threatfox_export_json": "2026-11-15T20:43:10Z",
+    "urlhaus_recent_urls": "2026-11-16T04:17:11Z",
+    "malwarebazaar_recent": "2026-11-16T04:08:05Z",
+    "threatfox_export_json": "2026-11-16T04:19:57Z",
     "feodo_ipblocklist": "2026-03-04T14:28:39Z",
-    "sslbl_ja3": "2020-12-27T16:53:04Z",
-    "openphish_feed": "2026-11-15T20:44:13Z",
-    "spamhaus_drop": "2026-11-15T20:44:12Z",
-    "dshield_block": "2026-11-15T20:44:12Z",
-    "blocklist_de_ssh": "2026-11-15T20:44:12Z",
-    "ci_army_list": "2026-11-15T20:44:12Z",
-    "tor_exit_nodes": "2026-11-15T20:44:13Z",
-    "et_compromised": "2026-11-15T20:44:13Z",
-    "binarydefense_banlist": "2026-11-15T20:44:13Z",
-    "ipsum_level5": "2026-11-15T20:44:13Z"
+    "openphish_feed": "2026-11-16T04:26:44Z",
+    "spamhaus_drop": "2026-11-16T04:26:44Z",
+    "dshield_block": "2026-11-16T04:26:44Z",
+    "blocklist_de_ssh": "2026-11-16T04:26:44Z",
+    "ci_army_list": "2026-11-16T04:26:44Z",
+    "tor_exit_nodes": "2026-11-16T04:26:45Z",
+    "et_compromised": "2026-11-16T04:26:44Z",
+    "binarydefense_banlist": "2026-11-16T04:26:45Z",
+    "ipsum_level5": "2026-11-16T04:26:45Z"
   },
   "quality_failures": [],
   "source_failures": [
+    {
+      "source": "nist_nvd_recent",
+      "error": "503 Server Error: Service Unavailable for url: https://services.nvd.nist.gov/rest/json/cves/2.0/?resultsPerPage=200&lastModStartDate=2026-11-14T04%3A26%3A43.000&lastModEndDate=2026-11-16T04%3A26%3A43.000"
+    },
+    {
+      "source": "sslbl_ja3",
+      "error": "HTTPSConnectionPool(host='sslbl.abuse.ch', port=443): Max retries exceeded with url: /blacklist/ja3_fingerprints.csv (Caused by ReadTimeoutError(\"HTTPSConnectionPool(host='sslbl.abuse.ch', port=443): Read timed out. (read timeout=20)\"))"
+    },
     {
       "source": "greensnow_blocklist",
       "error": "503 Server Error: Service Unavailable for url: https://blocklist.greensnow.co/greensnow.txt"
@@ -55,30 +61,30 @@
       "graceful_failure": false
     },
     "nist_nvd_recent": {
-      "state": "collected",
-      "returned": 635,
-      "eligible_before_cap": 635,
+      "state": "failed",
+      "returned": 0,
+      "eligible_before_cap": 0,
       "configured_cap": null,
       "graceful_failure": false
     },
     "urlhaus_recent_urls": {
       "state": "collected",
-      "returned": 1175,
-      "eligible_before_cap": 1175,
+      "returned": 1178,
+      "eligible_before_cap": 1178,
       "configured_cap": null,
       "graceful_failure": false
     },
     "malwarebazaar_recent": {
       "state": "collected",
-      "returned": 1192,
-      "eligible_before_cap": 1192,
+      "returned": 1138,
+      "eligible_before_cap": 1138,
       "configured_cap": null,
       "graceful_failure": false
     },
     "threatfox_export_json": {
       "state": "collected",
-      "returned": 2345,
-      "eligible_before_cap": 2345,
+      "returned": 2665,
+      "eligible_before_cap": 2665,
       "configured_cap": null,
       "graceful_failure": false
     },
@@ -90,9 +96,9 @@
       "graceful_failure": false
     },
     "sslbl_ja3": {
-      "state": "collected",
-      "returned": 97,
-      "eligible_before_cap": 97,
+      "state": "failed",
+      "returned": 0,
+      "eligible_before_cap": 0,
       "configured_cap": null,
       "graceful_failure": false
     },
@@ -119,8 +125,8 @@
     },
     "blocklist_de_ssh": {
       "state": "collected",
-      "returned": 4642,
-      "eligible_before_cap": 4642,
+      "returned": 4658,
+      "eligible_before_cap": 4658,
       "configured_cap": null,
       "graceful_failure": false
     },
@@ -140,8 +146,8 @@
     },
     "tor_exit_nodes": {
       "state": "collected",
-      "returned": 1256,
-      "eligible_before_cap": 1256,
+      "returned": 1260,
+      "eligible_before_cap": 1260,
       "configured_cap": null,
       "graceful_failure": false
     },
@@ -154,15 +160,15 @@
     },
     "binarydefense_banlist": {
       "state": "collected",
-      "returned": 751,
-      "eligible_before_cap": 751,
+      "returned": 1099,
+      "eligible_before_cap": 1099,
       "configured_cap": null,
       "graceful_failure": false
     },
     "ipsum_level5": {
       "state": "collected",
-      "returned": 3613,
-      "eligible_before_cap": 3613,
+      "returned": 2773,
+      "eligible_before_cap": 2773,
       "configured_cap": null,
       "graceful_failure": false
     }
