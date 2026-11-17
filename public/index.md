@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-11-16T17:49:49Z_
+_Generated 2026-11-17T02:44:19Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-11-16T17:49:49Z |
+| Generated | 2026-11-17T02:44:19Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3237 |
+| Duplicates removed | 3973 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-group overlaps | 442 |
+| Multi-group overlaps | 443 |
 | Score (min / avg / max) | 80 / 80.4 / 96 |
 | High-score indicators (≥80) | 10000 |
-| 2+ reporting groups | 442 |
+| 2+ reporting groups | 443 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-11-16T17:47:54Z |
+| Newest first_seen | 2026-11-17T02:43:55Z |
 
 ## Top indicators by score
 
@@ -31,9 +31,9 @@ _Generated 2026-11-16T17:49:49Z_
 | ipv4: `165[.]154[.]162[.]74` | score 96, 3 reporting groups |
 | ipv4: `165[.]154[.]227[.]8` | score 96, 3 reporting groups |
 | ipv4: `176[.]65[.]139[.]131` | score 96, 3 reporting groups |
-| ipv4: `181[.]215[.]115[.]186` | score 96, 3 reporting groups |
 | ipv4: `77[.]239[.]124[.]135` | score 96, 3 reporting groups |
-| ipv4: `45[.]78[.]201[.]248` | score 91, 3 reporting groups |
+| ipv4: `181[.]215[.]115[.]186` | score 93, 3 reporting groups |
+| ipv4: `45[.]78[.]201[.]248` | score 88, 3 reporting groups |
 | ipv4: `109[.]160[.]32[.]110` | score 88, 2 reporting groups |
 
 ## Per-source totals
@@ -41,26 +41,26 @@ _Generated 2026-11-16T17:49:49Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4284 |
-| threatfox_export_json | 3156 |
-| ipsum_level5 | 2773 |
+| blocklist_de_ssh | 4508 |
+| threatfox_export_json | 3123 |
+| ipsum_level5 | 2802 |
 | cisa_kev | 1781 |
 | spamhaus_drop | 1736 |
-| tor_exit_nodes | 1266 |
-| binarydefense_banlist | 1099 |
-| malwarebazaar_recent | 1023 |
-| greensnow_blocklist | 934 |
+| nist_nvd_recent | 1472 |
+| greensnow_blocklist | 1428 |
+| binarydefense_banlist | 1400 |
+| tor_exit_nodes | 1270 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 2973 |
-| sha256 | 2266 |
-| ipv4_cidr | 1720 |
-| url | 1162 |
-| domain | 884 |
-| ipv4 | 427 |
+| cve | 2916 |
+| sha256 | 2080 |
+| ipv4_cidr | 1618 |
+| url | 1245 |
+| domain | 1136 |
+| ipv4 | 437 |
 | md5 | 284 |
 | sha1 | 284 |
 
@@ -68,16 +68,16 @@ _Generated 2026-11-16T17:49:49Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3105 |
-| cve | 2973 |
-| malware | 2905 |
+| threatfox | 3247 |
+| malware | 2967 |
+| cve | 2916 |
 | exploited-in-the-wild | 1781 |
-| drop | 1720 |
-| spamhaus | 1720 |
-| nvd | 1609 |
-| malware_download | 919 |
-| Mirai | 818 |
-| None | 635 |
+| drop | 1618 |
+| spamhaus | 1618 |
+| nvd | 1552 |
+| malware_download | 1010 |
+| Mirai | 789 |
+| None | 644 |
 
 ## Multi-group reporting overlaps
 
