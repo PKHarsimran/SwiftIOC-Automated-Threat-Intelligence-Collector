@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-11-18T05:40:41Z_
+_Generated 2026-11-18T16:54:28Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-11-18T05:40:41Z |
+| Generated | 2026-11-18T16:54:28Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 4986 |
+| Duplicates removed | 4449 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-group overlaps | 446 |
+| Multi-group overlaps | 447 |
 | Score (min / avg / max) | 80 / 80.4 / 96 |
 | High-score indicators (≥80) | 10000 |
-| 2+ reporting groups | 446 |
+| 2+ reporting groups | 447 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-11-18T05:29:18Z |
+| Newest first_seen | 2026-11-18T16:53:18Z |
 
 ## Top indicators by score
 
@@ -41,43 +41,43 @@ _Generated 2026-11-18T05:40:41Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5104 |
+| blocklist_de_ssh | 5253 |
 | ipsum_level5 | 3629 |
-| threatfox_export_json | 2934 |
-| nist_nvd_recent | 2600 |
-| greensnow_blocklist | 2323 |
+| threatfox_export_json | 2610 |
+| nist_nvd_recent | 2200 |
+| greensnow_blocklist | 1810 |
 | cisa_kev | 1782 |
 | binarydefense_banlist | 1774 |
-| spamhaus_drop | 1739 |
-| tor_exit_nodes | 1280 |
+| spamhaus_drop | 1747 |
+| urlhaus_recent_urls | 1422 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3035 |
-| sha256 | 1948 |
-| ipv4_cidr | 1608 |
-| domain | 1170 |
-| url | 1020 |
-| ipv4 | 635 |
-| md5 | 292 |
-| sha1 | 292 |
+| cve | 3078 |
+| sha256 | 1953 |
+| url | 1499 |
+| ipv4_cidr | 1343 |
+| domain | 1124 |
+| ipv4 | 439 |
+| md5 | 282 |
+| sha1 | 282 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3382 |
-| cve | 3035 |
-| malware | 2696 |
+| malware | 3254 |
+| cve | 3078 |
+| threatfox | 3076 |
 | exploited-in-the-wild | 1782 |
-| nvd | 1671 |
-| drop | 1608 |
-| spamhaus | 1608 |
-| malware_download | 863 |
-| Mirai | 690 |
-| high | 540 |
+| nvd | 1714 |
+| malware_download | 1423 |
+| drop | 1343 |
+| spamhaus | 1343 |
+| github | 811 |
+| Mirai | 693 |
 
 ## Multi-group reporting overlaps
 
