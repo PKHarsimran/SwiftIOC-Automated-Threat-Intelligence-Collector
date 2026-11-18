@@ -2,16 +2,16 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-11-17T23:17:45Z_
+_Generated 2026-11-18T05:40:41Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-11-17T23:17:45Z |
+| Generated | 2026-11-18T05:40:41Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3812 |
+| Duplicates removed | 4986 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-group overlaps | 446 |
@@ -19,7 +19,7 @@ _Generated 2026-11-17T23:17:45Z_
 | High-score indicators (≥80) | 10000 |
 | 2+ reporting groups | 446 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-11-17T23:17:11Z |
+| Newest first_seen | 2026-11-18T05:29:18Z |
 
 ## Top indicators by score
 
@@ -41,26 +41,26 @@ _Generated 2026-11-17T23:17:45Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5025 |
-| threatfox_export_json | 3039 |
-| ipsum_level5 | 2802 |
-| nist_nvd_recent | 2200 |
-| greensnow_blocklist | 2064 |
+| blocklist_de_ssh | 5104 |
+| ipsum_level5 | 3629 |
+| threatfox_export_json | 2934 |
+| nist_nvd_recent | 2600 |
+| greensnow_blocklist | 2323 |
 | cisa_kev | 1782 |
+| binarydefense_banlist | 1774 |
 | spamhaus_drop | 1739 |
-| binarydefense_banlist | 1400 |
-| tor_exit_nodes | 1278 |
+| tor_exit_nodes | 1280 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3232 |
-| sha256 | 1813 |
-| ipv4_cidr | 1738 |
-| domain | 1117 |
-| url | 890 |
-| ipv4 | 626 |
+| cve | 3035 |
+| sha256 | 1948 |
+| ipv4_cidr | 1608 |
+| domain | 1170 |
+| url | 1020 |
+| ipv4 | 635 |
 | md5 | 292 |
 | sha1 | 292 |
 
@@ -68,16 +68,16 @@ _Generated 2026-11-17T23:17:45Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3262 |
-| cve | 3232 |
-| malware | 2446 |
-| nvd | 1868 |
+| threatfox | 3382 |
+| cve | 3035 |
+| malware | 2696 |
 | exploited-in-the-wild | 1782 |
-| drop | 1738 |
-| spamhaus | 1738 |
-| malware_download | 744 |
-| high | 665 |
-| Mirai | 600 |
+| nvd | 1671 |
+| drop | 1608 |
+| spamhaus | 1608 |
+| malware_download | 863 |
+| Mirai | 690 |
+| high | 540 |
 
 ## Multi-group reporting overlaps
 
@@ -92,6 +92,6 @@ _Generated 2026-11-17T23:17:45Z_
 | ipv4: 181[.]215[.]115[.]186 | blocklist_de_ssh, ci_army_list, ipsum_level5, threatfox_export_json |
 | ipv4: 45[.]78[.]201[.]248 | blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
 | ipv4: 77[.]239[.]124[.]135 | binarydefense_banlist, ci_army_list, ipsum_level5, threatfox_export_json |
-| ipv4: 109[.]160[.]32[.]136 | blocklist_de_ssh, greensnow_blocklist, threatfox_export_json |
+| ipv4: 109[.]160[.]32[.]110 | blocklist_de_ssh, ipsum_level5, threatfox_export_json |
 
 For more detail see [diagnostics/REPORT.md](diagnostics/REPORT.md) and the machine-readable feeds in [iocs/](iocs/).
