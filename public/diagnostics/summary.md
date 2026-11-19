@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-11-19T01:37:59Z_
+_Generated 2026-11-19T12:25:33Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-11-19T01:37:59Z |
+| Generated | 2026-11-19T12:25:33Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 4122 |
+| Duplicates removed | 3533 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-group overlaps | 452 |
+| Multi-group overlaps | 455 |
 | Score (min / avg / max) | 80 / 80.4 / 96 |
 | High-score indicators (≥80) | 10000 |
-| 2+ reporting groups | 452 |
+| 2+ reporting groups | 455 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-11-19T01:37:42Z |
+| Newest first_seen | 2026-11-19T12:25:10Z |
 
 ## Top indicators by score
 
@@ -30,35 +30,35 @@ _Generated 2026-11-19T01:37:59Z_
 | ipv4: `165[.]154[.]162[.]74` | score 96, 3 reporting groups |
 | ipv4: `165[.]154[.]227[.]8` | score 96, 3 reporting groups |
 | ipv4: `176[.]65[.]139[.]131` | score 96, 3 reporting groups |
-| ipv4: `181[.]215[.]115[.]186` | score 96, 3 reporting groups |
 | ipv4: `45[.]78[.]201[.]248` | score 96, 3 reporting groups |
-| ipv4: `77[.]239[.]124[.]135` | score 93, 3 reporting groups |
+| ipv4: `77[.]239[.]124[.]135` | score 96, 3 reporting groups |
+| ipv4: `181[.]215[.]115[.]186` | score 92, 3 reporting groups |
 
 ## Per-source totals
 
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5723 |
-| ipsum_level5 | 3629 |
-| nist_nvd_recent | 2400 |
-| threatfox_export_json | 2270 |
-| greensnow_blocklist | 2182 |
+| blocklist_de_ssh | 5777 |
+| ipsum_level5 | 2874 |
+| threatfox_export_json | 2430 |
+| nist_nvd_recent | 2000 |
+| greensnow_blocklist | 1805 |
 | cisa_kev | 1786 |
 | spamhaus_drop | 1747 |
-| urlhaus_recent_urls | 1461 |
-| tor_exit_nodes | 1296 |
+| urlhaus_recent_urls | 1630 |
+| tor_exit_nodes | 1299 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3490 |
-| sha256 | 2090 |
-| url | 1542 |
-| ipv4_cidr | 1121 |
-| domain | 727 |
-| ipv4 | 466 |
+| cve | 2918 |
+| sha256 | 2281 |
+| url | 1813 |
+| ipv4_cidr | 1314 |
+| domain | 618 |
+| ipv4 | 492 |
 | md5 | 282 |
 | sha1 | 282 |
 
@@ -66,16 +66,16 @@ _Generated 2026-11-19T01:37:59Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| cve | 3490 |
-| malware | 3435 |
-| threatfox | 2718 |
-| nvd | 2126 |
+| malware | 3657 |
+| cve | 2918 |
+| threatfox | 2853 |
 | exploited-in-the-wild | 1786 |
-| malware_download | 1465 |
-| drop | 1121 |
-| spamhaus | 1121 |
-| github | 908 |
-| high | 734 |
+| malware_download | 1709 |
+| nvd | 1554 |
+| drop | 1314 |
+| spamhaus | 1314 |
+| github | 1146 |
+| js | 885 |
 
 ## Multi-group reporting overlaps
 
@@ -83,6 +83,7 @@ _Generated 2026-11-19T01:37:59Z_
 | --- | --- |
 | ipv4: 45[.]90[.]163[.]37 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, ipsum_level5, threatfox_export_json |
 | ipv4: 91[.]92[.]43[.]221 | blocklist_de_ssh, ci_army_list, et_compromised, ipsum_level5, threatfox_export_json |
+| ipv4: 109[.]160[.]32[.]136 | blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
 | ipv4: 120[.]193[.]9[.]169 | blocklist_de_ssh, et_compromised, ipsum_level5, threatfox_export_json |
 | ipv4: 165[.]154[.]162[.]74 | blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
 | ipv4: 165[.]154[.]227[.]8 | blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
@@ -90,6 +91,5 @@ _Generated 2026-11-19T01:37:59Z_
 | ipv4: 181[.]215[.]115[.]186 | blocklist_de_ssh, ci_army_list, ipsum_level5, threatfox_export_json |
 | ipv4: 45[.]78[.]201[.]248 | blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
 | ipv4: 77[.]239[.]124[.]135 | binarydefense_banlist, ci_army_list, ipsum_level5, threatfox_export_json |
-| ipv4: 109[.]160[.]32[.]110 | blocklist_de_ssh, ipsum_level5, threatfox_export_json |
 
 For more detail see [diagnostics/REPORT.md](diagnostics/REPORT.md) and the machine-readable feeds in [iocs/](iocs/).
