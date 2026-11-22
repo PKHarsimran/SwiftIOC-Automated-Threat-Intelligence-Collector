@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-11-22T12:13:28Z_
+_Generated 2026-11-22T21:27:57Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-11-22T12:13:28Z |
+| Generated | 2026-11-22T21:27:57Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 2804 |
+| Duplicates removed | 2528 |
 | Sources reporting | 16 |
 | Indicator types | 9 |
 | Multi-group overlaps | 468 |
-| Score (min / avg / max) | 78 / 80.4 / 96 |
-| High-score indicators (≥80) | 9990 |
+| Score (min / avg / max) | 77 / 80.4 / 96 |
+| High-score indicators (≥80) | 9911 |
 | 2+ reporting groups | 468 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-11-22T12:13:14Z |
+| Newest first_seen | 2026-11-22T21:06:17Z |
 
 ## Top indicators by score
 
@@ -30,35 +30,35 @@ _Generated 2026-11-22T12:13:28Z_
 | ipv4: `91[.]92[.]43[.]221` | score 96, 4 reporting groups |
 | ipv4: `109[.]160[.]32[.]163` | score 96, 3 reporting groups |
 | ipv4: `120[.]193[.]9[.]169` | score 96, 3 reporting groups |
-| ipv4: `165[.]154[.]162[.]74` | score 96, 3 reporting groups |
 | ipv4: `165[.]154[.]227[.]8` | score 96, 3 reporting groups |
 | ipv4: `176[.]65[.]139[.]131` | score 96, 3 reporting groups |
-| ipv4: `181[.]215[.]115[.]186` | score 96, 3 reporting groups |
 | ipv4: `45[.]78[.]201[.]248` | score 96, 3 reporting groups |
+| ipv4: `77[.]239[.]124[.]135` | score 96, 3 reporting groups |
+| ipv4: `78[.]128[.]114[.]166` | score 96, 3 reporting groups |
 
 ## Per-source totals
 
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4681 |
+| blocklist_de_ssh | 4716 |
 | ipsum_level5 | 3261 |
-| urlhaus_recent_urls | 1932 |
-| nist_nvd_recent | 1824 |
+| greensnow_blocklist | 1831 |
 | cisa_kev | 1790 |
-| greensnow_blocklist | 1772 |
 | spamhaus_drop | 1752 |
-| malwarebazaar_recent | 1344 |
-| tor_exit_nodes | 1252 |
+| urlhaus_recent_urls | 1627 |
+| malwarebazaar_recent | 1335 |
+| tor_exit_nodes | 1254 |
+| binarydefense_banlist | 886 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3959 |
-| url | 1932 |
-| sha256 | 1917 |
+| cve | 3998 |
+| sha256 | 2105 |
 | ipv4_cidr | 1751 |
+| url | 1705 |
 | md5 | 151 |
 | sha1 | 151 |
 | ja3 | 97 |
@@ -69,16 +69,16 @@ _Generated 2026-11-22T12:13:28Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| cve | 3959 |
-| malware | 3677 |
-| nvd | 2595 |
-| malware_download | 1932 |
+| cve | 3998 |
+| malware | 3638 |
+| nvd | 2634 |
 | exploited-in-the-wild | 1790 |
 | drop | 1751 |
 | spamhaus | 1751 |
-| github | 1318 |
-| threatfox | 1087 |
-| js | 966 |
+| malware_download | 1705 |
+| threatfox | 1086 |
+| github | 1008 |
+| high | 915 |
 
 ## Multi-group reporting overlaps
 
