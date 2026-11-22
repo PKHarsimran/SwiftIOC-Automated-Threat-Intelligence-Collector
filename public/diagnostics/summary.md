@@ -1,15 +1,15 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-11-21T19:02:54Z_
+_Generated 2026-11-22T00:03:27Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-11-21T19:02:54Z |
+| Generated | 2026-11-22T00:03:27Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 3338 |
+| Duplicates removed | 3588 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
 | Multi-group overlaps | 468 |
@@ -17,7 +17,7 @@ _Generated 2026-11-21T19:02:54Z_
 | High-score indicators (≥80) | 10000 |
 | 2+ reporting groups | 468 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-11-21T19:02:33Z |
+| Newest first_seen | 2026-11-22T00:01:48Z |
 
 ## Top indicators by score
 
@@ -26,55 +26,55 @@ _Generated 2026-11-21T19:02:54Z_
 | ipv4: `109[.]160[.]32[.]110` | score 96, 4 reporting groups |
 | ipv4: `80[.]94[.]92[.]179` | score 96, 4 reporting groups |
 | ipv4: `91[.]92[.]43[.]221` | score 96, 4 reporting groups |
-| ipv4: `109[.]160[.]32[.]136` | score 96, 3 reporting groups |
 | ipv4: `120[.]193[.]9[.]169` | score 96, 3 reporting groups |
 | ipv4: `165[.]154[.]162[.]74` | score 96, 3 reporting groups |
 | ipv4: `165[.]154[.]227[.]8` | score 96, 3 reporting groups |
 | ipv4: `176[.]65[.]139[.]131` | score 96, 3 reporting groups |
 | ipv4: `45[.]78[.]201[.]248` | score 96, 3 reporting groups |
 | ipv4: `78[.]128[.]114[.]166` | score 96, 3 reporting groups |
+| ipv4: `109[.]160[.]32[.]136` | score 94, 3 reporting groups |
 
 ## Per-source totals
 
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 5696 |
+| blocklist_de_ssh | 5365 |
+| threatfox_export_json | 3057 |
 | ipsum_level5 | 2855 |
-| threatfox_export_json | 2817 |
-| nist_nvd_recent | 2400 |
-| urlhaus_recent_urls | 2028 |
-| greensnow_blocklist | 1921 |
+| greensnow_blocklist | 2305 |
+| nist_nvd_recent | 2139 |
+| urlhaus_recent_urls | 1948 |
 | cisa_kev | 1790 |
 | spamhaus_drop | 1752 |
-| tor_exit_nodes | 1292 |
+| tor_exit_nodes | 1264 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3284 |
-| url | 2146 |
-| sha256 | 1607 |
-| ipv4_cidr | 1325 |
-| domain | 659 |
-| ipv4 | 579 |
-| md5 | 200 |
-| sha1 | 200 |
+| cve | 3197 |
+| url | 2067 |
+| ipv4_cidr | 1553 |
+| sha256 | 1463 |
+| ipv4 | 713 |
+| domain | 705 |
+| md5 | 151 |
+| sha1 | 151 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| malware | 3499 |
-| cve | 3284 |
-| threatfox | 2410 |
-| malware_download | 2031 |
-| nvd | 1920 |
+| malware | 3242 |
+| cve | 3197 |
+| threatfox | 2574 |
+| malware_download | 1951 |
+| nvd | 1833 |
 | exploited-in-the-wild | 1790 |
-| github | 1386 |
-| drop | 1325 |
-| spamhaus | 1325 |
+| drop | 1553 |
+| spamhaus | 1553 |
+| github | 1317 |
 | js | 998 |
 
 ## Multi-group reporting overlaps
