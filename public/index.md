@@ -2,24 +2,24 @@
 
 This site is generated automatically from the latest SwiftIOC collection run.
 
-_Generated 2026-11-25T13:49:32Z_
+_Generated 2026-11-25T23:57:34Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-11-25T13:49:32Z |
+| Generated | 2026-11-25T23:57:34Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 4490 |
-| Sources reporting | 17 |
-| Indicator types | 8 |
-| Multi-group overlaps | 472 |
-| Score (min / avg / max) | 80 / 80.4 / 96 |
-| High-score indicators (≥80) | 10000 |
-| 2+ reporting groups | 472 |
-| Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-11-25T13:45:37Z |
+| Duplicates removed | 3191 |
+| Sources reporting | 16 |
+| Indicator types | 9 |
+| Multi-group overlaps | 482 |
+| Score (min / avg / max) | 77 / 80.1 / 96 |
+| High-score indicators (≥80) | 8876 |
+| 2+ reporting groups | 482 |
+| Earliest first_seen | 2004-12-06T05:00:00Z |
+| Newest first_seen | 2026-11-25T23:47:06Z |
 
 ## Top indicators by score
 
@@ -41,43 +41,44 @@ _Generated 2026-11-25T13:49:32Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| threatfox_export_json | 8042 |
-| blocklist_de_ssh | 4814 |
+| blocklist_de_ssh | 4672 |
 | ipsum_level5 | 2966 |
-| nist_nvd_recent | 2800 |
-| greensnow_blocklist | 2124 |
-| cisa_kev | 1795 |
+| nist_nvd_recent | 2400 |
+| greensnow_blocklist | 2299 |
+| cisa_kev | 1805 |
 | spamhaus_drop | 1737 |
-| malwarebazaar_recent | 1495 |
+| malwarebazaar_recent | 1545 |
 | tor_exit_nodes | 1255 |
+| urlhaus_recent_urls | 808 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| ipv4 | 3414 |
-| cve | 1978 |
+| cve | 4202 |
+| sha256 | 1803 |
 | ipv4_cidr | 1736 |
-| sha256 | 1564 |
-| url | 814 |
+| url | 973 |
+| ipv4 | 695 |
 | domain | 294 |
 | md5 | 100 |
 | sha1 | 100 |
+| ja3 | 97 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 4759 |
-| offensive-agency | 3191 |
-| ARTEX | 2499 |
-| malware | 2064 |
-| cve | 1978 |
-| exploited-in-the-wild | 1795 |
+| cve | 4202 |
+| nvd | 2837 |
+| malware | 2492 |
+| threatfox | 2008 |
+| exploited-in-the-wild | 1805 |
 | drop | 1736 |
 | spamhaus | 1736 |
-| malware_download | 692 |
-| nvd | 613 |
+| medium | 1153 |
+| high | 914 |
+| malware_download | 881 |
 
 ## Multi-group reporting overlaps
 
