@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-11-27T13:25:26Z_
+_Generated 2026-11-27T23:52:47Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-11-27T13:25:26Z |
+| Generated | 2026-11-27T23:52:47Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 4001 |
+| Duplicates removed | 3834 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-group overlaps | 483 |
+| Multi-group overlaps | 485 |
 | Score (min / avg / max) | 80 / 80.4 / 96 |
 | High-score indicators (≥80) | 10000 |
-| 2+ reporting groups | 483 |
+| 2+ reporting groups | 485 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-11-27T13:25:15Z |
+| Newest first_seen | 2026-11-27T23:52:36Z |
 
 ## Top indicators by score
 
@@ -39,43 +39,43 @@ _Generated 2026-11-27T13:25:26Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| threatfox_export_json | 4432 |
-| blocklist_de_ssh | 4395 |
+| blocklist_de_ssh | 4337 |
+| threatfox_export_json | 3853 |
 | ipsum_level5 | 2990 |
-| nist_nvd_recent | 2221 |
-| greensnow_blocklist | 2195 |
-| cisa_kev | 1805 |
+| greensnow_blocklist | 2136 |
+| cisa_kev | 1808 |
 | spamhaus_drop | 1737 |
+| nist_nvd_recent | 1452 |
 | tor_exit_nodes | 1264 |
-| urlhaus_recent_urls | 1161 |
+| urlhaus_recent_urls | 1214 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3138 |
-| sha256 | 1651 |
-| url | 1420 |
-| ipv4 | 1275 |
-| domain | 1226 |
-| ipv4_cidr | 922 |
-| md5 | 184 |
-| sha1 | 184 |
+| cve | 3053 |
+| ipv4_cidr | 1736 |
+| url | 1421 |
+| sha256 | 1368 |
+| ipv4 | 1298 |
+| domain | 650 |
+| md5 | 237 |
+| sha1 | 237 |
 
 ## Top tags
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3907 |
-| cve | 3138 |
-| malware | 2591 |
-| exploited-in-the-wild | 1805 |
-| nvd | 1776 |
-| malware_download | 1165 |
-| drop | 922 |
-| spamhaus | 922 |
-| offensive-agency | 906 |
-| ARTEX | 816 |
+| threatfox | 3269 |
+| cve | 3053 |
+| malware | 2378 |
+| exploited-in-the-wild | 1808 |
+| drop | 1736 |
+| spamhaus | 1736 |
+| nvd | 1689 |
+| malware_download | 1220 |
+| offensive-agency | 962 |
+| ARTEX | 854 |
 
 ## Multi-group reporting overlaps
 
@@ -85,11 +85,11 @@ _Generated 2026-11-27T13:25:26Z_
 | ipv4: 109[.]160[.]32[.]110 | binarydefense_banlist, blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
 | ipv4: 109[.]160[.]32[.]131 | binarydefense_banlist, blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
 | ipv4: 211[.]230[.]3[.]71 | blocklist_de_ssh, ci_army_list, et_compromised, ipsum_level5, threatfox_export_json |
-| ipv4: 45[.]90[.]163[.]37 | binarydefense_banlist, blocklist_de_ssh, ci_army_list, ipsum_level5, threatfox_export_json |
 | ipv4: 80[.]94[.]92[.]179 | binarydefense_banlist, blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
 | ipv4: 109[.]160[.]32[.]136 | blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
 | ipv4: 109[.]160[.]32[.]163 | blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
 | ipv4: 120[.]193[.]9[.]169 | blocklist_de_ssh, et_compromised, ipsum_level5, threatfox_export_json |
 | ipv4: 165[.]154[.]162[.]74 | blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
+| ipv4: 165[.]154[.]227[.]8 | blocklist_de_ssh, greensnow_blocklist, ipsum_level5, threatfox_export_json |
 
 For more detail see [diagnostics/REPORT.md](diagnostics/REPORT.md) and the machine-readable feeds in [iocs/](iocs/).
