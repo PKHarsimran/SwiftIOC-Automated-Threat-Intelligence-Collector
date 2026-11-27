@@ -1,23 +1,23 @@
 # SwiftIOC IOC Summary
 
-_Generated 2026-11-27T02:36:39Z_
+_Generated 2026-11-27T13:25:26Z_
 
 ## Highlights
 
 | Metric | Value |
 | --- | ---: |
-| Generated | 2026-11-27T02:36:39Z |
+| Generated | 2026-11-27T13:25:26Z |
 | Window (hours) | 48 |
 | Total indicators | 10000 |
-| Duplicates removed | 4281 |
+| Duplicates removed | 4001 |
 | Sources reporting | 17 |
 | Indicator types | 8 |
-| Multi-group overlaps | 481 |
+| Multi-group overlaps | 483 |
 | Score (min / avg / max) | 80 / 80.4 / 96 |
 | High-score indicators (≥80) | 10000 |
-| 2+ reporting groups | 481 |
+| 2+ reporting groups | 483 |
 | Earliest first_seen | 2008-09-18T20:00:00Z |
-| Newest first_seen | 2026-11-27T02:36:21Z |
+| Newest first_seen | 2026-11-27T13:25:15Z |
 
 ## Top indicators by score
 
@@ -39,26 +39,26 @@ _Generated 2026-11-27T02:36:39Z_
 | Source | Indicators |
 | --- | ---: |
 | ci_army_list | 15000 |
-| blocklist_de_ssh | 4457 |
-| threatfox_export_json | 4141 |
+| threatfox_export_json | 4432 |
+| blocklist_de_ssh | 4395 |
 | ipsum_level5 | 2990 |
-| greensnow_blocklist | 2735 |
-| nist_nvd_recent | 2274 |
+| nist_nvd_recent | 2221 |
+| greensnow_blocklist | 2195 |
 | cisa_kev | 1805 |
 | spamhaus_drop | 1737 |
 | tor_exit_nodes | 1264 |
-| malwarebazaar_recent | 1064 |
+| urlhaus_recent_urls | 1161 |
 
 ## Indicator types
 
 | Type | Indicators |
 | --- | ---: |
-| cve | 3278 |
-| sha256 | 1479 |
-| ipv4_cidr | 1365 |
-| ipv4 | 1245 |
-| domain | 1238 |
-| url | 1027 |
+| cve | 3138 |
+| sha256 | 1651 |
+| url | 1420 |
+| ipv4 | 1275 |
+| domain | 1226 |
+| ipv4_cidr | 922 |
 | md5 | 184 |
 | sha1 | 184 |
 
@@ -66,16 +66,16 @@ _Generated 2026-11-27T02:36:39Z_
 
 | Tag | Indicators |
 | --- | ---: |
-| threatfox | 3953 |
-| cve | 3278 |
-| malware | 1918 |
-| nvd | 1914 |
+| threatfox | 3907 |
+| cve | 3138 |
+| malware | 2591 |
 | exploited-in-the-wild | 1805 |
-| drop | 1365 |
-| spamhaus | 1365 |
-| offensive-agency | 767 |
-| medium | 716 |
-| malware_download | 698 |
+| nvd | 1776 |
+| malware_download | 1165 |
+| drop | 922 |
+| spamhaus | 922 |
+| offensive-agency | 906 |
+| ARTEX | 816 |
 
 ## Multi-group reporting overlaps
 
